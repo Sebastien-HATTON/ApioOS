@@ -1,0 +1,23 @@
+<div id="editEventRunModify">
+	<style>
+	select[name]{
+		float: none !important;
+	}
+	</style>
+
+	<section class="newEventFormSection" ng-show="showStates">
+		<div id="statusesListInput" style="margin-left: 3%;">
+			<form id="content_statusesList" style="display: block; opacity: 1;">
+				<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
+					<input type="radio" name="all_statusesstatusesList" ng-model="$parent.newEvent.triggerState" ng-value="state.name" class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone" ng-click="show()">
+					<li class="statusName statusNameInvited nome_nuovo_scatenante">{{state.name}}</li>
+					<div class="nome_oggetto_nuovo_scatenante nome_oggetto_invitato">{{state.objectName}}</div>
+				</div>
+			</form>
+		</div>
+	</section>
+	
+	<section class="newEventFormSection" ng-hide="showStates">
+		<div id="selezioneDataNuovoEvento" style="text-align: center;"></div>
+	</section>
+</div>

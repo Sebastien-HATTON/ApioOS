@@ -1,0 +1,64 @@
+        <blockquote>{{newObject}}</blockquote>
+        <h4>Object <b>{{newObject.objectName}}</b> summary</h4>
+        <table style="width:100%" class="table table-bordered">
+          <tr>
+            <td>Name</td>
+            <td>{{newObject.objectName}}</td> 
+            <td></td>
+          </tr>
+          <tr>
+            <td>ID</td>
+            <td>{{newObject.objectId}}</td> 
+            <td></td>
+          </tr>
+          <tr>
+            <td>Protocol</td>
+            <td ng-if="newObject.protocol==='z'">ZigBee</td>
+            <td ng-if="newObject.protocol==='w'">Wireless</td>
+            <td ng-if="newObject.protocol==='l'">LightWeaveMesh</td>
+            <td ng-if="newObject.protocol==='b'">Bluetooth</td>
+            <td ng-if="newObject.protocol!=='z'&&newObject.protocol!=='w'&&newObject.protocol!=='l'&&newObject.protocol!=='b'">{{newObject.protocol}}</td> 
+            <td></td>
+          </tr>
+          <tr>
+            <td>Address</td>
+            <td>{{newObject.address}}</td> 
+            <td></td>
+          </tr>
+          <tr ng-if="key==='properties'" ng-repeat="(key,value) in newObject">
+            <td>{{key}}</td>
+            <td>
+                <table style="width:100%" class="table table-bordered">
+                    <tr ng-repeat="property in value">
+                        <td ng-if="property.type!=='List'" ng-repeat="(keyProperty,valueProperty) in property">{{keyProperty}} : {{valueProperty}}</td>
+                        <td ng-if="property.type==='List' && keyProperty!=='items'" ng-repeat="(keyProperty,valueProperty) in property">{{keyProperty}} : {{valueProperty}}</td>
+                        <td ng-if="property.type==='List' && keyProperty==='items'" ng-repeat="(keyProperty,valueProperty) in property">
+                            <table  style="width:100%" class="table table-bordered"> 
+                                <tr ng-repeat="(keyItem, valueItem) in valueProperty">
+                                    <td >{{keyItem}} : {{valueItem}}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+         </tr>
+         <tr ng-if="key==='pins'" ng-repeat="(key,value) in newObject">
+            <td>{{key}}</td>
+            <td>
+                <table style="width:100%" class="table table-bordered">
+                    <tr ng-repeat="pin in value">
+                        <td ng-repeat="(keyPin,valuePin) in pin">{{keyPin}} : {{valuePin}}</td>
+                    </tr>
+                </table>
+            </td>
+         </tr>
+
+        </table>   
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary" ng-click="panel.previousForm(formProtocolInfo.$valid)">Previous</button>
+            <button type="submit" class="btn btn-success" ng-disabled="formProtocolInfo.$invalid" ng-click="panel.doneForm(formProtocolInfo.$valid)">Done</button>
+        </div>   
+    </div>

@@ -1,0 +1,8 @@
+<div id="{{propertyname}}" class="box_proprietaiPhone" issensor="true">
+	<div id="{{propertyname}}flag" ng-show="currentObject.isRecording()  && !isRecorded()" ng-click="addPropertyToRecording()"  class="rec_flag"></div>
+    <div id="{{propertyname}}label" class="testo_proprietaiPhone"  ng-click="removePropertyFromRecording()">{{label}}</div>
+    <div ng-model="model" class="sensorinput">{{model}}</div>
+    <div >
+	    <input id="{{propertyname}}sensor" ng-show="currentObject.isRecording() && isRecorded()" ng-model="model" class="modify-sensor" type="range" min="{{min}}" max="{{max}}" step="{{step}}">
+	</div>
+</div>

@@ -1,0 +1,10 @@
+<div id="{{propertyname}}" class="box_proprietaiPhone">
+	<ng-include src="'apioProperties/Trigger/trigger.css'"></ng-include>
+	<div id="{{propertyname}}flag" ng-show="currentObject.isRecording()  && !isRecorded()" ng-click="addPropertyToRecording($event)" class="rec_flag"></div>
+    <div id="{{propertyname}}label" class="testo_proprietaiPhone"  ng-click="removePropertyFromRecording($event)">{{label}}</div>
+    <div class="content_pulsanteiPhone">
+		<div class='switch' ng-class="{'active': model == '1'}">
+			<div class='switch-handle'></div>
+		</div>
+    </div>
+</div>

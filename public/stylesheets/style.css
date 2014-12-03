@@ -1,0 +1,20 @@
+body {
+  padding: 50px;
+  font: 14px "Monaco", Helvetica, Arial, sans-serif;
+  color: black;
+}
+
+h1 {
+	color: #000;
+}
+
+
+
+a {
+  color: #00B7FF;
+}
+
+
+select {
+  display:inline !important;
+}

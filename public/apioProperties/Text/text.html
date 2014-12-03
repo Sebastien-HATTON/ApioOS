@@ -1,0 +1,8 @@
+<div id="{{propertyname}}" class="box_proprietaiPhone">
+	<link type="text/css" rel="stylesheet" href="apioProperties/Text/text.css"/>
+	<div id="{{propertyname}}flag" ng-show="currentObject.isRecording()  && !isRecorded()" ng-click="addPropertyToRecording()"  class="rec_flag"></div>
+    <div id="{{propertyname}}label" class="testo_proprietaiPhone"  ng-click="removePropertyFromRecording()">{{label}}</div>
+    <div class="testoproprieta">
+    	<input id="{{propertyname}}input" ng-model="model" class="testoinput" type="text">
+	</div>
+</div>

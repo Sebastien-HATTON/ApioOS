@@ -1,0 +1,26 @@
+<form name="formMicroInfo" class="form-horizontal" role="form" novalidate>
+
+    <div class="form-group">
+        <label for="inputFamily" class="col-sm-2 control-label">Family</label>
+        <div class="col-sm-10">
+          <select ng-model="selected.family" ng-change="panel.saveFamily(selected.family)" ng-options="s.family for s in microData" class="form-control input-lg"  id="inputFamily" >
+          </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inputType" class="col-sm-2 control-label">Type</label>
+        <div class="col-sm-10">
+          <select ng-model="selected.type" ng-change="panel.saveType(selected.type)" ng-options="b.type for b in selected.family.types" class="form-control input-lg"  id="inputType" >         
+          </select>
+        </div>
+    </div>
+
+
+  <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-primary" ng-click="panel.previousForm(formMicroInfo.$valid)">Previous</button>
+        <button type="submit" class="btn btn-primary" ng-disabled="formMicroInfo.$invalid" ng-click="panel.nextForm(formMicroInfo.$valid)">Next</button>
+      </div>   
+  </div>
+</form>

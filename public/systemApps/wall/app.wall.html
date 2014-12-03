@@ -1,0 +1,18 @@
+<div>
+    <link rel="stylesheet" href="apio_assets/lib/system/app/BachecaApp/BachecaApp.css" />
+
+    
+        <div id="wallContainer"  class="app_home openAppIconStyle">
+            <div class="elementBacheca box_proprietaiPhone" ng-repeat="state in states">
+                <li class="active"><button style="border-radius:100px;height:100%;border:0px;" ng-click="launchState(state)"><i class="fa fa-play"></i></button></li>
+                <li class="statusName">{{state.name}}<div class="name_object">{{state.objectName}}</div></li>
+                <li ng-click="editState(state)">&gt;</li>
+                <div class="option_Bacheca_id_state">
+                    <li class="delete" ng-click="deleteState(state)">elimina</li>
+                    <li class="tag">tag</li>
+                </div>
+            </div>
+        </div>
+        <div id="ApioApplicationContainerOld" hm-swipe="" hm-drag="addDragging()" ></div>
+    
+</div>
