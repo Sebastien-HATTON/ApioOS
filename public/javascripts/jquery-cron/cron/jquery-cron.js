@@ -127,6 +127,8 @@
     var months = ["January", "February", "March", "April",
                   "May", "June", "July", "August",
                   "September", "October", "November", "December"];
+    //var months =["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre",
+    //                "Ottobre","Novembre","Dicembre"]
     for (var i = 0; i < months.length; i++) {
         str_opt_month += "<option value='"+(i+1)+"'>" + months[i] + "</option>\n";
     }
@@ -135,6 +137,7 @@
     var str_opt_dow = "";
     var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
                 "Friday", "Saturday"];
+   // var days = ["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
     for (var i = 0; i < days.length; i++) {
         str_opt_dow += "<option value='"+i+"'>" + days[i] + "</option>\n";
     }
@@ -142,6 +145,7 @@
     // options for period
     var str_opt_period = "";
     var periods = ["minute", "hour", "day", "week", "month", "year"];
+   // var periods = ["minuto","ora","giorno","settimana","mese","anno"]
     for (var i = 0; i < periods.length; i++) {
         str_opt_period += "<option value='"+periods[i]+"'>" + periods[i] + "</option>\n";
     }

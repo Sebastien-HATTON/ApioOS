@@ -11,8 +11,12 @@ var fs = require('fs');
 var domain = require('domain');
 var async = require('async');
 var request = require('request');
-var ENVIRONMENT = "productio";
+var net = require('net');
+var ENVIRONMENT = "production";
 
+
+var HOST = '192.168.1.109';
+var PORT = 6969;
 
 var routes = {};
 routes.dashboard = require('./routes/dashboard.route.js');
@@ -163,7 +167,7 @@ app.delete("/apio/event/:name",function(req,res){
 
 app.put("/apio/event/:name",function(req,res){
     delete req.body.eventUpdate["_id"];
-    Apio.Database.db.collection("Events").update({name : req.params.name},{$set : req.body.eventUpdate},function(err){
+    Apio.Database.db.collection("Events").update({name : req.params.name},req.body.eventUpdate,function(err){
         if (!err) {
             Apio.io.emit("apio_event_update",{event : req.body.eventUpdate});
             res.send({error : false});
@@ -367,6 +371,8 @@ app.post('/apio/sensor/register',function(req,res){
     //scrivo in seriale il messaggio
 });
 
+
+
 /*APIO creation of the new ino html js mongo files from the wizard*/
 app.post('/apio/database/createNewApioApp', routes.dashboard.createNewApioApp);
 
@@ -461,6 +467,7 @@ Apio.io.on("disconnect",function(){
 });
 
 
+
 var server = http.createServer(app);
 
 
@@ -473,4 +480,7 @@ console.log("APIO server started");
 
 
 });
+
+
+
 

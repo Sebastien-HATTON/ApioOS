@@ -4,7 +4,53 @@ angular.module('ApioApplication')
             document.getElementById("targetBody").style.position = "";
                 $("#ApioApplicationContainer").hide(function(){
                     $("#ApioApplicationContainer").html("");
-                })
+                });
+
+                var mc = new Hammer(document.getElementById("editEventPanel"),{
+                    domEvents : true
+                   });
+
+                    mc.on('swiperight',function(ev) {
+                        $("#editEventPanel").hide("slide", {
+                            direction: 'right'
+                        }, 500, function() {
+
+
+                        if (window.innerWidth > 769)
+                                $("#ApioEventsContainer").css("width", "100%");
+
+                        });
+                    } );
+                var mmc = new Hammer(document.getElementById("editEventRunPanel"),{
+                    domEvents : true
+                   });
+                mmc.on('swiperight',function(ev) {
+                        $("#editEventRunPanel").hide("slide", {
+                            direction: 'right'
+                        }, 500, function() {
+
+
+                        });
+                    } );
+
+            $scope.stateOrTime = "";
+
+            $scope.showSave = false;
+
+            $scope.newRunState = function(){
+                $scope.showSave = true;
+            }
+
+            $scope.radioIsChecked = function(state){
+                var flag = true;
+                for(var i in $scope.currentEvent.triggerState){
+                    if($scope.currentEvent.triggerState[i] != state[i]){
+                        flag = false;
+                    }
+                }
+                return flag;
+            };
+
             $scope.loadRunModifier = function(){
 	            $.get("systemApps/events/app.events.activator.modify.html", function(data){
 					var app = $("#editEventPanel");
@@ -13,13 +59,13 @@ angular.module('ApioApplication')
 					$("#ApioApplicationEditEvent").css("width", Apio.appWidth+"px");
 					$("#ApioApplicationEditEvent").css("float", "left");
 			        app.css("overflowX", "auto");
-					
+
 				    app.append($(data));
 				    $("#editEventRunModify").css("width", Apio.appWidth+"px");
 				    $("#editEventRunModify").css("float", "left");
 				});
-            }
-            
+            };
+
             $scope.convertCron = function(cronDate){
 	            function addZero(arg){
 		            for(var i in arg){
@@ -33,66 +79,69 @@ angular.module('ApioApplication')
 
 	            var date = "";
 	            var cronComponents = cronDate.split(" ");
-	            if(cronComponents[1] == "*"){
+	            if(cronComponents[0] == "*"){
 		            date = "Ogni minuto";
+	            }
+	            else if(cronComponents[1] == "*"){
+		            addZero(cronComponents);
+		            date = "Ogni ora al minuto "+cronComponents[0];
 	            }
 	            else if(cronComponents[2] == "*"){
 		            addZero(cronComponents);
-		            date = "Ogni ora al minuto "+cronComponents[1];
+                    if(cronComponents[3] == "*" && cronComponents[4] != "*"){
+                        switch(cronComponents[4]){
+                            case "00" : case "07" : var day = "Domenica"; break;
+                            case "01" : var day = "Lunedì"; break;
+                            case "02" : var day = "Martedì"; break;
+                            case "03" : var day = "Mercoledì"; break;
+                            case "04" : var day = "Giovedì"; break;
+                            case "05" : var day = "Vernedì"; break;
+                            case "06" : var day = "Sabato"; break;
+                        }
+                        date = "Ogni settimana di "+day+" alle "+cronComponents[1]+":"+cronComponents[0];
+                    }
+                    else{
+                        date = "Ogni giorno alle "+cronComponents[1]+":"+cronComponents[0];
+                    }
 	            }
 	            else if(cronComponents[3] == "*"){
 		            addZero(cronComponents);
-		            date = "Ogni giorno alle "+cronComponents[2]+":"+cronComponents[1];
+		            date = "Ogni mese il giorno "+cronComponents[2]+" alle "+cronComponents[1]+":"+cronComponents[0];
 	            }
 	            else if(cronComponents[4] == "*"){
 		            addZero(cronComponents);
-		            date = "Ogni mese il giorno "+cronComponents[3]+" alle "+cronComponents[2]+":"+cronComponents[1];
+		            date = "Ongi anno il "+cronComponents[2]+"/"+cronComponents[3]+" alle "+cronComponents[1]+":"+cronComponents[0];
 	            }
-	            else if(cronComponents[5] == "*"){
-		            addZero(cronComponents);
-		            date = "Il "+cronComponents[3]+"/"+cronComponents[4]+" alle "+cronComponents[2]+":"+cronComponents[1];
-	            }
-	            else if(cronComponents[3] == "*" && cronComponents[4] == "*" && cronComponents[5] != "*"){
-		            addZero(cronComponents);
-		            switch(cronComponents[5]){
-			            case "0" : case "7" : var day = "Domenica"; break;
-			            case "1" : var day = "Lunedì"; break;
-			            case "2" : var day = "Martedì"; break;
-			            case "3" : var day = "Mercoledì"; break;
-			            case "4" : var day = "Giovedì"; break;
-			            case "5" : var day = "Vernedì"; break;
-			            case "6" : var day = "Sabato"; break;
-		            }
-		            date = "Ogni settimana di "+day+" alle "+cronComponents[2]+":"+cronComponents[1];
-	            }
-	            
 	            return date;
             }
-            
+
             $scope.showGuests = false;
 
-            $scope.editEventFormStep = 'mostraInvitati';
+            $scope.editEventFormStep = '';
             $scope.goToEditEventFormStep = function(step) {
                 $scope.editEventFormStep = step;
                 if($scope.editEventFormStep == "sceltaTipo"){
+                    $scope.showSave = false;
 					$('#editEventRunPanel').show('slide',
                         {
                             direction : 'right'
-                        },500);
+                        }, 500);
                 } else if ($scope.editEventFormStep == 'selezioneData'){
                     resetCronModifica();
+                    $scope.stateOrTime = "time";
+                } else if ($scope.editEventFormStep == 'selezioneStatoScatenante'){
+                    $scope.stateOrTime = "state";
                 }
-            }
+            };
+
             $scope.toggleShowGuests = function() {
                 $scope.showGuests = !$scope.showGuests;
-                if ($scope.showGuests === false)
-                    $scope.editEventFormStep = 'sceltaInvitati';
-                else
-                    $scope.editEventFormStep = 'mostraInvitati';
-            }
+            };
+
             $scope.currentEvent = {
                 triggeredStates: []
             };
+
             $scope.statesToAddToEvent = [];
             $scope.toggleNewStateInEvent = function(state) {
                 if ($scope.statesToAddToEvent.indexOf(state) > -1)
@@ -101,13 +150,36 @@ angular.module('ApioApplication')
                     $scope.statesToAddToEvent.push(state)
             }
             $scope.saveCurrentEvent = function() {
+
                 $.merge($scope.currentEvent.triggeredStates,$scope.statesToAddToEvent);
-                alert("Mando la request")
+
+                if ($scope.currentEvent.type !== "stateTiggered" && !$scope.currentEvent.hasOwnProperty("triggerTimer")) {
+                    $scope.currentEvent.triggerTimer = '* * * * *';
+                }
+                $("#editEventRunPanel").hide("slide",{
+                    direction :  "right"
+                },500);
+                $("#editEventPanel").hide("slide",{
+                    direction :  "right"
+                },500,function(){
+                    if (window.innerWidth > 769)
+                        $("#ApioEventsContainer").css("width", "100%");
+                });
+                console.log()
                 _saveEvent()
             }
 
             function _saveEvent() {
-                
+                if($scope.stateOrTime == "time"){
+                    $scope.currentEvent.type = "timeTriggered";
+                    delete $scope.currentEvent.triggerState;
+                }
+                else if($scope.stateOrTime == "state"){
+                    $scope.currentEvent.type = "stateTriggered";
+                    delete $scope.currentEvent.triggerTimer;
+                }
+                console.log("currentEvent vale:");
+                console.log($scope.currentEvent);
                 $http.put('/apio/event/'+$scope.currentEvent.name,{eventUpdate : $scope.currentEvent})
                 .success(function(data){
                     alert("Event successfully updates");
@@ -137,7 +209,7 @@ angular.module('ApioApplication')
 
             };
             $scope.stateInList = function(item) {
-                
+
                 if ($scope.currentEvent.triggeredStates.indexOf(item.name) > -1)
                     return false;
                 else
@@ -214,12 +286,10 @@ angular.module('ApioApplication')
                 $("#selezioneDataModificaEvento").html("");
                 $("#selezioneDataModificaEvento").cron({
                     onChange: function() {
+                        $scope.showSave = true;
                         if ($scope.currentEvent.hasOwnProperty('type') && $scope.currentEvent.type == 'timeTriggered') {
                             $scope.currentEvent.triggerTimer = $(this).cron("value");
-                            
-
                         }
-
                     }
                 });
             }

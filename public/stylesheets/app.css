@@ -903,9 +903,19 @@ body {
     font-size: 24px;
 }
 
+@media (min-width: 320px) and (max-width: 480px) {
+    .apioApplicationNavbar a {
+        font-size: 32px !important;
+    }
+}
 @media (min-width: 481px) and (max-width: 600px) {
     .apioApplicationNavbar a {
         font-size: 32px;
+    }
+}
+@media (min-width: 601px) and (max-width: 1000px) {
+    .apioApplicationNavbar a {
+        font-size: 40px !important;
     }
 }
 /*Top app oggetto inizio*/
@@ -982,8 +992,21 @@ body {
         width: 100%;
     }
 }
-
+/*iphone*/
 @media (min-width: 601px) and (max-width: 1000px) {
+	.dynamicPanel {
+	display:none;
+	background-color: white;
+	position: absolute;
+	top:50px;
+	right:0px;
+	/*-webkit-transform: translateX(350%);*/
+	width : 100%;
+	padding:0px;
+	height: 100%;
+    top: 0px;
+    z-index: 1031;
+	}
     #intro_rec {
         font-size: 20px;
         height: 5px;
@@ -1721,30 +1744,8 @@ position: fixed;
 width: 33.3%;
 }
 
-#editEventPanel {
-    display:none;
-    background-color: rgb(231, 230, 232);
-    position: absolute;
-    z-index: 3;
-    right:0px;
-    /*-webkit-transform: translate(100% ,-15%) !important;*/
-    width: 100%;
-    padding:0px;
-    margin: 0px;
-    height: 100%;
-}
-.dynamicPanel {
-    display:none;
-    background-color: rgb(231, 230, 232);
-    position: absolute;
-    z-index: 3;
-    right:0px;
-    /*-webkit-transform: translate(100% ,-15%) !important;*/
-    width: 100%;
-    padding:0px;
-    margin: 0px;
-    height: 100%;
-}
+
+
 .apioApplicationContainerOpen{
 
 }
@@ -1796,7 +1797,24 @@ float: left;
 .textNameIconApp{
 text-align: center;
 }
+
 @media (min-width: 480px) and (max-width: 600px) {
+
+.dynamicPanel {
+    display:none;
+    background-color: rgb(231, 230, 232);
+    position: absolute;
+    z-index: 3;
+    right:0px;
+    /*-webkit-transform: translate(100% ,-15%) !important;*/
+    width: 100%;
+    padding:0px;
+    margin: 0px;
+    height: 100%;
+    top: 0px;
+    z-index: 1031;
+}
+
 #ApioIconsContainer{
 padding-top: 5%;
 }
@@ -1849,31 +1867,7 @@ display: block;
 .iconeApp{
 width: 33.3%;
 }
-#editEventPanel {
-display:none;
-background-color: rgb(231, 230, 232);
-position: absolute;
-z-index: 3;
-right:0px;
-/*-webkit-transform: translate(100% ,-15%) !important;*/
-width: 100%;
-padding:0px;
-margin: 0px;
-height: 100%;
 
-}
-.dynamicPanel {
-display:none;
-background-color: rgb(231, 230, 232);
-position: absolute;
-z-index: 3;
-right:0px;
-/*-webkit-transform: translate(100% ,-15%) !important;*/
-width: 100%;
-padding:0px;
-margin: 0px;
-height: 100%;
-}
 .apioApplicationContainerOpen{
 
 }
@@ -1966,30 +1960,24 @@ position: fixed;
 .iconeApp{
 width: 33.3%;
 }
-#editEventPanel {
-display:none;
-background-color: white;
-position: absolute;
-top:50px;
-right:0px;
-/*-webkit-transform: translateX(350%);*/
-width : 400px;
-padding:0px;
-height: 100%;
+
+
 }
-.dynamicPanel {
-display:none;
-background-color: white;
-position: absolute;
-top:50px;
-right:0px;
-/*-webkit-transform: translateX(350%);*/
-width : 400px;
-padding:0px;
-height: 100%;
-}
-}
+/*pc*/
 @media (min-width: 1001px) {
+.dynamicPanel {
+	display:none;
+	background-color: white;
+	position: absolute;
+	top:50px;
+	right:0px;
+	/*-webkit-transform: translateX(350%);*/
+	width : 27%;
+	padding:0px;
+	height: 100%;
+    top: 0px;
+    z-index: 1031;
+	}
 #appApio{
 width: 400px;
 background-color: rgba(255, 255, 255, 0.97);
@@ -2047,31 +2035,10 @@ position: fixed;
 .iconeApp{
 width: 20%;
 }
-#editEventPanel {
-display:none;
-background-color: white;
-position: absolute;
-top:50px;
-right:0px;
-/*-webkit-transform: translateX(350%);*/
-width : 400px;
-padding:0px;
-height: 100%;
+
+
 }
-.dynamicPanel {
-display:none;
-background-color: white;
-position: absolute;
-top:50px;
-right:0px;
-/*-webkit-transform: translateX(350%);*/
-width : 400px;
-padding:0px;
-height: 100%;
-}
-}
-@media(max-width: 1024px)
-{
+@media (max-width: 1024px) {
 .menuTitle{
 }
 }
@@ -2936,7 +2903,7 @@ margin-top: 5%;
 
     }
 
-    /* Extra Small Devices, Phones */ 
+    /* Extra Small Devices, Phones 
     @media only screen and (min-width : 480px) {
         .nav>li {
             display:inline;
@@ -2953,7 +2920,7 @@ margin-top: 5%;
         }
 
 
-    }
+    }*/
 
     /* Small Devices, Tablets */
     @media only screen and (min-width : 768px) {

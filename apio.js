@@ -233,8 +233,6 @@ Apio.Serial.send = 	function(data) {
 		for (var key in data.properties)
 			message += key+":"+data.properties[key]+"-";
 
-		
-
 		//in teoria non serve utilizzarlo per come è attualmente (settembre) strutturato il sistema 
 		//in quanto il protocollo è già incapsulato nell'oggetto JSON
 		//la manteniamo in quanto non sappiamo come in futuro saranno implementate le gestioni dei 
@@ -341,6 +339,7 @@ Apio.Serial.read = function(data) {
 
 	switch(data.command) {
 		case "send":
+		console.log("Evento send dalla seriale");
 			//Prendo i dati ddell"oggetto in db, scrivo in seriale e updato il db.
 			//In seriale verrà mandata una stringa del tipo
 			//objId:command:chiavivalori
@@ -363,11 +362,10 @@ Apio.Serial.read = function(data) {
 			});
 		break;
 		case "update":
-			
+			console.log("Evento update dalla seriale");
 			
 			Apio.Database.updateProperty(data,function(){
 				Apio.io.emit('apio_server_update',data);
-				
 			});
 		break;
 		case "registration":
@@ -929,5 +927,4 @@ Apio.Property.create = function(propertyName,def) {
 
 
 })();
-
 
