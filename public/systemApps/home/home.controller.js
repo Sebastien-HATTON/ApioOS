@@ -69,24 +69,31 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
 
             socket.emit('apio_client_update', o);
         }
-    var mc = new Hammer(document.getElementById("ApioApplicationContainer"),{
-        domEvents : true
-       });
-        
+        /*var mc = new Hammer(document.getElementById("ApioApplicationContainer"),{
+            domEvents : true
+        });*/
 
-        mc.on('swiperight',function(ev) {
-            
-
+        /*mc.on('swiperight',function(event) {
+            alert()
+            //if(event.target.type == "range"){
+            //    mc.off('swiperight');
+            //    event.stopPropagation();
+            //}
             $("#ApioApplicationContainer").hide("slide", {
                 direction: 'right'
             }, 500, function() {
-                
- 
-            if (window.innerWidth > 769)
+                if (window.innerWidth > 769)
                     $("#ApioIconsContainer").css("width", "100%");
-                
             });
-        } );
+        });*/
+        /*$("#ApioApplicationContainer").on("swiperight", function(){
+            $("#ApioApplicationContainer").hide("slide", {
+                direction: 'right'
+            }, 500, function() {
+                if (window.innerWidth > 769)
+                    $("#ApioIconsContainer").css("width", "100%");
+            });
+        });*/
 
     $scope.launchApplication = function(id) {
 
@@ -94,8 +101,6 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
             $scope.currentObject = d.data;
             // new thing!
             currentObjectService.set(d.data);
-
-
 
             $.get("applications/" + id + "/" + id + ".html", function(data) {
                 if (window.innerWidth > 769)

@@ -91,7 +91,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
                 scope.model = el.val();
             }
             //
-            
+
             var event = attrs["event"] ? attrs["event"] : "mouseup touchend";
 	    	elem.on(event, function(){
 	    		//Aggiorna lo scope globale con il valore che è stato modificato nel template

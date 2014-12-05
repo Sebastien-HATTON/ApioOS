@@ -85,8 +85,9 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 	    	scope.propertyname = attrs["propertyname"];
 	    	//
 	    	
-            var event = attrs["event"] ? attrs["event"] : "click tap";
+            var event = attrs["event"] ? attrs["event"] : "mouseup";
 	    	elem.on(event, function(){
+
 //Serve per fare lo switch del trigger
 						
 						if (scope.model == "1"){
