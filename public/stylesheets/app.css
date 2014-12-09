@@ -67,7 +67,7 @@ body {
 		margin-bottom: 2%;
     }
     .nav_event{
-	       height: 200px;
+	        height: 125px;
 			margin-top: 5%;
 			margin-bottom: 5%;
 			position: fixed;
@@ -77,6 +77,9 @@ body {
     }
     .newEventFormSection{
 	    margin-top: 40%;
+		display: table;
+		position: absolute;
+		width: 100%;
     }
 
     .box_event_organization {
