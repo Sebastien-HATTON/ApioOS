@@ -25,8 +25,9 @@ build/Release
 node_modules
 public/bower_components/*
 public/applications/*
+!public/applications/README.md
 public/sketchbook/*
 
 # Users Environment Variables
 .lock-wscript
-
+*~
