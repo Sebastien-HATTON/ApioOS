@@ -62,6 +62,7 @@ angular.module('ApioDashboardApplication')
 
 	    var emptyHtml = '<div id="ApioApplicationINSERT_ID_APPLICATION" ng-app="ApioApplicationINSERT_ID_APPLICATION"  style="padding:10px;">\n';
 	    emptyHtml += '\t<div ng-controller="defaultController">\n';
+	    emptyHtml += '\t<topappapplication></topappapplication>\n';
 	    emptyHtml += '\t<h2 style="text-align:center;">INSERT_NAME_OBJECT</h2>\n';
 	    emptyHtml += '\t<!--INSERT_OBJECT_PROPIERTIES-->\n';
 	    emptyHtml += '\t</div>\n';
