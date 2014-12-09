@@ -78,9 +78,9 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 					document.getElementById("ApioApplicationContainer").innerHTML = "";
 					$("#ApioApplicationContainer").hide("slide", {
 		                direction: 'right'
-		            }, 500, function() {
-			            if (window.innerWidth > 769)
-			                $("#wallContainer").css("width", "100%");		                
+		            }, 500, 
+		            function() {
+			           document.getElementById('wallContainer').classList.remove('wall_open_edit_state');	                
 		            });
 		        }
 				else{
@@ -125,6 +125,7 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 					return;
 			
 				var o = {};
+				o.active = false;
 				o.name = scope.newStatusName;
 				o.objectName = scope.object.name;
 				o.objectId = scope.object.objectId;

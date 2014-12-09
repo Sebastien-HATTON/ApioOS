@@ -6,7 +6,43 @@ angular.module('ApioApplication')
                     $("#ApioApplicationContainer").html("");
                 });
 
-                var mc = new Hammer(document.getElementById("editEventPanel"),{
+            var startX, startY;
+            $("#editEventPanel").on("touchstart", function(event){
+                startX = event.originalEvent.changedTouches[0].pageX;
+                startY = event.originalEvent.changedTouches[0].pageY;
+            });
+            $("#editEventPanel").on("touchend", function(event){
+                var distX = event.originalEvent.changedTouches[0].pageX - startX;
+                var distY = event.originalEvent.changedTouches[0].pageY - startY;
+                if(!$(event.target).is("input") && distX > 0 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+                    $("#editEventPanel").hide("slide", {
+                        direction: 'right'
+                    }, 500, function () {
+                        if (window.innerWidth > 769)
+                            $("#ApioEventsContainer").css("width", "100%");
+                    });
+                }
+            });
+
+            var startX_, startY_;
+            $("#editEventRunPanel").on("touchstart", function(event){
+                startX_ = event.originalEvent.changedTouches[0].pageX;
+                startY_ = event.originalEvent.changedTouches[0].pageY;
+            });
+            $("#editEventRunPanel").on("touchend", function(event){
+                var distX_ = event.originalEvent.changedTouches[0].pageX - startX_;
+                var distY_ = event.originalEvent.changedTouches[0].pageY - startY_;
+                if(!$(event.target).is("input") && distX_ > 0 && ((distY_ >= 0 && distY_ <= 40) || (distY_ >= -40 && distY_ <= 0))){
+                    $("#editEventRunPanel").hide("slide", {
+                        direction: 'right'
+                    }, 500, function () {
+                        if (window.innerWidth > 769)
+                            $("#ApioEventsContainer").css("width", "100%");
+                    });
+                }
+            });
+
+                /*var mc = new Hammer(document.getElementById("editEventPanel"),{
                     domEvents : true
                    });
 
@@ -31,7 +67,7 @@ angular.module('ApioApplication')
 
 
                         });
-                    } );
+                    } );*/
 
             $scope.stateOrTime = "";
 
@@ -224,8 +260,7 @@ angular.module('ApioApplication')
 
                 document.getElementById('ApioEventsContainer').classList.add('openAppIconStyle');
 
-                if (window.innerWidth > 769)
-                    $("#ApioEventsContainer").css("width", "77%");
+                document.getElementById('ApioEventsContainer').classList.add('event_open_edit_state');
                 $("#editEventPanel").show("slide", {
                     direction: 'right'
                 }, 500, function() {
@@ -305,6 +340,7 @@ angular.module('ApioApplication')
             }
 
             $scope.reset = function() {
+            	document.getElementById('new_event').classList.remove('new_active_back_next');
                 $scope.newEvent = {};
                 $scope.newEvent.triggeredStates = {};
                 resetCron();
@@ -323,10 +359,13 @@ angular.module('ApioApplication')
 
             }
             $scope.showBack = function() {
-                if ($scope.currentFormStep == 'sceltaTipo')
-                    return false;
-                else
+                if ($scope.currentFormStep == 'sceltaTipo'){
+                	
+                    return false;}
+                else{
+                	
                     return true;
+                    }
             }
             $scope.goForward = function() {
                 switch ($scope.currentFormStep) {
@@ -351,12 +390,15 @@ angular.module('ApioApplication')
             $scope.goBack = function() {
                 switch ($scope.currentFormStep) {
                     case "sceltaTipo":
+						
                         break;
                     case "selezioneData":
                         $scope.goToFormStep('sceltaTipo');
+                        
                         break;
                     case "selezioneStatoScatenante":
                         $scope.goToFormStep('sceltaTipo');
+                        document.getElementById('new_event').classList.remove('new_active_back_next');
                         break;
                     case "selezioneStatiScatenati":
                         if ($scope.newEvent.type == 'stateTriggered')
@@ -380,36 +422,36 @@ angular.module('ApioApplication')
                         break
                 }
             }
-            $scope.saveEvent = function() {
 
+            $scope.checkedModel = function(state){
+                $scope.newEvent.triggeredStates = typeof $scope.newEvent.triggeredStates !== "undefined" && $scope.newEvent.triggeredStates instanceof Array ? $scope.newEvent.triggeredStates : [];
+                $scope.newEvent.triggeredStates.push({
+                    "name" : state.name,
+                    "objectName" : state.objectName
+                });
+            };
+
+            $scope.saveEvent = function() {
+				
                 console.log("Mi accingo a salvare il seguente evento");
 
-                //Pre-processing degli stati da scatenare
-                var _a = [];
-                for (var k in $scope.newEvent.triggeredStates) {
-                    if (true == $scope.newEvent.triggeredStates[k])
-                        _a.push(k);
-                }
-                $scope.newEvent.triggeredStates = _a;
                 //Pre processing dell'orario
                 if ($scope.newEvent.hasOwnProperty('triggerTimer')) {
                     $scope.newEvent.triggerTimer = '0 ' + $scope.newEvent.triggerTimer;
                 }
 
-                console.log($scope.newEvent)
+                console.log($scope.newEvent);
                 $http.post('/apio/event', {
                     event: $scope.newEvent
                 })
                     .success(function(data) {
                         alert("Evento salvato con successo");
+                        document.getElementById('new_event').classList.remove('new_active_back_next');
                         $scope.newEvent = {};
                         $scope.newEvent.triggeredStates = {};
                         $scope.showNewEventForm = false;
                         $scope.loadEvents();
                         $scope.currentFormStep = "";
-
-
-
                     })
                     .error("An error has occurred while saving the event")
             }
@@ -462,8 +504,10 @@ angular.module('ApioApplication')
             }
             $scope.goToFormStep = function(step) {
                 $scope.currentFormStep = step;
+                document.getElementById('new_event').classList.add('new_active_back_next');
                 if (step == 'selezioneData')
                     $scope.newEvent.type = "timeTriggered";
+                    
 
                 if (step == 'selezioneStatoScatenante') {
                     $scope.newEvent.type = 'stateTriggered';

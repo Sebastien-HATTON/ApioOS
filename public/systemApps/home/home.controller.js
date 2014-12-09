@@ -69,31 +69,24 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
 
             socket.emit('apio_client_update', o);
         }
-        /*var mc = new Hammer(document.getElementById("ApioApplicationContainer"),{
-            domEvents : true
-        });*/
 
-        /*mc.on('swiperight',function(event) {
-            alert()
-            //if(event.target.type == "range"){
-            //    mc.off('swiperight');
-            //    event.stopPropagation();
-            //}
-            $("#ApioApplicationContainer").hide("slide", {
-                direction: 'right'
-            }, 500, function() {
-                if (window.innerWidth > 769)
-                    $("#ApioIconsContainer").css("width", "100%");
-            });
-        });*/
-        /*$("#ApioApplicationContainer").on("swiperight", function(){
-            $("#ApioApplicationContainer").hide("slide", {
-                direction: 'right'
-            }, 500, function() {
-                if (window.innerWidth > 769)
-                    $("#ApioIconsContainer").css("width", "100%");
-            });
-        });*/
+        var startX, startY;
+        $("#ApioApplicationContainer").on("touchstart", function(event){
+            startX = event.originalEvent.changedTouches[0].pageX;
+            startY = event.originalEvent.changedTouches[0].pageY;
+        });
+        $("#ApioApplicationContainer").on("touchend", function(event){
+            var distX = event.originalEvent.changedTouches[0].pageX - startX;
+            var distY = event.originalEvent.changedTouches[0].pageY - startY;
+            if(!$(event.target).is("input") && distX > 0 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+                $("#ApioApplicationContainer").hide("slide", {
+                    direction: 'right'
+                }, 500, function () {
+                    if (window.innerWidth > 769)
+                        $("#ApioIconsContainer").css("width", "100%");
+                });
+            }
+        });
 
     $scope.launchApplication = function(id) {
 
@@ -112,6 +105,11 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
                     $("#ApioApplicationContainer").show("slide", {
                         direction: 'right'
                     }, 500, function() {
+                        window.scroll(0, 0);
+                        //alert(document.getElementById('ApioApplicationContainer').style.height);
+                        document.getElementById('ApioApplicationContainer').style.height = ""+(window.innerHeight+500)+"px !important";
+                        $("#ApioApplicationContainer").css("overflowY", "scroll");
+                        //alert(document.getElementById('ApioApplicationContainer').style.height);
                         $scope.$apply();
                     });
                 }

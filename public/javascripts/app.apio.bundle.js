@@ -280,7 +280,39 @@ ApioApplication.factory('DataSource', ['$http',function($http){
     }]);
 
 
+ApioApplication.controller('ApioNotificationController',['$scope','$http','socket',function($scope,$http,socket){
+        socket.on('apio_notification', function(notification) {
 
+            if (!("Notification" in window)) {
+                alert("Apio Notification : " + notification.message);
+            }
+            // Let's check if the user is okay to get some notification
+            else if (Notification.permission === "granted") {
+                // If it's okay let's create a notification
+                var notification = new Notification("Apio Notification", {
+                    body: notification.message,
+                    icon : '/images/Apio_Logo.png'
+                });
+            }
+
+            // Otherwise, we need to ask the user for permission
+            // Note, Chrome does not implement the permission static property
+            // So we have to check for NOT 'denied' instead of 'default'
+            else if (Notification.permission !== 'denied') {
+                Notification.requestPermission(function(permission) {
+                    // If the user is okay, let's create a notification
+                    if (permission === "granted") {
+                        var notification = new Notification("Apio Notification", {
+                            body: notification.message,
+                            icon : '/images/Apio_Logo.png'
+                        });
+                    }
+                });
+            }
+
+
+        });
+}])
 
     
 var apioProperty = angular.module('apioProperty', ['ApioApplication']);
@@ -394,28 +426,6 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
   }]);
 
 
-/*
-
-TODO REMOVE
- 
-apioProperty.controller('apioProperty',['$scope','$http', function(){
-	
-}]);
-apioProperty.controller('label',['$scope','$http', function(){
-	
-}]);
-apioProperty.controller('body',['$scope','$http', function(){
-	
-}]);
-apioProperty.controller('value',['$scope','$http', function(){
-	alert('value');
-}]);
-apioProperty.controller('bind',['$scope','$http', function($scope){
-	$scope.pupo = 'ciao';
-}]);
-
-
-*/
 
 
     

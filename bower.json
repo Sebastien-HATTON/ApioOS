@@ -32,6 +32,8 @@
     "mobile-angular-ui": "~1.1.0-beta.30",
     "q": "~2.0.2",
     "ryanmullins-angular-hammer": "~2.0.2",
-    "angular-ui-ace" : "~0.1.1"
+    "angular-ui-ace": "~0.1.1",
+    "angular-css-injector": "~1.0.3",
+    "angular-ui-utils": "bower"
   }
 }

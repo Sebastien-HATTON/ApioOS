@@ -339,7 +339,7 @@ Apio.Serial.read = function(data) {
 
 	switch(data.command) {
 		case "send":
-		console.log("Evento send dalla seriale");
+		
 			//Prendo i dati ddell"oggetto in db, scrivo in seriale e updato il db.
 			//In seriale verrà mandata una stringa del tipo
 			//objId:command:chiavivalori
@@ -362,8 +362,38 @@ Apio.Serial.read = function(data) {
 			});
 		break;
 		case "update":
-			console.log("Evento update dalla seriale");
-			
+			console.log("%%%%%%%%%%%%Arrivato un update, mando la notifica");
+			//Prima di tutto cerco la notifica nel db
+			console.log(data);
+			Apio.Database.db.collection('Objects').findOne({objectId : data.objectId},function(err,document){
+				if (err) {
+					console.log('Apio.Serial.read Error while looking for notifications');
+				} else {
+					if (document.hasOwnProperty('notifications')) {
+						for (var prop in data.properties) //prop è il nome della proprietà di cui cerco notifiche
+							if (document.notifications.hasOwnProperty(prop)) {
+								//Ho trovato una notifica da lanciare
+								if (document.notifications[prop].hasOwnProperty(data.properties[prop])){
+									console.log("Ho trovato una notifica per la proprietà "+prop+" e per il valore corrispondente "+data.properties[prop])
+									var notifica = {
+										objectId : data.objectId,
+										message : document.notifications[prop][data.properties[prop]]
+									}
+									console.log("Mando la notifica");
+									Apio.System.notify(notifica);
+								} //Se ha una notifica per il valore attuale
+								else {
+									console.log("Ho una notifica registarata per quella property ma non per quel valore")
+								}
+
+									
+							} else{
+								console.log("L'oggetto non ha una notifica registrata per la proprietà "+prop)
+							}
+					}
+				}
+			})
+			//Apio.System.notify(data);
 			Apio.Database.updateProperty(data,function(){
 				Apio.io.emit('apio_server_update',data);
 			});
@@ -455,6 +485,27 @@ Apio.Database.updateProperty = function(data,callback) {
 			}
 
 		});
+};
+
+Apio.Database.getMaximumObjectId = function(callback){
+	
+	console.log('getMaximumObjectId');
+	var error = null;
+	var result = null;
+	
+	var options = { "sort": [['objectId','desc']] };
+	Apio.Database.db.collection("Objects").findOne({}, options , function(err, doc) {
+		if(err){
+			error = 'Apio.Database.getMaximumObjectId() failed to fetch maximum objectId';
+			console.log('Apio.Database.getMaximumObjectId() failed to fetch maximum objectId');
+		}
+		else{
+	    	console.log('Recoverder as maximum id: ' + doc.objectId);
+	    	result = doc.objectId;
+		}
+		callback(error,result);
+	}); 
+
 };
 
 /* 
@@ -830,10 +881,20 @@ Apio.System.checkEvent = function(state) {
 	//Se allo stato triggerato corrisponde un evento, lancia quell'evento
 };
 
-Apio.System.notify = function(event) {
+Apio.System.notify = function(notification,callback) {
 	//Notifica a tutti gli utenti di un evento
 	//Questo viene fatto inviando una notifica ai client attivi
-	Apio.Socket.io.broadcast('apio_event',event);
+	Apio.Database.db.collection('Users').update({},{$push : notification},function(err,data){
+		if (err)
+			console.log("Apio.System.notify Error, unable to send the notification");
+		else {
+			console.log("Emitto la notifica");
+			Apio.io.emit('apio_notification',notification);
+			if (callback)
+				callback();
+		}
+	})
+	
 }
 
 Apio.System.jobs = {};

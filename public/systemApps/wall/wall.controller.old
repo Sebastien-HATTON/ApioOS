@@ -1,10 +1,7 @@
 angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$http', 'socket', 'objectService', 'currentObject', '$rootScope',
     function($scope, $http, socket, objectService, currentObject, $rootScope) {
         document.getElementById("targetBody").style.position = "";
-        $("#ApioApplicationContainer").hide(function(){
-            $("#ApioApplicationContainer").html("");
-        })
-
+        $("#appApio").html("");
         $http.get('/apio/state')
             .success(function(data) {
                 $scope.states = data;
@@ -16,10 +13,10 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
             console.log("Arrivata modifica di uno stato dal server, la applico")
             console.log(state);
             $scope.states.forEach(function(e, i, a) {
-                if (e.name == state.name) {
-                    e.properties = state.properties;
-                    e.active = state.active;
-                }
+                if (e.name == state.name)
+                    e.properties = state.properties
+                    //for (k in state.properties)
+                    //e.properties[k] = state.properties[k];
             })
         });
 
@@ -40,12 +37,7 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
             $scope.$apply();
         })
 
-        $scope.launchState = function(state, index) {
-            if(state.active)
-                document.getElementById("state-"+index).classList.add('active_on');
-            else
-                document.getElementById("state-"+index).classList.remove('active_on');
-            state.active = !state.active;
+        $scope.launchState = function(state) {
             $http.post('/apio/state/apply', {
                 state: state
             })
@@ -69,19 +61,44 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
         };
 
         $scope.editState = function(state) {
-            document.getElementById('wallContainer').classList.add('wall_open_edit_state');
+            $("#wallContainer").css("width", "84%");
             var id = state.objectId;
             currentObject.recordingStateName(state.name);
             //$("#appApio").css("width", Apio.appWidth + "px");
             //$("#appApio").addClass("proprieta");
             $("#ApioApplicationContainer").css("width", Apio.appWidth + "px");
-            //$("#ApioApplicationContainer").addClass("proprieta");
-            //document.getElementById("targetBody").style.position = "fixed";
+            $("#ApioApplicationContainer").addClass("proprieta");
+            document.getElementById("targetBody").style.position = "fixed";
             Apio.newWidth = Apio.appWidth;
             objectService.getById(id).then(function(d) {
                 $scope.currentObject = d.data;
                 // new thing!
                 currentObject.set(d.data);
+
+                /*if ($scope.currrentApplication == null) {
+                    $.get("applications/" + id + "/" + id + ".html", function(data) {
+                        $("#appApio").html($(data));
+                        $("#appApio").find("h2").text($scope.currentObject.name);
+                        setTimeout(function() {
+                            for (key in state.properties) {
+                                currentObject.record(key, state.properties[key]);
+                                currentObject.get().properties[key] = state.properties[key];
+                            }
+                            currentObject.isModifying(true);
+                            $("#registra_statoinput").trigger("click");
+                            $("#registra_statoinput").trigger("tap");
+                        }, 300);
+                    });
+
+                    $('body').animate({
+                        scrollLeft: document.body.scrollWidth
+                    }, 700, function() {
+
+                    });
+
+                    //});
+
+                }*/
 
                 $.get("applications/" + id + "/" + id + ".html", function(data) {
                     if (window.innerWidth > 769)
@@ -97,13 +114,12 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
                         currentObject.isModifying(true);
                         $("#registra_statoinput").trigger("click");
                         $("#registra_statoinput").trigger("tap");
-                        $("#ApioApplicationContainer").show("slide", {
-                            direction: 'right'
-                        }, 500, function() {
-                            $scope.$apply();
-                        });
                     }, 300);
-                    
+                    $("#ApioApplicationContainer").show("slide", {
+                        direction: 'right'
+                    }, 500, function() {
+                        $scope.$apply();
+                    });
                 });
 
             });

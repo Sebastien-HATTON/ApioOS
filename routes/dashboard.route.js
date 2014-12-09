@@ -2,7 +2,7 @@ var fs = require('fs');
 
 module.exports = {
 	index : function(req,res) {
-		res.sendfile("public/html/dashboard.html");
+		res.sendfile("public/dashboardApp/dashboard.html");
 	},
 	updateApioApp : function(req,res){
 		    var objectId = req.body.objectId;

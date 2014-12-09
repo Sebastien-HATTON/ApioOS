@@ -5,45 +5,51 @@
 	}
 	</style>
 	<div id="ApioEventsContainer" class="container-fluid">
-		<div class="create_new create_new_event" ng-class="{'create_new_active' : currentFormStep !== ''}" ng-click="reset()">+</div>
-		
+		<section class="nav_event">
+			<div id="goBack" class="box_byDate" style="opacity: 1;" ng-show="currentFormStep !== 'sceltaTipo' && currentFormStep !== ''" ng-click="goBack()" ng-show="showBack()">
+				<div id="goBackinput" class="goBack"><span id="goBackspan">Indietro</span></div>
+			</div>
+
+			<div id="new_event" class="create_new create_new_event"  ng-class="{'create_new_active' : currentFormStep !== ''}" ng-click="reset()"><p>+</p></div>
+
+			<div id="goForward" class="box_byDate" style=" opacity: 1;" ng-show="showForward()">
+				<div id="goForwardinput" class="goForward" ng-click="goForward()"><span id="goForwardspan">Avanti</span></div>
+			</div>
+
+			<div id="createNewEvent" class="box_byDate" style="opacity: 1;" ng-show="eventNameIsValid()">
+				<div id="createNewEventinput" class="createNewEvent crea" ng-click="saveEvent()"><span id="createNewEventspan">Crea!</span></div>
+			</div>
+		</section>
+
 		<section class="newEventFormSection" ng-show="currentFormStep == ''">
 			<div class="elementEventi box_proprietaiPhone" ng-repeat="event in events">
 				<li class="eventName">{{event.name}}<div class="infoEvent">Matteo Di Sabatino</div></li>
 				<li class="modify modifica_Evento_id" ng-click="editEvent(event)">&gt;</li>
 				<div class="option_Evento_id_state">
-					<div class="delete elimina_evento" ng-click="deleteEvent(event)">elimina</div>
+					<div class="elimina_evento" ng-click="deleteEvent(event)">elimina</div>
 				</div>
 			</div>
 		</section>
 		
-		<section class="newEventFormSection" ng-show="currentFormStep !== 'sceltaTipo' && currentFormStep !== ''">
-			<div id="goBack" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="display: block; opacity: 1;" ng-click="goBack()" ng-show="showBack()">
-				<div id="goBackinput" class="goBack"><span id="goBackspan">Indietro</span></div>
-			</div>
-			<div id="goForward" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="display: block; opacity: 1;" ng-show="showForward()">
-				<div id="goForwardinput" class="goForward" ng-click="goForward()"><span id="goForwardspan">Avanti</span></div>
-			</div>
-			<div id="createNewEvent" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="display: block; opacity: 1;" ng-show="eventNameIsValid()">
-				<div id="createNewEventinput" class="createNewEvent crea" ng-click="saveEvent()"><span id="createNewEventspan">Crea!</span></div>
-			</div>
-		</section>
+		
+			
+		
 
 		<div style="clear: both;"></div>
 
 		<section class="newEventFormSection" ng-show="currentFormStep == 'sceltaTipo'">
 			<h1 style="text-align: center;">Scelta Tipo</h1>
-			<div id="byStatus" class="box_proprietaiPhone no_box_proprieta_iPhone box_byStatus" style="display: block; opacity: 1;">
+			<div id="byStatus" class="box_proprietaiPhone no_box_proprieta_iPhone box_byStatus" style="opacity: 1;">
 				<div id="byStatusinput" class="byStatus" ng-click="goToFormStep('selezioneStatoScatenante',$event)"><span id="byStatusspan">Stato</span></div>
 			</div>
-			<div id="byDate" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="display: block; opacity: 1;">
+			<div id="byDate" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="opacity: 1;">
 				<div id="byDateinput" class="byDate" ng-click="goToFormStep('selezioneData',$event)"><span id="byDatespan">Data</span></div>
 			</div>
 		</section>
 
 		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatoScatenante'">
 			<h1 style="text-align: center;">Selezione Stato Scatenante</h1>
-			<div id="statusesListInput" style="margin-left: 3%;">
+			<div id="statusesListInput" >
 				<form id="content_statusesList" style="display: block; opacity: 1;">
 					<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
 						<input type="radio" name="all_statusesstatusesList" ng-model="$parent.newEvent.triggerState" ng-value="state.name" class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone">
@@ -56,8 +62,9 @@
 
 		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatiScatenati'">
 			<h1 style="text-align: center;">Selezione Stati scatenati</h1>
-			<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states" style="margin-left: 3%;">
-				<input type="checkbox" name="all_guestslistOfGuests" ng-model="newEvent.triggeredStates[state.name]" class="elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
+			<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
+				<!--<input type="checkbox" name="all_guestslistOfGuests" ng-model="newEvent.triggeredStates[state.name]" class="elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">-->
+				<input type="checkbox" name="all_guestslistOfGuests" ng-click="checkedModel(state)" class="elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
 				<li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
 				<li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
 			</div>
@@ -80,6 +87,7 @@
 
 	<div id="editEventPanel" class="dynamicPanel">
 		<div class="container-fluid">
+			<h1>{{currentEvent.name}}</h1>
 			<div id="run_event_modifier" class="box_proprietaiPhone">
 				<div class="testo_proprietaiPhone dynvlabel" ng-show="currentEvent.type == 'stateTriggered'">{{currentEvent.triggerState}}</div>
 				<div class="testo_proprietaiPhone dynvlabel" ng-show="currentEvent.type == 'timeTriggered'">{{convertCron(currentEvent.triggerTimer)}}</div>
@@ -90,10 +98,10 @@
 
 			<section id="content_invitati" class="editEventFormSection" ng-show="showGuests">
 				<div ng-repeat="state in currentEvent.triggeredStates" class="elementGuests elementGuests_invitati option_invitati_state no_box_proprieta_iPhone">
-					<li class="statusName nome_stato_invitato">{{state}}</li>
-					<div class="nome_nuovo_oggetto_invitato">Nome_Oggetto</div>
+					<li class="statusName nome_stato_invitato">{{state.name}}</li>
+					<div class="nome_nuovo_oggetto_invitato">{{state.objectName}}</div>
 					<div class="">
-						<div class="delete delete_element elimina_invitati" ng-click="deleteGuest(state)">elimina</div>
+						<div class="delete_element elimina_invitati" ng-click="deleteGuest(state)">elimina</div>
 					</div>
 				</div>
 			</section>
@@ -105,7 +113,7 @@
 					</div>
 				</div>
 
-				<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states | filter:stateInList" style="margin-left: 3%;">
+				<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states | filter:stateInList" >
 					<input type="checkbox" name="all_guestslistOfGuests" ng-model="newEvent.triggeredStates[state.name]" class="addNewGuest elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante" ng-change="toggleNewStateInEvent(state.name)">
 					<li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
 					<li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
@@ -115,13 +123,13 @@
 	</div>
 		
 	<div Id="editEventRunPanel" class="dynamicPanel">
-		<div class="container-fluid">
+		<div class="">
 			<section class="editEventFormSection" ng-show="editEventFormStep == 'sceltaTipo' || editEventFormStep == 'selezioneStatoScatenante' || editEventFormStep == 'selezioneData'">
 				<h1 style="text-align: center;">Scelta Tipo</h1>
-				<div id="byStatus" class="box_proprietaiPhone no_box_proprieta_iPhone box_byStatus" style="display: block; opacity: 1;">
+				<div id="byStatus" class="box_byStatus">
 					<div id="byStatusinput" class="byStatus" ng-click="goToEditEventFormStep('selezioneStatoScatenante',$event)"><span id="byStatusspan">Stato</span></div>
 				</div>
-				<div id="byDate" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="display: block; opacity: 1;">
+				<div id="byDate" class="box_byDate">
 					<div id="byDateinput" class="byDate" ng-click="goToEditEventFormStep('selezioneData',$event)"><span id="byDatespan">Data</span></div>
 				</div>
 			</section>
@@ -134,7 +142,7 @@
 
 			<section class="newEventFormSection" ng-show="editEventFormStep == 'selezioneStatoScatenante'">
 				<h1 style="text-align: center;">Selezione Stato Scatenante</h1>
-				<div id="statusesListInput" style="margin-left: 3%;">
+				<div id="statusesListInput" >
 					<form id="content_statusesList" style="display: block; opacity: 1;">
 						<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
 							<input type="radio" name="all_statusesstatusesList" ng-click="newRunState()" ng-model="$parent.currentEvent.triggerState" ng-value="state.name" class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone">

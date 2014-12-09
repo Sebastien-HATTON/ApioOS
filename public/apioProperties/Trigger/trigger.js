@@ -9,20 +9,20 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 	    	model : "=propertyname"
 	    },
 	    templateUrl: "apioProperties/Trigger/trigger.html",
-	    link: function(scope, elem, attrs, controller){
-	    	scope.object = currentObject.get();
+	    link: function(scope, elem, attrs){
+			scope.object = currentObject.get();
 	    	scope.currentObject = currentObject;
 	    	scope.isRecorded = function() {
 	    		return scope.currentObject.record(attrs['propertyname']);
-	    	}
+	    	};
 	    	scope.addPropertyToRecording = function($event) {
-	    		$event.stopPropagation();
+				$event.stopPropagation();
 	    		scope.currentObject.record(attrs['propertyname'], scope.model);
-	    	}
+	    	};
 	    	scope.removePropertyFromRecording = function($event) {
-	    		$event.stopPropagation();
+				$event.stopPropagation();
 	    		scope.currentObject.removeFromRecord(attrs['propertyname']);
-	    	}	    	
+	    	};
 	    	//Serve per il cloud: aggiorna in tempo reale il valore di una proprietà che è stata modificata da un"altro utente
 	    	socket.on("apio_server_update", function(data){
 				if(data.objectId === scope.object.objectId && !currentObject.isRecording()){
@@ -84,20 +84,18 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 	    	scope.model = scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
 	    	//
-	    	
-            var event = attrs["event"] ? attrs["event"] : "mouseup";
-	    	elem.on(event, function(){
 
-//Serve per fare lo switch del trigger
-						
-						if (scope.model == "1"){
-							scope.model = "0";
-							scope.label = attrs["labeloff"];
-						}
-						else{
-							scope.model = "1";
-							scope.label = attrs["labelon"];
-						}
+			var event = attrs["event"] ? attrs["event"] : "click tap";
+			elem.on(event, function(){
+				//Serve per fare lo switch del trigger
+				if (scope.model == "1"){
+					scope.model = "0";
+					scope.label = attrs["labeloff"];
+				}
+				else{
+					scope.model = "1";
+					scope.label = attrs["labelon"];
+				}
 				//Aggiorna lo scope globale con il valore che è stato modificato nel template
 				scope.object.properties[attrs["propertyname"]] = scope.model;
 				

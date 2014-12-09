@@ -1,0 +1,76 @@
+
+
+<style>
+	.ace_editor  {
+	  height : 500px;
+	}
+</style>
+
+<!-- crea panel -->
+
+<section id="EditorPanel" class="tab-pane" ng-controller="EditorPanel as panell">
+    <ul class="nav nav-tabs" role="tablist">
+      <li ng-class="{active: panell.isSelected(1), disabled: panell.isDisabled(1)}"><a ng-click="panell.selectTab(1)" href="">Firmware</a></li>
+      <li ng-class="{active: panell.isSelected(2), disabled: panell.isDisabled(2)}"><a ng-click="panell.selectTab(2)" href="">Application Html</a></li>
+      <li ng-class="{active: panell.isSelected(3), disabled: panell.isDisabled(3)}"><a ng-click="panell.selectTab(3)" href="">Application JS</a></li>
+      <li ng-class="{active: panell.isSelected(4), disabled: panell.isDisabled(4)}"><a ng-click="panell.selectTab(4)" href="">DataBase</a></li>
+    </ul>
+    
+    <div class="panel" ng-show="panell.isSelected(1)">
+        <h4>Firmware</h4>
+        <div ui-ace="{useWrapMode : true,
+            showGutter: true,
+            theme:'twilight',
+            mode: 'arduino',
+            onLoad: aceLoadedIno}"
+            ng-model="ino">
+        </div>
+    </div>
+
+    <div class="panel" ng-show="panell.isSelected(2)">
+        <h4>Application Html</h4>
+                    <div ui-ace="{useWrapMode : true,
+                        showGutter: true,
+                        theme:'twilight',
+                        mode: 'html',
+                        onLoad: aceLoadedHtml}"
+                        ng-model="html">
+                    </div>
+    </div>
+    <div class="panel" ng-show="panell.isSelected(3)">
+        <h4>Application Html</h4>      
+                    <div ui-ace="{useWrapMode : true,
+                        showGutter: true,
+                        theme:'twilight',
+                        mode: 'javascript',
+                        onLoad: aceLoadedJs}"
+                        ng-model="js">
+                    </div>
+    </div>
+
+    <div class="panel" ng-show="panell.isSelected(4)">
+        <h4>DataBase</h4>
+        <div ui-ace="{useWrapMode : true,
+                showGutter: true,
+                theme:'twilight',
+                mode: 'javascript',
+                onLoad: aceLoadedMongo}"
+                ng-model="mongo">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10" ng-hide="hideCreate">
+            <button id="create" type="button" ng-click="panell.sendFilesToServer()" class="btn btn-primary btn-lg">Create</button>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10" ng-hide="hideUpdate">
+            <button id="update" type="button" ng-click="panell.updateApioApp()" class="btn btn-primary btn-lg">Update</button>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10" ng-hide="hideCreateNew">
+            <button id="createNew" type="button" ng-click="panell.createNewApioAppFromEditor()" class="btn btn-primary btn-lg">Create New</button>
+        </div>
+    </div>
+
+</section>
+
+    

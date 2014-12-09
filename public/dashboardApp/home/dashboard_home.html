@@ -1,0 +1,24 @@
+<div id="Home" class="dashboardPage container-fluid active">
+    <div style="margin-top:100px;" class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+            <p>Use the following input to send Apio encoded strings to the Apio board</p>
+            <fieldset>
+                <div class="input-group">
+                    <input id="keyvalue" type="text" placeholder="Put the Apio encoded string here" ng-model="encodedString" class="form-control input-lg" /><span class="input-group-btn"><button id="sendKeyValue" type="button" ng-click="sendEncodedString()" class="btn btn-primary btn-lg">Send to Apio</button></span>
+                </div>
+                <div class="col-lg-4">
+                    <div class="checkbox">
+                        <label>
+                            <input id="writeToDatabase" type="checkbox" ng-model="writeToDatabase" /> Write to database</label>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="checkbox">
+                        <label>
+                            <input id="writeToSerial" type="checkbox" ng-model="writeToSerial" /> Write to serial port</label>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
