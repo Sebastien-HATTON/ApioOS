@@ -15,7 +15,7 @@ var net = require('net');
 var targz = require('tar.gz');
 var formidable = require('formidable');
 
-var ENVIRONMENT = "productio";
+var ENVIRONMENT = "production";
 
 
 var routes = {};
