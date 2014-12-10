@@ -543,7 +543,7 @@ Apio.Database.registerObject = function(objectData,callback) {
 
 Apio.Database.deleteObject = function(id,callback) {
 
-		Apio.Database.db.collection("objects").remove({"objectId":id},function(error){
+		Apio.Database.db.collection("Objects").remove({"objectId":id},function(error){
 			if(error)
 				throw new Apio.Database.Error("Apio.Database.deleteObject() encountered an error while trying to connect to the database");
 			if(null !== callback)

@@ -29,9 +29,9 @@ angular.module('ApioDashboardApplication')
           "id" : "1",
           "family" : "ST",
           "types" : [
-              { "type" : "BOH" },
-              { "type" : "Alex" },
-              { "type" : "Mattia" }
+              { "type" : "Uno" },
+              { "type" : "Due" },
+              { "type" : "Tre" }
           ]
       }
   ];
