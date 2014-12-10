@@ -12,11 +12,13 @@ var domain = require('domain');
 var async = require('async');
 var request = require('request');
 var net = require('net');
+var ENVIRONMENT = "productio";
 var targz = require('tar.gz');
 var formidable = require('formidable');
 
-var ENVIRONMENT = "poduction";
 
+var HOST = '192.168.1.109';
+var PORT = 6969;
 
 var routes = {};
 routes.dashboard = require('./routes/dashboard.route.js');
@@ -108,87 +110,18 @@ app.get("/dashboard",routes.dashboard.index);
 /*
 *   Crea un nuovo evento
 **/
-app.post("/apio/event",function(req,res){
-    var evt = req.body.event;
-    console.log("Salvo l'evento ");
-    console.log(evt);
-    Apio.Database.db.collection('Events').insert(evt,function(err,result){
-        if (err) {
-            console.log("Error while creating a new event");
-            res.status(500).send({error : "DB"});
-        } else {
-            if (evt.hasOwnProperty('triggerTimer')){
-                Apio.System.registerCronEvent(evt);
-            }
-            Apio.io.emit("apio_event_new",evt);
-            res.status(200).send(result[0].objectId);
-        }
-    })
-});
+app.post("/apio/event",routes.core.events.create);
 
-app.get('/apio/notify/:message',function(req,res){
-    Apio.io.emit('apio_notification',{message : req.params.message});
-    res.send();
-})
-app.post('/apio/notifications/markAsRead',function(req,res){
-    var notif = req.body.notification;
-    var user = req.body.username;
-    Apio.Database.db.collection('Users').update({"username" : user},{$pull : {"unread_notifications" : notif}},function(err){
-        if (err){
-            console.log('apio/notification/markAsRead Error while updating notifications');
-            res.status(500).send({});
-        }
-        else {
-            res.status(200).send({});
-        }
-    })
-})
+app.get('/apio/notifications',routes.core.notifications.list);
+app.post('/apio/notifications/markAsRead',routes.core.notifications.delete)
 /* Returns all the events */
-app.get("/apio/event",function(req,res){
-    Apio.Database.db.collection('Events').find().toArray(function(err,data){
-        if (err) {
-            console.log("Error while fetching events");
-            res.status(500).send({error : "DB"});
-        } else {
-            res.send(data);
-        }
-    })
-})
+app.get("/apio/event",routes.core.events.list)
 /* Return event by name*/
-app.get("/apio/event/:name",function(req,res){
-    Apio.Database.db.collection('Events').findOne({name : req.params.name},function(err,data){
-        if (err) {
-            console.log("Error while fetching event named "+req.params.name);
-            res.status(500).send({error : "DB"});
-        } else {
-            res.send(data);
-        }
-    })
-})
+app.get("/apio/event/:name",routes.core.events.getByName)
 
-app.delete("/apio/event/:name",function(req,res){
-    
-    Apio.Database.db.collection("Events").remove({name : req.params.name},function(err){
-        if (!err) {
-            Apio.io.emit("apio_event_delete",{name : req.params.name});
-            res.send({error : false});
-        }
-        else
-            res.send({error : 'DATABASE_ERROR'});
-    })
-})
+app.delete("/apio/event/:name",routes.core.events.delete)
 
-app.put("/apio/event/:name",function(req,res){
-    delete req.body.eventUpdate["_id"];
-    Apio.Database.db.collection("Events").update({name : req.params.name},req.body.eventUpdate,function(err){
-        if (!err) {
-            Apio.io.emit("apio_event_update",{event : req.body.eventUpdate});
-            res.send({error : false});
-        }
-        else
-            res.send({error : 'DATABASE_ERROR'});
-    })
-})
+app.put("/apio/event/:name",routes.core.events.update);
 
 /****************************************************************
 ****************************************************************/
@@ -328,7 +261,7 @@ app.get("/apio/event/launch",routes.core.events.launch)
 /*
 *   restituisce la lista degli eventi
 */
-app.get("/apio/event",routes.core.events.get)
+app.get("/apio/event",routes.core.events.list)
 
 /// error handlers
 

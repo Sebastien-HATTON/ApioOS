@@ -98,17 +98,88 @@ module.exports = {
 		    });
 		}
 	},
-	events : {
+	notifications : {
 		create : function(req,res) {
 
 		},
-		delete : function(req,res) {
+		list : function(req,res) {
+			    var currentUser = 'matteo.di.sabatino.1989@gmail.com';
 
+			    Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
+				        if(err) {
+				            console.log("Un errore ");
+				            console.log(err);
+				            res.status(500).send({});
+				        } else {
+				            res.send(doc.unread_notifications);
+				        }
+				    })
 		},
-		getById : function(req,res){
-		    
+		delete : function(req,res){
+		    var notif = req.body.notification;
+		    var user = req.body.username;
+		    Apio.Database.db.collection('Users').update({"username" : user},{$pull : {"unread_notifications" : notif}},function(err){
+		        if (err){
+		            console.log('apio/notification/markAsRead Error while updating notifications');
+		            res.status(500).send({});
+		        }
+		        else {
+		            res.status(200).send({});
+		        }
+		    })
+		}
+	},
+	events : {
+		create : function(req,res){
+		    var evt = req.body.event;
+		    console.log("Salvo l'evento ");
+		    console.log(evt);
+		    Apio.Database.db.collection('Events').insert(evt,function(err,result){
+		        if (err) {
+		            console.log("Error while creating a new event");
+		            res.status(500).send({error : "DB"});
+		        } else {
+		            if (evt.hasOwnProperty('triggerTimer')){
+		                Apio.System.registerCronEvent(evt);
+		            }
+		            Apio.io.emit("apio_event_new",evt);
+		            res.status(200).send(result[0].objectId);
+		        }
+		    })
 		},
-		get : function(req,res){
+		update : function(req,res){
+		    delete req.body.eventUpdate["_id"];
+		    Apio.Database.db.collection("Events").update({name : req.params.name},req.body.eventUpdate,function(err){
+		        if (!err) {
+		            Apio.io.emit("apio_event_update",{event : req.body.eventUpdate});
+		            res.send({error : false});
+		        }
+		        else
+		            res.send({error : 'DATABASE_ERROR'});
+		    })
+		},
+		delete : function(req,res){
+    
+		    Apio.Database.db.collection("Events").remove({name : req.params.name},function(err){
+		        if (!err) {
+		            Apio.io.emit("apio_event_delete",{name : req.params.name});
+		            res.send({error : false});
+		        }
+		        else
+		            res.send({error : 'DATABASE_ERROR'});
+		    })
+		},
+		getByName : function(req,res){
+		    Apio.Database.db.collection('Events').findOne({name : req.params.name},function(err,data){
+		        if (err) {
+		            console.log("Error while fetching event named "+req.params.name);
+		            res.status(500).send({error : "DB"});
+		        } else {
+		            res.send(data);
+		        }
+		    })
+		},
+		list : function(req,res){
 		    Apio.Database.db.collection("Events").find({}).toArray(function(err,result){
 		        if (err)
 		            res.status(500).send({error:true});
@@ -173,3 +244,7 @@ module.exports = {
 		}
 	}
 }
+
+
+
+
