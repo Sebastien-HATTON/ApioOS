@@ -18,7 +18,8 @@
     "socket.io": "^1.2.1",
     "static-favicon": "^1.0.2",
     "tar.gz": "^0.1.1",
-    "time": "^0.11.0"
+    "time": "^0.11.0",
+    "ncp": "~1.0.1"
   },
   "devDependencies": {},
   "scripts": {

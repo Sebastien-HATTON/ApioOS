@@ -58,8 +58,8 @@ angular.module('ApioDashboardApplication')
           mongo : $rootScope.mongo
         })
       .success(function(){
-        $scope.switchPage('Objects');
-        $('#objectIdTrigger').trigger('click'); //simulate the click to refresh the object list      
+        // $scope.switchPage('Objects');
+        //$('#objectIdTrigger').trigger('click'); //simulate the click to refresh the object list      
         $('#static').modal('hide');
         //sweet.show('Done!', 'Your Apio object is now updated in the home!', 'success');
         sweet.show({
@@ -121,8 +121,9 @@ angular.module('ApioDashboardApplication')
     console.log(dao);
     $http.post('/apio/database/createNewApioApp',{object : dao, ino : $scope.ino, html : $scope.html, js : $scope.js, mongo : $scope.mongo, makefile : $scope.makefile})
       .success(function(){
-        $scope.switchPage('Objects');
-        $('#objectIdTrigger').trigger('click');        
+        //$scope.switchPage('Objects');
+        //$('#objectIdTrigger').trigger('click');        
+        //$state.go('objects.objectsLaunch');
         //sweet.show('Done!', 'Your Apio object is now available in the home!', 'success');
         sweet.show({
                       title: "Done!",
@@ -134,7 +135,8 @@ angular.module('ApioDashboardApplication')
                       closeOnConfirm: true
                     },
                     function(){
-                        $state.go('objects.objectsLaunch');
+                      window.open('/apio/app/exportIno?id='+dao.objectId);
+                      $state.go('objects.objectsLaunch');
                     });
 
         $scope.$parent.newObject = {};

@@ -1,5 +1,5 @@
 angular.module('ApioDashboardApplication')
-.controller('ApioDashboardLaunchController', ['$scope','socket','objectService','$http','$rootScope', function($scope,socket,objectService,$http,$rootScope){
+.controller('ApioDashboardLaunchController', ['$scope','socket','objectService','$http','$rootScope','$state', function($scope,socket,objectService,$http,$rootScope,$state){
 
 	socket.on('apio_server_update',function(e) {
     	
@@ -89,7 +89,8 @@ angular.module('ApioDashboardApplication')
 	    .success(function(data,status,header){
 	      console.log('/apio/app/delete success()');
 	      $('#appModal').modal('hide');
-	      $scope.switchPage('Objects');
+	      //$scope.switchPage('Objects');
+	      $state.go('objects.objectsLaunch');
 	      alert("App Deleted")
 	    })
 	    .error(function(data,status,header){

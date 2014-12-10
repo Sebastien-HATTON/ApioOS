@@ -1,32 +1,36 @@
 var fs = require('fs');
+var targz = require('tar.gz');
+var formidable = require('formidable');
+var ncp = require('ncp').ncp;
+var Apio = require("../apio.js");
 
 module.exports = {
 	index : function(req,res) {
-		res.sendfile("public/dashboardApp/dashboard.html");
-	},
-	updateApioApp : function(req,res){
-		    var objectId = req.body.objectId;
-		    var ino = req.body.ino;
-		    var html = req.body.html;
-		    var js = req.body.js;
-		    var mongo = req.body.mongo;
-		    console.log('updating the object: '+objectId);
-		    //si potrebbero usare writeFile (asincrono) annidati ed eliminare il try catch
-		    try {
-		        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '/' + objectId + '.ino',ino);
-		        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.html',html);
-		        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.js',js);
-		        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.mongo',mongo);
-		        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '/Makefile',makefile);
-		        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.json',JSON.stringify(objectToSave));
-		    } catch(e) {
-		        res.status(500).send();
-		        return;
-		    }
-
-		    res.send(200);
-		   
+			res.sendfile("public/dashboardApp/dashboard.html");
 		},
+	updateApioApp : function(req,res){
+	    var objectId = req.body.objectId;
+	    var ino = req.body.ino;
+	    var html = req.body.html;
+	    var js = req.body.js;
+	    var mongo = req.body.mongo;
+	    console.log('updating the object: '+objectId);
+	    //si potrebbero usare writeFile (asincrono) annidati ed eliminare il try catch
+	    try {
+	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '/' + objectId + '.ino',ino);
+	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.html',html);
+	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.js',js);
+	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.mongo',mongo);
+	        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '/Makefile',makefile);
+	        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.json',JSON.stringify(objectToSave));
+	    } catch(e) {
+	        res.status(500).send();
+	        return;
+	    }
+
+	    res.send(200);
+	   
+	},
 	modifyApioApp : function(req,res){
 	    var id = req.body.id;
 	    var path = 'public/applications/'+id+'/'+id;
@@ -35,9 +39,10 @@ module.exports = {
 
 	    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
 	    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
-	    object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
+	    //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
 	    object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
-	    object.ino = fs.readFileSync(path+'/'+id+'.ino', {encoding: 'utf8'});
+	    path = 'public/applications/'+id+'/_'+id;
+	    object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
 	    
 	    /*console.log('js:\n'+object.js);
 	    console.log('html:\n'+object.html);
@@ -116,143 +121,191 @@ module.exports = {
 	        console.log();
 	    }; 
 
-	    objectToSave.db=JSON.parse(mongo.slice(7,mongo.length)); //problema db : { db : { ... }}
-	    
+	    //objectToSave.db=JSON.parse(mongo.slice(7,mongo.length)); //problema db : { db : { ... }}
+	    console.log('mongo: '+mongo);
+	    objectToSave.db=JSON.parse(mongo); //problema db : { db : { ... }}
 
 	    console.log('Object' + obj.objectId + 'is being manipulated by the server');
 	    console.log('APIO: Creating application ' + obj.objectId);
-	    fs.mkdirSync("public/applications/" + obj.objectId);
-	    fs.mkdirSync("public/applications/" + obj.objectId +'/' + obj.objectId);
-
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '/' + obj.objectId + '.ino',ino);
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '/Makefile',makefile);
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.html',html);
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.js',js);
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
 
 	    Apio.Database.registerObject(objectToSave,function(error){
 	        if (error) {
 	            console.log("/apio/Database/createNewApioApp Error while saving");
 	            res.send(500);
 	        }else{
+	            //QUA
+
+	            fs.mkdirSync("public/applications/" + obj.objectId);
+	            fs.mkdirSync("public/applications/" + obj.objectId +'/_' + obj.objectId);
+	            fs.mkdirSync("public/applications/" + obj.objectId +'/_' + obj.objectId+'/XBee');
+
+	            fs.writeFileSync('public/applications/'+obj.objectId+'/_' + obj.objectId + '/_' + obj.objectId + '.ino',ino);
+	            fs.writeFileSync('public/applications/'+obj.objectId+'/_' + obj.objectId + '/Makefile',makefile);
+	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.html',html);
+	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.js',js);
+	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
+	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
+	            
+	            var source = 'public/arduino/';
+	            if(obj.protocol=='z'){
+	                source += 'XBee';
+	            }else{
+	                source += 'LWM';
+	            }
+	            var destination = 'public/applications/'+obj.objectId+'/_' + obj.objectId ;
+
+	            ncp.limit = 16;
+
+	            ncp(source, destination, function (err) {
+	             if (err) {
+	               return console.error(err);
+	             }
+	             console.log('done!');
+	            });
+
 	            res.send();
 	        }
 	    });   
 
 	},
-	createNewObject : function(req,res){
-    
-		    var obj = req.body.object;
-		    var data = {
-		        properties : {}
-		    }; //Used to send to database
-		    for (var k in obj) {
-		        if (k !== 'properties')
-		            data[k] = obj[k];
-		    for(var k in obj.properties)
-		        data["properties"][k] = obj.properties[k]["defaultValue"];
-
-		    }
-		    Apio.Database.registerObject(data,function(error){
-		        if (error) {
-		            console.log("/apio/Database/createNewObject Error while saving")
-		            res.send(500);
-		        }
-		        console.log('APIO: Creating application '+obj.objectId);
-		        fs.mkdirSync("public/applications/"+obj.objectId);
-		        
-		            var xml = '<application objectId="'+obj.objectId+'" objectAddress="'+obj.address+'" protocol="'+obj.protocol+'" microType="'+obj.microType+'" microFamily="'+obj.microFamily+'">\n';
-		                for (var k in obj.properties) {
-		                    switch(obj.properties[k].type){
-		                        case 'Slider' :
-		                            xml += '\t<Property type="'+obj.properties[k].type+'" pin="'+obj.properties[k].pin+'" model="'+obj.properties[k].name+'" min="'+obj.properties[k].min+'" max="'+obj.properties[k].max+'" step="'+obj.properties[k].step+'"  />\n'
-		                        break;
-		                        case 'Trigger' :
-		                            xml += '\t<Property type="'+obj.properties[k].type+'" pin="'+obj.properties[k].pin+'" model="'+obj.properties[k].name+'" on="'+obj.properties[k].on+'" off="'+obj.properties[k].off+'" />\n'
-		                        break;
-		                        case 'Button' :
-		                            xml += '\t<Property type="'+obj.properties[k].type+'" pin="'+obj.properties[k].pin+'" model="'+obj.properties[k].name+'" value="'+obj.properties[k].value+'" />\n'
-		                        break;
-		                        case 'List' :
-		                            xml += '\t<Property type="'+obj.properties[k].type+'" pin="'+obj.properties[k].pin+'" model="'+obj.properties[k].name+'" default="" />\n'
-		                        break;
-		                        default :
-		                            xml += '\t<Property type="'+obj.properties[k].type+'" pin="'+obj.properties[k].pin+'" model="'+obj.properties[k].name+'" />\n'
-		                        break;
-		                    }
-		                    
-		                }
-		            xml += '</application>'
-		        console.log('APIO: Creating the view file');
-		        fs.writeFileSync('public/applications/'+obj.objectId+'/view.xml',xml);
-		        var js = '/*Insert here you application controller code and functions*/\n(function(){\n/*Insert here you application actions, listeners and correlations*/\n\tinit : function() {\n//Put your initialization code here\n}\n\n})();';
-		        console.log('APIO: Creating the controller file');
-		        fs.writeFileSync('public/applications/'+obj.objectId+'/'+obj.objectId+'.js',js);
-		        var conf = 'objectId:'+obj.objectId+'\nprotocol:'+obj.protocol+'\nobjectAddress:'+obj.address+'\nmicro:'+obj.microFamily+' '+obj.microType+'\n\n';
-		        for(var k in obj.pins){
-			        conf +='pin:'+obj.pins[k].name+' '+obj.pins[k].number+' '+obj.pins[k].type+'\n';
-		        }
-		        for (var k in obj.variables){
-			        conf+='\nvar:'+obj.variables[k].type+' '+obj.variables[k].name+' '+obj.variables[k].value+'\n';
-		        }
-		        for(var k in obj.functions){
-			        conf +='\nfunctionBegin:'+obj.functions[k].text+'\nfunctionEnd:\n\n';
-		        }
-		        for (var k in obj.properties) {
-		                    switch(obj.properties[k].type){
-		                        case 'Slider' :
-		                            conf += obj.properties[k].name+':'+obj.properties[k].sliderFunction+';\n'
-		                        break;
-		                        case 'Trigger' :
-		                            conf += obj.properties[k].name+':'+obj.properties[k].on+':'+obj.properties[k].onFunction+';\n'+obj.properties[k].name+':'+obj.properties[k].off+':'+obj.properties[k].offFunction+';\n'
-		                        break;
-		                        case 'Button' :
-		                           conf += obj.properties[k].name+':'+obj.properties[k].buttonFunction+';\n'
-		                        break;
-		                        case 'List' :
-		                            conf += obj.properties[k].name+':'+obj.properties[k].listFunction+';\n'
-		                        break;
-								case 'Number' :
-		                           conf += obj.properties[k].name+':'+obj.properties[k].numberFunction+';\n'
-		                        break;
-		                        case 'Button' :
-		                           conf += obj.properties[k].name+':'+obj.properties[k].buttonFunction+';\n'
-		                        break;
-		                        case 'Text' :
-		                           conf += obj.properties[k].name+':'+obj.properties[k].textFunction+';\n'
-		                        break;
-		                        
-		                    }
-		                    
-		                }
-		        
-		        console.log('APIO: Creating the conf file');
-		        fs.writeFileSync('public/applications/'+obj.objectId+'/'+obj.objectId+'.conf',conf);
-		        
-		        console.log('APIO: Object installation completed ✔✔');
-		        //Lanciare il file parser.php
-			function puts(error, stdout, stderr) { sys.puts(stdout) }
-			exec('php -f parser.php '+obj.objectId, puts);
-		        console.log('APIO: Object creation '+obj.objectId+'.ino');
-		        res.send(200);
-		    });
-		},
 	exportApioApp : function(req,res){
+	    console.log('/apio/app/export')
 	    var id = req.query.id;
-	    var targz = require('tar.gz');
-	    //var compress = new targz().compress('/applications/:id', '/applications/temp/:id.tar.gz', function(err){
-	    var compress = new targz().compress('public/applications/'+id, 'public/applications/temp/'+id+'.tar.gz', function(err){
-	        if(err)
-	            console.log(err);
-	        else{
-	            res.download('public/applications/temp/'+id+'.tar.gz',id+'.tar.gz',function(err){
+	    var dummy = '8=====D';
+	    var path = 'public/applications/'+id+'/'+id;
+	    var object = {};
+	    var jsonObject = {};
+
+	    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
+	    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
+	    //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
+	    object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
+	    object.ino = fs.readFileSync(path+'/'+id+'.ino', {encoding: 'utf8'});
+	    object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
+
+	    //jsonObject = JSON.parse(object.json);
+	    jsonObject = JSON.parse(object.mongo);
+	    console.log('jsonObject.name: '+jsonObject.name);
+	    
+	    //TO FIX: MAKE REPLACE RECURSIVE
+	    object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	    object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	    object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	    
+	    object.html=object.html.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	    object.html=object.html.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	    object.html=object.html.replace('applications/'+id+'/'+id+'.js','applications/'+dummy+'/'+dummy+'.js');
+
+	    //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+	    object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+
+	    try {
+	        var path = 'public/';
+	        console.log('path + dummy:'+path + dummy);
+	        console.log('target: public/exported/'+jsonObject.name+'.tar.gz');
+	        fs.mkdirSync(path+'/temp');
+	        path = 'public/temp';
+	        fs.mkdirSync(path +'/'+ dummy);
+	        fs.mkdirSync(path +'/'+ dummy + '/' + dummy);
+	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/' + dummy + '.ino',object.ino);
+	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
+	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
+	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',object.mongo);
+	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/Makefile',object.makefile);
+	        //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
+	 
+	        //var compress = new targz().compress('/applications/:id', '/applications/temp/:id.tar.gz', function(err){
+	        
+	        var compress = new targz().compress(path +'/'+ dummy, path+'/'+jsonObject.name+'.tar.gz', function(err){
+	            if(err)
+	                console.log(err);
+	            else
+	            {
+	                res.download(path+'/'+jsonObject.name+'.tar.gz',jsonObject.name+'.tar.gz',function(err){
+	                    if(err){
+	                        console.log(err);
+	                    }else{
+	                        console.log('deleting temp folder '+'public/temp')
+	                        var deleteFolderRecursive = function(path) {
+	                            console.log('deleting the directory '+path);
+	                            if( fs.existsSync(path) ) {
+	                                fs.readdirSync(path).forEach(function(file,index){
+	                                  var curPath = path + "/" + file;
+	                                  if(fs.lstatSync(curPath).isDirectory()) { // recurse
+	                                    deleteFolderRecursive(curPath);
+	                                  } else { // delete file
+	                                    fs.unlinkSync(curPath);
+	                                  }
+	                                });
+	                                fs.rmdirSync(path);
+	                            }
+	                        };
+	                        deleteFolderRecursive(path);
+	                        //fs.unlinkSync(path+jsonObject.name+'.tar.gz');
+	                    }
+	                });
+	                console.log('The compression has ended!');
+	            }
+	        });
+
+	    } catch(e) {
+	        res.status(500).send();
+	        console.log(e);
+	        return;
+	    }
+	
+	},
+	exportInoApioApp : function(req,res){
+	    console.log('/apio/app/exportIno')
+	    var obj = {};
+	    obj.objectId = req.query.id;
+	    
+	    try {
+	            var compress = new targz().compress("public/applications/" + obj.objectId +'/_' + obj.objectId, "public/applications/" + obj.objectId +'/' + obj.objectId +'.tar.gz', function(err){
 	                if(err)
 	                    console.log(err);
+	                else
+	                {
+	                    console.log('QUA')
+	                    console.log("public/applications/" + obj.objectId +'/' + obj.objectId +'.tar.gz');
+	                    console.log(obj.objectId+'.tar.gz')
+	                    console.log('FINE')
+	                    res.download("public/applications/" + obj.objectId +'/' + obj.objectId +'.tar.gz',obj.objectId+'.tar.gz',function(err){
+	                        if(err){
+	                            console.log('There is an error')
+	                            console.log(err);
+	                        }else{
+	                            console.log('Download has been executed')
+	                            console.log('deleting temp folder '+'public/temp')
+	                            var deleteFolderRecursive = function(path) {
+	                                console.log('deleting the directory '+path);
+	                                if( fs.existsSync(path) ) {
+	                                    fs.readdirSync(path).forEach(function(file,index){
+	                                      var curPath = path + "/" + file;
+	                                      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+	                                        deleteFolderRecursive(curPath);
+	                                      } else { // delete file
+	                                        fs.unlinkSync(curPath);
+	                                      }
+	                                    });
+	                                    fs.rmdirSync(path);
+	                                }
+	                            };
+
+
+	                            //deleteFolderRecursive(path);
+	                            //fs.unlinkSync(path+jsonObject.name+'.tar.gz');
+	                        }
+	                    });
+	                    console.log('The compression has ended!');
+	                }
 	            });
-	            console.log('The compression has ended!');
-	        }
-	    });
+	    } catch(e) {
+	        res.status(500).send();
+	        console.log(e);
+	        return;
+	    }
+	    
 	},
 	deleteApioApp : function(req,res){
 	    var id = req.body.id;
@@ -272,6 +325,7 @@ module.exports = {
 	    };
 
 	    Apio.Database.deleteObject(id,function(err){
+	       // Apio.Database.db.collection('Objects').remove({objectId : id}, function(err){
 	        if(err){
 	            console.log('error while deleting the object '+id+' from the db');
 	            res.status(500).send();
@@ -284,5 +338,131 @@ module.exports = {
 
 	    })
 	    
+	},
+	uploadApioApp : function(req,res){
+	    console.log('/apio/app/upload')
+	    fs.mkdirSync('upload');
+	    
+	    var form = new formidable.IncomingForm();
+	        form.uploadDir = "upload";
+	        form.keepExtensions = true;
+
+
+	        form.on('file', function(name, file) {
+	            console.log('file name: '+file.name);
+	            console.log('file path: '+file.path);
+	            fs.rename(file.path, 'upload/'+file.name);
+
+	            var compress = new targz().extract('upload/'+file.name, 'upload/temp', function(err){
+	                if(err)
+	                    console.log(err);
+
+	                console.log('The extraction has ended!');
+	                //recupero max actual id
+	                Apio.Database.getMaximumObjectId(function(error, data){
+	                    if(error){
+	                        console.log('error: '+error);
+	                    }
+	                    else if(data){
+	                        console.log(data);
+	                        //qui rinomino i cazzetti nell'id attuale
+
+	                        var id = '8=====D';
+	                        var path = 'upload/temp/'+id+'/'+id;
+	                        var object = {};
+	                        var jsonObject = {};
+
+	                        object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
+	                        object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
+	                        //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
+	                        object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
+	                        object.ino = fs.readFileSync(path+'/'+id+'.ino', {encoding: 'utf8'});
+	                        object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
+
+	                        //jsonObject = JSON.parse(object.json);
+	                        jsonObject = JSON.parse(object.mongo);
+	                        console.log('jsonObject.name: '+jsonObject.name);
+
+	                        var dummy = (parseInt(data)+1).toString();
+	                        
+	                        
+	                        object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	                        object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	                        object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	                        
+	                        object.html=object.html.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	                        object.html=object.html.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+	                        object.html=object.html.replace('applications/'+id+'/'+id+'.js','applications/'+dummy+'/'+dummy+'.js');
+
+	                        //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+	                        object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+	                        
+	                        //Apio.Database.db.collection('Objects').insert(JSON.parse(object.json),function(err,data){
+	                        Apio.Database.db.collection('Objects').insert(JSON.parse(object.mongo),function(err,data){
+	                            if(err)
+	                                console.log(err);
+	                            else
+	                            {
+	                                var deleteFolderRecursive = function(path) {
+	                                    console.log('deleting the directory '+path);
+	                                    if( fs.existsSync(path) ) {
+	                                        fs.readdirSync(path).forEach(function(file,index){
+	                                          var curPath = path + "/" + file;
+	                                          if(fs.lstatSync(curPath).isDirectory()) { // recurse
+	                                            deleteFolderRecursive(curPath);
+	                                          } else { // delete file
+	                                            fs.unlinkSync(curPath);
+	                                          }
+	                                        });
+	                                        fs.rmdirSync(path);
+	                                    }
+	                                };
+
+	                                var path = 'public/applications/';
+	                                console.log('path + dummy:'+path + dummy);
+
+	                                fs.mkdirSync(path +'/'+ dummy);
+	                                fs.mkdirSync(path +'/'+ dummy + '/' + dummy);
+	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/' + dummy + '.ino',object.ino);
+	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
+	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
+	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',object.mongo);
+	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/Makefile',object.makefile);
+	                                //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
+	                                deleteFolderRecursive('upload');
+	                            }
+	                        });
+	                        
+	                        
+
+	                        //fine
+	                    }
+
+	                })
+	            });
+
+	        });
+
+	        form.parse(req, function(err, fields, files) {
+	          console.log('received upload:\n\n');
+	          res.send(200);
+	        });
+
+	    return;
+
+	},
+	maximumIdApioApp : function(req,res){
+	    console.log('/apio/app/maximumId');
+	    Apio.Database.getMaximumObjectId(function(error,data){
+	        if(error){
+	            console.log('error: '+error);
+	        }
+	        else if(data){
+	            console.log(data);
+	            res.send(data);
+	        }
+	    });
+	
 	}
+
 }
