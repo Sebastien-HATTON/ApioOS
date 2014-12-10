@@ -147,11 +147,13 @@ module.exports = {
 	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
 	            
 	            var source = 'public/arduino/';
-	            if(obj.protocol=='z'){
+	            console.log('obj.protocol: '+ obj.protocol);
+	            if(obj.protocol==='z'){
 	                source += 'XBee';
 	            }else{
 	                source += 'LWM';
 	            }
+	            console.log('source: '+ source);
 	            var destination = 'public/applications/'+obj.objectId+'/_' + obj.objectId ;
 
 	            ncp.limit = 16;
