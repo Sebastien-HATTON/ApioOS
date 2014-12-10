@@ -44,9 +44,5 @@ angular.module('ApioApplication').controller('ApioNotificationController',['$sco
             })
         }
         $scope.loadNotifications();
-        $scope.showNotificationsCenter = function() {
-                
-              $( "#notificationsCenter" ).toggle( "slide",{ direction : 'up'}, 500 );
-            
-        }
+        
 }])

@@ -179,7 +179,11 @@ Apio.currentApplication.subapps = {};
 var ApioApplication = angular.module('ApioApplication',['ui.bootstrap','ngRoute']);
 
 
-
+$("#notificationTrigger").on('click',function() {
+                
+              $( "#notificationsCenter" ).toggle( "slide",{ direction : 'up'}, 500 );
+            
+        });
 
 ApioApplication.config(['$routeProvider',
   function($routeProvider) {
