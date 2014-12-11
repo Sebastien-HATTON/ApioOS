@@ -227,7 +227,7 @@ Apio.Serial.init = function() {
 *	adding the end transmission char -
 *	and check the protocol type 
 */
-Apio.Serial.send = 	function(data) {
+Apio.Serial.send = 	function(data,callback) {
 	//NOTA data dovrebbe mandare soltanto objID e le prop
 		var message = "";
 		for (var key in data.properties)
