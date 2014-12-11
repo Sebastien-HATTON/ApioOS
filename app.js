@@ -155,7 +155,24 @@ app.post("/apio/state/apply",function(req,res){
                         console.log("applyState unable to apply state")
                         console.log(err);
                     }
+                    else if (state.active == true){
+                        Apio.Database.db.collection('States').update({name : state.name},{$set : {active : false}},function(errOnActive){
+                            if (errOnActive) {
+                                console.log("Impossibile settare il flag dello stato");
+                                res.status(500).send({error : "Impossibile settare il flag dello stato"})
+                            } else {
+                                var s = state;
+                                s.active = false;
+                                Apio.io.emit('apio_state_update',s);
+                                re.send({error:false});
+                            }
+                        })
+                    }
                     else {
+                        Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
+                            if (err)
+                                console.log("Non ho potuto settare il flag a true");
+                        })
                         console.log("Lo stato che sto per applicare è ")
                         console.log(state)
                         Apio.Database.updateProperty(state,function(){
