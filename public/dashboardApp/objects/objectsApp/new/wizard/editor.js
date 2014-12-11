@@ -3,8 +3,9 @@ angular.module('ApioDashboardApplication')
 
   this.tabb = 1;
 
+
   this.selectTab = function(setTab){
-      this.tabb = setTab;
+    this.tabb = setTab;
   };
 
   this.isSelected = function(checkTab){
@@ -22,7 +23,7 @@ angular.module('ApioDashboardApplication')
 
   $scope.aceLoadedHtml = function(_editor){
     $scope.$parent.editorHtml=_editor;
-    
+
     /*console.log('editor in ace html loaded: ');
     console.log(_editor);
     console.log('$scope.editor in ace html loaded: ');

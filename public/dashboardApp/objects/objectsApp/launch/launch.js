@@ -90,7 +90,8 @@ angular.module('ApioDashboardApplication')
 	      console.log('/apio/app/delete success()');
 	      $('#appModal').modal('hide');
 	      //$scope.switchPage('Objects');
-	      $state.go('objects.objectsLaunch');
+	      //$state.go('objects.objectsLaunch');
+	      $state.go($state.current, {}, {reload: true});
 	      alert("App Deleted")
 	    })
 	    .error(function(data,status,header){

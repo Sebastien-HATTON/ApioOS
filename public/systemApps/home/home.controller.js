@@ -37,6 +37,10 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
 
         });
 
+        $scope.launchDashboard = function(){
+            window.location = 'dashboard';
+        }
+
 
         
 

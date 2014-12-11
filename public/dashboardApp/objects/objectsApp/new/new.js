@@ -1,5 +1,5 @@
 angular.module('ApioDashboardApplication')
-.controller('ApioDashboardNewController', ['$scope','objectService','$http', function($scope,objectService,$http){
+.controller('ApioDashboardNewController', ['$scope','objectService','$http','$timeout', function($scope,objectService,$http,$timeout){
 	$scope.currentApplication=$scope.$parent.currentApplication;
 	$scope.hideWizard=true;
 	$scope.hideNewEditor=true;
@@ -53,6 +53,10 @@ angular.module('ApioDashboardApplication')
 	    $scope.hideCreateNew=false;
 	    $scope.hideUpdate=true;
 	    $scope.initNewEditor();
+	   /* $('#inoEditor').trigger('click');
+	    $('#jsEditor').trigger('click');
+	    $('#htmlEditor').trigger('click');
+	    $('#mongoEditor').trigger('click');*/
 	};
 
 	$scope.initNewEditor = function(){
@@ -94,21 +98,46 @@ angular.module('ApioDashboardApplication')
 	    editorMongo += '\t"db" : {\n\t}\n';
 	    editorMongo += '}';
 
-	    $scope.editorIno.setValue(emptyIno);
-	    $scope.editorIno.clearSelection();  
-	    $scope.editorHtml.setValue(emptyHtml);  
-	    $scope.editorHtml.clearSelection();
-	    $scope.editorJs.setValue(emptyJs); 
-	    $scope.editorJs.clearSelection();
-	    $scope.editorMongo.setValue(editorMongo);  
-	    $scope.editorMongo.clearSelection(); 
+	    console.log('editorHtml: ')
+	    console.log($scope.editorHtml)
+	    console.log('editorJs: ')
+	    console.log($scope.editorJs)
+	    console.log('editorMongo: ')
+	    console.log($scope.editorMongo)
+
+		   	$scope.editorIno.setValue(emptyIno);
+		    $scope.editorIno.clearSelection();  
+		    $scope.editorIno.blur();
+		    $scope.editorHtml.setValue(emptyHtml);  
+		    $scope.editorHtml.clearSelection();
+		    $scope.editorHtml.blur();
+		    $scope.editorJs.setValue(emptyJs); 
+		    $scope.editorJs.clearSelection();
+		    $scope.editorJs.blur();
+		    $scope.editorMongo.setValue(editorMongo);  
+		    $scope.editorMongo.clearSelection();
+		    $scope.editorMongo.blur();
+
 	    //devo settare anche i valori nello scope perchè altrimenti se viene
 	    //premuto update prima che sia stato dato il focus all'editor 
 	    //i relativi ng-model rimangono vuoti
-	    $scope.ino = emptyIno;
-	    $scope.html = emptyHtml;
-	    $scope.js = emptyJs;
-	    $scope.mongo = editorMongo;
+	    
+	    //$timeout(function(){}, [delay], [invokeApply]);
+
+	    $timeout(function(){
+	    	$scope.ino = emptyIno;
+	    	$timeout(function(){
+			    $scope.html = emptyHtml;
+			    $timeout(function(){
+			   		$scope.js = emptyJs;
+			   		$timeout(function(){
+						$scope.mongo = editorMongo;	
+					},1,false)
+				},1,false)	
+			},1,false)
+	    },1,false)
+	    
+
 	};
 
 	$scope.addNewProperty = function() {

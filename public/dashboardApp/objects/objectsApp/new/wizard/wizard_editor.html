@@ -10,15 +10,15 @@
 
 <section id="EditorPanel" class="tab-pane" ng-controller="EditorPanel as panell">
     <ul class="nav nav-tabs" role="tablist">
-      <li ng-class="{active: panell.isSelected(1), disabled: panell.isDisabled(1)}"><a ng-click="panell.selectTab(1)" href="">Firmware</a></li>
-      <li ng-class="{active: panell.isSelected(2), disabled: panell.isDisabled(2)}"><a ng-click="panell.selectTab(2)" href="">Application Html</a></li>
-      <li ng-class="{active: panell.isSelected(3), disabled: panell.isDisabled(3)}"><a ng-click="panell.selectTab(3)" href="">Application JS</a></li>
-      <li ng-class="{active: panell.isSelected(4), disabled: panell.isDisabled(4)}"><a ng-click="panell.selectTab(4)" href="">DataBase</a></li>
+      <li ng-class="{active: panell.isSelected(1), disabled: panell.isDisabled(1)}"><a id = "inoClick" ng-click="panell.selectTab(1)" href="">Firmware</a></li>
+      <li ng-class="{active: panell.isSelected(2), disabled: panell.isDisabled(2)}"><a id = "htmlClick" ng-click="panell.selectTab(2)" href="">Application Html</a></li>
+      <li ng-class="{active: panell.isSelected(3), disabled: panell.isDisabled(3)}"><a id = "jsClick" ng-click="panell.selectTab(3)" href="">Application JS</a></li>
+      <li ng-class="{active: panell.isSelected(4), disabled: panell.isDisabled(4)}"><a id = "mongoClick" ng-click="panell.selectTab(4)" href="">DataBase</a></li>
     </ul>
     
     <div class="panel" ng-show="panell.isSelected(1)">
         <h4>Firmware</h4>
-        <div ui-ace="{useWrapMode : true,
+        <div id='inoEditor' ui-ace="{useWrapMode : true,
             showGutter: true,
             theme:'twilight',
             mode: 'arduino',
@@ -29,7 +29,7 @@
 
     <div class="panel" ng-show="panell.isSelected(2)">
         <h4>Application Html</h4>
-                    <div ui-ace="{useWrapMode : true,
+                    <div id='htmlEditor' ui-ace="{useWrapMode : true,
                         showGutter: true,
                         theme:'twilight',
                         mode: 'html',
@@ -38,8 +38,8 @@
                     </div>
     </div>
     <div class="panel" ng-show="panell.isSelected(3)">
-        <h4>Application Html</h4>      
-                    <div ui-ace="{useWrapMode : true,
+        <h4>Application Js</h4>      
+                    <div id='jsEditor' ui-ace="{useWrapMode : true,
                         showGutter: true,
                         theme:'twilight',
                         mode: 'javascript',
@@ -50,7 +50,7 @@
 
     <div class="panel" ng-show="panell.isSelected(4)">
         <h4>DataBase</h4>
-        <div ui-ace="{useWrapMode : true,
+        <div id='mongoEditor' ui-ace="{useWrapMode : true,
                 showGutter: true,
                 theme:'twilight',
                 mode: 'javascript',

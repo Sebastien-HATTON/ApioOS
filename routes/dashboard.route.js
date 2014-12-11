@@ -4,6 +4,21 @@ var formidable = require('formidable');
 var ncp = require('ncp').ncp;
 var Apio = require("../apio.js");
 
+var deleteFolderRecursive = function(path) {
+    console.log('deleting the directory '+path);
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file,index){
+          var curPath = path + "/" + file;
+          if(fs.lstatSync(curPath).isDirectory()) { // recurse
+            deleteFolderRecursive(curPath);
+          } else { // delete file
+            fs.unlinkSync(curPath);
+          }
+        });
+        fs.rmdirSync(path);
+    }
+};
+
 module.exports = {
 	index : function(req,res) {
 			res.sendfile("public/dashboardApp/dashboard.html");
@@ -228,20 +243,6 @@ module.exports = {
 	                        console.log(err);
 	                    }else{
 	                        console.log('deleting temp folder '+'public/temp')
-	                        var deleteFolderRecursive = function(path) {
-	                            console.log('deleting the directory '+path);
-	                            if( fs.existsSync(path) ) {
-	                                fs.readdirSync(path).forEach(function(file,index){
-	                                  var curPath = path + "/" + file;
-	                                  if(fs.lstatSync(curPath).isDirectory()) { // recurse
-	                                    deleteFolderRecursive(curPath);
-	                                  } else { // delete file
-	                                    fs.unlinkSync(curPath);
-	                                  }
-	                                });
-	                                fs.rmdirSync(path);
-	                            }
-	                        };
 	                        deleteFolderRecursive(path);
 	                        //fs.unlinkSync(path+jsonObject.name+'.tar.gz');
 	                    }
@@ -279,21 +280,6 @@ module.exports = {
 	                        }else{
 	                            console.log('Download has been executed')
 	                            console.log('deleting temp folder '+'public/temp')
-	                            var deleteFolderRecursive = function(path) {
-	                                console.log('deleting the directory '+path);
-	                                if( fs.existsSync(path) ) {
-	                                    fs.readdirSync(path).forEach(function(file,index){
-	                                      var curPath = path + "/" + file;
-	                                      if(fs.lstatSync(curPath).isDirectory()) { // recurse
-	                                        deleteFolderRecursive(curPath);
-	                                      } else { // delete file
-	                                        fs.unlinkSync(curPath);
-	                                      }
-	                                    });
-	                                    fs.rmdirSync(path);
-	                                }
-	                            };
-
 
 	                            //deleteFolderRecursive(path);
 	                            //fs.unlinkSync(path+jsonObject.name+'.tar.gz');
@@ -311,20 +297,6 @@ module.exports = {
 	},
 	deleteApioApp : function(req,res){
 	    var id = req.body.id;
-	    var deleteFolderRecursive = function(path) {
-	        console.log('deleting the directory '+path);
-	        if( fs.existsSync(path) ) {
-	            fs.readdirSync(path).forEach(function(file,index){
-	              var curPath = path + "/" + file;
-	              if(fs.lstatSync(curPath).isDirectory()) { // recurse
-	                deleteFolderRecursive(curPath);
-	              } else { // delete file
-	                fs.unlinkSync(curPath);
-	              }
-	            });
-	            fs.rmdirSync(path);
-	        }
-	    };
 
 	    Apio.Database.deleteObject(id,function(err){
 	       // Apio.Database.db.collection('Objects').remove({objectId : id}, function(err){
@@ -405,21 +377,6 @@ module.exports = {
 	                                console.log(err);
 	                            else
 	                            {
-	                                var deleteFolderRecursive = function(path) {
-	                                    console.log('deleting the directory '+path);
-	                                    if( fs.existsSync(path) ) {
-	                                        fs.readdirSync(path).forEach(function(file,index){
-	                                          var curPath = path + "/" + file;
-	                                          if(fs.lstatSync(curPath).isDirectory()) { // recurse
-	                                            deleteFolderRecursive(curPath);
-	                                          } else { // delete file
-	                                            fs.unlinkSync(curPath);
-	                                          }
-	                                        });
-	                                        fs.rmdirSync(path);
-	                                    }
-	                                };
-
 	                                var path = 'public/applications/';
 	                                console.log('path + dummy:'+path + dummy);
 

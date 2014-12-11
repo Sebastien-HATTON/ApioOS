@@ -164,7 +164,8 @@ angular.module('ApioDashboardApplication')
       }
 
     }
-    this.mongo = this.mongo.slice(0,this.mongo.length-2);
+    if((Object.keys(objectToParse.properties)).length!==0)
+      this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
 
     this.mongo += '"db" : {\n';
