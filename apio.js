@@ -256,70 +256,88 @@ Apio.Serial.send = 	function(data) {
 			}
 			//if (data.protocol !== obj.protocol)
 			//	throw new Error("Apio.Serial.Send() trying to communicate to object "+obj.objectId+" with the wrong protocol");
-			switch(data.protocol) { //Devo usare data.protocol che è quella richiesta.
-				case "z" :
-					if (!Apio.Serial.hasOwnProperty("serialPort"))
-						throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
-					Apio.Serial.serialPort.write(data.protocol+obj.address+":"+message,function(err,result){
-									Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
-									if (Apio.Util.isSet(err))
-										Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
-									else
-							   			Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
-					});
-				break;
-				case "l" :
-					if (!Apio.Serial.hasOwnProperty("serialPort"))
-						throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
-					Apio.Serial.serialPort.write(data.protocol+data.address+":"+message,function(err,result){
-									Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
-									if (Apio.Util.isSet(err))
-										Apio.Util.debug("Apio.Serial.Send() Error: " + err);
-							   		Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
-				});		
-				break;
-				case "w" :
-					console.log("Apio.Serial.send() Sending "+message+" to HTTP object ")
-					var req = http.request({
-						host : '127.0.0.1',
-						port : '8004',
-						method : 'GET',
-						path : '/'+message
-					},function(response){
-						response.on('data',function(data){
-							console.log("Apio.Serial.send() http::response::data Data sent trough http to object")
-						});
-						response.on('end',function(){
-							console.log("Apio.Serial.send() http::response::end Data sent trough http to object")
-						})
-						
-					});
-					req.on('error',function(){
-						console.log("Apio.Serial.send() http::request::error")
-					});
-					req.end();
-				break;
-				case "b" :
-					//TODO
-				break;
-				default : 
-					//Cerco nella cartella dell'oggetto, se ho una specifica per un protocollo proprietario, la uso
-					//Ovvero faccio un require di un modulo che mi esporta un hash.
-					//Questo hash non ha altro che delle stringhe di conversione
-					if (fs.existsSync(__dirname+"/public/applications/"+obj.objectId+"/adapter.js")) {
-					var adapter = require(__dirname+"/public/applications/"+obj.objectId+"/adapter.js");
-					console.log("Sto per mandare all'adapter l'oggetto ");
-					console.log(data);
-					adapter.send(data);
-					} else {
-						Apio.Util.debug("Apio.Serial.Send() Error: protocol "+obj.protocol+ "is not supported and no adapter was found.");
-					    // Do something
-					}
-				break;
-			}
-		});
+		switch(data.protocol) { //Devo usare data.protocol che è quella richiesta.
+			case "z" :
+				if (!Apio.Serial.hasOwnProperty("serialPort"))
+					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				Apio.Serial.serialPort.write(data.protocol+obj.address+":"+message,function(err,result){
+								Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
+								if (Apio.Util.isSet(err))
+									Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
+								else
+									Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
+								if(callback){
+									console.log("PARTE LA CALLBACK DELLA SERIAL");
+									callback();
+								}
 
-			
+				});
+			break;
+			case "l" :
+				if (!Apio.Serial.hasOwnProperty("serialPort"))
+					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				Apio.Serial.serialPort.write(data.protocol+data.address+":"+message,function(err,result){
+					Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
+					if (Apio.Util.isSet(err))
+						Apio.Util.debug("Apio.Serial.Send() Error: " + err);
+					Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
+					if(callback){
+						console.log("PARTE LA CALLBACK DELLA SERIAL");
+						callback();
+					}
+			});
+			break;
+			case "w" :
+				console.log("Apio.Serial.send() Sending "+message+" to HTTP object ")
+				var req = http.request({
+					host : '127.0.0.1',
+					port : '8004',
+					method : 'GET',
+					path : '/'+message
+				},function(response){
+					response.on('data',function(data){
+						console.log("Apio.Serial.send() http::response::data Data sent trough http to object")
+					});
+					response.on('end',function(){
+						console.log("Apio.Serial.send() http::response::end Data sent trough http to object")
+					})
+					if(callback){
+						console.log("PARTE LA CALLBACK DELLA SERIAL");
+						callback();
+					}
+				});
+				req.on('error',function(){
+					console.log("Apio.Serial.send() http::request::error")
+				});
+				req.end();
+			break;
+			case "b" :
+				//TODO
+				if(callback){
+					console.log("PARTE LA CALLBACK DELLA SERIAL");
+					callback();
+				}
+			break;
+			default :
+				//Cerco nella cartella dell'oggetto, se ho una specifica per un protocollo proprietario, la uso
+				//Ovvero faccio un require di un modulo che mi esporta un hash.
+				//Questo hash non ha altro che delle stringhe di conversione
+				if (fs.existsSync(__dirname+"/public/applications/"+obj.objectId+"/adapter.js")) {
+				var adapter = require(__dirname+"/public/applications/"+obj.objectId+"/adapter.js");
+				console.log("Sto per mandare all'adapter l'oggetto ");
+				console.log(data);
+				adapter.send(data);
+				if(callback){
+					console.log("PARTE LA CALLBACK DELLA SERIAL");
+					callback();
+				}
+				} else {
+					Apio.Util.debug("Apio.Serial.Send() Error: protocol "+obj.protocol+ "is not supported and no adapter was found.");
+					// Do something
+				}
+			break;
+		}
+	});		
 };
 
 /*
@@ -833,6 +851,7 @@ Apio.System.launchEvent = function(eventName,callback) {
 							console.log("Trovato un evento da lanciare")
 							e.triggeredStates.forEach(function(_e,_i,_v){
 								console.log("Trovato stato da triggerare: "+_e);
+								console.log(_e)
 								Apio.System.applyState(_e,function(err){
 									//
 								})
@@ -884,7 +903,10 @@ Apio.System.checkEvent = function(state) {
 Apio.System.notify = function(notification,callback) {
 	//Notifica a tutti gli utenti di un evento
 	//Questo viene fatto inviando una notifica ai client attivi
-	Apio.Database.db.collection('Users').update({},{$push : notification},function(err,data){
+	console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
+	notification.timestamp = (new Date()).getTime();
+	console.log(notification);
+	Apio.Database.db.collection('Users').update({},{$push : {"unread_notifications" : notification}},function(err,data){
 		if (err)
 			console.log("Apio.System.notify Error, unable to send the notification");
 		else {

@@ -3,9 +3,15 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
         document.getElementById("targetBody").style.position = "";
         $("#ApioApplicationContainer").hide(function(){
             $("#ApioApplicationContainer").html("");
-        })
+        });
 
-        $http.get('/apio/state')
+        //Reset handlers
+        $("#ApioApplicationContainer").off("touchstart");
+        $("#ApioApplicationContainer").off("touchend");
+        $("#ApioApplicationContainer").off("mousedown");
+        $("#ApioApplicationContainer").off("mouseup");
+
+            $http.get('/apio/state')
             .success(function(data) {
                 $scope.states = data;
 
@@ -69,7 +75,6 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
         };
 
         $scope.editState = function(state) {
-            document.getElementById('wallContainer').classList.add('wall_open_edit_state');
             var id = state.objectId;
             currentObject.recordingStateName(state.name);
             //$("#appApio").css("width", Apio.appWidth + "px");
@@ -84,8 +89,7 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
                 currentObject.set(d.data);
 
                 $.get("applications/" + id + "/" + id + ".html", function(data) {
-                    if (window.innerWidth > 769)
-                        $("#ApioIconsContainer").css("width", "77%");
+                    document.getElementById('wallContainer').classList.add('wall_open_edit_state');
 
                     $("#ApioApplicationContainer").html($(data));
                     $("#ApioApplicationContainer").find("h2").text($scope.currentObject.name);

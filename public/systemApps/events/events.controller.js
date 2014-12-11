@@ -5,8 +5,12 @@ angular.module('ApioApplication')
                 $("#ApioApplicationContainer").hide(function(){
                     $("#ApioApplicationContainer").html("");
                 });
-
-            var startX, startY;
+				
+			
+			
+            //var startX, startY;
+            //Touch event
+            /*
             $("#editEventPanel").on("touchstart", function(event){
                 startX = event.originalEvent.changedTouches[0].pageX;
                 startY = event.originalEvent.changedTouches[0].pageY;
@@ -18,13 +22,45 @@ angular.module('ApioApplication')
                     $("#editEventPanel").hide("slide", {
                         direction: 'right'
                     }, 500, function () {
-                        if (window.innerWidth > 769)
-                            $("#ApioEventsContainer").css("width", "100%");
+                        document.getElementById("ApioEventsContainer").classList.remove('event_open_edit_state');
                     });
                 }
             });
-
+            */
+            window.swipe('editEventPanel', function (){
+                document.getElementById("ApioEventsContainer").classList.remove('event_open_edit_state');
+            });
+            
+            
+	            window.affix('editEventPanel','myAffix',null,0,function(){
+	            	
+		            document.getElementById('myAffix').classList.add('add_new_guest');
+		           
+	            },function(){
+		            document.getElementById('myAffix').classList.remove('add_new_guest');
+	            });
+			
+            //Mouse event
+            /*
+            $("#editEventPanel").on("mousedown", function(event){
+                startX = event.pageX;
+                startY = event.pageY;
+            });
+            $("#editEventPanel").on("mouseup", function(event){
+                var distX = event.pageX - startX;
+                var distY = event.pageY - startY;
+                if(!$(event.target).is("input") && distX > 0 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+                    $("#editEventPanel").hide("slide", {
+                        direction: 'right'
+                    }, 500, function () {
+                        document.getElementById("ApioEventsContainer").classList.remove('event_open_edit_state');
+                    });
+                }
+            });
+			*/
+			
             var startX_, startY_;
+            //Touch event
             $("#editEventRunPanel").on("touchstart", function(event){
                 startX_ = event.originalEvent.changedTouches[0].pageX;
                 startY_ = event.originalEvent.changedTouches[0].pageY;
@@ -35,39 +71,24 @@ angular.module('ApioApplication')
                 if(!$(event.target).is("input") && distX_ > 0 && ((distY_ >= 0 && distY_ <= 40) || (distY_ >= -40 && distY_ <= 0))){
                     $("#editEventRunPanel").hide("slide", {
                         direction: 'right'
-                    }, 500, function () {
-                        if (window.innerWidth > 769)
-                            $("#ApioEventsContainer").css("width", "100%");
-                    });
+                    }, 500);
                 }
             });
 
-                /*var mc = new Hammer(document.getElementById("editEventPanel"),{
-                    domEvents : true
-                   });
-
-                    mc.on('swiperight',function(ev) {
-                        $("#editEventPanel").hide("slide", {
-                            direction: 'right'
-                        }, 500, function() {
-
-
-                        if (window.innerWidth > 769)
-                                $("#ApioEventsContainer").css("width", "100%");
-
-                        });
-                    } );
-                var mmc = new Hammer(document.getElementById("editEventRunPanel"),{
-                    domEvents : true
-                   });
-                mmc.on('swiperight',function(ev) {
-                        $("#editEventRunPanel").hide("slide", {
-                            direction: 'right'
-                        }, 500, function() {
-
-
-                        });
-                    } );*/
+            //Mouse event
+            $("#editEventRunPanel").on("mousedown", function(event){
+                startX_ = event.pageX;
+                startY_ = event.pageY;
+            });
+            $("#editEventRunPanel").on("mouseup", function(event){
+                var distX_ = event.pageX - startX_;
+                var distY_ = event.pageY - startY_;
+                if(!$(event.target).is("input") && distX_ > 0 && ((distY_ >= 0 && distY_ <= 40) || (distY_ >= -40 && distY_ <= 0))){
+                    $("#editEventRunPanel").hide("slide", {
+                        direction: 'right'
+                    }, 500);
+                }
+            });
 
             $scope.stateOrTime = "";
 
@@ -180,10 +201,28 @@ angular.module('ApioApplication')
 
             $scope.statesToAddToEvent = [];
             $scope.toggleNewStateInEvent = function(state) {
-                if ($scope.statesToAddToEvent.indexOf(state) > -1)
-                    $scope.statesToAddToEvent.splice($scope.statesToAddToEvent.indexOf(state),1);
-                else
-                    $scope.statesToAddToEvent.push(state)
+                function objectIndex(obj){
+                    var index = -1;
+                    var flag = true;
+                    for(var i = 0;flag && i < $scope.statesToAddToEvent.length;i++){
+                        if($scope.statesToAddToEvent[i].name == obj.name && $scope.statesToAddToEvent[i].objectName == obj.objectName){
+                            index = i;
+                            flag = false;
+                        }
+                    }
+
+                    return index;
+                }
+                var index = objectIndex({ "name" : state.name, "objectName" : state.objectName });
+                if(index > -1){
+                    $scope.statesToAddToEvent.splice(index, 1);
+                }
+                else{
+                    $scope.statesToAddToEvent.push({
+                        "name" : state.name,
+                        "objectName" : state.objectName
+                    });
+                }
             }
             $scope.saveCurrentEvent = function() {
 
@@ -198,8 +237,7 @@ angular.module('ApioApplication')
                 $("#editEventPanel").hide("slide",{
                     direction :  "right"
                 },500,function(){
-                    if (window.innerWidth > 769)
-                        $("#ApioEventsContainer").css("width", "100%");
+                    document.getElementById("ApioEventsContainer").classList.remove('event_open_edit_state');
                 });
                 console.log()
                 _saveEvent()
@@ -390,11 +428,9 @@ angular.module('ApioApplication')
             $scope.goBack = function() {
                 switch ($scope.currentFormStep) {
                     case "sceltaTipo":
-						
                         break;
                     case "selezioneData":
                         $scope.goToFormStep('sceltaTipo');
-                        
                         break;
                     case "selezioneStatoScatenante":
                         $scope.goToFormStep('sceltaTipo');
@@ -410,10 +446,10 @@ angular.module('ApioApplication')
                             $scope.goToFormStep('');
                             $scope.reset();
                         }
-
                         break;
                     case "selezioneNomeEvento":
                         $scope.goToFormStep('selezioneStatiScatenati');
+                        $scope.newEvent.name = "";
                         break;
                     default:
                         alert("Si è verificato un errore, tipo di evento non riconosciuto.")
@@ -424,11 +460,29 @@ angular.module('ApioApplication')
             }
 
             $scope.checkedModel = function(state){
+                function objectIndex(obj){
+                    var index = -1;
+                    var flag = true;
+                    for(var i = 0;flag && i < $scope.newEvent.triggeredStates.length;i++){
+                        if($scope.newEvent.triggeredStates[i].name == obj.name && $scope.newEvent.triggeredStates[i].objectName == obj.objectName){
+                            index = i;
+                            flag = false;
+                        }
+                    }
+
+                    return index;
+                }
                 $scope.newEvent.triggeredStates = typeof $scope.newEvent.triggeredStates !== "undefined" && $scope.newEvent.triggeredStates instanceof Array ? $scope.newEvent.triggeredStates : [];
-                $scope.newEvent.triggeredStates.push({
-                    "name" : state.name,
-                    "objectName" : state.objectName
-                });
+                var index = objectIndex({ "name" : state.name, "objectName" : state.objectName });
+                if(index > -1){
+                    $scope.newEvent.triggeredStates.splice(index, 1);
+                }
+                else{
+                    $scope.newEvent.triggeredStates.push({
+                        "name" : state.name,
+                        "objectName" : state.objectName
+                    });
+                }
             };
 
             $scope.saveEvent = function() {

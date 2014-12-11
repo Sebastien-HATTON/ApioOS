@@ -10,15 +10,99 @@ Apio.newWidth = parseInt($("#appApio").css('width'),10);
 Apio.currentApplication = {};
 Apio.currentApplication.subapps = {};
 
+$("#notificationTrigger").on('click',function() {             
+  $( "#notificationsCenter" ).toggle( "slide",{ direction : 'up'}, 500 );
+});
 
 var ApioApplication = angular.module('ApioApplication',['ui.bootstrap','ngRoute']);
+window.swipe = function(target, callback){
+	var startX, startY;
+    //Touch event
+    $("#"+target).on("touchstart", function(event){
+        startX = event.originalEvent.changedTouches[0].pageX;
+        startY = event.originalEvent.changedTouches[0].pageY;
+    });
+    $("#"+target).on("touchend", function(event){
+        var distX = event.originalEvent.changedTouches[0].pageX - startX;
+        var distY = event.originalEvent.changedTouches[0].pageY - startY;
+        if(!$(event.target).is("input") && distX > parseFloat($("#"+target).css("width"))/3 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+            $("#"+target).hide("slide", {
+                direction: 'right'
+            }, 700, callback());
+        }
+    });
+    
+    //Mouse event
+    $("#"+target).on("mousedown", function(event){
+        startX = event.pageX;
+        startY = event.pageY;
+    });
+    $("#"+target).on("mouseup", function(event){
+        var distX = event.pageX - startX;
+        var distY = event.pageY - startY;
+        if(!$(event.target).is("input") && distX > parseFloat($("#"+target).css("width"))/3 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+            $("#"+target).hide("slide", {
+                direction: 'right'
+            }, 700, callback());
+        }
+    });	
+}
+window.affix = function(targetScoll,target,top,bottom,callback,callback1){
+var startY;
+var scroll;
+var ex_top = document.getElementById(targetScoll).style.marginTop;
+if(!ex_top){
+	ex_top = 0;
+}
+var touch = 1;
+var firstInteract = 1;
+var interact = 0;
+ $("#"+targetScoll).on("touchstart", function(event){
+ 	//alert('');
+	touch = 0; 
+	if(firstInteract == 1){
+	firstInteract = 0;
+		if(top === null){
+			top = {};
+			top.top = $('#'+target).offset().top;
+		}
+	}
+ });
+ $("#"+targetScoll).on("scroll", function(event){
+ 	//alert('');
+	touch = 0; 
+	if(firstInteract == 1){
+	firstInteract = 0;
+		if(top === null){
+			top = {};
+			top.top = $('#'+target).offset().top;
+		}
+	}
+ });
+    setInterval(function(){
+    scroll = document.getElementById(targetScoll).scrollTop;
+    	if(touch == 0){
+	        console.log(scroll+' '+top.top);
+	   if(scroll >= top.top && interact == 0){
+		   interact = 1;
+		   //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOn');
+		   //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOff');
+		   document.getElementById(target).style.marginTop = '-'+(top.top)+'px';
+	        callback();
+	        //alert('maggiore')
+        } else if(scroll <= top.top) {
+	        interact = 0;
+	        //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOn');
+	        //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOff');
+		    document.getElementById(target).style.marginTop = ex_top+'px'
+	        callback1();
+	        //alert('minore')
+        }
+		}
+    }, 100) ;
+   
+}
 
-
-$("#notificationTrigger").on('click',function() {
-                
-              $( "#notificationsCenter" ).toggle( "slide",{ direction : 'up'}, 500 );
-            
-        });
 
 ApioApplication.config(['$routeProvider',
   function($routeProvider) {
@@ -119,6 +203,7 @@ ApioApplication.factory('DataSource', ['$http',function($http){
     }]);
 
 
+/*
 ApioApplication.controller('ApioNotificationController',['$scope','$http','socket',function($scope,$http,socket){
         socket.on('apio_notification', function(notification) {
 
@@ -152,7 +237,7 @@ ApioApplication.controller('ApioNotificationController',['$scope','$http','socke
 
         });
 }])
-
+*/
     
 var apioProperty = angular.module('apioProperty', ['ApioApplication']);
 

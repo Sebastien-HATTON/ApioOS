@@ -67,13 +67,13 @@ body {
 		margin-bottom: 2%;
     }
     .nav_event{
-	        height: 125px;
-			margin-top: 5%;
-			margin-bottom: 5%;
-			position: fixed;
-			width: 100%;
-			background-color: rgba(233, 233, 233, 0.89);
-	    
+	    height: 220px;
+		margin-top: -1%;
+		margin-bottom: 5%;
+		position: fixed;
+		width: 100%;
+		z-index: 1000;
+		background-color: rgba(233, 233, 233, 0.95);	    
     }
     .newEventFormSection{
 	    margin-top: 40%;
@@ -105,8 +105,8 @@ padding-bottom: 15px;
 height: 10px;
 }
 .create_new_event{
--webkit-transition: all 0.3s ease 0s;
-transition: all 0.3s ease 0s;
+-webkit-transition: -webkit-transform 0.3s ease 0s, background 0.3s ease 0s;
+transition: -webkit-transform 0.3s ease 0s, background 0.3s ease 0s;
 font-size: 40px !important;
 width: 80px;
 height: 80px;
@@ -117,7 +117,11 @@ line-height: 75px;
 text-align: center;
 border: solid 1px;
 border-radius: 100px;
-margin-top: 3%;
+margin-top: 13%;
+}
+#myAffix div{
+	margin-top: 2% !important;
+	margin-bottom: 2% !important;
 }
 .new_active_back_next{
 	display: inline-block;
@@ -146,7 +150,7 @@ height: 10px;
 -webkit-overflow-scrolling: touch;
 -webkit-user-drag: none;
 height: 130px;
-width: 94%;
+width: 100%;
 padding-top: 15px;
 overflow-y: hidden;
 overflow-x: auto;
@@ -194,8 +198,26 @@ text-align: center;
 width: 50%;
 margin-top: 5%;
 }
-}
 
+.add_new_guest{
+		position: fixed;
+		//display: table;
+		width: 100%;
+		background-color: #fff;
+		z-index: 10000;
+		margin: 0;
+		margin-top: 14%;
+	}
+
+
+
+.webkitOverflowScrollingOn{
+	-webkit-overflow-scrolling: auto !important;
+}
+.webkitOverflowScrollingOff{
+	-webkit-overflow-scrolling: touch !important;
+}
+}
 @media (min-width: 601px) and (max-width: 1000px) {
     .elenco_invitati {
         display: table;
@@ -233,6 +255,29 @@ margin-top: 5%;
 }
 
 @media (min-width: 1001px) {
+#wallContainer div{
+	margin-left: 4%;
+}
+	.add_new_guest{
+		position: fixed;
+		//display: table;
+		width: 26%;
+		background-color: #fff;
+		z-index: 10000;
+	}
+	
+	.save_new_guest{
+		position: fixed;
+		display: table;
+		margin-top: 2%;
+		width: 100%;
+		background-color: #fff;
+		z-index: 10000;
+	}
+	#run_event_modifier{
+		width: 100%;
+		margin: 0;
+	}
 	#save_new_run{
 		width: 26%;
 		display: table-cell;
@@ -351,7 +396,7 @@ margin-top: 5%;
     .nome_oggetto_invitato {
         font-size: 15px !important;
         position: relative !important;
-        width: 100px !important;
+        width: 200px !important;
         margin-top: 30px !important;
         display: table !important;
         height: 0px !important;
@@ -1461,11 +1506,13 @@ width: 100px !important;*/
         color: #8e8e8e;
         font-size: 50px;
         line-height: 130%;
+        
     }
 
     .dynvlabel {
-        line-height: 230%;
-    }
+		line-height: 230%;
+		width: 80%;    
+	}
 }
 /*Button*/
 @media (min-width: 481px) and (max-width: 1000px) {
@@ -1488,9 +1535,9 @@ width: 100px !important;*/
         margin: 0;
         text-align: center;
         padding: 0;
-        width: 86px;
-        height: 86px;
-        line-height: 86px;
+        width: 66px;
+        height: 66px;
+        line-height: 66px;
         border-radius: 2000px;
         border: solid 1px rgb(88, 170, 220);
         margin-left: auto;
@@ -2138,11 +2185,11 @@ width: 33.3%;
 /*pc*/
 @media (min-width: 1001px) {
 .wall_open_edit_state{
-	width: 85% !important;
+	width: 77% !important;
 	margin:0 !important;
 }
 .event_open_edit_state{
-	width: 85% !important;
+	width: 77% !important;
 	margin:0 !important;
 }
 .dynamicPanel {
@@ -2535,9 +2582,10 @@ list-style: none;
 position: relative;
 }
 .option_Bacheca_id_state{
-position: static;
-float: left !important;
-width: 100%;
+    position: static;
+    float: left !important;
+    width: 100%;
+    margin-left: 0px !important;
 }
 .option_Bacheca_id_state li{
 float: left !important;
@@ -2570,14 +2618,11 @@ width: 50%;
 margin-top: 5%;
 }
 .name_object{
-font-size:15px !important;
-margin-right: auto;
-margin-left: auto;
-position: absolute;
-width: 180px !important;
-text-align: center;
-height: 10px;
-margin-top: 10px;
+    font-size:15px !important;
+    margin-left: -30px !important;
+    text-align: center;
+    height: 10px;
+    margin-top: 10px;
 }
 }
 @media (min-width: 320px) and (max-width: 600px){
@@ -2716,6 +2761,7 @@ opacity: 1;
 }
 }
 </style>
+
 <style type="text/css">
 @media only screen and (min-width: 320px)  and (max-width: 600px){
 select{
@@ -2923,6 +2969,7 @@ height: 90px;
 overflow-y: hidden;
 overflow-x: auto;
 width: 250px !important;
+margin-left: 4.3%;
 line-height: 28px !important;
 }
 .elementEventi li{
@@ -3197,6 +3244,7 @@ margin-top: 5%;
         overflow-y: hidden;
         overflow-x: auto;
         padding: 0px;
+        padding-left: 2%;
         display: block;    
     }
 

@@ -51,10 +51,9 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 					document.getElementById("ApioApplicationContainer").innerHTML = "";
 		            $("#ApioApplicationContainer").hide("slide", {
 		                direction: 'right'
-		            }, 500, function() {		 
-			            if (window.innerWidth > 769)
-			                $("#ApioIconsContainer").css("width", "100%");		                
-		            });
+		            }, 500, function() {
+						document.getElementById('wallContainer').classList.remove('wall_open_edit_state');
+					});
 					scope.currentObject.resetRecord();
 					currentObject.isRecording(false);
 					currentObject.isModifying(false);

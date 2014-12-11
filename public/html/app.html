@@ -110,7 +110,14 @@
 </style>
                             <div id="notificationsCenter" style="position:absolute;left:0px;right:0px;bottom:0px;top:50px;background-color:black;color:white;display:none;z-index:1045;" ng-controller="ApioNotificationController">
                                 <div id="more_notificationinput" class="more_notification_"><span id="more_notificationspan">+</span></div>
-                                <div class="notifica" ng-repeat="n in notifications" style="">{{n.message}}</div>
+                                <div class="notifica" ng-repeat="n in notifications" style="" ng-click="markAsRead(n)">
+                                    <div class="row">
+                                        <div class="col-xs-6">{{n.message}}</div>
+                                        <div class="col-xs-3">{{n.timestamp}}</div>
+                                        <div class="col-xs-3"><button class="btn btn-small btn-danger">Pubblica in bacheca</button></div>
+                                    </div>
+                                
+                                </div>
                             </div>
 
                             <div ng-view></div>

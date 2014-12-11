@@ -37,11 +37,9 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
 
         });
 
-        $scope.launchDashboard = function(){
-            window.location = 'dashboard';
+        $scope.launchDashboard = function() {
+            window.location = 'dashboard'
         }
-
-
         
 
         //Riferimento a tutti gli oggetti scaricati dal db
@@ -75,6 +73,7 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
         }
 
         var startX, startY;
+        //Touch event
         $("#ApioApplicationContainer").on("touchstart", function(event){
             startX = event.originalEvent.changedTouches[0].pageX;
             startY = event.originalEvent.changedTouches[0].pageY;
@@ -82,19 +81,44 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
         $("#ApioApplicationContainer").on("touchend", function(event){
             var distX = event.originalEvent.changedTouches[0].pageX - startX;
             var distY = event.originalEvent.changedTouches[0].pageY - startY;
-            if(!$(event.target).is("input") && distX > 0 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+            if(!$(event.target).is("input") && distX > parseFloat($("#ApioApplicationContainer").css("width"))/3 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
                 $("#ApioApplicationContainer").hide("slide", {
                     direction: 'right'
                 }, 500, function () {
-                    if (window.innerWidth > 769)
+                    if (window.innerWidth > 769) {
                         $("#ApioIconsContainer").css("width", "100%");
+                    }
+                });
+            }
+        });
+
+        //Mouse event
+        $("#ApioApplicationContainer").on("mousedown", function(event){
+            startX = event.pageX;
+            startY = event.pageY;
+        });
+        $("#ApioApplicationContainer").on("mouseup", function(event){
+            var distX = event.pageX - startX;
+            var distY = event.pageY - startY;
+            var target = $(event.target);
+            //console.log("event target div vale:");
+            //console.log($(event.target));
+            while(!target.prev()){
+                target = target.parent();
+            }
+            if(!$(event.target).is("input") && distX > parseFloat($("#ApioApplicationContainer").css("width"))/3 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))){
+                $("#ApioApplicationContainer").hide("slide", {
+                    direction: 'right'
+                }, 500, function () {
+                    if (window.innerWidth > 769) {
+                        $("#ApioIconsContainer").css("width", "100%");
+                    }
                 });
             }
         });
 
     $scope.launchApplication = function(id) {
-
-        objectService.getById(id).then(function(d) {
+       objectService.getById(id).then(function(d) {
             $scope.currentObject = d.data;
             // new thing!
             currentObjectService.set(d.data);
