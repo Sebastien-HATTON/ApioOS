@@ -259,13 +259,8 @@ angular.module('ApioDashboardApplication')
        //declare LWM libraries
        this.ino += '\n';
        this.ino += '#include "atmegarfr2.h"\n';
-       this.ino += '#include "commands.h"\n';
        this.ino += '#include "config.h"\n';
        this.ino += '#include "hal.h"\n';
-       this.ino += '#include "halBoard.h"\n';
-       this.ino += '#include "halGpio.h"\n';
-       this.ino += '#include "halLed.h"\n';
-       this.ino += '#include "halSleep.h"\n';
        this.ino += '#include "halTimer.h"\n';
        this.ino += '#include "nwk.h"\n';
        this.ino += '#include "nwkCommand.h"\n';
