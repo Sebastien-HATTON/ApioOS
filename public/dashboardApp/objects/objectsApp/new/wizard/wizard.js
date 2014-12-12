@@ -257,35 +257,34 @@ angular.module('ApioDashboardApplication')
      this.ino='';
      if(objectToParse.protocol=='l'){
        //declare LWM libraries
-       this.ino += '#include <Arduino.h>\n'
-       this.ino += 'extern "C"{\n';
-       this.ino += '#include <atmegarfr2.h>\n';
-       this.ino += '#include <commands.h>\n';
-       this.ino += '#include <config.h>\n';
-       this.ino += '#include <hal.h>\n';
-       this.ino += '#include <halBoard.h>\n';
-       this.ino += '#include <halGpio.h>\n';
-       this.ino += '#include <halLed.h>\n';
-       this.ino += '#include <halSleep.h>\n';
-       this.ino += '#include <halTimer.h>\n';
-       this.ino += '#include <nwk.h>\n';
-       this.ino += '#include <nwkCommand.h>\n';
-       this.ino += '#include <nwkDataReq.h>\n';
-       this.ino += '#include <nwkFrame.h>\n';
-       this.ino += '#include <nwkGroup.h>\n';
-       this.ino += '#include <nwkRoute.h>\n';
-       this.ino += '#include <nwkRouteDiscovery.h>\n';
-       this.ino += '#include <nwkRx.h>\n';
-       this.ino += '#include <nwkSecurity.h>\n';
-       this.ino += '#include <nwkTx.h>\n';
-       this.ino += '#include <phy.h>\n';
-       this.ino += '#include <sys.h>\n';
-       this.ino += '#include <sysConfig.h>\n';
-       this.ino += '#include <sysEncrypt.h>\n';
-       this.ino += '#include <sysTimer.h>\n';
-       this.ino += '#include <sysTypes.h>\n';
-       this.ino += '}\n';
-       this.ino += '#include <ApioLwm.h>\n';
+       this.ino += '\n';
+       this.ino += '#include "atmegarfr2.h"\n';
+       this.ino += '#include "commands.h"\n';
+       this.ino += '#include "config.h"\n';
+       this.ino += '#include "hal.h"\n';
+       this.ino += '#include "halBoard.h"\n';
+       this.ino += '#include "halGpio.h"\n';
+       this.ino += '#include "halLed.h"\n';
+       this.ino += '#include "halSleep.h"\n';
+       this.ino += '#include "halTimer.h"\n';
+       this.ino += '#include "nwk.h"\n';
+       this.ino += '#include "nwkCommand.h"\n';
+       this.ino += '#include "nwkDataReq.h"\n';
+       this.ino += '#include "nwkFrame.h"\n';
+       this.ino += '#include "nwkGroup.h"\n';
+       this.ino += '#include "nwkRoute.h"\n';
+       this.ino += '#include "nwkRouteDiscovery.h"\n';
+       this.ino += '#include "nwkRx.h"\n';
+       this.ino += '#include "nwkSecurity.h"\n';
+       this.ino += '#include "nwkTx.h"\n';
+       this.ino += '#include "phy.h"\n';
+       this.ino += '#include "sys.h"\n';
+       this.ino += '#include "sysConfig.h"\n';
+       this.ino += '#include "sysEncrypt.h"\n';
+       this.ino += '#include "sysTimer.h"\n';
+       this.ino += '#include "sysTypes.h"\n';
+       this.ino += '\n';
+       this.ino += '#include "ApioLwm.h"\n';
 
      } else if(objectToParse.protocol=='z'){
        //declare XBee libraries
@@ -300,6 +299,7 @@ angular.module('ApioDashboardApplication')
      if(objectToParse.protocol=='l')
      {
        //initialize LWM
+       this.ino += "apioSetup("+objectToParse.address+");\n";
 
      }else if(objectToParse.protocol=='z'){
        //initialize XBee
@@ -313,8 +313,11 @@ angular.module('ApioDashboardApplication')
 
      this.ino += "}\n\n";
      this.ino += "void loop(){\n";
+     if(objectToParse.protocol=='l'){
+       this.ino+="\tapioLoop();\n";
+     }
      if(objectToParse.protocol=='z'){
-       this.ino+="\tApioReceive();\n";
+       this.ino+="\tapioLoop();\n";
      }
      for(key in objectToParse.properties)
      {
