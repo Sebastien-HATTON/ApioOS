@@ -248,26 +248,31 @@ var interact = 0;
 		}
 	}
  });
-    setInterval(function(){
-    scroll = document.getElementById(targetScoll).scrollTop;
-    	if(touch == 0){
-	        console.log(scroll+' '+top.top);
-	   if(scroll >= top.top && interact == 0){
-		   interact = 1;
-		   //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOn');
-		   //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOff');
-		   document.getElementById(target).style.marginTop = '-'+(top.top)+'px';
-	        callback();
-	        //alert('maggiore')
-        } else if(scroll <= top.top) {
-	        interact = 0;
-	        //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOn');
-	        //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOff');
-		    document.getElementById(target).style.marginTop = ex_top+'px'
-	        callback1();
-	        //alert('minore')
+    var interval_ = setInterval(function(){
+        if(!document.getElementById(targetScoll)){
+            clearInterval(interval_);
         }
-		}
+        else{
+            scroll = document.getElementById(targetScoll).scrollTop;
+            if(touch == 0){
+                console.log(scroll+' '+top.top);
+                if(scroll >= top.top && interact == 0){
+                    interact = 1;
+                    //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOn');
+                    //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOff');
+                    document.getElementById(target).style.marginTop = '-'+(top.top)+'px';
+                    callback();
+                    //alert('maggiore')
+                } else if(scroll <= top.top) {
+                    interact = 0;
+                    //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOn');
+                    //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOff');
+                    document.getElementById(target).style.marginTop = ex_top+'px'
+                    callback1();
+                    //alert('minore')
+                }
+            }
+        }
     }, 100) ;
    
 }
