@@ -239,9 +239,17 @@ app.post("/apio/state/apply",function(req,res){
 
 app.delete("/apio/state/:name",function(req,res){
     console.log("Mi arriva da eliminare questo: "+req.params.name)
-    Apio.Database.db.collection("States").remove({name : req.params.name},function(err){
+    Apio.Database.db.collection("States").remove({name : req.params.name}, function(err){
         if (!err) {
-            Apio.io.emit("apio_state_delete",{name : req.params.name});
+            Apio.io.emit("apio_state_delete", {name : req.params.name});
+            Apio.Database.db.collection("Events").remove({triggerState : req.params.name}, function(err){
+                if(err){
+                    res.send({error : 'DATABASE_ERROR'});
+                }
+                else{
+                    Apio.io.emit("apio_event_delete", {name : req.params.name});
+                }
+            });
             res.send({error : false});
         }
         else
