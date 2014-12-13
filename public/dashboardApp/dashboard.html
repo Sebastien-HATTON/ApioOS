@@ -42,11 +42,22 @@
     <div class="row">
       <div class="col-xs-12">
           <h2 style="text-align:center;"><i class="fa fa-code"></i> Developer Dashboard</h2>
-          <div class="pull-right">
-            <button class="btn btn-default" ng-click="switchToApioOS()"><i class="fa fa-globe"></i> Apio OS</button>
+          <div class="icon_app" ng-click="switchToApioOS()">
+          <div class="pull-right" style="
+                            border: 1px solid #CCC;
+                            border-radius: 12px;
+                            height: 65px;
+                            width: 65px;
+                            background-size:100%;
+                            background-position:50%;
+                            margin-top:-40px;
+                            background-image: url(dashboardApp/icon/icon.png);
+                        ">
+           
           </div>
       </div>
     </div>
+  </div>
     <!--this is where the code is injected-->
       <div class="container-fluid">
         <div ui-view></div>
