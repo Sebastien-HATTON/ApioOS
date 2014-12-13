@@ -78,6 +78,9 @@ apioProperty.directive("property", ["currentObject", "socket", function(currentO
 					if(attrs["listener"]){
 						scope.$parent.$eval(attrs["listener"]);
 					}
+					else{
+						currentObject.update(attrs["propertyname"], $(elem).find("[propertyinput]").val());
+					}
 					//
 					
 					//Se è stata definita una correlazione da parte dell'utente la eseguo

@@ -43,7 +43,6 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
         socket.on('apio_state_new', function(state) {
             alert("Nuovo stato!")
             $scope.states.push(state);
-            $scope.$apply();
         })
 
         $scope.launchState = function(state, index) {

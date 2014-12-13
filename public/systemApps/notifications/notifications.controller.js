@@ -38,6 +38,62 @@ angular.module('ApioApplication').controller('ApioNotificationController',['$sco
 
 
         });
+    $scope.showDisabled = false;
+
+    $scope.toggleShowDisabled = function(){
+        $scope.showDisabled = !$scope.showDisabled;
+    };
+
+    $scope.publishNotify = function(n){
+        var s = {
+            "active" : false,
+            "name" : n.message,
+            "objectName" : n.objectName,
+            "objectId" : n.objectId,
+            "properties" : n.properties
+        };
+        var dao = {
+            state : s
+        };
+        $http.post('/apio/state', dao)
+            .success(function(data){
+                if(data.error === 'STATE_NAME_EXISTS'){
+                    alert("Uno stato con questo nome è già presente in bacheca, si prega di sceglierne un altro")
+                }
+                if(data.error === 'STATE_PROPERTIES_EXIST'){
+                    alert("Lo stato di nome "+s.name+" non è stato pubblicato perchè lo stato "+data.state+" ha già le stesse proprietà");
+                }
+                if(data.error === false) {
+                    alert("Notifica pubblicata");
+                }
+            })
+            .error(function(){
+                alert("Si è verificato un errore di sistema");
+            });
+    };
+
+    $scope.disableNotify = function(n) {
+        console.log("CHIAMO DISABLENOTIFY CON");
+        console.log(n);
+        $http.post('/apio/notifications/disable',{
+            "notification" : n
+        }).success(function(data,status,headers){
+            alert("Notifica disabilitata con successo");
+        }).error(function(data,status,headers){
+            alert("ERRORE nella disabilitazione della notifica")
+        });
+    };
+
+    $scope.enableNotify = function(n){
+        $http.post('/apio/notifications/enable',{
+            "notification" : n
+        }).success(function(data,status,headers){
+            alert("Notifica abilitata con successo");
+            $scope.loadNotifications();
+        }).error(function(data,status,headers){
+            alert("ERRORE nell'abilitazione della notifica")
+        });
+    };
 
         $scope.getTimeFromTimestamp = function(t) {
             var date = new Date(t*1000);
@@ -57,20 +113,33 @@ angular.module('ApioApplication').controller('ApioNotificationController',['$sco
 
         $scope.loadNotifications = function() {
             $scope.notifications = [];
+            $scope.disabledNotifications = [];
             $http.get('/apio/notifications')
-            .success(function(data,status,headers){
-                console.log("Got notifications");
-                console.log(data)
-                data.forEach(function(e,i,a){
-                    e.timestamp = $scope.getTimeFromTimestamp(e.timestamp);
-                    $scope.notifications.push(e)
+                .success(function(data,status,headers){
+                    console.log("Got notifications");
+                    console.log(data)
+                    data.forEach(function(e,i,a){
+                        $scope.notifications.push(e)
+                    })
+
                 })
-                
-            })
-            .error(function(data,status,headers){
-                console.log("Unable to download notifications");
-            })
-        }
+                .error(function(data,status,headers){
+                    console.log("Unable to download notifications");
+                });
+
+            $http.get('/apio/notifications/listDisabled')
+                .success(function(data,status,headers){
+                    console.log("Got notifications");
+                    console.log(data)
+                    data.forEach(function(e,i,a){
+                        $scope.disabledNotifications.push(e);
+                    })
+
+                })
+                .error(function(data,status,headers){
+                    console.log("Unable to download notifications");
+                });
+        };
         $scope.loadNotifications();
         $scope.markAsRead = function(n) {
             console.log("CHIAMO MARKESRID CON")

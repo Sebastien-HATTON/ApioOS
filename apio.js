@@ -172,7 +172,7 @@ Apio.Serial.Error.prototype.name = "Apio.Serial.Error";
 
 
 Apio.Serial.Configuration = {
-	port : "/dev/ttyO2",
+	port : "/dev/ttyACM0",
 	baudrate : 115200
 }
 /*
@@ -227,7 +227,7 @@ Apio.Serial.init = function() {
 *	adding the end transmission char -
 *	and check the protocol type 
 */
-Apio.Serial.send = 	function(data,callback) {
+Apio.Serial.send = 	function(data, callback) {
 	//NOTA data dovrebbe mandare soltanto objID e le prop
 		var message = "";
 		for (var key in data.properties)
@@ -393,12 +393,17 @@ Apio.Serial.read = function(data) {
 								//Ho trovato una notifica da lanciare
 								if (document.notifications[prop].hasOwnProperty(data.properties[prop])){
 									console.log("Ho trovato una notifica per la proprietà "+prop+" e per il valore corrispondente "+data.properties[prop])
-									var notifica = {
-										objectId : data.objectId,
-										message : document.notifications[prop][data.properties[prop]]
-									}
-									console.log("Mando la notifica");
-									Apio.System.notify(notifica);
+									Apio.Database.getObjectById(data.objectId, function(result){
+										var notifica = {
+											objectId : data.objectId,
+											objectName : result.objectName,
+											message : document.notifications[prop][data.properties[prop]],
+											properties : data.properties,
+											timestamp : new Date().getTime()
+										};
+										console.log("Mando la notifica");
+										Apio.System.notify(notifica);
+									});
 								} //Se ha una notifica per il valore attuale
 								else {
 									console.log("Ho una notifica registarata per quella property ma non per quel valore")
@@ -900,7 +905,7 @@ Apio.System.checkEvent = function(state) {
 	//Se allo stato triggerato corrisponde un evento, lancia quell'evento
 };
 
-Apio.System.notify = function(notification,callback) {
+/*Apio.System.notify = function(notification,callback) {
 	//Notifica a tutti gli utenti di un evento
 	//Questo viene fatto inviando una notifica ai client attivi
 	console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
@@ -917,7 +922,68 @@ Apio.System.notify = function(notification,callback) {
 		}
 	})
 	
-}
+}*/
+Apio.System.notify = function(notification,callback) {
+	var areJSONsEqual = function(a, b) {
+		function check(a, b) {
+			for (var attr in a) {
+				if (attr !== "timestamp" && a.hasOwnProperty(attr) && b.hasOwnProperty(attr)) {
+					if (a[attr] != b[attr]) {
+						switch (a[attr].constructor) {
+							case Object:
+								return areJSONsEqual(a[attr], b[attr]);
+							case Function:
+								if (a[attr].toString() != b[attr].toString()) {
+									return false;
+								}
+								break;
+							default:
+								return false;
+						}
+					}
+				} else {
+					return false;
+				}
+			}
+			return true;
+		}
+		return check(a, b) && check(b, a);
+	};
+
+	//Notifica a tutti gli utenti di un evento
+	//Questo viene fatto inviando una notifica ai client attivi
+	console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
+	notification.timestamp = (new Date()).getTime();
+	console.log(notification);
+	Apio.Database.db.collection("Users").find().toArray(function(err, data){
+		if(err){
+			console.log("Errore: "+err);
+		}
+		else {
+			for (var i in data) {
+				var flag = false;
+				for (var j in data[i].disabled_notification) {
+					if (typeof data[i].disabled_notification !== "undefined" && data[i].disabled_notification.length > 0 && areJSONsEqual(data[i].disabled_notification[j], notification)) {
+						flag = true;
+						break;
+					}
+				}
+				if (!flag) {
+					Apio.Database.db.collection('Users').update({"email": data[i].email}, {$push: {"unread_notifications": notification}}, function (err, data) {
+						if (err)
+							console.log("Apio.System.notify Error, unable to send the notification");
+						else {
+							console.log("Emitto la notifica");
+							Apio.io.emit('apio_notification', notification);
+							if (callback)
+								callback();
+						}
+					});
+				}
+			}
+		}
+	});
+};
 
 Apio.System.jobs = {};
 

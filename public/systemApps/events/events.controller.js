@@ -90,8 +90,6 @@ angular.module('ApioApplication')
                 }
             });
 
-            $scope.stateOrTime = "";
-
             $scope.showSave = false;
 
             $scope.newRunState = function(){
@@ -185,9 +183,11 @@ angular.module('ApioApplication')
                         }, 500);
                 } else if ($scope.editEventFormStep == 'selezioneData'){
                     resetCronModifica();
-                    $scope.stateOrTime = "time";
+                    $scope.currentEvent.type = "timeTriggered";
+                    delete $scope.currentEvent.triggerState;
                 } else if ($scope.editEventFormStep == 'selezioneStatoScatenante'){
-                    $scope.stateOrTime = "state";
+                    $scope.currentEvent.type = "stateTriggered";
+                    delete $scope.currentEvent.triggerTimer;
                 }
             };
 
@@ -244,14 +244,6 @@ angular.module('ApioApplication')
             }
 
             function _saveEvent() {
-                if($scope.stateOrTime == "time"){
-                    $scope.currentEvent.type = "timeTriggered";
-                    delete $scope.currentEvent.triggerState;
-                }
-                else if($scope.stateOrTime == "state"){
-                    $scope.currentEvent.type = "stateTriggered";
-                    delete $scope.currentEvent.triggerTimer;
-                }
                 console.log("currentEvent vale:");
                 console.log($scope.currentEvent);
                 $http.put('/apio/event/'+$scope.currentEvent.name,{eventUpdate : $scope.currentEvent})
@@ -362,6 +354,7 @@ angular.module('ApioApplication')
                         $scope.showSave = true;
                         if ($scope.currentEvent.hasOwnProperty('type') && $scope.currentEvent.type == 'timeTriggered') {
                             $scope.currentEvent.triggerTimer = $(this).cron("value");
+                            $scope.$apply();
                         }
                     }
                 });
@@ -488,11 +481,6 @@ angular.module('ApioApplication')
             $scope.saveEvent = function() {
 				
                 console.log("Mi accingo a salvare il seguente evento");
-
-                //Pre processing dell'orario
-                if ($scope.newEvent.hasOwnProperty('triggerTimer')) {
-                    $scope.newEvent.triggerTimer = '0 ' + $scope.newEvent.triggerTimer;
-                }
 
                 console.log($scope.newEvent);
                 $http.post('/apio/event', {

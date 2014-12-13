@@ -113,7 +113,14 @@ app.get("/dashboard",routes.dashboard.index);
 app.post("/apio/event",routes.core.events.create);
 
 app.get('/apio/notifications',routes.core.notifications.list);
-app.post('/apio/notifications/markAsRead',routes.core.notifications.delete)
+app.get('/apio/notifications/listDisabled',routes.core.notifications.listdisabled);
+app.post('/apio/notifications/markAsRead',routes.core.notifications.delete);
+app.post('/apio/notifications/disable',routes.core.notifications.disable);
+app.post('/apio/notifications/enable',routes.core.notifications.enable);
+app.get('/apio/notify/:message',function(req,res){
+    Apio.System.notify({objectId : "4545", objectName : "Piantana", message : "ciao", properties : {onoff : "1"}, timestamp : new Date().getTime()});
+    res.send({});
+});
 /* Returns all the events */
 app.get("/apio/event",routes.core.events.list)
 /* Return event by name*/

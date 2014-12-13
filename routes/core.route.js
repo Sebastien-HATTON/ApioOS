@@ -15,8 +15,12 @@ module.exports = {
 	            res.send({error : "STATE_NAME_EXISTS"});
 	        }
 	        else {
+				console.log("objectId vale:");
+				console.log(req.body.state.objectId);
+				console.log("properties vale:");
+				console.log(req.body.state.properties);
 	            Apio.Database.db.collection('States').aggregate({$match : {objectId : req.body.state.objectId, properties: req.body.state.properties}},function(err,result){
-	                if (result.length > 0) {
+					if (typeof result !== "undefined" && result.length > 0) {
 	                    console.log("Esiste già uno stato con queste proprietà");
 	                    res.send({error : 'STATE_PROPERTIES_EXIST', state : result[0]["name"]});
 	                }
@@ -103,30 +107,69 @@ module.exports = {
 
 		},
 		list : function(req,res) {
-			    var currentUser = 'matteo.di.sabatino.1989@gmail.com';
+			var currentUser = 'matteo.di.sabatino.1989@gmail.com';
 
-			    Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
-				        if(err) {
-				            console.log("Un errore ");
-				            console.log(err);
-				            res.status(500).send({});
-				        } else {
-				            res.send(doc.unread_notifications);
-				        }
-				    })
+			Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
+				if(err) {
+					console.log("Un errore ");
+					console.log(err);
+					res.status(500).send({});
+				} else {
+					res.send(doc.unread_notifications);
+				}
+			})
+		},
+		listdisabled : function(req,res) {
+			var currentUser = 'matteo.di.sabatino.1989@gmail.com';
+
+			Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
+				if(err) {
+					console.log("Un errore ");
+					console.log(err);
+					res.status(500).send({});
+				} else {
+					res.send(doc.disabled_notification);
+				}
+			})
 		},
 		delete : function(req,res){
-		    var notif = req.body.notification;
-		    var user = req.body.username;
-		    Apio.Database.db.collection('Users').update({"username" : user},{$pull : {"unread_notifications" : notif}},function(err){
-		        if (err){
-		            console.log('apio/notification/markAsRead Error while updating notifications');
-		            res.status(500).send({});
-		        }
-		        else {
-		            res.status(200).send({});
-		        }
-		    })
+			var notif = req.body.notification;
+			var user = req.body.username;
+			Apio.Database.db.collection('Users').update({"username" : user},{$pull : {"unread_notifications" : notif}},function(err){
+				if (err){
+					console.log('apio/notification/markAsRead Error while updating notifications');
+					res.status(500).send({});
+				}
+				else {
+					res.status(200).send({});
+				}
+			})
+		},
+		disable : function(req,res){
+			var notif = req.body.notification;
+			var user = req.body.username;
+			Apio.Database.db.collection('Users').update({"username" : user}, {$push : {"disabled_notification" : notif}}, function(err){
+				if (err){
+					console.log('apio/notification/disable Error while updating notifications');
+					res.status(500).send({});
+				}
+				else {
+					res.status(200).send({});
+				}
+			})
+		},
+		enable : function(req,res){
+			var notif = req.body.notification;
+			var user = req.body.username;
+			Apio.Database.db.collection('Users').update({"username" : user}, {$pull : {"disabled_notification" : notif}}, function(err){
+				if (err){
+					console.log('apio/notification/enable Error while updating notifications');
+					res.status(500).send({});
+				}
+				else {
+					res.status(200).send({});
+				}
+			})
 		}
 	},
 	events : {

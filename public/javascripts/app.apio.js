@@ -10,8 +10,12 @@ Apio.newWidth = parseInt($("#appApio").css('width'),10);
 Apio.currentApplication = {};
 Apio.currentApplication.subapps = {};
 
-$("#notificationTrigger").on('click',function() {             
+$("#notificationTrigger").on('click',function() {
   $( "#notificationsCenter" ).toggle( "slide",{ direction : 'up'}, 500 );
+});
+
+$("#notificationTrigger_mobile").on('click tap',function() {
+    $( "#notificationsCenter" ).toggle( "slide",{ direction : 'up'}, 500 );
 });
 
 var ApioApplication = angular.module('ApioApplication',['ui.bootstrap','ngRoute']);

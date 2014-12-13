@@ -10,6 +10,8 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 	    },
 	    templateUrl: "apioProperties/Trigger/trigger.html",
 	    link: function(scope, elem, attrs){
+			scope.valueon = attrs['valueon'] ? attrs['valueon'] : "1";
+			scope.valueoff = attrs['valueoff'] ? attrs['valueoff'] : "0";
 			scope.object = currentObject.get();
 	    	scope.currentObject = currentObject;
 	    	scope.isRecorded = function() {
@@ -45,7 +47,7 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 						}
 						else{
 							scope.model = data.properties[attrs["propertyname"]];
-							scope.label = parseInt(data.properties[attrs["propertyname"]]) === 0 ? attrs["labeloff"] : attrs["labelon"];							
+							scope.label = parseInt(data.properties[attrs["propertyname"]]) === parseInt(scope.valueoff) ? attrs["labeloff"] : attrs["labelon"];
 							//Aggiorna lo scope globale con il valore che è stato modificato nel template
 							scope.object.properties[attrs["propertyname"]] = data.properties[attrs["propertyname"]];
 							//
@@ -63,7 +65,7 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 			socket.on("apio_server_update_", function(data){
 				if(data.objectId === scope.object.objectId  && !scope.currentObject.isRecording()){
 					scope.model = data.properties[attrs["propertyname"]];
-					scope.label = parseInt(data.properties[attrs["propertyname"]]) === 0 ? attrs["labeloff"] : attrs["labelon"];
+					scope.label = parseInt(data.properties[attrs["propertyname"]]) === parseInt(scope.valueoff) ? attrs["labeloff"] : attrs["labelon"];
 					scope.object.properties[attrs["propertyname"]] = data.properties[attrs["propertyname"]];
 				}
 			});
@@ -75,25 +77,25 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 			//Se il controller modifica l'oggetto allora modifico il model;
 			scope.$watch("object.properties."+attrs["propertyname"], function(){
 			  	scope.model = scope.object.properties[attrs["propertyname"]];
-				scope.label = parseInt(scope.model) === 0 ? attrs["labeloff"] : attrs["labelon"];
+				scope.label = parseInt(scope.model) === parseInt(scope.valueoff) ? attrs["labeloff"] : attrs["labelon"];
 		    });
 			//
 			
 	    	//Inizializzo la proprietà con i dati memorizzati nel DB
-	    	scope.label = parseInt(scope.model) === 0 ? attrs["labeloff"] : attrs["labelon"];
-	    	scope.model = scope.object.properties[attrs["propertyname"]];
+			scope.model = scope.object.properties[attrs["propertyname"]];
+	    	scope.label = parseInt(scope.model) === parseInt(scope.valueoff) ? attrs["labeloff"] : attrs["labelon"];
 	    	scope.propertyname = attrs["propertyname"];
 	    	//
 
 			var event = attrs["event"] ? attrs["event"] : "click tap";
 			elem.on(event, function(){
 				//Serve per fare lo switch del trigger
-				if (scope.model == "1"){
-					scope.model = "0";
+				if (scope.model == scope.valueon){
+					scope.model = scope.valueoff;
 					scope.label = attrs["labeloff"];
 				}
 				else{
-					scope.model = "1";
+					scope.model = scope.valueon;
 					scope.label = attrs["labelon"];
 				}
 				//Aggiorna lo scope globale con il valore che è stato modificato nel template
