@@ -26,6 +26,7 @@ node_modules
 public/bower_components/*
 public/applications/*
 !public/applications/README.md
+!public/applications/add/*
 public/sketchbook/*
 
 # Users Environment Variables
