@@ -37,7 +37,6 @@ angular.module('ApioDashboardApplication')
         "id" : "2",
           "family" : "Apio",
           "types" : [
-              { "type" : "Dongle" },
               { "type" : "General" }
           ]
 
@@ -213,7 +212,6 @@ angular.module('ApioDashboardApplication')
      this.html+=objectToParse.objectId +'" ng-app="ApioApplication' + objectToParse.objectId + '"  style="padding:10px;">\n';
      this.html+='\t<div ng-controller="defaultController">\n';
      this.html+='\t<topappapplication></topappapplication>\n';
-     this.html+='\t\t<h2 style="text-align:center;">' + objectToParse.objectName + '</h2>\n';
      
      for(key in objectToParse.properties){
       
