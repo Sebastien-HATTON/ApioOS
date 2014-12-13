@@ -438,6 +438,81 @@ Apio.io.on("connection", function(socket){
             Apio.Database.updateProperty(data,function(){
                 //Connected clients are notified of the change in the database
                 socket.broadcast.emit("apio_server_update",data);
+
+                Apio.Database.db.collection("States").findOne({objectId : data.objectId, properties : data.properties}, function(err, result){
+                    if(err){
+                        console.log("Error while fetching states");
+                    }
+                    else{
+                        console.log("result vale:");
+                        console.log(result);
+                        var applyStateFn = function(stateName) {
+                            var pause = function(millis){
+                                var date = new Date();
+                                var curDate = null;
+                                do{
+                                    curDate = new Date();
+                                }while(curDate-date < millis);
+                            };
+
+                            Apio.Database.db.collection("States").findOne({name : stateName}, function(err, state){
+                                if (err) {
+                                    console.log("applyState unable to apply state");
+                                    console.log(err);
+                                }
+                                else {
+                                    console.log("state vale:");
+                                    console.log(state);
+                                    Apio.Database.updateProperty(state,function(){
+                                        Apio.io.emit("apio_server_update",state);
+                                        if (ENVIRONMENT == 'production') {
+                                            Apio.Serial.send(state, function(){
+                                                console.log("SONO LA CALLBACK");
+                                                //Ora cerco eventuali eventi
+                                                Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
+                                                    if (err) {
+                                                        console.log("error while fetching events");
+                                                        console.log(err);
+                                                    }
+                                                    console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                                                    console.log(data)
+                                                    //data è un array di eventi
+                                                    data.forEach(function(ev,ind,ar){
+                                                        var states = ev.triggeredStates;
+                                                        states.forEach(function(ee,ii,vv){
+                                                            applyStateFn(ee.name);
+                                                        })
+                                                    })
+                                                })
+                                                pause(500);
+                                            });
+                                        }
+                                        else{
+                                            Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
+                                                if (err) {
+                                                    console.log("error while fetching events");
+                                                    console.log(err);
+                                                }
+                                                console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                                                console.log(data)
+                                                //data è un array di eventi
+                                                data.forEach(function(ev,ind,ar){
+                                                    var states = ev.triggeredStates;
+                                                    states.forEach(function(ee,ii,vv){
+                                                        applyStateFn(ee.name);
+                                                    })
+                                                })
+                                            })
+                                            pause(500);
+                                        }
+                                    });
+                                }
+
+                            })
+                        };
+                        applyStateFn(result.name);
+                    }
+                });
             });
         else
             Apio.Util.debug("Skipping write to Database");
