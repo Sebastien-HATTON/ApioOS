@@ -16,6 +16,11 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
                 $scope.states = data;
 
             });
+
+        $scope.tagState = function(state){
+            alert("Coming soon...");
+        }
+
         $scope.currentApplication = null;
         socket.on('apio_state_update', function(state) {
 
