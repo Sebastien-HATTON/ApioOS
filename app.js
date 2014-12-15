@@ -482,26 +482,28 @@ Apio.io.on("connection", function(socket){
                                 }
                             });
                         };
-                        applyStateFn(result.name, function(){
-                            if(ENVIRONMENT == "production"){
-                                var pause = function (millis) {
-                                    var date = new Date();
-                                    var curDate = null;
-                                    do {
-                                        curDate = new Date();
-                                    } while (curDate - date < millis);
-                                };
-
-                                console.log("arr vale:");
-                                console.log(arr);
-                                for(var i in arr){
-                                    Apio.Serial.send(arr[i], function(){
-                                        pause(200);
-                                    })
-                                }
-                                arr = [];
-                            }
-                        });
+                        if(result){
+	                        applyStateFn(result.name, function(){
+	                            if(ENVIRONMENT == "production"){
+	                                var pause = function (millis) {
+	                                    var date = new Date();
+	                                    var curDate = null;
+	                                    do {
+	                                        curDate = new Date();
+	                                    } while (curDate - date < millis);
+	                                };
+	
+	                                console.log("arr vale:");
+	                                console.log(arr);
+	                                for(var i in arr){
+	                                    Apio.Serial.send(arr[i], function(){
+	                                        pause(200);
+	                                    })
+	                                }
+	                                arr = [];
+	                            }
+	                        });
+                        }
                     }
                 });
             });
