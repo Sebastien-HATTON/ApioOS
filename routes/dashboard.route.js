@@ -25,26 +25,66 @@ module.exports = {
 		},
 	updateApioApp : function(req,res){
 	    var objectId = req.body.objectId;
+	    var newId = req.body.newId;
 	    var ino = req.body.ino;
 	    var html = req.body.html;
 	    var js = req.body.js;
 	    var mongo = req.body.mongo;
-	    console.log('updating the object: '+objectId);
+	    var makefile = req.body.makefile;
+	    console.log('updating the object: '+objectId)+' with the new id '+newId;
+	    console.log('ino: '+ino);
 	    //si potrebbero usare writeFile (asincrono) annidati ed eliminare il try catch
-	    try {
-	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '/' + objectId + '.ino',ino);
-	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.html',html);
-	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.js',js);
-	        fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.mongo',mongo);
-	        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '/Makefile',makefile);
-	        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.json',JSON.stringify(objectToSave));
-	    } catch(e) {
-	        res.status(500).send();
-	        return;
-	    }
 
-	    res.send(200);
+	    if(objectId === newId){
+	    	Apio.Database.db.collection('Objects').update({'objectId':objectId},JSON.parse(mongo),function(error){
+	    		if(error){
+	    			console.log(error);
+	    			console.log(e);
+	       			res.status(500).send();
+	    		}else{
+	    			fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/_' + newId + '.ino',ino);
+			        fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/Makefile',makefile);
+			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.html',html);
+			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.js',js);
+			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.mongo',mongo);
+			        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.json',JSON.stringify(objectToSave));
+				    res.send(200);
+	    		}
+	    	})
+	    }else{
+	    	Apio.Database.db.collection('Objects').insert(JSON.parse(mongo),function(error,count){
+	    		if(error){
+	    			console.log(error);
+	    			console.log(e);
+	       			res.status(500).send();
+	    		}
+	    		else{
+		    		fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/_' + newId + '.ino',ino);
+			        fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/Makefile',makefile);
+			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.html',html);
+			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.js',js);
+			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.mongo',mongo);
+			        //fs.writeFileSync('public/applications/'+objectId+'/' + objectId + '.json',JSON.stringify(objectToSave));
+				    res.send(200);
+			    }
+	    	})
+	    }
 	   
+	},
+	folderApioApp : function(req,res){
+		var id = req.body.id;
+		console.log('making the folder for updated app with new id '+id);
+
+		var path = 'public/applications/';
+		try{
+			fs.mkdirSync(path +'/'+ id);
+	    	fs.mkdirSync(path +'/'+ id + '/_' + id);
+	    }
+	    catch(e){
+	    	console.log(e);
+	    	res.status(500).send({});
+	    }
+	    res.send(200);
 	},
 	modifyApioApp : function(req,res){
 	    var id = req.body.id;
@@ -58,6 +98,7 @@ module.exports = {
 	    object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
 	    path = 'public/applications/'+id+'/_'+id;
 	    object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
+	    object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
 	    
 	    /*console.log('js:\n'+object.js);
 	    console.log('html:\n'+object.html);
@@ -78,10 +119,10 @@ module.exports = {
 
 	    console.log('APIO: Creating application ' + obj.objectId);
 	    fs.mkdirSync("public/applications/" + obj.objectId);
-	    fs.mkdirSync("public/applications/" + obj.objectId +'/' + obj.objectId);
+	    fs.mkdirSync("public/applications/" + obj.objectId +'/_' + obj.objectId);
 
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '/' + obj.objectId + '.ino',ino);
-	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '/Makefile',makefile);
+	    fs.writeFileSync('public/applications/'+obj.objectId+'/_' + obj.objectId + '/_' + obj.objectId + '.ino',ino);
+	    fs.writeFileSync('public/applications/'+obj.objectId+'/_' + obj.objectId + '/Makefile',makefile);
 	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.html',html);
 	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.js',js);
 	    fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
@@ -197,7 +238,8 @@ module.exports = {
 	    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
 	    //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
 	    object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
-	    object.ino = fs.readFileSync(path+'/'+id+'.ino', {encoding: 'utf8'});
+	    path = 'public/applications/'+id+'/_'+id;
+	    object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
 	    object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
 
 	    //jsonObject = JSON.parse(object.json);
@@ -220,15 +262,15 @@ module.exports = {
 	        var path = 'public/';
 	        console.log('path + dummy:'+path + dummy);
 	        console.log('target: public/exported/'+jsonObject.name+'.tar.gz');
-	        fs.mkdirSync(path+'/temp');
 	        path = 'public/temp';
+	        fs.mkdirSync(path);
 	        fs.mkdirSync(path +'/'+ dummy);
-	        fs.mkdirSync(path +'/'+ dummy + '/' + dummy);
-	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/' + dummy + '.ino',object.ino);
+	        fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',object.mongo);
-	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/Makefile',object.makefile);
+	        fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/_' + dummy + '.ino',object.ino);
+	        fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/Makefile',object.makefile);
 	        //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
 	 
 	        //var compress = new targz().compress('/applications/:id', '/applications/temp/:id.tar.gz', function(err){
@@ -269,10 +311,8 @@ module.exports = {
 	                    console.log(err);
 	                else
 	                {
-	                    console.log('QUA')
 	                    console.log("public/applications/" + obj.objectId +'/' + obj.objectId +'.tar.gz');
 	                    console.log(obj.objectId+'.tar.gz')
-	                    console.log('FINE')
 	                    res.download("public/applications/" + obj.objectId +'/' + obj.objectId +'.tar.gz',obj.objectId+'.tar.gz',function(err){
 	                        if(err){
 	                            console.log('There is an error')
@@ -338,7 +378,7 @@ module.exports = {
 	                        console.log('error: '+error);
 	                    }
 	                    else if(data){
-	                        console.log(data);
+	                        console.log('data is: '+data);
 	                        //qui rinomino i cazzetti nell'id attuale
 
 	                        var id = '8=====D';
@@ -350,7 +390,8 @@ module.exports = {
 	                        object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
 	                        //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
 	                        object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
-	                        object.ino = fs.readFileSync(path+'/'+id+'.ino', {encoding: 'utf8'});
+	                        path = 'upload/temp/'+id+'/_'+id;
+	                        object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
 	                        object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
 
 	                        //jsonObject = JSON.parse(object.json);
@@ -358,6 +399,7 @@ module.exports = {
 	                        console.log('jsonObject.name: '+jsonObject.name);
 
 	                        var dummy = (parseInt(data)+1).toString();
+	                        console.log('new dummy is: '+ dummy)
 	                        
 	                        
 	                        object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
@@ -369,10 +411,14 @@ module.exports = {
 	                        object.html=object.html.replace('applications/'+id+'/'+id+'.js','applications/'+dummy+'/'+dummy+'.js');
 
 	                        //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
-	                        object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+	                        //object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"')
+	                        object.mongo=JSON.parse(object.mongo);
+	                        console.log('"objectId before":"'+object.mongo.objectId+'"')
+	                        object.mongo.objectId=dummy;
+	                        console.log('"objectId after":"'+object.mongo.objectId+'"')
 	                        
 	                        //Apio.Database.db.collection('Objects').insert(JSON.parse(object.json),function(err,data){
-	                        Apio.Database.db.collection('Objects').insert(JSON.parse(object.mongo),function(err,data){
+	                        Apio.Database.db.collection('Objects').insert(object.mongo,function(err,data){
 	                            if(err)
 	                                console.log(err);
 	                            else
@@ -381,20 +427,16 @@ module.exports = {
 	                                console.log('path + dummy:'+path + dummy);
 
 	                                fs.mkdirSync(path +'/'+ dummy);
-	                                fs.mkdirSync(path +'/'+ dummy + '/' + dummy);
-	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/' + dummy + '.ino',object.ino);
+	                                fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
-	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',object.mongo);
-	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '/Makefile',object.makefile);
+	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',JSON.stringify(object.mongo));
+	                                fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/_' + dummy + '.ino',object.ino);
+	                                fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/Makefile',object.makefile);
 	                                //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
 	                                deleteFolderRecursive('upload');
 	                            }
 	                        });
-	                        
-	                        
-
-	                        //fine
 	                    }
 
 	                })

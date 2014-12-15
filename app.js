@@ -14,7 +14,7 @@ var request = require('request');
 var net = require('net');
 var targz = require('tar.gz');
 var formidable = require('formidable');
-var ENVIRONMENT = "production";
+var ENVIRONMENT = "local";
 
 
 var HOST = '192.168.1.109';
