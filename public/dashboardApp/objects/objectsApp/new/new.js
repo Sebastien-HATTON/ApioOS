@@ -7,7 +7,6 @@ angular.module('ApioDashboardApplication')
 	$scope.newEditorDisabled=false;
 	$scope.wizardDisabled=false;
 
-
 	$scope.newObject = {};
     $scope.newObject.properties = {};
     $scope.newObject.pins = {};

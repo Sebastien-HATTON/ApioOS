@@ -6,7 +6,6 @@ angular.module('ApioDashboardApplication')
 
   this.selectTab = function(setTab){
     this.tabb = setTab;
-    alert(setTab)
   };
 
   this.isSelected = function(checkTab){

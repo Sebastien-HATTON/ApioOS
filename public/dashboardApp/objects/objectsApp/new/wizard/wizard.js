@@ -17,12 +17,13 @@ angular.module('ApioDashboardApplication')
     console.log($scope.newObject.availablePins)
     console.log('$scope.newObject.microType '+$scope.newObject.microType);
   };
-  $scope.check = function(){
-    console.log('im check')
-    console.log('family: '+$scope.newObject.microFamily)
-    console.log('type: '+$scope.newObject.microType)
 
+  $scope.savePin = function(pin){
+    console.log('pin')
+    console.log(pin)
+    $scope.newPin.number = pin.number;
   }
+
   $scope.selected = {};
 
   $scope.microData = [
@@ -36,7 +37,7 @@ angular.module('ApioDashboardApplication')
                               "name" : "tx"
                             },
                             {"number" : "1",
-                              "name" : "tx"
+                              "name" : "rx"
                             }
                           ]
               },
@@ -55,7 +56,61 @@ angular.module('ApioDashboardApplication')
         "id" : "2",
           "family" : "Apio",
           "types" : [
-              { "type" : "General" }
+              { "type" : "General",
+                "pins" : [
+                            {"number" : "0",
+                              "name" : "D0"
+                            },
+                            {"number" : "1",
+                              "name" : "D1"
+                            },
+                            {"number" : "2",
+                              "name" : "D2"
+                            },
+                            {"number" : "3",
+                              "name" : "D3"
+                            },
+                            {"number" : "4",
+                              "name" : "D4"
+                            },
+                            {"number" : "5",
+                              "name" : "D5"
+                            },
+                            {"number" : "6",
+                              "name" : "D6"
+                            },
+                            {"number" : "7",
+                              "name" : "D7(PWM)"
+                            },
+                            {"number" : "8",
+                              "name" : "D8(PWM)"
+                            },
+                            {"number" : "9",
+                              "name" : "D9(PWM)"
+                            },
+                            {"number" : "A7",
+                              "name" : "A7"
+                            },
+                            {"number" : "A6",
+                              "name" : "A6"
+                            },
+                            {"number" : "A5",
+                              "name" : "A5"
+                            },
+                            {"number" : "A4",
+                              "name" : "A4"
+                            },
+                            {"number" : "A3",
+                              "name" : "A3"
+                            },
+                            {"number" : "A2",
+                              "name" : "A2"
+                            },
+                            {"number" : "A0",
+                              "name" : "A0"
+                            }
+                          ]
+              }
           ]
 
       }

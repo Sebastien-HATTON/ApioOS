@@ -5,10 +5,10 @@
         <dd>Select the pin you want to interact with and set if they are <b>Outputs</b> or <b>Inputs</b> for your Smart Object</dd>
   </dl>
 
-  <div class="form-group">
-    <label for="inputFamily" class="col-sm-2 control-label">Qua</label>
+  <div class="form-group" ng-show="newObject.availablePins.length>0">
+    <label for="inputFamily" class="col-sm-2 control-label">Pin</label>
     <div class="col-sm-10">
-      <select ng-model="selected.family" ng-change="saveFamily(selected.family)" ng-options="p.pins for p in newObject.availablePins" class="form-control input-lg"  id="inputPins" >
+      <select ng-model="selected.pins" ng-change="savePin(selected.pins)" ng-options="p.name for p in newObject.availablePins" class="form-control input-lg"  id="inputPins" >
       </select>
     </div>
   </div>
@@ -20,13 +20,12 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-hide="newObject.availablePins.length>0">
     <label for="inputPinNumber" class="col-sm-2 control-label">Number</label>
     <div class="col-sm-10">
       <input ng-model="newPin.number" type="text" class="form-control" id="inputObjectId" placeholder="Pin number" >
     </div>
   </div>
-
 
   <div class="form-group">
     <label for="inputPinType" class="col-sm-2 control-label">Type</label>
@@ -41,11 +40,6 @@
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button type="submit" class="btn btn-success" ng-disabled="formObjectInfo.$invalid"  ng-click="addNewPin()">Add</button>
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-success" ng-disabled="formObjectInfo.$invalid"  ng-click="check()">check</button>
     </div>
   </div>
 
