@@ -385,6 +385,9 @@ app.post('/apio/app/maximumId', routes.dashboard.maximumIdApioApp);
 /* APIO delete of the App */
 app.post('/apio/app/delete', routes.dashboard.deleteApioApp);
 
+/* APIO make an empty App folder */
+app.post('/apio/app/folder', routes.dashboard.folderApioApp);
+
 /* APIO modify of the App */
 app.post('/apio/app/modify', routes.dashboard.modifyApioApp);
 
