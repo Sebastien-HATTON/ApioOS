@@ -216,8 +216,8 @@ void apioSetup(uint16_t objectAddress)
 {
   SYS_Init();
   NWK_SetAddr(objectAddress);
-  NWK_SetPanId(0x02);
-  PHY_SetChannel(0xf);
+  NWK_SetPanId(0x01);
+  PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, apioReceive);
 
