@@ -6,14 +6,6 @@
   </dl>
 
   <div class="form-group">
-    <label for="inputFamily" class="col-sm-2 control-label">Qua</label>
-    <div class="col-sm-10">
-      <select ng-model="selected.family" ng-change="saveFamily(selected.family)" ng-options="p.pins for p in newObject.availablePins" class="form-control input-lg"  id="inputPins" >
-      </select>
-    </div>
-  </div>
-
-  <div class="form-group">
     <label for="inputPinName" class="col-sm-2 control-label">Name</label>
     <div class="col-sm-10">
       <input ng-model="newPin.name" type="text" class="form-control" id="inputObjectName" placeholder="Pin name" >
@@ -49,25 +41,37 @@
     </div>
   </div>
 
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-        <p>Below you can see the preview of your object's pin</p>
-        <table class="table table-bordered">
-            <tr>
-                <td>Name</td>
-                <td>Data</td>
-                <td>Action</td>
-            </tr>
-            <tr ng-repeat="(key,value) in newObject.pins">
-                <td>{{key}}</td>
-                <td>{{value}}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger" ng-click="removeKeyValuePins(key)">Remove</button>
-                </td>
-            </tr>
-        </table>
-    </div>
+ <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+          <p>Below you can see the preview of your object's pin</p>
+          <table class="table table-bordered">
+              <tr>
+                  <td>Name</td>
+                  <td>Data</td>
+                  <td>Action</td>
+              </tr>
+              <tr ng-repeat="(key,value) in newObject.pins">
+                  <td>{{key}}</td>
+                  <td>{{value}}</td>
+                  <td>
+                      <button class="btn btn-sm btn-danger" ng-click="removeKeyValuePins(key)">Remove</button>
+                  </td>
+              </tr>
+          </table>
+      </div>
   </div>
+
+ <!-- <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+          <table class="table table-bordered">
+              <tr ng-repeat="(key,value) in newPin">
+                  <td>{{key}}</td>
+                  <td>{{value}}</td>
+              </tr>
+          </table>
+      </div>
+  </div>
+  -->
 
   <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">

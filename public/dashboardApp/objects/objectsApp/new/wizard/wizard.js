@@ -3,7 +3,7 @@ angular.module('ApioDashboardApplication')
 
   $scope.tab = 1;
   $scope.hide = false;
-  $scope.progressBarValue = 0;
+  this.progressBarValue = 0;
   $scope.activeForm = 1;  
 
   this.saveFamily = function(family){
@@ -12,8 +12,17 @@ angular.module('ApioDashboardApplication')
   };
   this.saveType = function(type){
     $scope.newObject.microType=type.type;
+    $scope.newObject.availablePins=type.pins
+    console.log('pins:')
+    console.log($scope.newObject.availablePins)
     console.log('$scope.newObject.microType '+$scope.newObject.microType);
   };
+  $scope.check = function(){
+    console.log('im check')
+    console.log('family: '+$scope.newObject.microFamily)
+    console.log('type: '+$scope.newObject.microType)
+
+  }
   $scope.selected = {};
 
   $scope.microData = [
@@ -21,7 +30,16 @@ angular.module('ApioDashboardApplication')
           "id" : "0",
           "family" : "Arduino",
           "types" : [
-              { "type" : "Uno" },
+              { "type" : "Uno",
+                "pins" : [
+                            {"number" : "0",
+                              "name" : "tx"
+                            },
+                            {"number" : "1",
+                              "name" : "tx"
+                            }
+                          ]
+              },
               { "type" : "Mega" },
               { "type" : "Nano" }
           ]
@@ -110,8 +128,8 @@ angular.module('ApioDashboardApplication')
   this.nextForm = function(isValid){
     if(isValid){
       console.log('nextForm')
-      $scope.progressBarValue += 20;
-      console.log('progressBarValue: '+ $scope.progressBarValue);
+      this.progressBarValue += 20;
+      console.log('progressBarValue: '+ this.progressBarValue);
       console.log('previous activeForm : ' +$scope.activeForm);
       $scope.activeForm ++;
       console.log('actual activeForm : ' +$scope.activeForm);
@@ -121,8 +139,8 @@ angular.module('ApioDashboardApplication')
   };
   
   this.previousForm = function(){
-    $scope.progressBarValue -= 20;
-    console.log('progressBarValue: '+ $scope.progressBarValue);
+    this.progressBarValue -= 20;
+    console.log('progressBarValue: '+ this.progressBarValue);
     $scope.activeForm --;
     this.selectTab($scope.activeForm);
   };

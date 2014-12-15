@@ -4,7 +4,8 @@ angular.module('ApioDashboardApplication')
             url: '/apio/app/upload',
             queueLimit : 1,
             onSuccessItem : function(item, response, status, headers) {
-            	$state.go('objects.objectsLaunch');
+            	$state.go('objects.objectsLaunch',{'reload':true});
+            	
             }
         });	
 }]);

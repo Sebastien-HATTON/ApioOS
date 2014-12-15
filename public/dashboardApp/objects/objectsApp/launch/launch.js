@@ -144,11 +144,13 @@ angular.module('ApioDashboardApplication')
 	      $scope.html = data.html;
 	      $scope.js = data.js;
 	      $scope.mongo = data.mongo;
+	      $scope.makefile = data.makefile;
 
 	      $rootScope.ino = data.ino;
 	      $rootScope.html = data.html;
 	      $rootScope.js = data.js;
 	      $rootScope.mongo = data.mongo;
+	      $rootScope.makefile = data.makefile;
 	      console.log("Launching the updater editor");
 	      
 	    })

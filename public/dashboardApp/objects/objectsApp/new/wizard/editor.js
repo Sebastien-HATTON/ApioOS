@@ -6,6 +6,7 @@ angular.module('ApioDashboardApplication')
 
   this.selectTab = function(setTab){
     this.tabb = setTab;
+    alert(setTab)
   };
 
   this.isSelected = function(checkTab){
@@ -48,15 +49,16 @@ angular.module('ApioDashboardApplication')
     console.log($scope.$parent.editorMongo);*/
   }
 
-  this.updateApioApp = function(){
-    console.log('updating object: '+ $rootScope.currentApplication.objectId);
+  $scope.updateLaunch = function(oldId,newId,ino,html,js,mongo){
+    console.log('I am the updateLaunch updating the app: '+oldId)
     $http.post('/apio/database/updateApioApp',
         {
-          objectId : $rootScope.currentApplication.objectId,
-          ino   : $rootScope.ino,
-          html  : $rootScope.html,
-          js    : $rootScope.js,
-          mongo : $rootScope.mongo
+          objectId : oldId,
+          newId: newId,
+          ino   : ino,
+          html  : html,
+          js    : js,
+          mongo : mongo
         })
       .success(function(){
         // $scope.switchPage('Objects');
@@ -73,13 +75,44 @@ angular.module('ApioDashboardApplication')
                       closeOnConfirm: true
                     },
                     function(){
-                        $state.go('objects.objectsLaunch');
+                        //$state.go('objects.objectsLaunch');
+                        $state.go($state.current, {}, {reload: true});
                     });
 
       })
       .error(function(){
         alert("An error has occurred while updating the object" + $rootScope.currentApplication.objectId);
     });
+  }
+
+  this.updateApioApp = function(){
+    console.log('updating object: '+ $rootScope.currentApplication.objectId);
+    console.log('$rootScope.currentApplication.objectId: '+$rootScope.currentApplication.objectId);
+    console.log('$rootScope.ino: '+$rootScope.ino);
+    console.log('$scope.$parent.ino: '+$scope.$parent.ino);
+    console.log('$scope.ino: '+$scope.ino);
+    var actualId = $rootScope.currentApplication.objectId;
+    var modifiedId = (JSON.parse($scope.mongo)).objectId;
+
+    if(actualId===modifiedId){
+      console.log('id has not been modified. It\'s just needed to update the file in the '+actualId+' folder')
+      $scope.updateLaunch(actualId,modifiedId,$scope.ino,$scope.html,$scope.js,$scope.mongo);
+    }
+    else{
+      console.log('id has been modified.\n\tActualId: '+actualId+'\n\tModifiedId: '+modifiedId);
+      console.log('It\'s needed to drop the old folder and create a new one');
+      $http.post('/apio/app/delete',{id:actualId})
+      .success(function(){
+        console.log('folder '+actualId+'successfully deleted')
+        $http.post('/apio/app/folder',{id:modifiedId})
+        .success(function(){
+          console.log('folder '+modifiedId+'successfully created');
+          $scope.updateLaunch(actualId,modifiedId,$scope.ino,$scope.html,$scope.js,$scope.mongo);
+        })
+        .error(function(){console.log('Error. Folder '+actualId+'not created')});
+        })
+      .error(function(){console.log('Error. Folder '+actualId+'not deleted')});
+    }
   };
 
   this.createNewApioAppFromEditor = function(){

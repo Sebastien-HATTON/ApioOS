@@ -1,10 +1,12 @@
 angular.module('ApioDashboardApplication')
 .controller('ApioDashboardNewController', ['$scope','objectService','$http','$timeout', function($scope,objectService,$http,$timeout){
+
 	$scope.currentApplication=$scope.$parent.currentApplication;
 	$scope.hideWizard=true;
 	$scope.hideNewEditor=true;
 	$scope.newEditorDisabled=false;
 	$scope.wizardDisabled=false;
+
 
 	$scope.newObject = {};
     $scope.newObject.properties = {};
@@ -42,7 +44,7 @@ angular.module('ApioDashboardApplication')
 	  $scope.wizardDisabled=true;
 	  $scope.getNewObjectId();
 	};
-
+	
 	$scope.showNewEditor = function(){
 		$scope.hideNewEditor=false;
 	    $scope.hideWizard=true;
@@ -53,10 +55,6 @@ angular.module('ApioDashboardApplication')
 	    $scope.hideCreateNew=false;
 	    $scope.hideUpdate=true;
 	    $scope.initNewEditor();
-	   /* $('#inoEditor').trigger('click');
-	    $('#jsEditor').trigger('click');
-	    $('#htmlEditor').trigger('click');
-	    $('#mongoEditor').trigger('click');*/
 	};
 
 	$scope.initNewEditor = function(){
@@ -86,65 +84,68 @@ angular.module('ApioDashboardApplication')
 	    emptyJs += '\tangular.bootstrap(document.getElementById(\'ApioApplicationINSERT_ID_APPLICATION\'), [\'ApioApplicationINSERT_ID_APPLICATION\']);\n';
 	    emptyJs += '},10);';
 
-	    var editorMongo = '{\n';
-	    editorMongo += '\t"properties" : {\n';
-	    editorMongo += '\t\t"INSERT_NAME1_PROPERTY" : "INSERT_VALUE1_PROPERTY",\n';
-	    editorMongo += '\t\t"INSERT_NAME2_PROPERTY" : "INSERT_VALUE2_PROPERTY"\n';
-	    editorMongo += '\t},\n';
-	    editorMongo += '\t"name" : "INSERT_NAME_OBJECT",\n';
-	    editorMongo += '\t"objectId" : "INSERT_ID_OBJECT",\n';
-	    editorMongo += '\t"protocol" : "INSERT_PROTOCOL_OBJECT",\n';
-	    editorMongo += '\t"address" : "INSERT_ADDRESS_OBJECT",\n';
-	    editorMongo += '\t"db" : {\n\t}\n';
-	    editorMongo += '}';
+	    var emptyMongo = '{\n';
+	    emptyMongo += '\t"properties" : {\n';
+	    emptyMongo += '\t\t"INSERT_NAME1_PROPERTY" : "INSERT_VALUE1_PROPERTY",\n';
+	    emptyMongo += '\t\t"INSERT_NAME2_PROPERTY" : "INSERT_VALUE2_PROPERTY"\n';
+	    emptyMongo += '\t},\n';
+	    emptyMongo += '\t"name" : "INSERT_NAME_OBJECT",\n';
+	    emptyMongo += '\t"objectId" : "INSERT_ID_OBJECT",\n';
+	    emptyMongo += '\t"protocol" : "INSERT_PROTOCOL_OBJECT",\n';
+	    emptyMongo += '\t"address" : "INSERT_ADDRESS_OBJECT",\n';
+	    emptyMongo += '\t"db" : {\n\t}\n';
+	    emptyMongo += '}';
 
 	    console.log('editorHtml: ')
 	    console.log($scope.editorHtml)
 	    console.log('editorJs: ')
 	    console.log($scope.editorJs)
-	    console.log('editorMongo: ')
+	    console.log('emptyMongo: ')
 	    console.log($scope.editorMongo)
 
-		   	$scope.editorIno.setValue(emptyIno);
+	    $timeout(function(){
+	     	$scope.editorIno.setValue(emptyIno);
 		    $scope.editorIno.clearSelection();  
-		    $scope.editorIno.blur();
 		    $scope.editorHtml.setValue(emptyHtml);  
 		    $scope.editorHtml.clearSelection();
-		    $scope.editorHtml.blur();
 		    $scope.editorJs.setValue(emptyJs); 
 		    $scope.editorJs.clearSelection();
-		    $scope.editorJs.blur();
-		    $scope.editorMongo.setValue(editorMongo);  
-		    $scope.editorMongo.clearSelection();
-		    $scope.editorMongo.blur();
+		    $scope.editorMongo.setValue(emptyMongo);  
+		    $scope.editorMongo.clearSelection(); 
+	    	console.log('nel timeout')
+	    	$scope.ino = emptyIno;
+			$scope.html = emptyHtml;
+			$scope.js = emptyJs;
+			$scope.mongo = emptyMongo;
+			
+			//$scope.$digest();
+			//$scope.$apply();
+	    },1,false)
 
+		   	
 	    //devo settare anche i valori nello scope perchè altrimenti se viene
 	    //premuto update prima che sia stato dato il focus all'editor 
 	    //i relativi ng-model rimangono vuoti
 	    
 	    //$timeout(function(){}, [delay], [invokeApply]);
 
-	    $timeout(function(){
-	    	$scope.ino = emptyIno;
-	    	$timeout(function(){
-			    $scope.html = emptyHtml;
-			    $timeout(function(){
-			   		$scope.js = emptyJs;
-			   		$timeout(function(){
-						$scope.mongo = editorMongo;	
-					},1,false)
-				},1,false)	
-			},1,false)
-	    },1,false)
-	    
-
+     
+	   
 	};
-
+	
 	$scope.addNewProperty = function() {
       var t = $scope.newProperty;
       $scope.newObject.properties[$scope.newProperty.name] = t;
       $scope.newProperty = {};
     }
+
+    $scope.removeKeyValueProperties = function(key){
+    	delete $scope.newObject.properties[key]
+ 	}
+
+ 	$scope.removeKeyValuePins = function(key){
+    	delete $scope.newObject.pins[key]
+ 	}
   
     $scope.addNewPin = function() {
       var t = $scope.newPin;
