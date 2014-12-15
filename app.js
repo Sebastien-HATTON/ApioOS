@@ -467,6 +467,9 @@ Apio.io.on("connection", function(socket){
                                             }
                                             console.log("Ho trovato eventi scatenati dallo stato " + state.name);
                                             console.log(data);
+                                            if(callback && data.length == 0){
+                                                callback();
+                                            }
                                             //data è un array di eventi
                                             data.forEach(function (ev, ind, ar) {
                                                 var states = ev.triggeredStates;
@@ -476,9 +479,6 @@ Apio.io.on("connection", function(socket){
                                             })
                                         });
                                     });
-                                }
-                                if(callback){
-                                    callback();
                                 }
                             });
                         };
@@ -492,9 +492,11 @@ Apio.io.on("connection", function(socket){
                                     } while (curDate - date < millis);
                                 };
 
+                                console.log("arr vale:");
+                                console.log(arr);
                                 for(var i in arr){
                                     Apio.Serial.send(arr[i], function(){
-                                        pause(100);
+                                        pause(200);
                                     })
                                 }
                             }
