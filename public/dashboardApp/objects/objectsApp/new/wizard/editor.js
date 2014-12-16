@@ -149,9 +149,23 @@ angular.module('ApioDashboardApplication')
   this.sendFilesToServer = function(){
     var self = this;
     var dao = {}; //dataAccessObject
-    dao = angular.copy($scope.newObject);
+    var mongoObject = JSON.parse($scope.mongo);
     console.log("Trying to create the new object")
+    dao = angular.copy($scope.newObject);
+    console.log('dao');
     console.log(dao);
+    if(mongoObject.objectId!==dao.objectId)
+    {
+      console.log('Id has been changed')
+      console.log('mongoObject Id: '+mongoObject.objectId)
+      console.log('mongoObject Id: '+dao.objectId)
+      dao.objectId = mongoObject.objectId;
+    }
+    else{
+      console.log('Id has not been changed')
+      console.log('mongoObject Id: '+mongoObject.objectId)
+      console.log('mongoObject Id: '+dao.objectId)
+    }
     $http.post('/apio/database/createNewApioApp',{object : dao, ino : $scope.ino, html : $scope.html, js : $scope.js, mongo : $scope.mongo, makefile : $scope.makefile})
       .success(function(){
         //$scope.switchPage('Objects');

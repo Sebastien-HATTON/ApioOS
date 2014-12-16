@@ -168,11 +168,18 @@ module.exports = {
 	                //bisognerebbe far settare la voce della select che vogliono come prima voce attraverso il wizard
 	                for(var k in o) return k;
 	            }
+	  
 
-	            console.log('obj.properties[key].name: ' + obj.properties[key].name);
+	        	console.log('obj.properties[key].name: ' + obj.properties[key].name);
 	            console.log('obj.properties[key].firstItemValue: ' + returnFirstListItemValue(obj.properties[key].items));
 	            objectToSave.properties[obj.properties[key].name] = returnFirstListItemValue(obj.properties[key].items);
 	            console.log('objectToSave.properties[obj.properties[key].name]: ' + objectToSave.properties[obj.properties[key].name]);
+
+	            //vecchia versione cambiata per allinearsi alla logica di matteo
+	            /*console.log('obj.properties[key].name: ' + obj.properties[key].name);
+	            console.log('obj.properties[key].firstItemValue: ' + returnFirstListItemValue(obj.properties[key].items));
+	            objectToSave.properties[obj.properties[key].name] = returnFirstListItemValue(obj.properties[key].items);
+	            console.log('objectToSave.properties[obj.properties[key].name]: ' + objectToSave.properties[obj.properties[key].name]);*/
 	        }
 	        console.log();
 	    }; 
@@ -184,7 +191,8 @@ module.exports = {
 	    console.log('Object' + obj.objectId + 'is being manipulated by the server');
 	    console.log('APIO: Creating application ' + obj.objectId);
 
-	    Apio.Database.registerObject(objectToSave,function(error){
+	    //Apio.Database.registerObject(objectToSave,function(error){
+	    Apio.Database.registerObject(JSON.parse(mongo),function(error){
 	        if (error) {
 	            console.log("/apio/Database/createNewApioApp Error while saving");
 	            res.send(500);

@@ -28,32 +28,7 @@ angular.module('ApioDashboardApplication')
 
   $scope.microData = [
       {
-          "id" : "0",
-          "family" : "Arduino",
-          "types" : [
-              { "type" : "Uno",
-                "pins" : [
-                            {"number" : "0",
-                              "name" : "tx"
-                            },
-                            {"number" : "1",
-                              "name" : "rx"
-                            }
-                          ]
-              },
-              { "type" : "Mega" },
-              { "type" : "Nano" }
-          ]
-      },{
-          "id" : "1",
-          "family" : "ST",
-          "types" : [
-              { "type" : "Uno" },
-              { "type" : "Due" },
-              { "type" : "Tre" }
-          ]
-      }, {
-        "id" : "2",
+        "id" : "0",
           "family" : "Apio",
           "types" : [
               { "type" : "General",
@@ -108,11 +83,43 @@ angular.module('ApioDashboardApplication')
                             },
                             {"number" : "A0",
                               "name" : "A0"
+                            },
+                            {"number" : "20",
+                              "name" : "led1"
+                            },
+                            {"number" : "21",
+                              "name" : "led2"
                             }
                           ]
               }
           ]
 
+      },
+      {
+          "id" : "1",
+          "family" : "Arduino",
+          "types" : [
+              { "type" : "Uno",
+                "pins" : [
+                            {"number" : "0",
+                              "name" : "tx"
+                            },
+                            {"number" : "1",
+                              "name" : "rx"
+                            }
+                          ]
+              },
+              { "type" : "Mega" },
+              { "type" : "Nano" }
+          ]
+      },{
+          "id" : "2",
+          "family" : "ST",
+          "types" : [
+              { "type" : "Uno" },
+              { "type" : "Due" },
+              { "type" : "Tre" }
+          ]
       }
   ];
 
@@ -236,7 +243,10 @@ angular.module('ApioDashboardApplication')
       if(objectToParse.properties[key].type.toLowerCase()==='list'){
         this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : ';
         for(keykey in objectToParse.properties[key].items){
-          this.mongo += '"'+keykey+'",\n';
+          console.log('QUA '+keykey)
+          console.log('QUI '+key)
+          console.log('QUO '+objectToParse.properties[key].items[keykey])
+          this.mongo += '"'+objectToParse.properties[key].items[keykey]+'",\n';
           break
         };
       }else{
@@ -244,22 +254,23 @@ angular.module('ApioDashboardApplication')
       }
 
     }
+
     if((Object.keys(objectToParse.properties)).length!==0)
       this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
-
     this.mongo += '"db" : {\n';
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='list'){
-        this.mongo += '\t"' + objectToParse.properties[key].name + '" : {\n';
+        this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : {\n';
         for(keykey in objectToParse.properties[key].items){
-          this.mongo += '\t\t"' + objectToParse.properties[key].items[keykey] + '" : "' + keykey  + '",\n';
-        };
+          this.mongo += '\t\t"'+objectToParse.properties[key].items[keykey]+'" : "'+keykey+'",\n';
+        }
         this.mongo = this.mongo.slice(0,(this.mongo.length-2));
-        this.mongo += '\n\t\t}\n';
-      };
-    };
-    this.mongo += '\t}\n';
+        this.mongo += '\n\t\t},\n';
+      }
+    }
+    this.mongo = this.mongo.slice(0,(this.mongo.length-2));
+    this.mongo += '\n\t}\n';
     this.mongo += '}';
   };
 
@@ -285,10 +296,14 @@ angular.module('ApioDashboardApplication')
      this.html+=objectToParse.objectId +'" ng-app="ApioApplication' + objectToParse.objectId + '"  style="padding:10px;">\n';
      this.html+='\t<div ng-controller="defaultController">\n';
      this.html+='\t<topappapplication></topappapplication>\n';
+     var buttonEmpty = '';
      
      for(key in objectToParse.properties){
-      
-      this.html+='\t\t\t<' + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
+      if(objectToParse.properties[key].type.toLowerCase()==='button'){
+        //only button has the "apio" string on the beginning
+        buttonEmpty = 'apio';
+      }
+      this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
       
       if(objectToParse.properties[key].type.toLowerCase()==='trigger'){
         this.html+='labelon="'+ objectToParse.properties[key].onLabel +'" labeloff="'+ objectToParse.properties[key].offLabel +'">';
@@ -297,14 +312,14 @@ angular.module('ApioDashboardApplication')
       }else if(objectToParse.properties[key].type.toLowerCase()==='list'){
         this.html+='label="'+ objectToParse.properties[key].listLabel+'" >';
       }else if(objectToParse.properties[key].type.toLowerCase()==='button'){
-        this.html+='label="'+ objectToParse.properties[key].buttonLabel+'" innertext= " ">';
+        this.html+='label="'+ objectToParse.properties[key].buttonLabel+'" innertext= "'+objectToParse.properties[key].buttonLabel+'">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='number'){
         this.html+='label="'+ objectToParse.properties[key].numberLabel+'">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='text'){
         this.html+='label="'+ objectToParse.properties[key].textBuilderLabel+'">';
       }
 
-      this.html+='</' + objectToParse.properties[key].type.toLowerCase() + '>\n';
+      this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
 
      };
      this.html+='\t</div>\n';

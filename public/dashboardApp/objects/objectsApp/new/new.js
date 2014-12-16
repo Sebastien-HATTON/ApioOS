@@ -174,8 +174,9 @@ angular.module('ApioDashboardApplication')
         if (!$scope.newProperty.hasOwnProperty("items"))
           $scope.newProperty.items = {};
         //l'ho dovuta cambiare per adattarsi alla struttura di matteo 
-        //$scope.newProperty.items[$scope.newListItem.name] = $scope.newListItem.value;
-        $scope.newProperty.items[$scope.newListItem.value] = $scope.newListItem.name;
+        //e ora l'ho riportata alla vecchia versione
+        $scope.newProperty.items[$scope.newListItem.name] = $scope.newListItem.value;
+        //$scope.newProperty.items[$scope.newListItem.value] = $scope.newListItem.name;
         console.log($scope.newProperty.items);
         $scope.newListItem.name = '';
         $scope.newListItem.value = '';
