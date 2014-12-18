@@ -19,10 +19,14 @@ module.exports = {
 				console.log(req.body.state.objectId);
 				console.log("properties vale:");
 				console.log(req.body.state.properties);
-	            Apio.Database.db.collection('States').aggregate({$match : {objectId : req.body.state.objectId, properties: req.body.state.properties}},function(err,result){
-					if (typeof result !== "undefined" && result.length > 0) {
+	            //Apio.Database.db.collection('States').aggregate({$match : {objectId : req.body.state.objectId, properties: req.body.state.properties}},function(err,result){
+				Apio.Database.db.collection('States').findOne({objectId : req.body.state.objectId, properties: req.body.state.properties}, function(err, result){
+					console.log("result vale:");
+					console.log(result);
+					if (result !== null) {
 	                    console.log("Esiste già uno stato con queste proprietà");
-	                    res.send({error : 'STATE_PROPERTIES_EXIST', state : result[0]["name"]});
+	                    //res.send({error : 'STATE_PROPERTIES_EXIST', state : result[0]["name"]});
+						res.send({error : 'STATE_PROPERTIES_EXIST', state : result.name});
 	                }
 	                else {
 	                    if (req.body.hasOwnProperty('event')) {
