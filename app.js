@@ -428,6 +428,7 @@ app.post("/apio/state/apply",function(req,res){
                                         })
                                     })
                                 });
+                                pause(500);
                             }
                         });
                     }
@@ -455,42 +456,47 @@ app.post("/apio/state/apply",function(req,res){
                             var s = state;
                             s.active = false;
                             Apio.io.emit('apio_state_update',s);
-                            res.send({error:false});
                         }
                     })
                 }
                 else {
-                    Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
-                        if (err)
+                    Apio.Database.db.collection('States').update({name: state.name}, {$set: {active: true}}, function (err) {
+                        if (err) {
                             console.log("Non ho potuto settare il flag a true");
-                    });
-                    console.log("Lo stato che sto per applicare è ");
-                    console.log(state);
-                    Apio.Database.updateProperty(state,function(){
-                        stateHistory[state.name] = 1;
-                        //Connected clients are notified of the change in the database
-                        Apio.io.emit("apio_server_update",state);
-                        Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
-                            if (err) {
-                                console.log("error while fetching events");
-                                console.log(err);
-                            }
-                            console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                            console.log(data);
-                            if(callback && data.length == 0){
-                                callback();
-                            }
-                            //data è un array di eventi
-                            data.forEach(function(ev,ind,ar){
-                                var states = ev.triggeredStates;
-                                states.forEach(function(ee,ii,vv){
-                                    applyStateFn(ee.name, callback);
-                                })
-                            })
-                        });
+                        }
+                        else {
+                            var s = state;
+                            s.active = true;
+                            Apio.io.emit('apio_state_update', s);
+                        }
                     });
                 }
-
+                arr.push(state);
+                console.log("Lo stato che sto per applicare è ");
+                console.log(state);
+                Apio.Database.updateProperty(state,function(){
+                    stateHistory[state.name] = 1;
+                    //Connected clients are notified of the change in the database
+                    Apio.io.emit("apio_server_update",state);
+                    Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
+                        if (err) {
+                            console.log("error while fetching events");
+                            console.log(err);
+                        }
+                        console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                        console.log(data);
+                        if(callback && data.length == 0){
+                            callback();
+                        }
+                        //data è un array di eventi
+                        data.forEach(function(ev,ind,ar){
+                            var states = ev.triggeredStates;
+                            states.forEach(function(ee,ii,vv){
+                                applyStateFn(ee.name, callback);
+                            })
+                        })
+                    });
+                });
             })
         } else {
             console.log("Skipping State application because of loop.")
