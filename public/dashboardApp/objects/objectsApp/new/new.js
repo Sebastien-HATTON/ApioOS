@@ -135,6 +135,7 @@ angular.module('ApioDashboardApplication')
 	$scope.addNewProperty = function() {
       var t = $scope.newProperty;
       $scope.newObject.properties[$scope.newProperty.name] = t;
+      console.log($scope.newObject.properties)
       $scope.newProperty = {};
     }
 
@@ -148,6 +149,7 @@ angular.module('ApioDashboardApplication')
   
     $scope.addNewPin = function() {
       var t = $scope.newPin;
+      $scope.newPin.propertyType = $scope.newObject.properties[$scope.newPin.propertyName].type
       $scope.newObject.pins[$scope.newPin.name] = t;
       $scope.newPin = {};
     }

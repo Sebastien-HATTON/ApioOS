@@ -416,8 +416,18 @@ angular.module('ApioDashboardApplication')
         console.log(objectToParse.properties[key]);
          this.ino +='\t\tif(value=="'+objectToParse.properties[key].on+'"){\n';
          this.ino += '\t\t\t//Do Something\n\t\t}\n';
+         for(keyPin in objectToParse.pins){
+            if(objectToParse.pins[keyPin].propertyType === 'Trigger' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
+              this.ino += '\t\t\tdigitalWrite('+objectToParse.pins[keyPin].name+',HIGH);\n'
+            }
+         }
          this.ino +='\t\tif(value=="'+objectToParse.properties[key].off+'"){\n';
          this.ino += '\t\t\t//Do Something\n\t\t}\n';
+         for(keyPin in objectToParse.pins){
+            if(objectToParse.pins[keyPin].propertyType === 'Trigger' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
+              this.ino += '\t\t\tdigitalWrite('+objectToParse.pins[keyPin].name+',LOW);\n'
+            }
+         }
        }
        else if(objectToParse.properties[key].type=="List")
        {
