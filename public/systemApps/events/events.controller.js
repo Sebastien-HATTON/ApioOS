@@ -496,6 +496,11 @@ angular.module('ApioApplication')
                         $scope.currentFormStep = "";
                     })
                     .error("An error has occurred while saving the event")
+
+                var checkbox = document.getElementsByName("all_guestslistOfGuests");
+                for(var i in checkbox){
+                    checkbox[i].checked = false;
+                }
             }
             $scope.launchEvent = function(event) {
 
