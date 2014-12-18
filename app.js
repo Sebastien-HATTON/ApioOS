@@ -627,7 +627,7 @@ Apio.io.on("connection", function(socket){
                                 console.log(arr);
                                 for(var i in arr){
                                     Apio.Serial.send(arr[i], function(){
-                                        pause(200);
+                                        pause(80);
                                     })
                                 }
                                 arr = [];
