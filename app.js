@@ -809,125 +809,146 @@ Apio.io.on("connection", function(socket){
                 console.log(data.properties);
 
                 /*Apio.Database.db.collection("States").findOne({objectId: data.objectId, properties: data.properties}, function (err, result) {
-                    if (err) {
-                        console.log("Error while fetching states");
-                    }
-                    else {
-                        var arr = [];
-                        console.log("result vale:");
-                        console.log(result);
-                        var applyStateFn = function (stateName, callback) {
-                            Apio.Database.db.collection("States").findOne({name: stateName}, function (err, state) {
-                                if (err) {
-                                    console.log("applyState unable to apply state");
-                                    console.log(err);
-                                }
-                                else {
-                                    arr.push(state);
-                                    Apio.Database.updateProperty(state, function () {
-                                        Apio.io.emit("apio_server_update", state);
-                                        Apio.Database.db.collection("Events").find({triggerState: state.name}).toArray(function (err, data) {
-                                            if (err) {
-                                                console.log("error while fetching events");
-                                                console.log(err);
-                                            }
-                                            console.log("Ho trovato eventi scatenati dallo stato " + state.name);
-                                            console.log(data);
-                                            if(callback && data.length == 0){
-                                                callback();
-                                            }
-                                            //data è un array di eventi
-                                            data.forEach(function (ev, ind, ar) {
-                                                var states = ev.triggeredStates;
-                                                states.forEach(function (ee, ii, vv) {
-                                                    applyStateFn(ee.name, callback);
-                                                })
-                                            })
-                                        });
-                                    });
-                                }
-                            });
-                        };
-                        applyStateFn(result.name, function(){
-                            if(ENVIRONMENT == "production"){
-                                var pause = function (millis) {
-                                    var date = new Date();
-                                    var curDate = null;
-                                    do {
-                                        curDate = new Date();
-                                    } while (curDate - date < millis);
-                                };
+                 if (err) {
+                 console.log("Error while fetching states");
+                 }
+                 else {
+                 var arr = [];
+                 console.log("result vale:");
+                 console.log(result);
+                 var applyStateFn = function (stateName, callback) {
+                 Apio.Database.db.collection("States").findOne({name: stateName}, function (err, state) {
+                 if (err) {
+                 console.log("applyState unable to apply state");
+                 console.log(err);
+                 }
+                 else {
+                 arr.push(state);
+                 Apio.Database.updateProperty(state, function () {
+                 Apio.io.emit("apio_server_update", state);
+                 Apio.Database.db.collection("Events").find({triggerState: state.name}).toArray(function (err, data) {
+                 if (err) {
+                 console.log("error while fetching events");
+                 console.log(err);
+                 }
+                 console.log("Ho trovato eventi scatenati dallo stato " + state.name);
+                 console.log(data);
+                 if(callback && data.length == 0){
+                 callback();
+                 }
+                 //data è un array di eventi
+                 data.forEach(function (ev, ind, ar) {
+                 var states = ev.triggeredStates;
+                 states.forEach(function (ee, ii, vv) {
+                 applyStateFn(ee.name, callback);
+                 })
+                 })
+                 });
+                 });
+                 }
+                 });
+                 };
+                 applyStateFn(result.name, function(){
+                 if(ENVIRONMENT == "production"){
+                 var pause = function (millis) {
+                 var date = new Date();
+                 var curDate = null;
+                 do {
+                 curDate = new Date();
+                 } while (curDate - date < millis);
+                 };
 
-                                console.log("arr vale:");
-                                console.log(arr);
-                                for(var i in arr){
-                                    Apio.Serial.send(arr[i], function(){
-                                        pause(80);
-                                    })
-                                }
-                                arr = [];
+                 console.log("arr vale:");
+                 console.log(arr);
+                 for(var i in arr){
+                 Apio.Serial.send(arr[i], function(){
+                 pause(80);
+                 })
+                 }
+                 arr = [];
+                 }
+                 });
+                 }
+                 });*/
+
+                Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function(err, result){
+                    if(err){
+                        console.log("ERROR: Unable to find object with id"+data.objectId);
+                    }
+                    else{
+                        var actualObjectState = result.properties;
+                        Apio.Database.db.collection("States").find({objectId: data.objectId}).toArray(function (err, result) {
+                            if (err) {
+                                console.log("Error while fetching states");
                             }
-                        });
-                    }
-                });*/
-                Apio.Database.db.collection("States").findOne({objectId: data.objectId, properties: data.properties}, function (err, result) {
-                    if (err) {
-                        console.log("Error while fetching states");
-                    }
-                    else {
-                        var arr = [];
-                        console.log("result vale:");
-                        console.log(result);
-                        var applyStateFn = function (stateName, callback) {
-                            Apio.Database.db.collection("States").findOne({name: stateName}, function (err, state) {
-                                if (err) {
-                                    console.log("applyState unable to apply state");
-                                    console.log(err);
-                                }
-                                else {
-                                    arr.push(state);
-                                    Apio.Database.updateProperty(state, function () {
-                                        Apio.io.emit("apio_server_update", state);
-                                        Apio.Database.db.collection("Events").find({triggerState: state.name}).toArray(function (err, data) {
-                                            if (err) {
-                                                console.log("error while fetching events");
-                                                console.log(err);
-                                            }
-                                            console.log("Ho trovato eventi scatenati dallo stato " + state.name);
-                                            console.log(data);
-                                            if(callback && data.length == 0){
-                                                callback();
-                                            }
-                                            //data è un array di eventi
-                                            data.forEach(function (ev, ind, ar) {
-                                                var states = ev.triggeredStates;
-                                                states.forEach(function (ee, ii, vv) {
-                                                    applyStateFn(ee.name, callback);
-                                                })
-                                            })
-                                        });
+                            else {
+                                var arr = [];
+                                var applyStateFn = function (stateName, callback) {
+                                    Apio.Database.db.collection("States").findOne({name: stateName}, function (err, state) {
+                                        if (err) {
+                                            console.log("applyState unable to apply state");
+                                            console.log(err);
+                                        }
+                                        else {
+                                            arr.push(state);
+                                            Apio.Database.updateProperty(state, function () {
+                                                Apio.io.emit("apio_server_update", state);
+                                                Apio.Database.db.collection("Events").find({triggerState: state.name}).toArray(function (err, data) {
+                                                    if (err) {
+                                                        console.log("error while fetching events");
+                                                        console.log(err);
+                                                    }
+                                                    console.log("Ho trovato eventi scatenati dallo stato " + state.name);
+                                                    console.log(data);
+                                                    if(callback && data.length == 0){
+                                                        callback();
+                                                    }
+                                                    //data è un array di eventi
+                                                    data.forEach(function (ev, ind, ar) {
+                                                        var states = ev.triggeredStates;
+                                                        states.forEach(function (ee, ii, vv) {
+                                                            applyStateFn(ee.name, callback);
+                                                        })
+                                                    })
+                                                });
+                                            });
+                                        }
                                     });
-                                }
-                            });
-                        };
-                        applyStateFn(result.name, function(){
-                            if(ENVIRONMENT == "production"){
-                                var pause = function (millis) {
-                                    var date = new Date();
-                                    var curDate = null;
-                                    do {
-                                        curDate = new Date();
-                                    } while (curDate - date < millis);
                                 };
+                                console.log("result vale:");
+                                console.log(result);
+                                var statesFlag = true;
+                                for(var i in result){
+                                    for(var j in result[i].properties){
+                                        if(!actualObjectState.hasOwnProperty(j) || result[i].properties[j] !== actualObjectState[j]){
+                                            statesFlag = false;
+                                            break;
+                                        }
+                                    }
+                                    if(statesFlag){
+                                        applyStateFn(result[i].name, function(){
+                                            if(ENVIRONMENT == "production"){
+                                                var pause = function (millis) {
+                                                    var date = new Date();
+                                                    var curDate = null;
+                                                    do {
+                                                        curDate = new Date();
+                                                    } while (curDate - date < millis);
+                                                };
 
-                                console.log("arr vale:");
-                                console.log(arr);
-                                for(var i in arr){
-                                    Apio.Serial.send(arr[i], function(){
-                                        pause(80);
-                                    })
+                                                console.log("arr vale:");
+                                                console.log(arr);
+                                                for(var i in arr){
+                                                    Apio.Serial.send(arr[i], function(){
+                                                        pause(80);
+                                                    })
+                                                }
+                                                arr = [];
+                                            }
+                                        });
+                                    }
+                                    statesFlag = true;
                                 }
-                                arr = [];
                             }
                         });
                     }
