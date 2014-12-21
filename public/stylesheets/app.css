@@ -746,17 +746,6 @@ margin-top: 5%;
         font-size: 35px;
     }
 
-    .proprieta_menu {
-        float: left;
-        width: 41%;
-        margin-top: 10%;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 0;
-        display: inline-table;
-        box-shadow: 0 0 0 0;
-    }
-
     .box_createNewEvent {
         display: block;
         opacity: 1;
@@ -793,17 +782,6 @@ margin-top: 5%;
         font-size: 35px;
     }
 
-    .proprieta_menu {
-        float: left;
-        width: 41%;
-        margin-top: 10%;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 0;
-        display: inline-table;
-        box-shadow: 0 0 0 0;
-    }
-
     .box_createNewEvent {
         display: block;
         opacity: 1;
@@ -837,17 +815,6 @@ margin-top: 5%;
         line-height: 86px;
         border-radius: 2000px;
         border: solid 1px rgb(88, 170, 220);
-    }
-
-    .proprieta_menu {
-        float: left;
-        width: 41%;
-        margin-top: 10%;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 0;
-        display: inline-table;
-        box-shadow: 0 0 0 0;
     }
 
     .box_createNewEvent {
@@ -1544,33 +1511,7 @@ width: 100px !important;*/
         margin-right: auto;
     }
 }
-/*Proprieta_menu*/
-@media (min-width: 481px) and (max-width: 1000px) {
-    .proprieta_menu {
-        float: left;
-        width: 41%;
-        margin-top: 10%;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 0;
-        display: inline-table;
-        box-shadow: 0 0 0 0;
-    }
-}
 
-@media (min-width: 1001px) {
-    .proprieta_menu {
-        float: left;
-        width: 41%;
-        margin-top: 10%;
-        margin-left: 1%;
-        margin-right: 0;
-        margin-bottom: 0;
-        display: inline-table;
-        box-shadow: 0 0 0 0;
-        border: none;
-    }
-}
 /*Number*/
 @media only screen and (min-width: 320px) and (max-width: 480px) {
     .numeroproprieta {}
@@ -1628,10 +1569,6 @@ width: 100px !important;*/
         line-height: 0;
     }
 }
-/*Text*/
-
-
-
 
 @media only screen and (min-width: 320px) and (max-width: 480px) {
     input[type="range"] {
