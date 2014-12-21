@@ -170,8 +170,8 @@ window.Apio = Apio;
 window.$ = $;
 Apio.Socket.init();
 //Fixare questo scempio con la dependency injection
-Apio.appWidth = parseInt($("#appApio").css('width'),10);
-Apio.newWidth = parseInt($("#appApio").css('width'),10);
+Apio.appWidth = parseInt($("#ApioApplicationContainer").css('width'),10);
+Apio.newWidth = parseInt($("#ApioApplicationContainer").css('width'),10);
 Apio.currentApplication = {};
 Apio.currentApplication.subapps = {};
 
