@@ -1449,38 +1449,6 @@ width: 100px !important;*/
         opacity: 1;
     }
 }
-/*DynamicView*/
-@media only screen and (min-width: 481px) and (max-width: 768px) {
-    .dynvinput {
-        float: right;
-        font-family: sans-serif;
-        font-weight: 100;
-        color: #8e8e8e;
-        font-size: 50px;
-        line-height: 130%;
-    }
-
-    .dynvlabel {
-        line-height: 120%;
-    }
-}
-
-@media only screen and (min-width: 769px) {
-    .dynvinput {
-        float: right;
-        font-family: sans-serif;
-        font-weight: 100;
-        color: #8e8e8e;
-        font-size: 50px;
-        line-height: 130%;
-        
-    }
-
-    .dynvlabel {
-		line-height: 230%;
-		width: 80%;    
-	}
-}
 
 /*Number*/
 @media only screen and (min-width: 320px) and (max-width: 480px) {
@@ -2662,9 +2630,7 @@ margin-left:40px;
 opacity: 1;
 }
 }
-</style>
 
-<style type="text/css">
 @media only screen and (min-width: 320px)  and (max-width: 600px){
 select{
 -webkit-appearance: none;
@@ -2717,7 +2683,6 @@ line-height: 22px;
 /*******************
 EVENTI
 *****************/
-<style type="text/css">
 @media (min-width: 320px) and (max-width: 600px){
 .infoEvent{
 font-size: 20px;
