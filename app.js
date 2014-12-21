@@ -14,7 +14,17 @@ var request = require('request');
 var net = require('net');
 var targz = require('tar.gz');
 var formidable = require('formidable');
+
+var APIO_CONFIGURATION = {
+    port : 8083
+}
 var ENVIRONMENT = "production";
+if (process.argv.indexOf('--no-serial') > -1)
+    ENVIRONMENT = "development"
+if (process.argv.indexOf('--port') > -1) {
+    var index = process.argv.indexOf('--port');
+    APIO_CONFIGURATION.port = process.argv[index+1]
+}
 
 
 var HOST = '192.168.1.109';
@@ -74,7 +84,26 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 
-;
+app.get('/',function(req,res){
+    res.sendfile('public/html/index.html');
+})
+app.post('/apio/authenticate',function(req,res){
+    var user = req.body.user;
+    var password = req.body.password;
+
+    if (user === 'apio' && password === 'apio')
+        res.send({
+            status : true
+        })
+    else
+        res.status(401).send({
+            status : false,
+            errors : [{
+                code : 401,
+                message : 'Username or password did not match.'
+            }]
+        })
+})
 
 app.post('/apio/adapter',function(req,res){
                 var req_data = {
@@ -982,8 +1011,8 @@ var server = http.createServer(app);
 
 
 Apio.io.listen(server);
-server.listen(8083,function() {
-console.log("APIO server started");
+server.listen(APIO_CONFIGURATION.port,function() {
+console.log("APIO server started on port "+APIO_CONFIGURATION.port);
 });
 
 
