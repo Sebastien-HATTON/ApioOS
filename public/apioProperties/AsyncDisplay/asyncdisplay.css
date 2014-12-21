@@ -1,0 +1,15 @@
+@media (min-width: 481px) and (max-width: 1000px) {
+    .asyncinput {
+        float: right;
+        line-height: 70px;
+        font-size: 60px;
+    }
+}
+
+@media (min-width: 1001px) {
+    .asyncinput {
+        float: right;
+        line-height: 50px;
+        font-size: 35px;
+    }
+}
