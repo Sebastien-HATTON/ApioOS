@@ -349,7 +349,7 @@ app.get('/apio/notify/:message',function(req,res){
                 console.log(arr);
                 for (var i in arr) {
                     Apio.Serial.send(arr[i], function () {
-                        pause(80);
+                        pause(100);
                     });
                 }
                 arr = [];
@@ -591,7 +591,7 @@ app.post("/apio/state/apply",function(req,res){
                 console.log(arr);
                 for (var i in arr) {
                     Apio.Serial.send(arr[i], function () {
-                        pause(80);
+                        pause(100);
                     });
                 }
                 arr = [];
@@ -940,7 +940,7 @@ Apio.io.on("connection", function(socket){
                                                 console.log(arr);
                                                 for(var i in arr){
                                                     Apio.Serial.send(arr[i], function(){
-                                                        pause(80);
+                                                        pause(100);
                                                     })
                                                 }
                                                 arr = [];
