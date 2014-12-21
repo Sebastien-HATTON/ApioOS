@@ -85,6 +85,7 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
                 $("#ApioApplicationContainer").hide("slide", {
                     direction: 'right'
                 }, 500, function () {
+                    $("#ApioApplicationContainer").css("width", Apio.appWidth+"px");
                     if (window.innerWidth > 769) {
                         $("#ApioIconsContainer").css("width", "100%");
                     }
@@ -110,6 +111,8 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
                 $("#ApioApplicationContainer").hide("slide", {
                     direction: 'right'
                 }, 500, function () {
+                    Apio.newWidth = Apio.appWidth;
+                    $("#ApioApplicationContainer").css("width", Apio.appWidth+"px");
                     if (window.innerWidth > 769) {
                         $("#ApioIconsContainer").css("width", "100%");
                     }
@@ -129,6 +132,8 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
 
                 $("#ApioApplicationContainer").html($(data));
                 $("#ApioApplicationContainer").find("h2").text($scope.currentObject.name);
+                Apio.newWidth = Apio.appWidth;
+                $("#ApioApplicationContainer").css("width", Apio.appWidth+"px");
                 if ($("#ApioApplicationContainer").css('display') == 'none') {
                     $("#ApioApplicationContainer").show("slide", {
                         direction: 'right'
