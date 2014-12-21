@@ -85,6 +85,7 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
                 $("#ApioApplicationContainer").hide("slide", {
                     direction: 'right'
                 }, 500, function () {
+                    Apio.newWidth = Apio.appWidth;
                     $("#ApioApplicationContainer").css("width", Apio.appWidth+"px");
                     if (window.innerWidth > 769) {
                         $("#ApioIconsContainer").css("width", "100%");
