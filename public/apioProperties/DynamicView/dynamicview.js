@@ -28,28 +28,17 @@ apioProperty.directive("dynamicview", ["currentObject", "socket", "$timeout", fu
 					//Carimento della subapp
 					var uri = attrs["load"] ? attrs["load"] : "applications/"+scope.object.objectId+"/subapps/"+attrs["propertyname"]+".html";
 					$.get(uri, function(data){
-						var old_transformW = $("#appApio").css("-webkit-transform");
-						var matrixW = new WebKitCSSMatrix(old_transformW);
-						var old_translateW = matrixW.m41;
-						
-						var old_transform = $("#appApio").css("transform");
-						var matrix = new WebKitCSSMatrix(old_transform);
-						var old_translate = matrix.m41;
-						
 						var app = $(elem).parent().parent().parent();
 						Apio.newWidth += Apio.appWidth;
-						$("#appApio").css("width", Apio.newWidth+"px");
+						$("#ApioApplicationContainer").css("width", Apio.newWidth+"px");
 						$("#ApioApplication"+scope.object.objectId).css("width", Apio.appWidth+"px");
 						$("#ApioApplication"+scope.object.objectId).css("float", "left");
 				        app.css("overflowX", "auto");
 						
 						var subapp = attrs["propertyname"].charAt(0).toUpperCase() + attrs["propertyname"].slice(1);
-					    $("#appApio").append($(data));
+					    $("#ApioApplicationContainer").append($(data));
 					    $("#ApioApplication"+subapp).css("width", Apio.appWidth+"px");
 					    $("#ApioApplication"+subapp).css("float", "left");
-					    var new_translate = -8*Apio.newWidth/15+453;
-					    $("#appApio").css("-webkit-transform", "translateX("+new_translate+"%)");
-					    $("#appApio").css("transform", "translateX("+new_translate+"%)");
 					});
 					//
 					
