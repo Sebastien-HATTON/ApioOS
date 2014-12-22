@@ -409,9 +409,6 @@ app.post("/apio/state/apply",function(req,res){
     }
 
     var incomingState = req.body.state;
-        console.log("+++++++++++++++++++++++++++++\n\n")
-        console.log("Ricevuta richiesta di stato ")
-        console.log(incomingState);
 
         var stateHistory = {};
 
@@ -501,7 +498,7 @@ app.post("/apio/state/apply",function(req,res){
         }; //End of applyStateFn*/
     var arr = [];
     var applyStateFn = function(stateName, callback, eventFlag) {
-        console.log("\n\nApplico lo stato "+stateName+"\n\n");
+        console.log("***********Applico lo stato "+stateName+"************");
         if (!stateHistory.hasOwnProperty(stateName)) { //se non è nella history allora lo lancio
             getStateByName(stateName,function(err,state){
                 if (err) {
@@ -520,8 +517,8 @@ app.post("/apio/state/apply",function(req,res){
                             Apio.io.emit('apio_state_update',s);
                         }
                     });
-                    console.log("Lo stato che sto per applicare è ");
-                    console.log(state);
+                    console.log("Lo stato che sto per applicare è "+state.name);
+                    //console.log(state);
                     Apio.Database.updateProperty(state,function(){
                         stateHistory[state.name] = 1;
                         //Connected clients are notified of the change in the database
@@ -574,7 +571,7 @@ app.post("/apio/state/apply",function(req,res){
                             }
                         });
                         console.log("Lo stato che sto per applicare è ");
-                        console.log(state);
+                        //console.log(state);
                         Apio.Database.updateProperty(state,function(){
                             stateHistory[state.name] = 1;
                             //Connected clients are notified of the change in the database
@@ -608,6 +605,7 @@ app.post("/apio/state/apply",function(req,res){
         }
     }; //End of applyStateFn
         applyStateFn(incomingState.name, function(){
+            console.log("applyStateFn callback")
             if(ENVIRONMENT == "production") {
                 var pause = function (millis) {
                     var date = new Date();
@@ -616,14 +614,19 @@ app.post("/apio/state/apply",function(req,res){
                         curDate = new Date();
                     } while (curDate - date < millis);
                 };
-                console.log("arr vale:");
-                console.log(arr);
+                //console.log("arr vale:");
+                //console.log(arr);
                 for (var i in arr) {
+                    console.log("Mando alla seriale la roba numero "+i)
                     Apio.Serial.send(arr[i], function () {
                         pause(100);
                     });
+                    
                 }
+                res.send({});
                 arr = [];
+            } else {
+                res.send({});
             }
         }, false);
     });
@@ -705,12 +708,15 @@ app.get("/apio/event",routes.core.events.list)
 
 // development error handler
 // will print stacktrace
-if (app.get("env") === "development") {
+/*
+if (app.get("env") === "development" || ENVIRONMENT === "development") {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render("error", {
-            message: err.message,
-            error: err
+        console.log("========== ERROR DETECTED ===========")
+        console.log(err);
+        res.send({
+            status : false,
+            errors: [{message : err.message}]
         });
         //Da testare
         next();
@@ -723,14 +729,12 @@ if (app.get("env") === "development") {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render("error", {
-        message: err.message,
-        error: {}
-    });
+    res.send({status : false});
+    console.log(err);
     //Da testare
     next();
 });
-
+*/
 
 
 //FIXME andrebbero fatte in post per rispettare lo standard REST
