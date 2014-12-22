@@ -173,6 +173,7 @@ angular.module('ApioApplication')
             $scope.showGuests = false;
 
             $scope.editEventFormStep = '';
+            var stateOrTime = "";
             $scope.goToEditEventFormStep = function(step) {
                 $scope.editEventFormStep = step;
                 if($scope.editEventFormStep == "sceltaTipo"){
@@ -183,11 +184,13 @@ angular.module('ApioApplication')
                         }, 500);
                 } else if ($scope.editEventFormStep == 'selezioneData'){
                     resetCronModifica();
-                    $scope.currentEvent.type = "timeTriggered";
-                    delete $scope.currentEvent.triggerState;
+                    //$scope.currentEvent.type = "timeTriggered";
+                    //delete $scope.currentEvent.triggerState;
+                    stateOrTime = "time";
                 } else if ($scope.editEventFormStep == 'selezioneStatoScatenante'){
-                    $scope.currentEvent.type = "stateTriggered";
-                    delete $scope.currentEvent.triggerTimer;
+                    //$scope.currentEvent.type = "stateTriggered";
+                    //delete $scope.currentEvent.triggerTimer;
+                    stateOrTime = "state";
                 }
             };
 
@@ -225,8 +228,16 @@ angular.module('ApioApplication')
                 }
             }
             $scope.saveCurrentEvent = function() {
-
                 $.merge($scope.currentEvent.triggeredStates,$scope.statesToAddToEvent);
+
+                if (stateOrTime == "time"){
+                    $scope.currentEvent.type = "timeTriggered";
+                    delete $scope.currentEvent.triggerState;
+                }
+                else if (stateOrTime == "state") {
+                    $scope.currentEvent.type = "stateTriggered";
+                    delete $scope.currentEvent.triggerTimer;
+                }
 
                 if ($scope.currentEvent.type !== "stateTiggered" && !$scope.currentEvent.hasOwnProperty("triggerTimer")) {
                     $scope.currentEvent.triggerTimer = '* * * * *';
@@ -338,7 +349,6 @@ angular.module('ApioApplication')
                     onChange: function() {
                         if ($scope.newEvent.hasOwnProperty('type') && $scope.newEvent.type == 'timeTriggered') {
                             $scope.newEvent.triggerTimer = $(this).cron("value");
-                            $scope.$apply();
 
                         } else {
                             console.log("Sto cambiando la data ma non ho settato il tipo, si sono coglione")
@@ -352,9 +362,8 @@ angular.module('ApioApplication')
                 $("#selezioneDataModificaEvento").cron({
                     onChange: function() {
                         $scope.showSave = true;
-                        if ($scope.currentEvent.hasOwnProperty('type') && $scope.currentEvent.type == 'timeTriggered') {
+                        if (stateOrTime == "time") {
                             $scope.currentEvent.triggerTimer = $(this).cron("value");
-                            $scope.$apply();
                         }
                     }
                 });
