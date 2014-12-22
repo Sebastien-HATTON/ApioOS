@@ -21,6 +21,7 @@ angular.module('ApioDashboardApplication')
   $scope.savePin = function(pin){
     console.log('pin')
     console.log(pin)
+    $scope.newPin.name = 'pin'+pin.number;
     $scope.newPin.number = pin.number;
   }
 
@@ -255,12 +256,14 @@ angular.module('ApioDashboardApplication')
 
     }
 
+    var flagList = 0;
     if((Object.keys(objectToParse.properties)).length!==0)
       this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
     this.mongo += '"db" : {\n';
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='list'){
+        flagList = 1;
         this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : {\n';
         for(keykey in objectToParse.properties[key].items){
           this.mongo += '\t\t"'+objectToParse.properties[key].items[keykey]+'" : "'+keykey+'",\n';
@@ -269,7 +272,8 @@ angular.module('ApioDashboardApplication')
         this.mongo += '\n\t\t},\n';
       }
     }
-    this.mongo = this.mongo.slice(0,(this.mongo.length-2));
+    if(flagList===1)
+      this.mongo = this.mongo.slice(0,(this.mongo.length-2));
     this.mongo += '\n\t}\n';
     this.mongo += '}';
   };
@@ -444,7 +448,7 @@ angular.module('ApioDashboardApplication')
               this.ino += '\t\t\tanalogWrite('+objectToParse.pins[keyPin].name+',value.toInt());\n'
             }
          }
-          this.ino += '\t\t\t//Do Something\n\t\t}\n';
+          this.ino += '\t\t\t//Do Something\n\t\t';
           
        }
        else
