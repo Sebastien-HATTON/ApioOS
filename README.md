@@ -9,6 +9,7 @@ This repository contains the apio server application and the client application.
 To install and run the Apio Server application you will need:
 * Nodejs
 * NPM
+* MongoDB
 
 ===========
 ### Install
@@ -21,9 +22,15 @@ To install and run the Apio Server application you will need:
 The apio server application is now installed and configured
 
 ### Run
+From the server folder run:
 
+* `mongod start &`
 * `node app`
 
+### Use it:
+Open your browser and digit this URL:
+
+* `localhost:8083/app`
 
 
 
