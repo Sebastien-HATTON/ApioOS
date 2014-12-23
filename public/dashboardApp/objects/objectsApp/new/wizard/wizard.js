@@ -438,7 +438,8 @@ angular.module('ApioDashboardApplication')
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type=="Sensor"){
         this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
-        break;
+        this.ino+='\n\tif(exists('+objectToParse.properties[key].name+', '+objectToParse.properties[key].name+', "+String('+objectToParse.properties[key].name+'Val)+")){\n';
+        this.ino+='\t\tapioSend("'+objectToParse.objectId+':'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t}\n';
       }
     }
      for(key in objectToParse.properties)
