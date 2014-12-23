@@ -209,12 +209,12 @@ module.exports = {
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.js',js);
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
 	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
-	            
+	            //Insert libraries
 	            var source = 'public/arduino/';
 	            console.log('obj.protocol: '+ obj.protocol);
 	            if(obj.protocol==='z'){
 	                source += 'XBee';
-	            }else{
+	            }else if (obj.protocol==='l'){
 	                source += 'LWM';
 	            }
 	            console.log('source: '+ source);
