@@ -209,6 +209,7 @@ module.exports = {
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.js',js);
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
 	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
+	            
 	            //Insert libraries
 	            var source = 'public/arduino/';
 	            console.log('obj.protocol: '+ obj.protocol);
@@ -222,6 +223,14 @@ module.exports = {
 
 	            ncp.limit = 16;
 
+	            ncp(source, destination, function (err) {
+	             if (err) {
+	               return console.error(err);
+	             }
+	             console.log('done!');
+	            });
+
+	            source = 'public/arduino/apioGeneral';
 	            ncp(source, destination, function (err) {
 	             if (err) {
 	               return console.error(err);
