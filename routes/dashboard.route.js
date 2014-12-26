@@ -261,7 +261,7 @@ module.exports = {
 	exportApioApp : function(req,res){
 	    console.log('/apio/app/export')
 	    var id = req.query.id;
-	    var dummy = '8=====D';
+	    var dummy = '*_TMP_*';
 	    var path = 'public/applications/'+id+'/'+id;
 	    var object = {};
 	    var jsonObject = {};
@@ -413,7 +413,7 @@ module.exports = {
 	                        console.log('data is: '+data);
 	                        //qui rinomino i cazzetti nell'id attuale
 
-	                        var id = '8=====D';
+	                        var id = '*_TMP_*';
 	                        var path = 'upload/temp/'+id+'/'+id;
 	                        var object = {};
 	                        var jsonObject = {};
