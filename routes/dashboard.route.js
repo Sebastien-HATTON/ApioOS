@@ -149,6 +149,7 @@ module.exports = {
 	    console.log('makefile: '+makefile);
 	    console.log('req.makefile: '+req.body.makefile);
 	    var objectToSave = {properties:{}};
+	    var SensorInProperties = 0;
 
 	    objectToSave.name = obj.objectName;
 	    objectToSave.objectId = obj.objectId;
@@ -158,6 +159,10 @@ module.exports = {
 	    for (var key in obj.properties){
 	        console.log('key : '+key);
 	        if(obj.properties[key].type!=='List'){ 
+
+	        	if(obj.properties[key].type==='Sensor')
+	        		SensorInProperties = 1;
+
 	            console.log('obj.properties[key].name: ' + obj.properties[key].name);
 	            console.log('obj.properties[key].defaultValue: ' + obj.properties[key].defaultValue);
 	            objectToSave.properties[obj.properties[key].name] =  obj.properties[key].defaultValue;
@@ -197,7 +202,6 @@ module.exports = {
 	            console.log("/apio/Database/createNewApioApp Error while saving");
 	            res.send(500);
 	        }else{
-	            //QUA
 
 	            fs.mkdirSync("public/applications/" + obj.objectId);
 	            fs.mkdirSync("public/applications/" + obj.objectId +'/_' + obj.objectId);
@@ -210,7 +214,7 @@ module.exports = {
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
 	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
 	            
-	            //Insert libraries
+	            //Injection of the libraries file in the sketch folder
 	            var source = 'public/arduino/';
 	            console.log('obj.protocol: '+ obj.protocol);
 	            if(obj.protocol==='z'){
@@ -237,6 +241,17 @@ module.exports = {
 	             }
 	             console.log('done!');
 	            });
+
+	            //if there is a sensor in properties inject the sensor.h from libraries
+	            if(SensorInProperties===1){
+	            	source = 'public/arduino/libraries';
+		            ncp(source, destination, function (err) {
+		             if (err) {
+		               return console.error(err);
+		             }
+		             console.log('done!');
+		            });
+	            }
 
 	            res.send();
 	        }
