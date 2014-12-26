@@ -273,6 +273,22 @@ Apio.Serial.send = 	function(data, callback) {
 
 				});
 			break;
+			case "s" :
+				if (!Apio.Serial.hasOwnProperty("serialPort"))
+					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				Apio.Serial.serialPort.write(obj.address+":"+message,function(err,result){
+								Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
+								if (Apio.Util.isSet(err))
+									Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
+								else
+									Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
+								if(callback){
+									console.log("PARTE LA CALLBACK DELLA SERIAL");
+									callback();
+								}
+
+				});
+			break;
 			case "l" :
 				if (!Apio.Serial.hasOwnProperty("serialPort"))
 					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
