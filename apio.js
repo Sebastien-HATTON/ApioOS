@@ -17,7 +17,7 @@ var time = require('time');
 var fs = require("fs");
 
 
-/**
+/*
 	@module Apio
 */
 var Apio = {};
@@ -258,24 +258,31 @@ Apio.Serial.send = 	function(data, callback) {
 			//	throw new Error("Apio.Serial.Send() trying to communicate to object "+obj.objectId+" with the wrong protocol");
 		switch(data.protocol) { //Devo usare data.protocol che è quella richiesta.
 			case "z" :
-				if (!Apio.Serial.hasOwnProperty("serialPort"))
+				if (!Apio.Serial.hasOwnProperty("serialPort")){
+					console.log('Notice: Serial port is disabled, the information cannot be sent to it. If you want to use the serial port try launching the server without the --no-serial flag.');
+					console.log("\n The message blocked by serial port is "+data.protocol+data.address+":"+message)
 					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
-				Apio.Serial.serialPort.write(data.protocol+obj.address+":"+message,function(err,result){
-								Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
-								if (Apio.Util.isSet(err))
-									Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
-								else
-									Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
-								if(callback){
-									console.log("PARTE LA CALLBACK DELLA SERIAL");
-									callback();
-								}
+				} else{
+					Apio.Serial.serialPort.write(data.protocol+obj.address+":"+message,function(err,result){
+						Apio.Util.debug("Apio.Serial.Send() wrote to serial the string: "+data.protocol+data.address+":"+message);
+						if (Apio.Util.isSet(err))
+							Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
+						else
+							Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
+						if(callback){
+							console.log("PARTE LA CALLBACK DELLA SERIAL");
+							callback();
+						}
+					});
+				}
 
-				});
 			break;
 			case "s" :
-				if (!Apio.Serial.hasOwnProperty("serialPort"))
+				if (!Apio.Serial.hasOwnProperty("serialPort")) {
+					console.log('Notice: Serial port is disabled, the information cannot be sent to it. If you want to use the serial port try launching the server without the --no-serial flag.');
+					console.log("\n The message blocked by serial port is "+data.protocol+data.address+":"+message)
 					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				}
 				Apio.Serial.serialPort.write(obj.address+":"+message,function(err,result){
 								Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
 								if (Apio.Util.isSet(err))
@@ -290,8 +297,11 @@ Apio.Serial.send = 	function(data, callback) {
 				});
 			break;
 			case "l" :
-				if (!Apio.Serial.hasOwnProperty("serialPort"))
+				if (!Apio.Serial.hasOwnProperty("serialPort")) {
+					console.log('Notice: Serial port is disabled, the information cannot be sent to it. If you want to use the serial port try launching the server without the --no-serial flag.');
+					console.log("\n The message blocked by serial port is "+data.protocol+data.address+":"+message)
 					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				}
 				Apio.Serial.serialPort.write(data.protocol+data.address+":"+message,function(err,result){
 					Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
 					if (Apio.Util.isSet(err))
