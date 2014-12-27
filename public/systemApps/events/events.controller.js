@@ -349,6 +349,7 @@ angular.module('ApioApplication')
                     onChange: function() {
                         if ($scope.newEvent.hasOwnProperty('type') && $scope.newEvent.type == 'timeTriggered') {
                             $scope.newEvent.triggerTimer = $(this).cron("value");
+                            $scope.$apply();
 
                         } else {
                             console.log("Sto cambiando la data ma non ho settato il tipo, si sono coglione")
@@ -558,6 +559,7 @@ angular.module('ApioApplication')
 
                 }
             }
+            
             $scope.goToFormStep = function(step) {
                 $scope.currentFormStep = step;
                 document.getElementById('new_event').classList.add('new_active_back_next');
