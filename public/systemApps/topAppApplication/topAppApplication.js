@@ -160,20 +160,36 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 			
 						//$('#appApio').find('.box_proprietaiPhone[issensor=\'true\']').each(function(index){
 						$('#ApioApplicationContainer').find('.box_proprietaiPhone[issensor=\'true\']').each(function(index){
-							var d = {
-								isSensor : true,
-								message : $(this).attr('id')+':'+scope.object.properties[$(this).attr('id')],
-								objectId : scope.object.objectId
+							//Check, devo controllare che questo sensore sia stato effettivamente registrato
+							/*if (currentObject.record().hasOwnProperty($(this).attr('id')))
+								console.log("Il sensore "+$(this).attr('id')+" effettivamente va comunicato alla seriale")
+							else
+								console.log("Il sensore "+$(this).attr('id')+" non deve essere notificato alla seriale")
+							*/
+							if (currentObject.record().hasOwnProperty($(this).attr('id'))) {
+								console.log("Il sensore "+$(this).attr('id')+" effettivamente va comunicato alla seriale")
+								var d = {
+									isSensor : true,
+									message : $(this).attr('id')+':'+scope.object.properties[$(this).attr('id')],
+									objectId : scope.object.objectId,
+									properties : {
+
+									}
+								}
+
+								d.properties[$(this).attr('id')] =scope.object.properties[$(this).attr('id')];
+								var e = $(this);
+								console.log("POST /apio/serial/send");
+								console.log(d);
+								$http.post('/apio/serial/send',d)
+									.success(function(data){
+										console.log("Sensore notificato con successo")
+									})
+									.error(function(data){
+										console.log("Impossibile notificare il sensore")
+									})
 							}
-							var e = $(this);
-							console.log("POST /apio/serial/send");
-							$http.post('/apio/serial/send',d)
-								.success(function(data){
-									console.log("Sensore notificato con successo")
-								})
-								.error(function(data){
-									console.log("Impossibile notificare il sensore")
-								})
+
 			
 						})
 					}

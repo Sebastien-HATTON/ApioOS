@@ -321,6 +321,8 @@ angular.module('ApioDashboardApplication')
         this.html+='label="'+ objectToParse.properties[key].numberLabel+'">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='text'){
         this.html+='label="'+ objectToParse.properties[key].textBuilderLabel+'">';
+      }else if(objectToParse.properties[key].type.toLowerCase()==='sensor'){
+        this.html+='label="'+ objectToParse.properties[key].sensorLabel+'">';
       }
 
       this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
@@ -353,6 +355,11 @@ angular.module('ApioDashboardApplication')
   this.parserIno = function(objectToParse){
     console.log('Parsing object ' + objectToParse + ' for .ino');
      this.ino='';
+     if(objectToParse.microType=="General")
+     {
+        this.ino += '\n';
+        this.ino += '#include "apioGeneral.h"\n';
+     }
      if(objectToParse.protocol=='l'){
        //declare LWM libraries
        this.ino += '\n';
@@ -383,16 +390,32 @@ angular.module('ApioDashboardApplication')
        //declare XBee libraries
        this.ino +="#include <XBee.h>\n#include <ApioXbee.h>\n";
      }
-
+     for(key in objectToParse.properties){
+      if(objectToParse.properties[key].type=="Sensor"){
+        this.ino +='#include "sensors.h"\n';
+        break;
+      }
+     }
+     for(key in objectToParse.properties){
+      if(objectToParse.properties[key].type=="Sensor"){
+        this.ino+='ApioList '+objectToParse.properties[key].name+'= NULL;\n';
+        this.ino+='//You can use this variable for store the value of sensors\n';
+        this.ino+='int '+objectToParse.properties[key].name+'Val;\n\n';
+      }
+     }
      for(key in objectToParse.pins){
        //declare Pins type name = value
        this.ino += "int "+objectToParse.pins[key].name+"="+objectToParse.pins[key].number+";\n";  
      }
      this.ino += "void setup() {\n";
+     if(objectToParse.microType=="General")
+     {
+      this.ino += "\tgeneralSetup();\n"
+     }
      if(objectToParse.protocol=='l')
      {
        //initialize LWM
-       this.ino += "apioSetup("+objectToParse.address+");\n";
+       this.ino += "\tapioSetup("+objectToParse.address+");\n";
 
      }else if(objectToParse.protocol=='z'){
        //initialize XBee
@@ -412,6 +435,13 @@ angular.module('ApioDashboardApplication')
      if(objectToParse.protocol=='z'){
        this.ino+="\tapioLoop();\n";
      }
+    for(key in objectToParse.properties){
+      if(objectToParse.properties[key].type=="Sensor"){
+        this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
+        this.ino+='\n\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val))){\n';
+        this.ino+='\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t}\n';
+      }
+    }
      for(key in objectToParse.properties)
      {
        this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
@@ -451,11 +481,23 @@ angular.module('ApioDashboardApplication')
           this.ino += '\t\t\t//Do Something\n\t\t';
           
        }
+       else if(objectToParse.properties[key].type=="Sensor")
+       {
+        this.ino+='\t\tif(value==""){\n';
+        this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n'
+        this.ino+='\t\t}else{\n';
+        this.ino+='\t\t\tif(!exists('+objectToParse.properties[key].name+', property, value)){\n';
+        this.ino+='\t\t\t\tinsert(&'+objectToParse.properties[key].name+', property, value);\n';
+        this.ino+='\t\t\t}else{\n';
+        this.ino+='\t\t\t\tdeleteItem(&'+objectToParse.properties[key].name+', property, value);\n';
+        this.ino+='\t\t\t}\n';
+        this.ino+='\t\t\tproperty="";\n\t\t}\n';
+       }
        else
        {
          this.ino += '\t\t//Do Something\n\t';
        }
-       this.ino += '}\n';       
+       this.ino += '\t}\n';       
      }
      this.ino +="}";
     };

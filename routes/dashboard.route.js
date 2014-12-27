@@ -149,6 +149,7 @@ module.exports = {
 	    console.log('makefile: '+makefile);
 	    console.log('req.makefile: '+req.body.makefile);
 	    var objectToSave = {properties:{}};
+	    var SensorInProperties = 0;
 
 	    objectToSave.name = obj.objectName;
 	    objectToSave.objectId = obj.objectId;
@@ -158,6 +159,10 @@ module.exports = {
 	    for (var key in obj.properties){
 	        console.log('key : '+key);
 	        if(obj.properties[key].type!=='List'){ 
+
+	        	if(obj.properties[key].type==='Sensor')
+	        		SensorInProperties = 1;
+
 	            console.log('obj.properties[key].name: ' + obj.properties[key].name);
 	            console.log('obj.properties[key].defaultValue: ' + obj.properties[key].defaultValue);
 	            objectToSave.properties[obj.properties[key].name] =  obj.properties[key].defaultValue;
@@ -197,7 +202,6 @@ module.exports = {
 	            console.log("/apio/Database/createNewApioApp Error while saving");
 	            res.send(500);
 	        }else{
-	            //QUA
 
 	            fs.mkdirSync("public/applications/" + obj.objectId);
 	            fs.mkdirSync("public/applications/" + obj.objectId +'/_' + obj.objectId);
@@ -210,11 +214,12 @@ module.exports = {
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
 	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
 	            
+	            //Injection of the libraries file in the sketch folder
 	            var source = 'public/arduino/';
 	            console.log('obj.protocol: '+ obj.protocol);
 	            if(obj.protocol==='z'){
 	                source += 'XBee';
-	            }else{
+	            }else if (obj.protocol==='l'){
 	                source += 'LWM';
 	            }
 	            console.log('source: '+ source);
@@ -229,6 +234,25 @@ module.exports = {
 	             console.log('done!');
 	            });
 
+	            source = 'public/arduino/apioGeneral';
+	            ncp(source, destination, function (err) {
+	             if (err) {
+	               return console.error(err);
+	             }
+	             console.log('done!');
+	            });
+
+	            //if there is a sensor in properties inject the sensor.h from libraries
+	            if(SensorInProperties===1){
+	            	source = 'public/arduino/libraries';
+		            ncp(source, destination, function (err) {
+		             if (err) {
+		               return console.error(err);
+		             }
+		             console.log('done!');
+		            });
+	            }
+
 	            res.send();
 	        }
 	    });   
@@ -237,7 +261,7 @@ module.exports = {
 	exportApioApp : function(req,res){
 	    console.log('/apio/app/export')
 	    var id = req.query.id;
-	    var dummy = '8=====D';
+	    var dummy = '*_TMP_*';
 	    var path = 'public/applications/'+id+'/'+id;
 	    var object = {};
 	    var jsonObject = {};
@@ -389,7 +413,7 @@ module.exports = {
 	                        console.log('data is: '+data);
 	                        //qui rinomino i cazzetti nell'id attuale
 
-	                        var id = '8=====D';
+	                        var id = '*_TMP_*';
 	                        var path = 'upload/temp/'+id+'/'+id;
 	                        var object = {};
 	                        var jsonObject = {};
