@@ -239,7 +239,7 @@ angular.module('ApioApplication')
                     delete $scope.currentEvent.triggerTimer;
                 }
 
-                if ($scope.currentEvent.type !== "stateTiggered" && !$scope.currentEvent.hasOwnProperty("triggerTimer")) {
+                if (stateOrTime == "time" && !$scope.currentEvent.hasOwnProperty("triggerTimer")) {
                     $scope.currentEvent.triggerTimer = '* * * * *';
                 }
                 $("#editEventRunPanel").hide("slide",{
@@ -305,8 +305,10 @@ angular.module('ApioApplication')
                 $("#editEventPanel").show("slide", {
                     direction: 'right'
                 }, 500, function() {
-                	document.getElementById("editEventPanel").style.opacity = "1";
-                    $scope.$apply();
+                    document.getElementById("editEventPanel").style.opacity = "1";
+                    $("#editEventRunPanel").hide("slide",{
+                        direction :  "right"
+                    },500);
                 });
 
 
