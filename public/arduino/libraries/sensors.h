@@ -26,9 +26,9 @@ void insert(ApioList *lista, String key, String value) {
 void printList(ApioList lista) {
 	ApioListNode *cursor;
 	cursor = lista;
-	while (cursor != NULL) {
-		Serial.println(cursor->key);
-		Serial.println(cursor->value);
+	while (cursor != NULL && cursor->next != 0) {
+                Serial.println(cursor->key+":"+cursor->value);
+
 		cursor = cursor->next;
 	}
 
@@ -39,11 +39,12 @@ hasKeyValue
 */
 
 int exists(ApioList lista, String key, String value) {
-	ApioListNode *cursor;
+	ApioList cursor;
 	cursor = lista;
-	while (cursor->next != NULL) {
-		if (cursor->key == key && cursor->value == value)
+	while (cursor != 0 && cursor->next != 0) {
+		if (cursor->key == key && cursor->value == value){
 			return 1;
+                }
 		cursor = cursor->next;
 	}
 	return 0;
