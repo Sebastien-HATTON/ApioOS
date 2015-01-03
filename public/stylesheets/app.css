@@ -2139,8 +2139,8 @@ background: none repeat scroll 0 0 #FFFFFF;
 border-radius: 40px;
 /*box-shadow: 0 0 2px -1px;*/
 float: right;
-height: 68px;
-width: 133px;
+height: 60px;
+width: 132px;
 }
 input[type=button][name="iPhone"]{
 -webkit-appearance: none;
@@ -2171,8 +2171,8 @@ background: none repeat scroll 0 0 #FFFFFF;
 border-radius: 40px;
 /*box-shadow: 0 0 2px -1px;*/
 float: right;
-height: 68px;
-width: 133px;
+height: 60px;
+width: 132px;
 }
 input[type=button][name="iPhone"]{
 -webkit-appearance: none;
@@ -2211,9 +2211,9 @@ background: none repeat scroll 0 0 #FFFFFF;
 border-radius: 40px;
 /*box-shadow: 0 0 2px -1px;*/
 float: right;
-height: 34px;
+height: 40px;
 margin-top: 5px;
-width: 68px;
+width: 80px;
 }
 .pulsanteonoffeffetto2iPhone{
 background: #CCC;
