@@ -14,7 +14,7 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 			scope.newStatusName = "";
 			scope.newEventName = "";
 			scope.object = currentObject.get();
-			
+
 			function removeRecordingStatus(){
 				scope.currentObject.resetRecord();
 				scope.showPublishButton = false;
@@ -33,9 +33,9 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 					scope.$apply(); //per riapplicare i bindings
 				});
 			}
-			
+
 			scope.recStep = "";
-			
+
 			scope.saveModify = function(){
 				var toDB = scope.currentObject.record();
 				var _p = {};
@@ -64,12 +64,12 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 				});
 				$("#wallContainer").css("width", "");
 			}
-	
+
 			scope.startRecording = function(){
 			    currentObject.isRecording(true);
 			    scope.showPublishButton = false;
 			}
-			
+
 			scope.stopRecording = function(){
 				if(currentObject.isModifying()){
 					currentObject.isModifying(false);
@@ -77,9 +77,9 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 					document.getElementById("ApioApplicationContainer").innerHTML = "";
 					$("#ApioApplicationContainer").hide("slide", {
 		                direction: 'right'
-		            }, 500, 
+		            }, 500,
 		            function() {
-			           document.getElementById('wallContainer').classList.remove('wall_open_edit_state');	                
+			           document.getElementById('wallContainer').classList.remove('wall_open_edit_state');
 		            });
 		        }
 				else{
@@ -88,42 +88,50 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 				$("#wallContainer").css("width", "");
 				removeRecordingStatus();
 			}
-			
+
 			scope.useRecording = function(){
 				scope.showPublishButton = true;
 				if(currentObject.isRecording() !== true || scope.currentObject.recordLength() < 1){
 					return;
 				}
-				
+
 				for(key in scope.currentObject.record())
 					scope.currentObject.record(key, scope.object.properties[key]);
-		
+
 				scope.recStep = "EventOrWall";
 				$timeout(function(){
 					document.getElementById("app").style.display = "none";
 				}, 0);
 			}
-			
+
 			scope.eventRecording = function(){
 				scope.recStep = "EventNameChoice";
 			}
-			
+
 			scope.wallRecording = function(){
 				scope.recStep = "StatusNameChoice";
 			}
-			
+
 			scope.showPublish = function(){
 				if((scope.recStep === "StatusNameChoice" && scope.newStatusName !== "") || (scope.recStep === "EventNameChoice" && scope.newStatusName !== "" && scope.newEventName !== "")){
 					scope.showPublishButtonActive = true;
 				}
 			}
-			
+
 			scope.publishRecording = function(){
 				console.log("publishRecording() chiamato allo stato "+scope.recStep)
 				if(scope.recStep !== 'EventNameChoice' && scope.recStep !== 'StatusNameChoice')
 					return;
-			
+
 				var o = {};
+				o.sensors = [];
+				$('#ApioApplicationContainer')
+					.find('.box_proprietaiPhone[issensor=\'true\']')
+					.each(function(index){
+						if (currentObject.record().hasOwnProperty($(this).attr('id'))){
+							o.sensors.push($(this).attr('id'))
+						}
+					});
 				o.active = false;
 				o.name = scope.newStatusName;
 				o.objectName = scope.object.name;
@@ -136,9 +144,8 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 					e.name = scope.newEventName;
 					dao.event = e;
 				}
-			
+
 				//Ho impacchettato evento e stato dentro la variabile dao che invio al server
-				console.log("POST /apio/state");
 				$http.post('/apio/state',dao)
 				.success(function(data){
 					if(data.error === 'STATE_NAME_EXISTS'){
@@ -152,12 +159,8 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 						alert('Esiste già un evento di nome '+e.name);
 					}
 					if(data.error === false){
-						if(scope.newEventName !== '')
-							alert("Stato ed evento creati con successo");
-						else
-							alert("Stato creato con successo");
-						removeRecordingStatus();
-			
+
+
 						//$('#appApio').find('.box_proprietaiPhone[issensor=\'true\']').each(function(index){
 						$('#ApioApplicationContainer').find('.box_proprietaiPhone[issensor=\'true\']').each(function(index){
 							//Check, devo controllare che questo sensore sia stato effettivamente registrato
@@ -166,22 +169,26 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 							else
 								console.log("Il sensore "+$(this).attr('id')+" non deve essere notificato alla seriale")
 							*/
-							if (currentObject.record().hasOwnProperty($(this).attr('id'))) {
-								console.log("Il sensore "+$(this).attr('id')+" effettivamente va comunicato alla seriale")
-								var d = {
-									isSensor : true,
-									message : $(this).attr('id')+':'+scope.object.properties[$(this).attr('id')],
-									objectId : scope.object.objectId,
-									properties : {
 
-									}
+
+							if (currentObject.record().hasOwnProperty($(this).attr('id'))) {
+								alert("Il sensore "+$(this).attr('id')+" effettivamente va comunicato alla seriale")
+								var props = {
+
+								}
+								props[$(this).attr('id')] = scope.object.properties[$(this).attr('id')]
+								var d = {
+									//isSensor : true,
+									//message : $(this).attr('id')+':'+scope.object.properties[$(this).attr('id')],
+									objectId : scope.object.objectId,
+									properties : props
 								}
 
 								d.properties[$(this).attr('id')] =scope.object.properties[$(this).attr('id')];
 								var e = $(this);
-								console.log("POST /apio/serial/send");
-								console.log(d);
-								$http.post('/apio/serial/send',d)
+
+
+								$http.post('/apio/serial/send',{data : d})
 									.success(function(data){
 										console.log("Sensore notificato con successo")
 									})
@@ -190,8 +197,14 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
 									})
 							}
 
-			
+
+
 						})
+						if(scope.newEventName !== '')
+							alert("Stato ed evento creati con successo");
+						else
+							alert("Stato creato con successo");
+						removeRecordingStatus();
 					}
 				})
 				.error(function(){
