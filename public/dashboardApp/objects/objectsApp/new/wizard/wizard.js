@@ -398,7 +398,7 @@ angular.module('ApioDashboardApplication')
      }
      for(key in objectToParse.properties){
       if(objectToParse.properties[key].type=="Sensor"){
-        this.ino+='ApioList '+objectToParse.properties[key].name+'= NULL;\n';
+        this.ino+='ApioList '+objectToParse.properties[key].name+'= new ApioListNode;\n';
         this.ino+='//You can use this variable for store the value of sensors\n';
         this.ino+='int '+objectToParse.properties[key].name+'Val;\n\n';
       }
@@ -483,15 +483,13 @@ angular.module('ApioDashboardApplication')
        }
        else if(objectToParse.properties[key].type=="Sensor")
        {
-        this.ino+='\t\tif(value==""){\n';
-        this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n'
-        this.ino+='\t\t}else{\n';
-        this.ino+='\t\t\tif(!exists('+objectToParse.properties[key].name+', property, value)){\n';
+        this.ino+='\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n'
+        this.ino+='\t\tif(!exists('+objectToParse.properties[key].name+', property, value)){\n';
         this.ino+='\t\t\t\tinsert(&'+objectToParse.properties[key].name+', property, value);\n';
         this.ino+='\t\t\t}else{\n';
         this.ino+='\t\t\t\tdeleteItem(&'+objectToParse.properties[key].name+', property, value);\n';
         this.ino+='\t\t\t}\n';
-        this.ino+='\t\t\tproperty="";\n\t\t}\n';
+        this.ino+='\t\tproperty="";\n\t\t\n';
        }
        else
        {
