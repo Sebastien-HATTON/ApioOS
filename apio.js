@@ -891,7 +891,7 @@ Apio.System.launchEvent = function(eventName,callback) {
 							e.triggeredStates.forEach(function(_e,_i,_v){
 								console.log("Trovato stato da triggerare: "+_e);
 								console.log(_e)
-								Apio.System.applyState(_e,function(err){
+								Apio.System.applyState(_e.name,function(err){
 									//
 								})
 							})
@@ -1049,6 +1049,8 @@ Apio.System.registerCronEvent = function(event) {
 Apio.System.resumeCronEvents = function() { //FIX
 	//Trova tutti gli eventi schedulati
 	Apio.Database.db.collection('Events').find({triggerTimer : {$exists : true}}).toArray(function(err,docs){
+		console.log("docs vale:");
+		console.log(docs);
 		docs.forEach(function(event,i,a){
 			Apio.System.registerCronEvent(event);
 		})
