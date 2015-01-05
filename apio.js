@@ -1,7 +1,7 @@
 //apio.js
 /*
 *	jshint strict: true
-*	
+*
 */
 (function(){
 "use strict";
@@ -60,7 +60,7 @@ Apio.Util.printError = function(error) {
 *	Convert a JSON object into a string written in the Codifica Apio and return it
 */
 Apio.Util.JSONToApio = function(obj) {
-	
+
 	var string = "";
 	string += obj.protocol+obj.objectId+":";
 	//Se siamo in receiveSerialData, mi serve gestire il campo command
@@ -195,7 +195,7 @@ Apio.Serial.init = function() {
 		                        serialString = serialString.toString();
 		                        //TODO add validation
 		                        //TODO Cambierà in futuro perchè saranno supportati messaggi del
-		                        
+
 		                        var tokens = serialString.split(":");
 		                        //Se la serialString è da meno di 4 token significa che non è wellformed (fatta bene)
 		                        if (tokens.length >= 4) {
@@ -215,7 +215,7 @@ Apio.Serial.init = function() {
 		                        //Come in receiveSerialData.php
 		                });
 				});
-				
+
 				Apio.Serial.serialPort.on("close",function(){
 					Apio.Util.debug("APIO::SERIAL::CLOSED");
 				});
@@ -223,19 +223,23 @@ Apio.Serial.init = function() {
 	}
 };
 /*
-*	Take a JSON in input and split it into a regular Apio Codifica string 
+*	Take a JSON in input and split it into a regular Apio Codifica string
 *	adding the end transmission char -
-*	and check the protocol type 
+*	and check the protocol type
 */
 Apio.Serial.send = 	function(data, callback) {
 	//NOTA data dovrebbe mandare soltanto objID e le prop
 		var message = "";
+		console.log("\n\n&&&&&&&&&&&&&&&")
+		console.log("Sono ApioSerialSend e compongo il send serial con questo")
+		console.log(data)
+		console.log("\n\n&&&&&&&&&&&&&&&")
 		for (var key in data.properties)
 			message += key+":"+data.properties[key]+"-";
 
-		//in teoria non serve utilizzarlo per come è attualmente (settembre) strutturato il sistema 
+		//in teoria non serve utilizzarlo per come è attualmente (settembre 2014) strutturato il sistema
 		//in quanto il protocollo è già incapsulato nell'oggetto JSON
-		//la manteniamo in quanto non sappiamo come in futuro saranno implementate le gestioni dei 
+		//la manteniamo in quanto non sappiamo come in futuro saranno implementate le gestioni dei
 		//protocolli w (wireless) e b (bluetooth)
 		Apio.Database.getObjectById(data.objectId, function(obj){
 			if(obj){
@@ -260,8 +264,8 @@ Apio.Serial.send = 	function(data, callback) {
 			case "z" :
 				if (!Apio.Serial.hasOwnProperty("serialPort")){
 					console.log('Notice: Serial port is disabled, the information cannot be sent to it. If you want to use the serial port try launching the server without the --no-serial flag.');
-					console.log("\n The message blocked by serial port is "+data.protocol+data.address+":"+message)
-					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+					console.log("\n NOTICE : The message blocked by serial port is "+data.protocol+data.address+":"+message)
+					//throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
 				} else{
 					Apio.Serial.serialPort.write(data.protocol+obj.address+":"+message,function(err,result){
 						Apio.Util.debug("Apio.Serial.Send() wrote to serial the string: "+data.protocol+data.address+":"+message);
@@ -280,38 +284,42 @@ Apio.Serial.send = 	function(data, callback) {
 			case "s" :
 				if (!Apio.Serial.hasOwnProperty("serialPort")) {
 					console.log('Notice: Serial port is disabled, the information cannot be sent to it. If you want to use the serial port try launching the server without the --no-serial flag.');
-					console.log("\n The message blocked by serial port is "+data.protocol+data.address+":"+message)
-					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
-				}
-				Apio.Serial.serialPort.write(obj.address+":"+message,function(err,result){
-								Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
-								if (Apio.Util.isSet(err))
-									Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
-								else
-									Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
-								if(callback){
-									console.log("PARTE LA CALLBACK DELLA SERIAL");
-									callback();
-								}
+					console.log("\n NOTICE: The message blocked by serial port is "+data.protocol+data.address+":"+message)
+					//throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				} else {
+					Apio.Serial.serialPort.write(obj.address+":"+message,function(err,result){
+									Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
+									if (Apio.Util.isSet(err))
+										Apio.Util.debug("Apio.Serial.Send() ERROR: " + err);
+									else
+										Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
+									if(callback){
+										console.log("PARTE LA CALLBACK DELLA SERIAL");
+										callback();
+									}
 
-				});
+					});
+				}
+
 			break;
 			case "l" :
 				if (!Apio.Serial.hasOwnProperty("serialPort")) {
 					console.log('Notice: Serial port is disabled, the information cannot be sent to it. If you want to use the serial port try launching the server without the --no-serial flag.');
-					console.log("\n The message blocked by serial port is "+data.protocol+data.address+":"+message)
-					throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+					console.log("\nNOTICE: The message blocked by serial port is "+data.protocol+data.address+":"+message)
+					//throw new Apio.Serial.Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+				} else{
+					Apio.Serial.serialPort.write(data.protocol+data.address+":"+message,function(err,result){
+						Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
+						if (Apio.Util.isSet(err))
+							Apio.Util.debug("Apio.Serial.Send() Error: " + err);
+						Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
+						if(callback){
+							console.log("PARTE LA CALLBACK DELLA SERIAL");
+							callback();
+						}
+					});
 				}
-				Apio.Serial.serialPort.write(data.protocol+data.address+":"+message,function(err,result){
-					Apio.Util.debug("Apio.Serial.Send() wrote to serial the string:"+data.protocol+data.address+":"+message);
-					if (Apio.Util.isSet(err))
-						Apio.Util.debug("Apio.Serial.Send() Error: " + err);
-					Apio.Util.debug("Apio.Serial.Send() data wrote to serial and returned: " + result);
-					if(callback){
-						console.log("PARTE LA CALLBACK DELLA SERIAL");
-						callback();
-					}
-			});
+
 			break;
 			case "w" :
 				console.log("Apio.Serial.send() Sending "+message+" to HTTP object ")
@@ -363,16 +371,16 @@ Apio.Serial.send = 	function(data, callback) {
 				}
 			break;
 		}
-	});		
+	});
 };
 
 /*
-*	used when the Server Apio has received some message on the serial from 
-* 	an external Apio Object (mostly a Sensor/Button) which is trying to 
+*	used when the Server Apio has received some message on the serial from
+* 	an external Apio Object (mostly a Sensor/Button) which is trying to
 *	update some information on the database
 */
 Apio.Serial.read = function(data) {
-	
+
 	//I sensori invieranno le seguenti informazioni
 	//SensorID:command:Chiave:Valore
 	//Quindi la funzione read, deve fare una query nel db per capire quale azione intraprendere
@@ -383,7 +391,7 @@ Apio.Serial.read = function(data) {
 
 	switch(data.command) {
 		case "send":
-		
+
 			//Prendo i dati ddell"oggetto in db, scrivo in seriale e updato il db.
 			//In seriale verrà mandata una stringa del tipo
 			//objId:command:chiavivalori
@@ -435,7 +443,7 @@ Apio.Serial.read = function(data) {
 									console.log("Ho una notifica registarata per quella property ma non per quel valore")
 								}
 
-									
+
 							} else{
 								console.log("L'oggetto non ha una notifica registrata per la proprietà "+prop)
 							}
@@ -472,8 +480,8 @@ Apio.Database.Configuration = {
 	port : "27017"
 };
 /*
-* Take the configuration file of MongoDB and 
-* return a string which can be used for the 
+* Take the configuration file of MongoDB and
+* return a string which can be used for the
 * connection to the DB
 */
 Apio.Database.getConnectionString = function() {
@@ -537,11 +545,11 @@ Apio.Database.updateProperty = function(data,callback) {
 };
 
 Apio.Database.getMaximumObjectId = function(callback){
-	
+
 	console.log('getMaximumObjectId');
 	var error = null;
 	var result = null;
-	
+
 	var options = { "sort": [['objectId','desc']] };
 	Apio.Database.db.collection("Objects").findOne({}, options , function(err, doc) {
 		if(err){
@@ -553,11 +561,11 @@ Apio.Database.getMaximumObjectId = function(callback){
 	    	result = doc.objectId;
 		}
 		callback(error,result);
-	}); 
+	});
 
 };
 
-/* 
+/*
 *	Exception object definition
 *	This is very useful when doing error management, since it allows to understand which is the failure point
 *	and handle the errror accordingly.
@@ -576,15 +584,15 @@ Apio.Database.Error.prototype.name = "Apio.Database.Error";
 Apio.Database.registerObject = function(objectData,callback) {
 
 			Apio.Database.db.collection("Objects").insert(objectData,function(error) {
-				
+
 				if(error) {
 					throw new Apio.Database.Error("APIO::ERROR Apio.Database.registerObject() encountered an error while trying to update the property on the database"+error);
 				}
 				Apio.Util.debug("Apio.Database.registerObject() Object Successfully registered");
 				callback(error);
-				
+
 			});
-	
+
 
 };
 
@@ -602,7 +610,7 @@ Apio.Database.deleteObject = function(id,callback) {
 };
 
 Apio.Database.getObjects = function(callback) {
-	
+
 
 		Apio.Database.db.collection("Objects").find().toArray(function(error,result) {
 			if(error) {
@@ -624,7 +632,7 @@ Apio.Database.getObjects = function(callback) {
 };
 
 Apio.Database.getObjectById = function(id,callback) {
-	
+
 
 		Apio.Database.db.collection("Objects").findOne({objectId : id},function(error,result) {
 			if(error) {
@@ -641,10 +649,10 @@ Apio.Database.getObjectById = function(id,callback) {
 			Apio.Util.debug("Apio.Database.getObjectById() Object Successfully fetched (id : "+id+")");
 			if (callback !== null)
 				callback(result);
-			
+
 		});
 
-		
+
 
 };
 
@@ -673,7 +681,7 @@ Apio.Property.ApioSystemProperty = function(nomeStato,label, pushFlag) {
     if(pushFlag){
             this._html += '<script type="text/javascript">proprieta_oggetto_attuale.push('+this.nomestato+');</script>';
         }
-        
+
         this._html += '<script type="text/javascript">var model_'+this.nomestato+' = new Array();</script>';
 
 
@@ -768,7 +776,7 @@ Apio.Property.ApioSystemProperty.prototype.listener = function($e, $function){
                 $func = $function;
             }
         }
-        
+
         $events.forEach(function($event,i,a){
         	if($event == 'hold' || $event == 'tap' || $event == 'doubletap'
             || $event == 'drag' || $event == 'dragstart' || $event == 'dragend'
@@ -947,7 +955,7 @@ Apio.System.checkEvent = function(state) {
 				callback();
 		}
 	})
-	
+
 }*/
 Apio.System.notify = function(notification,callback) {
 	var areJSONsEqual = function(a, b) {
@@ -1024,7 +1032,7 @@ Apio.System.registerCronEvent = function(event) {
 		Day of Week: 0-6
 
 		* * * * * *
-		00 10 16 20 * 
+		00 10 16 20 *
 	*/
 	console.log("Registro evento con timer ("+event.triggerTimer+")");
 	Apio.System.jobs[event.name] = new CronJob(event.triggerTimer,
@@ -1057,7 +1065,7 @@ Apio.System.deleteCronEvent = function(eventName) {
 		console.log("Apio.System.deleteCronEvent: unable to delete cron event "+eventName+" : the cron event does not exist;");
 }
 
-            
+
 
 
 /*
@@ -1096,7 +1104,7 @@ drwxrwxrwx 2 pi pi  4096 set 17 15:49 system
 module.exports = Apio;
 
 Apio.Property.create = function(propertyName,def) {
-	
+
 }
 
 
@@ -1104,4 +1112,3 @@ Apio.Property.create = function(propertyName,def) {
 
 
 })();
-

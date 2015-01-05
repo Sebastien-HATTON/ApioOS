@@ -620,7 +620,7 @@ app.post("/apio/state/apply",function(req,res){
                     Apio.Serial.send(arr[i], function () {
                         pause(100);
                     });
-                    
+
                 }
                 res.send({});
                 arr = [];
@@ -632,7 +632,7 @@ app.post("/apio/state/apply",function(req,res){
 
 app.delete("/apio/state/:name",function(req,res){
     console.log("Mi arriva da eliminare questo: "+req.params.name)
-    Apio.Database.db.collection("States").remove({name : req.params.name}, function(err){
+    Apio.Database.db.collection("States").findAndRemove({name : req.params.name}, function(err,removedState){
         if (!err) {
             Apio.io.emit("apio_state_delete", {name : req.params.name});
             Apio.Database.db.collection("Events").remove({triggerState : req.params.name}, function(err){
@@ -643,6 +643,21 @@ app.delete("/apio/state/:name",function(req,res){
                     Apio.io.emit("apio_event_delete", {name : req.params.name});
                 }
             });
+            if (removedState.hasOwnProperty('sensors')) {
+
+              removedState.sensors.forEach(function(e,i,a){
+                var props = {};
+                props[e] = removedState.properties[e];
+                Apio.Serial.send({
+                  'objectId' : removedState.objectId,
+                  'properties' : props
+                })
+
+              })
+
+
+            }
+
             res.send({error : false});
         }
         else
@@ -737,6 +752,7 @@ app.use(function(err, req, res, next) {
 
 
 //FIXME andrebbero fatte in post per rispettare lo standard REST
+/*
 app.post('/apio/serial/send',function(req,res){
 
          var keyValue = req.body.message;
@@ -757,9 +773,15 @@ app.post('/apio/serial/send',function(req,res){
             Apio.Serial.send(obj);
             res.send();
 });
-app.post('/apio/sensor/register',function(req,res){
-    //Mi vado a prendere protocolo e indirizzo del sensore
-    //scrivo in seriale il messaggio
+*/
+app.post('/apio/serial/send',function(req,res){
+
+            var obj = req.body.data;
+            console.log("\n\n%%%%%%%%%%\nAl seria/send arriva questp")
+            console.log(obj)
+            console.log("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n")
+            Apio.Serial.send(obj);
+            res.send({status : true});
 });
 
 
@@ -822,7 +844,7 @@ Apio.io.on("connection", function(socket){
     socket.join("apio_client");
 
     socket.on("apio_client_update",function(data){
-        
+
         console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         console.log("App.js on(apio_client_update)  received a message");
 
@@ -877,7 +899,3 @@ console.log("APIO server started on port "+APIO_CONFIGURATION.port);
 
 
 });
-
-
-
-
