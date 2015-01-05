@@ -25,6 +25,19 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 					if(data.properties.hasOwnProperty(attrs["propertyname"])){
 						if (attrs["push"]) {
 							scope.$parent.$eval(attrs["push"]);
+
+							var $property = {
+								name : attrs["propertyname"],
+								value : data.properties[attrs["propertyname"]]
+							};
+							var fn = scope.$parent[attrs["push"]];
+							if(typeof fn === "function"){
+								var params = [$property];
+								fn.apply(scope.$parent,params);
+							}
+							else{
+								throw new Error("The Push attribute must be a function name present in scope")
+							}
 						}
 						else{						
 							scope.model = data.properties[attrs["propertyname"]];
