@@ -28,7 +28,7 @@ apioProperty.directive("text", ["currentObject", "socket", "$timeout", function(
 		    				scope.$parent.$eval(attrs["push"]);
 		    				$property = {
 		    					name : attrs["propertyname"],
-		    					value : data.properties[attrs["propertyname"]]
+		    					value : self.properties[attrs["propertyname"]]
 		    				}
 			    			var fn = scope.$parent[attrs["push"]];
 			    			if(typeof fn === "function"){
