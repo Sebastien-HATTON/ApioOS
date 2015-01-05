@@ -39,22 +39,24 @@ apioProperty.directive("asyncdisplay", ["currentObject", "socket", "$timeout", f
 		    
 		    var event = attrs["event"] ? attrs["event"] : "click touchend";
 	    	elem.on(event, function(){
-				//Aggiorna lo scope globale con il valore che è stato modificato nel template
-				scope.object.properties[attrs["propertyname"]] = scope.model;
-				//
-	
-				//Se è stato definito un listener da parte dell'utente lo eseguo altrimenti richiamo currentObject.update che invia i dati al DB e alla seriale
-				if(attrs["listener"]) {
-					scope.$parent.$eval(attrs["listener"]);
+				if(!currentObject.isRecording()){
+					//Aggiorna lo scope globale con il valore che è stato modificato nel template
+					scope.object.properties[attrs["propertyname"]] = scope.model;
+					//
+
+					//Se è stato definito un listener da parte dell'utente lo eseguo altrimenti richiamo currentObject.update che invia i dati al DB e alla seriale
+					if(attrs["listener"]) {
+						scope.$parent.$eval(attrs["listener"]);
+					}
+					//
+
+					//Se è stata definita una correlazione da parte dell'utente la eseguo
+
+
+					//Esegue codice javascript contenuto nei tag angular
+					scope.$apply();
+					//
 				}
-				//
-
-				//Se è stata definita una correlazione da parte dell'utente la eseguo
-
-
-				//Esegue codice javascript contenuto nei tag angular
-				scope.$apply();
-				//
 			});
 			
 
