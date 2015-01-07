@@ -1,5 +1,5 @@
 var apioProperty = angular.module("apioProperty");
-apioProperty.directive("sensor", ["currentObject", "socket", "$timeout", function(currentObject, socket, $timeout){
+apioProperty.directive("sensor", ["currentObject", "socket", "$http", function(currentObject, socket, $http){
 	return{
 	    restrict: "E",
 	    replace: true,
@@ -130,7 +130,22 @@ apioProperty.directive("sensor", ["currentObject", "socket", "$timeout", functio
 				}
 			});
 			
-
+			elem.on("click tap", function(){
+				alert("Ho cliccato sul sensore");
+				//Aggiornare il valore del sensore, chiedere ad Alessandro qual è l'istruzione da mandare
+				var props = {};
+				props[attrs["propertyname"]] = "/";
+				$http.post('/apio/serial/send', {data : {objectId : scope.object.objectId, properties : props}})
+					.success(function(data){
+						alert("Successo");
+						console.log('sensore notificato');
+					})
+					.error(function(err){
+						alert("Fallimento");
+						console.log("Impossibile notificare il sensore");
+						console.log(err);
+					});
+			});
 		    //
 		}
 	};
