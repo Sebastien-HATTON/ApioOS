@@ -295,6 +295,7 @@ module.exports = {
 	        console.log('path + dummy:'+path + dummy);
 	        console.log('target: public/exported/'+jsonObject.name+'.tar.gz');
 	        path = 'public/temp';
+	        deleteFolderRecursive(path);
 	        fs.mkdirSync(path);
 	        fs.mkdirSync(path +'/'+ dummy);
 	        fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
@@ -387,6 +388,8 @@ module.exports = {
 	},
 	uploadApioApp : function(req,res){
 	    console.log('/apio/app/upload')
+	    
+	    deleteFolderRecursive('upload');
 	    fs.mkdirSync('upload');
 	    
 	    var form = new formidable.IncomingForm();

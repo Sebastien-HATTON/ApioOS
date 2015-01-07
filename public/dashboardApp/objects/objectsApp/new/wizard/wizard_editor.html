@@ -61,13 +61,13 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10" ng-hide="hideCreate">
-            <button id="create" type="button" ng-click="panell.sendFilesToServer()" class="btn btn-primary btn-lg">Create</button>
+            <button  ng-disabled="createIsDisabled" id="create" type="button" ng-click="panell.sendFilesToServer()" class="btn btn-primary btn-lg">Create</button>
         </div>
         <div class="col-sm-offset-2 col-sm-10" ng-hide="hideUpdate">
             <button id="update" type="button" ng-click="panell.updateApioApp()" class="btn btn-primary btn-lg">Update</button>
         </div>
-        <div class="col-sm-offset-2 col-sm-10" ng-hide="hideCreateNew">
-            <button id="createNew" type="button" ng-click="panell.createNewApioAppFromEditor()" class="btn btn-primary btn-lg">Create New</button>
+        <div  class="col-sm-offset-2 col-sm-10" ng-hide="hideCreateNew">
+            <button ng-disabled="createEditorIsDisabled" id="createNew" type="button" ng-click="panell.createNewApioAppFromEditor()" class="btn btn-primary btn-lg">Create New</button>
         </div>
     </div>
 

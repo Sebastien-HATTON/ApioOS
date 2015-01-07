@@ -1,5 +1,5 @@
 angular.module('ApioDashboardApplication')
-.controller('ApioDashboardLaunchController', ['$scope','socket','objectService','$http','$rootScope','$state', function($scope,socket,objectService,$http,$rootScope,$state){
+.controller('ApioDashboardLaunchController', ['$scope','socket','objectService','$http','$rootScope','$state','sweet', function($scope,socket,objectService,$http,$rootScope,$state,sweet){
 
 	socket.on('apio_server_update',function(e) {
     	
@@ -82,21 +82,58 @@ angular.module('ApioDashboardApplication')
 	    });*/
 	    window.open('/apio/app/export?id='+$scope.currentApplication.objectId);
 	  };
-	  
+
+
+
 	  $scope.deleteApioApplication = function(){
-	    console.log('deleting the application '+$scope.currentApplication.objectId);
-	    $http.post('/apio/app/delete',{id : $scope.currentApplication.objectId})
-	    .success(function(data,status,header){
-	      console.log('/apio/app/delete success()');
-	      $('#appModal').modal('hide');
-	      //$scope.switchPage('Objects');
-	      //$state.go('objects.objectsLaunch');
-	      $state.go($state.current, {}, {reload: true});
-	      alert("App Deleted")
-	    })
-	    .error(function(data,status,header){
-	      console.log('/apio/app/delete failure()');
+
+	  	console.log('deleting the application '+$scope.currentApplication.objectId);
+	  	$('#appModal').modal('hide');
+		sweet.show({
+	        title: "Deleting Application.",
+	        text: "Your will not be able to restore those information unless you have them exported!",
+	        type: "warning",
+	        showCancelButton: true,
+	        confirmButtonClass: "btn-warning",
+	        cancelButtonClass: "btn-info",
+	        confirmButtonText: "Delete the App",
+	        cancelButtonText: "Keep it",
+	        closeOnConfirm: false,
+	        closeOnCancel: true 
+	      }, 
+	      function(isConfirm){   
+	         if (isConfirm) {
+
+		        $http.post('/apio/app/delete',{id : $scope.currentApplication.objectId})
+			    .success(function(data,status,header){
+			      console.log('/apio/app/delete success()');
+			              //sweet.show("Done!", "Your wizard procedure is done. Proceed to The Apio editor", "success");   
+	          	  sweet.show({
+	                      title: "Done!",
+	                      text: "Your Application is deleted",
+	                      type: "success",
+	                      showCancelButton: false,
+	                      confirmButtonClass: "btn-success",
+	                      confirmButtonText: "Ok",
+	                      closeOnConfirm: true
+	                    },
+	                    function(){
+	                         
+						      //$scope.switchPage('Objects');
+						      //$state.go('objects.objectsLaunch');
+						      $state.go($state.current, {}, {reload: true});
+						      //alert("App Deleted")
+	                    });
+			     
+			    })
+			    .error(function(data,status,header){
+			      console.log('/apio/app/delete failure()');
+			    }); 
+
+	        }
+	       
 	    });
+
 	  };
 
 	  $scope.importApioApplication = function(){

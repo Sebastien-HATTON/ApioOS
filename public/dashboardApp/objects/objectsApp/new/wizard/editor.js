@@ -2,6 +2,7 @@ angular.module('ApioDashboardApplication')
 .controller('EditorPanel', ['$scope','$http','sweet','objectService','$state','$rootScope', function($scope,$http,sweet,objectService,$state,$rootScope){
 
   this.tabb = 1;
+  $scope.createIsDisabled = false;
 
 
   this.selectTab = function(setTab){
@@ -115,6 +116,8 @@ angular.module('ApioDashboardApplication')
   };
 
   this.createNewApioAppFromEditor = function(){
+    $scope.createEditorIsDisabled = true;
+    console.log($scope.createIsDisabled)
     var self = this;
     $scope.makefile ='';
     var dao = {}; //dataAccessObject
@@ -137,16 +140,19 @@ angular.module('ApioDashboardApplication')
                       closeOnConfirm: true
                     },
                     function(){
+                        $scope.createEditorIsDisabled = false;
                         $state.go('objects.objectsLaunch');
                     });
 
       })
       .error(function(){
+        $scope.createEditorIsDisabled = false;
         alert("An error has occurred while saving the object" + dao.objectName);
       });
   };
 
   this.sendFilesToServer = function(){
+    $scope.createIsDisabled = true;
     var self = this;
     var dao = {}; //dataAccessObject
     var mongoObject = JSON.parse($scope.mongo);
@@ -182,6 +188,7 @@ angular.module('ApioDashboardApplication')
                       closeOnConfirm: true
                     },
                     function(){
+                      $scope.createIsDisabled = false;
                       window.open('/apio/app/exportIno?id='+dao.objectId);
                       $state.go('objects.objectsLaunch');
                     });
@@ -200,6 +207,7 @@ angular.module('ApioDashboardApplication')
         //$scope.$apply();
       })
       .error(function(){
+        $scope.createIsDisabled = false;
         alert("An error has occurred while saving the object" + $scope.newObject.objectName);
       });
   };
