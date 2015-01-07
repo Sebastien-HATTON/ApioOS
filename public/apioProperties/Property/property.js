@@ -24,13 +24,14 @@ apioProperty.directive("property", ["currentObject", "socket", function(currentO
 	    	socket.on("apio_server_update", function(data){
 				if(data.objectId === scope.object.objectId && !currentObject.isRecording()){
 					if(data.properties.hasOwnProperty(attrs["propertyname"])){
+						scope.$parent.object.properties[attrs["propertyname"]] = data.properties[attrs["propertyname"]];
 						//Se è stata definita una funzione di push viene chiama questa altrimenti vengono fatti i settaggi predefiniti
 						if(attrs["push"]){
 							scope.$parent.$eval(attrs["push"]);
-							$property = {
+							var $property = {
 								name : attrs["propertyname"],
 								value : data.properties[attrs["propertyname"]]
-							}
+							};
 							var fn = scope.$parent[attrs["push"]];
 							if(typeof fn === "function"){
 								var params = [$property];
@@ -39,6 +40,9 @@ apioProperty.directive("property", ["currentObject", "socket", function(currentO
 							else {
 								throw new Error("The Push attribute must be a function name present in scope")
 							}
+						}
+						else{
+							inputElement.val(data.properties[attrs["propertyname"]]);
 						}
 						//
 
@@ -53,7 +57,7 @@ apioProperty.directive("property", ["currentObject", "socket", function(currentO
 			
 			socket.on("apio_server_update_", function(data){
 				if(data.objectId === scope.object.objectId  && !scope.currentObject.isRecording()){
-					scope.model = data.properties[attrs["propertyname"]];
+					inputElement.val(data.properties[attrs["propertyname"]]);
 				}
 			});
 			
@@ -79,7 +83,8 @@ apioProperty.directive("property", ["currentObject", "socket", function(currentO
 						scope.$parent.$eval(attrs["listener"]);
 					}
 					else{
-						currentObject.update(attrs["propertyname"], $(elem).find("[propertyinput]").val());
+						currentObject.update(attrs["propertyname"], inputElement.val());
+						scope.$parent.object.properties[attrs["propertyname"]] = inputElement.val();
 					}
 					//
 					

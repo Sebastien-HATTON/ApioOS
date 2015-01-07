@@ -29,21 +29,23 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 	    	socket.on("apio_server_update", function(data){
 				if(data.objectId === scope.object.objectId && !currentObject.isRecording()){
 					if(data.properties.hasOwnProperty(attrs["propertyname"])){
+						scope.$parent.object.properties[attrs["propertyname"]] = data.properties[attrs["propertyname"]];
 						//Se è stata definita una funzione di push viene chiama questa altrimenti vengono fatti i settaggi predefiniti
 						if(attrs["push"]){
-							scope.$parent.$eval(attrs["push"]);
-							$property = {
+							scope.$parent.$property = {
 								name : attrs["propertyname"],
 								value : data.properties[attrs["propertyname"]]
-							}
-							var fn = scope.$parent[attrs["push"]];
+							};
+							scope.$parent.$eval(attrs["push"]);
+
+							/*var fn = scope.$parent[attrs["push"]];
 							if(typeof fn === "function"){
 								var params = [$property];
 								fn.apply(scope.$parent,params);
 							}
 							else {
 								throw new Error("The Push attribute must be a function name present in scope")
-							}
+							}*/
 						}
 						else{
 							scope.model = data.properties[attrs["propertyname"]];
@@ -111,6 +113,7 @@ apioProperty.directive("trigger", ["currentObject", "socket", "$timeout", functi
 					}
 					else{
 						currentObject.update(attrs["propertyname"], scope.model);
+						scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 					}
 					//
 					

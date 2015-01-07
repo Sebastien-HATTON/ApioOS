@@ -23,6 +23,7 @@ apioProperty.directive("text", ["currentObject", "socket", "$timeout", function(
 			socket.on("apio_server_update", function(self) {
 				if (self.objectId === scope.object.objectId  && !currentObject.isRecording()) {
 					if (self.properties.hasOwnProperty(attrs["propertyname"])){
+						scope.$parent.object.properties[attrs["propertyname"]] = self.properties[attrs["propertyname"]];
 						//Se è stata definita una funzione di push viene chiama questa altrimenti vengono fatti i settaggi predefiniti
 		    			if(attrs["push"]){
 		    				scope.$parent.$eval(attrs["push"]);
@@ -83,6 +84,7 @@ apioProperty.directive("text", ["currentObject", "socket", "$timeout", function(
 					}
 					else{
 						currentObject.update(attrs["propertyname"], scope.model);
+						scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 					}
 					//
 					

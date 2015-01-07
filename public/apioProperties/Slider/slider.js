@@ -23,6 +23,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 			socket.on("apio_server_update", function(data){
 				if(data.objectId === scope.object.objectId  && !scope.currentObject.isRecording()){
 					if(data.properties.hasOwnProperty(attrs["propertyname"])){
+						scope.$parent.object.properties[attrs["propertyname"]] = data.properties[attrs["propertyname"]];
 						if (attrs["push"]) {
 							scope.$parent.$eval(attrs["push"]);
 
@@ -120,6 +121,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 					}
 					else{
 						currentObject.update(attrs["propertyname"], scope.model);
+						scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 					}
 					//
 					
