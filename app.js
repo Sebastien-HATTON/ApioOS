@@ -21,9 +21,14 @@ var APIO_CONFIGURATION = {
 var ENVIRONMENT = "production";
 if (process.argv.indexOf('--no-serial') > -1)
     ENVIRONMENT = "development"
-if (process.argv.indexOf('--port') > -1) {
-    var index = process.argv.indexOf('--port');
-    APIO_CONFIGURATION.port = process.argv[index+1]
+if (process.argv.indexOf('--http-port') > -1) {
+    var index = process.argv.indexOf('--http-port');
+    APIO_CONFIGURATION.port = process.argv[index+1];
+}
+
+if (process.argv.indexOf('--serial-port') > -1) {
+    var index = process.argv.indexOf('--serial-port');
+    Apio.Serial.Configuration.port = process.argv[index+1];
 }
 
 
