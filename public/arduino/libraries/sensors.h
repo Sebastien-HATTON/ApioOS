@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <Arduino.h>
 
-
+int actual = -1;
 typedef struct ApioListNode {
  String key, value;
  int flag;
@@ -17,6 +17,7 @@ void insert(ApioList *lista, String key, String value) {
 		temp =new ApioListNode;
 		temp->key = key;
 		temp->value = value;
+                temp->flag=0;
 		temp->next = *lista;
 		*lista = temp;
 }
@@ -38,11 +39,25 @@ deleteByKeyValue
 hasKeyValue
 */
 
-int exists(ApioList lista, String key, String value) {
+int exists(ApioList lista, String key, String value, int mode) {
 	ApioList cursor;
 	cursor = lista;
+
 	while (cursor != 0 && cursor->next != 0) {
 		if (cursor->key == key && cursor->value == value){
+                     if(mode==1){
+                       if(actual==cursor->value.toInt())
+                       {
+                         actual=-1;
+                         return 0;
+                       }
+                       else
+                       {
+                         actual=value.toInt();
+                         return 1;
+                       }
+                       
+                     }
 			return 1;
                 }
 		cursor = cursor->next;
