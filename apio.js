@@ -227,6 +227,7 @@ Apio.Serial.init = function() {
 *	adding the end transmission char -
 *	and check the protocol type
 */
+/*
 Apio.Serial.send = 	function(data, callback) {
 	//NOTA data dovrebbe mandare soltanto objID e le prop
 		var message = "";
@@ -373,7 +374,55 @@ Apio.Serial.send = 	function(data, callback) {
 		}
 	});
 };
+*/
+Apio.Serial.send = 	function(data, callback) {
+	//NOTA data dovrebbe mandare soltanto objID e le prop
+		console.log('&&&&&&&&&&&&&&&&&&&&&&&&&66SerialSend')
+		console.log(data)
+		console.log('&&&&&&&&&&&&&&&&&&&&&&&&&66SerialSend')
+		var sendSingleKeyValue = function(protocol,address,key,value,callback) {
+			var message = protocol+address+":"+key+":"+value+"-";
+			switch (protocol) {
+				case 'l' : case 'z' : case 's' :
+					if (!Apio.Serial.hasOwnProperty("serialPort")){
+						console.log("The serial port is disabled, the following message cannot be sent: "+message);
+					} else {
+						console.log("Scrivo "+message)
+						Apio.Serial.serialPort.write(message,callback);					}
+				break;
+				default :
+					console.log("Protocollo "+protocol+"sconosciuto, lancio l'adapter manager")
+				break;
+			}
+		}
 
+
+		var keys = Object.keys(data.properties);
+
+
+	Apio.Database.db.collection('Objects').findOne({objectId : data.objectId},function(err,doc){
+		if (err) {
+			console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
+		} else {
+			data.address = doc.address;
+			data.protocol = doc.protocol;
+			var timer = setInterval(function(){
+					keys.forEach(function(key,i){
+						sendSingleKeyValue(data.protocol,data.address,key,data.properties[key],function(){
+							keys.splice(i,1);
+
+						})
+					clearInterval(timer);
+					})
+				},500);
+		}
+	})
+
+
+
+
+
+}
 /*
 *	used when the Server Apio has received some message on the serial from
 * 	an external Apio Object (mostly a Sensor/Button) which is trying to
