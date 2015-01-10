@@ -47,9 +47,9 @@ apioProperty.directive("property", ["currentObject", "socket", function(currentO
 						//
 
 						//In particolare questa parte aggiorna il cloud nel caso siano state definite delle correlazioni
-						if(attrs["correlation"]){
+						/*if(attrs["correlation"]){
 							scope.$parent.$eval(attrs["correlation"]);
-						}
+						}*/
 						//
 					}
 				}

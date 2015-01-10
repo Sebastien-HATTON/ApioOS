@@ -25,9 +25,9 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
 					if(data.properties.hasOwnProperty(attrs["propertyname"])){
 						scope.model = data.properties[attrs["propertyname"]];
 						//In particolare questa parte aggiorna il cloud nel caso siano state definite delle correlazioni
-						if(attrs["correlation"]){
+						/*if(attrs["correlation"]){
 							scope.$parent.$eval(attrs["correlation"]);
-						}
+						}*/
 						//
 					}
 				}

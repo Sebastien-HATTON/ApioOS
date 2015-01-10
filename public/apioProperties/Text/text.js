@@ -45,9 +45,9 @@ apioProperty.directive("text", ["currentObject", "socket", "$timeout", function(
 		    			}
 		    			//
 		    			
-						if(attrs["correlation"]){
+						/*if(attrs["correlation"]){
 							scope.$parent.$eval(attrs["correlation"]);
-						}
+						}*/
 					}
 				}
 			});
