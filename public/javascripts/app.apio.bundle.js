@@ -281,9 +281,15 @@ var interact = 0;
 ApioApplication.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
-      when('/',{
+      when('/home',{
         templateUrl : 'systemApps/home/app.home.html',
-        controller : 'ApioHomeController'
+        controller : 'ApioHomeController',
+        reloadOnSearch: false
+      }).
+      when('/home/:application',{
+        templateUrl : 'systemApps/home/app.home.html',
+        controller : 'ApioHomeController',
+        reloadOnSearch: false
       }).
       when('/wall',{
         templateUrl : 'systemApps/wall/app.wall.html',
@@ -294,7 +300,7 @@ ApioApplication.config(['$routeProvider',
         controller : 'ApioEventsController'
       }).
       otherwise({
-        redirectTo: '/'
+        redirectTo: '/home'
       });
   }]);
 

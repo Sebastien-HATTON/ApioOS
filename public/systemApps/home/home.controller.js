@@ -1,10 +1,24 @@
-angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$http', 'socket', 'objectService', "DataSource", "$modal", "currentObject", "$rootScope",
-    function($scope, $http, socket, objectService, DataSource, $modal, currentObjectService, $rootScope) {
+angular.module('ApioApplication').controller('ApioHomeController',
+    ['$scope',
+    '$http', 
+    'socket', 
+    'objectService', 
+    "DataSource", 
+    "$modal", 
+    "currentObject", 
+    "$rootScope",
+    "$routeParams",
+    "$location",
+    function($scope, $http, socket, objectService, DataSource, $modal, currentObjectService, $rootScope,$routeParams,$location) {
+        
+
         document.getElementById("targetBody").style.position = "";
         $scope.currentApplication = null;
         $("#ApioApplicationContainer").hide(function(){
             $("#ApioApplicationContainer").html("");
         })
+
+ 
 
        
         socket.on('apio_notification', function(notification) {
@@ -52,9 +66,11 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
         $scope.currentView = {};
         objectService.list().then(function(d) {
             $scope.objects = d.data;
-            console.log("LOGGO Gli oggetti")
-            console.log(d)
+            
+            
         })
+
+
 
         $scope.updateProperty = function(prop_name, prop_value) {
             
@@ -121,7 +137,13 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
             }
         });
 
+    $scope.goToApplication = function(id) {
+
+        //history.pushState({},'#/home/'+id,'#/home/'+id)
+        $location.path('/home/'+id);
+    }
     $scope.launchApplication = function(id) {
+        
        objectService.getById(id).then(function(d) {
             $scope.currentObject = d.data;
             // new thing!
@@ -144,6 +166,9 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
                         document.getElementById('ApioApplicationContainer').style.height = ""+(window.innerHeight+500)+"px !important";
                         $("#ApioApplicationContainer").css("overflowY", "scroll");
                         //alert(document.getElementById('ApioApplicationContainer').style.height);
+                        
+
+                        //history.pushState({},'/events','/events')
                         $scope.$apply();
                     });
                 }
@@ -154,40 +179,19 @@ angular.module('ApioApplication').controller('ApioHomeController', ['$scope', '$
         });
 
     }
-    $scope.launchApplication2 = function(id) {
-            $("#appApio").css("width", Apio.appWidth + "px");
-            Apio.newWidth = Apio.appWidth;
-            objectService.getById(id).then(function(d) {
-                $scope.currentObject = d.data;
-                // new thing!
-                currentObjectService.set(d.data);
 
-                if ($scope.currentApplication == null) {
 
-                    document.getElementById('ApioIconsContainer').classList.add('openAppIconStyle');
+    if ($routeParams.hasOwnProperty('application')) {
+        console.log('Launching application '+$routeParams.application)
+        setTimeout(function(){
+            $scope.launchApplication($routeParams.application);
+        
+        },500)
+        
+                
+    }
+            
 
-                    $.get("applications/" + id + "/" + id + ".html", function(data) {
-                        $("#appApio").html($(data));
-                        $("#appApio").find("h2").text($scope.currentObject.name);
-                        if (window.innerWidth > 769)
-                            $("#ApioIconsContainer").css("width", "77%");
-                    });
-                    document.getElementById("appApio").classList.add("proprieta");
-
-                    document.getElementById("appApio").style.opacity = "1";
-                    document.getElementById("targetBody").style.position = "fixed";
-
-                    $("body").animate({
-                        scrollLeft: document.body.scrollWidth
-                    }, 900);
-
-                    //});
-
-                }
-
-            });
-
-        }
 
 
 

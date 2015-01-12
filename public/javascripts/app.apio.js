@@ -90,7 +90,7 @@ var interact = 0;
         else{
             scroll = document.getElementById(targetScoll).scrollTop;
             if(touch == 0){
-                console.log(scroll+' '+top.top);
+                //console.log(scroll+' '+top.top);
                 if(scroll >= top.top && interact == 0){
                     interact = 1;
                     //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOn');
@@ -116,9 +116,15 @@ var interact = 0;
 ApioApplication.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
-      when('/',{
+      when('/home',{
         templateUrl : 'systemApps/home/app.home.html',
-        controller : 'ApioHomeController'
+        controller : 'ApioHomeController',
+        reloadOnSearch: false
+      }).
+      when('/home/:application',{
+        templateUrl : 'systemApps/home/app.home.html',
+        controller : 'ApioHomeController',
+        reloadOnSearch: false
       }).
       when('/wall',{
         templateUrl : 'systemApps/wall/app.wall.html',
@@ -129,7 +135,7 @@ ApioApplication.config(['$routeProvider',
         controller : 'ApioEventsController'
       }).
       otherwise({
-        redirectTo: '/'
+        redirectTo: '/home'
       });
   }]);
 
@@ -196,7 +202,7 @@ ApioApplication.factory('DataSource', ['$http',function($http){
                       // it to the success function below
                         var x2js = new X2JS();
                         var json = x2js.xml_str2json( data );
-                        console.log("CIAO");
+                        
                         console.log(json);
                         return json;
                         }
