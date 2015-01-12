@@ -16,7 +16,7 @@ apioProperty.directive("dynamicview", ["currentObject", "socket", "$timeout", fu
 	    	scope.label = attrs["label"];
 	    	scope.model = scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
-	    	//
+	    	scope.anchor = attrs.hasOwnProperty('anchor') ? attrs['anchor'] : '>';
 	    	
             scope.$on('propertyUpdate',function() {
             	scope.object = currentObject.get();
@@ -28,18 +28,24 @@ apioProperty.directive("dynamicview", ["currentObject", "socket", "$timeout", fu
 					//Carimento della subapp
 					var uri = attrs["load"] ? attrs["load"] : "applications/"+scope.object.objectId+"/subapps/"+attrs["propertyname"]+".html";
 					$.get(uri, function(data){
-						var app = $(elem).parent().parent().parent();
-						Apio.newWidth += Apio.appWidth;
-						$("#ApioApplicationContainer").css("width", Apio.newWidth+"px");
-						$("#ApioApplication"+scope.object.objectId).css("width", Apio.appWidth+"px");
-						$("#ApioApplication"+scope.object.objectId).css("float", "left");
-				        app.css("overflowX", "auto");
-						
-						var subapp = attrs["propertyname"].charAt(0).toUpperCase() + attrs["propertyname"].slice(1);
-					    $("#ApioApplicationContainer").append($(data));
-					    $("#ApioApplication"+subapp).css("width", Apio.appWidth+"px");
-					    $("#ApioApplication"+subapp).css("float", "left");
-					});
+                        if(attrs["load"]){
+                            var loadComponents = attrs["load"].split("/");
+                            var app = loadComponents[loadComponents.length - 1];
+                            var appComponents = app.split(".");
+                            var application = appComponents[0];
+                            var subapp = application.charAt(0).toUpperCase() + application.slice(1);
+                        }
+                        else{
+                            var subapp = attrs["propertyname"].charAt(0).toUpperCase() + attrs["propertyname"].slice(1);
+                        }
+
+                        $("#ApioApplicationContainer").append($(data));
+                        $("#ApioApplication"+subapp).css("height", ""+$("#ApioApplicationContainer").children().eq(1).css("height"));
+                        $("#ApioApplication"+subapp).css("margin-top", "-"+$("#ApioApplicationContainer").children().eq(1).css("height"));
+                        $("#ApioApplication"+subapp).show("slide", {
+                            direction: 'right'
+                        }, 500);
+                    });
 					//
 					
 					//Se è stata definita una correlazione da parte dell'utente la eseguo
