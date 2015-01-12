@@ -71,7 +71,10 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 			});
 			
 	    	//Inizializzo la proprietà con i dati memorizzati nel DB
-			scope.arr = scope.object.db[attrs["propertyname"]];
+	    	if(attrs.hasOwnProperty("arraylist"))
+	    		scope.arr = currentObject.JSONToArray(scope.object.db[attrs["propertyname"]]);
+	    	else
+				scope.arr = scope.object.db[attrs["propertyname"]];
 	    	scope.label = attrs["label"];
 	    	scope.model = scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
