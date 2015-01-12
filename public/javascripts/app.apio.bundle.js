@@ -255,7 +255,7 @@ var interact = 0;
         else{
             scroll = document.getElementById(targetScoll).scrollTop;
             if(touch == 0){
-                console.log(scroll+' '+top.top);
+                //console.log(scroll+' '+top.top);
                 if(scroll >= top.top && interact == 0){
                     interact = 1;
                     //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOn');
@@ -303,7 +303,6 @@ ApioApplication.config(['$routeProvider',
         redirectTo: '/home'
       });
   }]);
-
 
 
 
@@ -367,7 +366,7 @@ ApioApplication.factory('DataSource', ['$http',function($http){
                       // it to the success function below
                         var x2js = new X2JS();
                         var json = x2js.xml_str2json( data );
-                        console.log("CIAO");
+                        
                         console.log(json);
                         return json;
                         }
@@ -418,6 +417,19 @@ ApioApplication.controller('ApioNotificationController',['$scope','$http','socke
         });
 }])
 */
+
+ApioApplication.filter('removeUndefinedFilter',function(){
+  
+  return function(items) {
+    var filtered = [];
+    items.forEach(function(x){
+      if ('undefined' !== typeof x)
+        filtered.push(x);
+    })
+        
+    return filtered;
+  }
+});
     
 var apioProperty = angular.module('apioProperty', ['ApioApplication']);
 
@@ -523,7 +535,20 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
               c()
           })
         
-      }
+      },
+      JSONToArray : function(obj){
+       var arr = [];
+       for(var i in obj){
+           if(isNaN(i)){
+               throw new Error("All indexes of JSON must be numbers");
+           }
+           else{
+               arr[parseInt(i)] = obj[i];
+           }
+       }
+       console.log(arr)
+       return arr;
+   }
     }
 
     return $window.sharedService;

@@ -141,7 +141,6 @@ ApioApplication.config(['$routeProvider',
 
 
 
-
 ApioApplication.factory('socket', function ($rootScope) {
   return {
     on: function (eventName, callback) {
@@ -253,6 +252,19 @@ ApioApplication.controller('ApioNotificationController',['$scope','$http','socke
         });
 }])
 */
+
+ApioApplication.filter('removeUndefinedFilter',function(){
+  
+  return function(items) {
+    var filtered = [];
+    items.forEach(function(x){
+      if ('undefined' !== typeof x)
+        filtered.push(x);
+    })
+        
+    return filtered;
+  }
+});
     
 var apioProperty = angular.module('apioProperty', ['ApioApplication']);
 
@@ -358,7 +370,20 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
               c()
           })
         
-      }
+      },
+      JSONToArray : function(obj){
+       var arr = [];
+       for(var i in obj){
+           if(isNaN(i)){
+               throw new Error("All indexes of JSON must be numbers");
+           }
+           else{
+               arr[parseInt(i)] = obj[i];
+           }
+       }
+       console.log(arr)
+       return arr;
+   }
     }
 
     return $window.sharedService;
