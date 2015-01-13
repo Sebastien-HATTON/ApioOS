@@ -14,7 +14,7 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 	    		return scope.currentObject.record(attrs['propertyname']);
 	    	}
 	    	scope.addPropertyToRecording = function() {
-	    		scope.currentObject.record(attrs['propertyname'], scope.model);
+	    		scope.currentObject.record(attrs['propertyname'], scope.model.toString());
 	    	}
 	    	scope.removePropertyFromRecording = function() {
 	    		scope.currentObject.removeFromRecord(attrs['propertyname']);
@@ -41,7 +41,7 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 							}
 						}
 						else{
-							scope.model = data.properties[attrs["propertyname"]];
+							scope.model = scope.isArray ? parseInt(data.properties[attrs["propertyname"]]) : data.properties[attrs["propertyname"]];
 						}
 						//
 						
@@ -56,13 +56,13 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 			//
 			socket.on("apio_server_update_", function(data){
 				if(data.objectId === scope.object.objectId  && !scope.currentObject.isRecording()){
-					scope.model = data.properties[attrs["propertyname"]];
+					scope.model = scope.isArray ? parseInt(data.properties[attrs["propertyname"]]) : data.properties[attrs["propertyname"]];
 				}
 			});
 
 			//Se il controller modifica l'oggetto allora modifico il model;
 			scope.$watch("object.properties."+attrs["propertyname"], function(){
-			  	scope.model = scope.object.properties[attrs["propertyname"]];
+			  	scope.model = scope.isArray ? parseInt(scope.object.properties[attrs["propertyname"]]) : scope.object.properties[attrs["propertyname"]];
 	    	});
 	    	//
 	    	
@@ -71,30 +71,33 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 			});
 			
 	    	//Inizializzo la proprietà con i dati memorizzati nel DB
-	    	if(attrs.hasOwnProperty("arraylist"))
-	    		scope.arr = currentObject.JSONToArray(scope.object.db[attrs["propertyname"]]);
-	    	else
+	    	if(attrs.hasOwnProperty("arraylist")){
+				scope.arr = currentObject.JSONToArray(scope.object.db[attrs["propertyname"]]);
+				scope.isValid = function(x){
+					return typeof x !== "undefined" ? true : false;
+				};
+			}
+	    	else{
 				scope.arr = scope.object.db[attrs["propertyname"]];
+			}
+			scope.isArray = scope.arr instanceof Array ? true : false;
 	    	scope.label = attrs["label"];
-	    	scope.model = scope.object.properties[attrs["propertyname"]];
+	    	scope.model = scope.isArray ? parseInt(scope.object.properties[attrs["propertyname"]]) : scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
 	    	//
 	    	
             var event = attrs["event"] ? attrs["event"] : "change";
 	    	elem.on(event, function(){
 	    		//Aggiorna lo scope globale con il valore che è stato modificato nel template
-		    	scope.object.properties[attrs["propertyname"]] = scope.model;
+		    	scope.object.properties[attrs["propertyname"]] = scope.model.toString();
 				if(!currentObject.isRecording()){
-					
-		    		//
-	
 					//Se è stato definito un listener da parte dell'utente lo eseguo altrimenti richiamo currentObject.update che invia i dati al DB e alla seriale
 					if(attrs["listener"]){
 						scope.$parent.$eval(attrs["listener"]);
 					}
 					else{
-						currentObject.update(attrs["propertyname"], scope.model);
-						scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
+						currentObject.update(attrs["propertyname"], scope.model.toString());
+						scope.$parent.object.properties[attrs["propertyname"]] = scope.model.toString();
 					}
 					//
 					
@@ -102,15 +105,13 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 					if(attrs["correlation"]){
 						scope.$parent.$eval(attrs["correlation"]);
 					}
+					//
 					
 	        		//Esegue codice javascript contenuto nei tag angular
 					scope.$apply();
 					//
 				}
 			});
-			
-
-		    //
 		}
 	};
 }]);
