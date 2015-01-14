@@ -1,6 +1,39 @@
 angular.module('ApioDashboardApplication')
 .controller('ApioDashboardNewController', ['$scope','objectService','$http','$timeout', function($scope,objectService,$http,$timeout){
 
+	$scope.myImage='';
+	$scope.myCroppedImage='';
+
+ 	  $scope.handleFileSelect=function(evt) {
+ 	  	console.log('handle')
+ 	  	console.log('evt: ');
+ 	  	console.log(evt);
+ 	  	console.log('evt.currentTarget: ');
+ 	  	console.log(evt.currentTarget);
+ 	  	console.log('evt.currentTarget.files[0]: ');
+ 	  	console.log(evt.currentTarget.files[0]);
+	  var file=evt.currentTarget.files[0];
+
+	  var reader = new FileReader();
+	  reader.onload = function (evt) {
+	  	console.log('reader.onload');
+	  	console.log('evt onload');
+	  	console.log(evt)
+	    $scope.$apply(function($scope){
+	    	console.log('apply');
+	    	console.log('evt.target');
+	    	console.log(evt.target);
+	    	console.log('evt.target.result');
+	    	console.log(evt.target.result);
+	      $scope.myImage=evt.target.result;
+	      console.log('img');
+	      console.log($scope.myImage)
+	    });
+	  };
+	  reader.readAsDataURL(file);
+	};
+
+
 	$scope.currentApplication=$scope.$parent.currentApplication;
 	$scope.hideWizard=true;
 	$scope.hideNewEditor=true;

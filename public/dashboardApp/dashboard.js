@@ -1,5 +1,5 @@
 var Apio = require ('../javascripts/apio.client.js');
-var ApioDashboardApplication = angular.module('ApioDashboardApplication',['ui.utils','ui.ace','hSweetAlert','ui.router','angularFileUpload']);
+var ApioDashboardApplication = angular.module('ApioDashboardApplication',['ui.utils','ui.ace','hSweetAlert','ui.router','angularFileUpload','ngImgCrop']);
 
 //Trova un modo migliore per iniettare le dipendenze 
 window.Apio = Apio;

@@ -19,6 +19,20 @@ var deleteFolderRecursive = function(path) {
     }
 };
 
+function decodeBase64Image(dataString) {
+  var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+    response = {};
+
+  if (matches.length !== 3) {
+    return new Error('Invalid input string');
+  }
+
+  response.type = matches[1];
+  response.data = new Buffer(matches[2], 'base64');
+
+  return response;
+};
+
 module.exports = {
 	index : function(req,res) {
 			res.sendfile("public/dashboardApp/dashboard.html");
@@ -146,6 +160,9 @@ module.exports = {
 	    var html = req.body.html;
 	    var js = req.body.js;
 	    var makefile = req.body.makefile;
+	    var icon = req.body.icon;
+	    console.log('icon: ')
+	    console.log(icon)
 	    console.log('makefile: '+makefile);
 	    console.log('req.makefile: '+req.body.makefile);
 	    var objectToSave = {properties:{}};
@@ -212,6 +229,7 @@ module.exports = {
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.html',html);
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.js',js);
 	            fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.mongo',mongo);
+	            fs.writeFileSync('public/applications/'+obj.objectId+'/icon.png',decodeBase64Image(icon).data);
 	            //fs.writeFileSync('public/applications/'+obj.objectId+'/' + obj.objectId + '.json',JSON.stringify(objectToSave));
 	            
 	            //Injection of the libraries file in the sketch folder

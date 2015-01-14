@@ -176,6 +176,7 @@ angular.module('ApioDashboardApplication')
     this.parserJs($scope.newObject);
     this.parserMongo($scope.newObject);
     this.parserMakefile($scope.newObject);
+    //$scope.icon=$scope.$parent.myCroppedImage;
     $scope.ino = this.ino;
     $scope.html = this.html;
     $scope.js = this.js;

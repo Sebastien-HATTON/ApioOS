@@ -14,6 +14,15 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/marketcloud-dashboard-sidebar.css">
 
     <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="bower_components/ngImgCrop/compile/minified/ng-img-crop.css" rel="stylesheet" />
+    <style>
+      .cropArea {
+        background: #E4E4E4;
+        overflow: hidden;
+        width:500px;
+        height:350px;
+      }
+    </style>
 </head>
 
 <body ng-app="ApioDashboardApplication" ng-controller="ApioDashboardGeneralController" class="container-fluid">
@@ -76,6 +85,8 @@
 <script src="/javascripts/jquery-cron/cron/jquery-cron.js"></script>
 
 <script type="text/javascript" src="/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+<script type="text/javascript" src="/bower_components/ngImgCrop/compile/unminified/ng-img-crop.js"></script>
+
 
 <script src="/dashboardApp/dashboard.bundle.js"></script>
 <script src="/dashboardApp/home/dashboard_home.js"></script>
@@ -94,5 +105,6 @@
 <script type="text/javascript" src="/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
 <script type="text/javascript" src="/bower_components/angular-h-sweetalert/dist/ngSweetAlert.min.js"></script>
 <script type="text/javascript" src="/bower_components/angular-file-upload/angular-file-upload.min.js"></script>
+
 
 </html>
