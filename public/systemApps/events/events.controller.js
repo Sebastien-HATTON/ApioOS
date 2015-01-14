@@ -6,7 +6,7 @@ angular.module('ApioApplication')
                     $("#ApioApplicationContainer").html("");
                 });
 				
-			
+			     $("#notificationsCenter").slideUp(500);
 			
             //var startX, startY;
             //Touch event

@@ -16,7 +16,11 @@ angular.module('ApioApplication').controller('ApioHomeController',
         $scope.currentApplication = null;
         $("#ApioApplicationContainer").hide(function(){
             $("#ApioApplicationContainer").html("");
-        })
+        });
+
+        $("#notificationsCenter").slideUp(500);
+
+
 
  
 
@@ -142,6 +146,42 @@ angular.module('ApioApplication').controller('ApioHomeController',
         //history.pushState({},'#/home/'+id,'#/home/'+id)
         $location.path('/home/'+id);
     }
+    $scope.launchApplicationSimple = function(id) {
+        objectService.getById(id).then(function(d) {
+            $scope.currentObject = d.data;
+            // new thing!
+            currentObjectService.set(d.data);
+
+            $.get("applications/" + id + "/" + id + ".html", function(data) {
+                if (window.innerWidth > 769)
+                    $("#ApioIconsContainer").css("width", "77%");
+
+                $("#ApioApplicationContainer").html($(data));
+                $("#ApioApplicationContainer").find("h2").text($scope.currentObject.name);
+                Apio.newWidth = Apio.appWidth;
+                $("#ApioApplicationContainer").css("width", Apio.appWidth+"px");
+                if ($("#ApioApplicationContainer").css('display') == 'none') {
+                    $("#ApioApplicationContainer").show({
+                        direction: 'right'
+                    }, 1, function() {
+                        window.scroll(0, 0);
+                        //alert(document.getElementById('ApioApplicationContainer').style.height);
+                        document.getElementById('ApioApplicationContainer').style.height = ""+(window.innerHeight+500)+"px !important";
+                        $("#ApioApplicationContainer").css("overflowY", "scroll");
+                        //alert(document.getElementById('ApioApplicationContainer').style.height);
+                        
+
+                        //history.pushState({},'/events','/events')
+                        $scope.$apply();
+                    });
+                }
+
+
+            });
+
+        });
+    }
+
     $scope.launchApplication = function(id) {
         
        objectService.getById(id).then(function(d) {
@@ -184,7 +224,7 @@ angular.module('ApioApplication').controller('ApioHomeController',
     if ($routeParams.hasOwnProperty('application')) {
         console.log('Launching application '+$routeParams.application)
         setTimeout(function(){
-            $scope.launchApplication($routeParams.application);
+            $scope.launchApplicationSimple($routeParams.application);
         
         },500)
         

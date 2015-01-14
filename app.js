@@ -16,7 +16,7 @@ var targz = require('tar.gz');
 var formidable = require('formidable');
 
 var APIO_CONFIGURATION = {
-    port : 8083
+    port : 80
 }
 var ENVIRONMENT = "production";
 if (process.argv.indexOf('--no-serial') > -1)

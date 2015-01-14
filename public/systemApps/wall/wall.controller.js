@@ -4,6 +4,7 @@ angular.module('ApioApplication').controller('ApioWallController', ['$scope', '$
         $("#ApioApplicationContainer").hide(function(){
             $("#ApioApplicationContainer").html("");
         });
+        $("#notificationsCenter").slideUp(500);
 
         //Reset handlers
         $("#ApioApplicationContainer").off("touchstart");
