@@ -606,8 +606,14 @@ Apio.Database.getMaximumObjectId = function(callback){
 			console.log('Apio.Database.getMaximumObjectId() failed to fetch maximum objectId');
 		}
 		else{
-	    	console.log('Recoverder as maximum id: ' + doc.objectId);
-	    	result = doc.objectId;
+			if(doc===null){
+				console.log('No maximum id. Return 1');;
+				result='0';
+			}
+			else{
+	    		console.log('Recoverder as maximum id: ' + doc.objectId);
+	    		result = doc.objectId;
+	    	}
 		}
 		callback(error,result);
 	});

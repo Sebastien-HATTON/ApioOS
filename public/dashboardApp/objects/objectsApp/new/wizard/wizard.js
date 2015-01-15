@@ -8,9 +8,16 @@ angular.module('ApioDashboardApplication')
 
   this.saveFamily = function(family){
     $scope.newObject.microFamily=family.family;
+    if(family.family!=='Apio')
+      $scope.newObject.protocol='';
     console.log('$scope.newObject.microFamily '+$scope.newObject.microFamily);
   };
   this.saveType = function(type){
+    if(type.type==='General')
+      $scope.newObject.protocol='l';
+    else
+      $scope.newObject.protocol='';
+    
     $scope.newObject.microType=type.type;
     $scope.newObject.availablePins=type.pins
     console.log('pins:')
