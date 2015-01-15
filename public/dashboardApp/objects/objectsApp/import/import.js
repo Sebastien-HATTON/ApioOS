@@ -5,7 +5,10 @@ angular.module('ApioDashboardApplication')
             queueLimit : 1,
             onSuccessItem : function(item, response, status, headers) {
             	$state.go('objects.objectsLaunch',{'reload':true});
-            	
+            	console.log('response: ')
+            	console.log(response)
+            	alert('Application successfully uploaded! Keep in mind to deactivate the popup block to enable the firmware automatic download.')
+            	window.open('/apio/app/exportIno?id='+response.id);            	
             }
         });	
 }]);

@@ -488,6 +488,7 @@ module.exports = {
 	                                fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/Makefile',object.makefile);
 	                                //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
 	                                deleteFolderRecursive('upload');
+	                                res.send({id:dummy});
 	                            }
 	                        });
 	                    }
@@ -499,7 +500,6 @@ module.exports = {
 
 	        form.parse(req, function(err, fields, files) {
 	          console.log('received upload:\n\n');
-	          res.send(200);
 	        });
 
 	    return;

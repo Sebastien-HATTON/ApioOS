@@ -593,33 +593,6 @@ Apio.Database.updateProperty = function(data,callback) {
 		});
 };
 
-/*
-Apio.Database.getMaximumObjectId = function(callback){
-
-	console.log('getMaximumObjectId');
-	var error = null;
-	var result = null;
-
-	var options = { "sort": [['objectId','desc']] };
-	Apio.Database.db.collection("Objects").findOne({}, options , function(err, doc) {
-		if(err){
-			error = 'Apio.Database.getMaximumObjectId() failed to fetch maximum objectId';
-			console.log('Apio.Database.getMaximumObjectId() failed to fetch maximum objectId');
-		}
-		else{
-			if(doc===null){
-				console.log('No maximum id. Return 1');;
-				result='0';
-			}
-			else{
-	    		console.log('Recoverder as maximum id: ' + doc.objectId);
-	    		result = doc.objectId;
-	    	}
-		}
-		callback(error,result);
-	});
-
-};*/
 Apio.Database.getMaximumObjectId = function(callback){
 
 	console.log('getMaximumObjectId');
