@@ -34,13 +34,9 @@
             </li>
             <li><a ui-sref="objects.objectsLaunch"><i class="fa fa-th" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Objects</span></a>
             </li>
-            <li><a ui-sref="events"><i class="fa fa-bell" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Events</span></a>
+            <li ng-click="switchToApioOS()"><a><i  class="fa fa-bell" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Apio OS</span></a>
             </li>
-            <li><a ui-sref="states"><i class="fa fa-check" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">States</span></a>
-            </li>
-            <li><a ui-sref="settings"><i class="fa fa-gear" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Settings</span></a>
-            </li>
-            <li><a ui-sref="documentation"><i class="fa fa-book" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Documentation</span></a>
+            <li><a href="http://www.apio.cc/en/wiki"><i class="fa fa-book" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Documentation</span></a>
             </li>
         </ul>
     </div>
@@ -51,20 +47,6 @@
     <div class="row">
       <div class="col-xs-12">
           <h2 style="text-align:center;"><i class="fa fa-code"></i> Developer Dashboard</h2>
-          <div class="icon_app" ng-click="switchToApioOS()">
-          <div class="pull-right" style="
-                            border: 1px solid #CCC;
-                            border-radius: 12px;
-                            height: 65px;
-                            width: 65px;
-                            background-size:100%;
-                            background-position:50%;
-                            margin-top:-40px;
-                            background-image: url(dashboardApp/icon/icon.png);
-                        ">
-           
-          </div>
-      </div>
     </div>
   </div>
     <!--this is where the code is injected-->

@@ -40,30 +40,16 @@ hasKeyValue
 */
 
 int exists(ApioList lista, String key, String value, int mode) {
-	ApioList cursor;
-	cursor = lista;
-
-	while (cursor != 0 && cursor->next != 0) {
-		if (cursor->key == key && cursor->value == value){
-                     if(mode==1){
-                       if(actual==cursor->value.toInt())
-                       {
-                         actual=-1;
-                         return 0;
-                       }
-                       else
-                       {
-                         actual=value.toInt();
-                         return 1;
-                       }
-                       
-                     }
-			return 1;
-                }
-		cursor = cursor->next;
-	}
-	return 0;
-} 
+    ApioList cursor;
+    cursor = lista;
+    while (cursor != 0 && cursor->next != 0) {
+        if (cursor->key == key && cursor->value == value){
+            return 1;
+               }
+        cursor = cursor->next;
+    }
+    return 0;
+}
 
 
 void deleteItem(ApioList *lista, String key, String value) {

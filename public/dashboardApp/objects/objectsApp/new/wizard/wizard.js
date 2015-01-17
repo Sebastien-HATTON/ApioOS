@@ -409,6 +409,7 @@ angular.module('ApioDashboardApplication')
         this.ino+='ApioList '+objectToParse.properties[key].name+'= new ApioListNode;\n';
         this.ino+='//You can use this variable for store the value of sensors\n';
         this.ino+='int '+objectToParse.properties[key].name+'Val;\n\n';
+        this.ino+='String lastValue = "";\n';
       }
      }
      for(key in objectToParse.pins){
@@ -446,8 +447,9 @@ angular.module('ApioDashboardApplication')
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type=="Sensor"){
         this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
+        this.ino+='if (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n\t';
         this.ino+='\n\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
-        this.ino+='\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t}\n';
+        this.ino+='\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t}}\n';
       }
     }
      for(key in objectToParse.properties)
@@ -491,7 +493,7 @@ angular.module('ApioDashboardApplication')
        }
        else if(objectToParse.properties[key].type=="Sensor")
        {
-        this.ino+='\t\tif(value="/"){\n';
+        this.ino+='\t\tif(value=="/"){\n';
         this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n'
         this.ino+='\t\t} else if(!exists('+objectToParse.properties[key].name+', property, value, 0)){\n';
         this.ino+='\t\t\t\tinsert(&'+objectToParse.properties[key].name+', property, value);\n';
