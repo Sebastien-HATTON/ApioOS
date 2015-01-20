@@ -458,16 +458,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
   CropArea.prototype.processMouseUp=function() {};
 
-  CropArea.prototype.setCenterPoint = function (point) {
-    var s = this.getSize();
-    this.setSize({x: point.x - s.w / 2, y: point.y - s.h / 2, w: s.w, h: s.h});
-  };
-  
-  CropArea.prototype.getCenterPoint = function () {
-    var s = this.getSize();
-    return {x: s.x + (s.w / 2), y: s.y + (s.h / 2) };
-  };
-
   return CropArea;
 }]);
 
