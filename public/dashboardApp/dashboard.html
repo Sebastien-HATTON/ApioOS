@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/marketcloud-dashboard-sidebar.css">
 
     <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-    <link href="bower_components/ngImgCrop/compile/minified/ng-img-crop.css" rel="stylesheet" />
+    <link href="javascripts/ngImgCrop_theBliz/ng-img-crop.css" rel="stylesheet" />
     <style>
       .cropArea {
         background: #E4E4E4;
@@ -34,7 +34,7 @@
             </li>
             <li><a ui-sref="objects.objectsLaunch"><i class="fa fa-th" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Objects</span></a>
             </li>
-            <li ng-click="switchToApioOS()"><a><i  class="fa fa-bell" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Apio OS</span></a>
+            <li><a ng-click="switchToApioOS()" href=""><i  class="fa fa-bell" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Apio OS</span></a>
             </li>
             <li><a href="http://www.apio.cc/en/wiki"><i class="fa fa-book" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Documentation</span></a>
             </li>
@@ -67,7 +67,7 @@
 <script src="/javascripts/jquery-cron/cron/jquery-cron.js"></script>
 
 <script type="text/javascript" src="/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
-<script type="text/javascript" src="/bower_components/ngImgCrop/compile/unminified/ng-img-crop.js"></script>
+<script type="text/javascript" src="/javascripts/ngImgCrop_theBliz/ng-img-crop.js"></script>
 
 
 <script src="/dashboardApp/dashboard.bundle.js"></script>

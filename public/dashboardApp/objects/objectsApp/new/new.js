@@ -33,7 +33,6 @@ angular.module('ApioDashboardApplication')
 	  reader.readAsDataURL(file);
 	};
 
-
 	$scope.currentApplication=$scope.$parent.currentApplication;
 	$scope.hideWizard=true;
 	$scope.hideNewEditor=true;

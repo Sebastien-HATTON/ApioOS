@@ -21,7 +21,7 @@
     <div class="form-group">
       <label for="objectIcon" class="col-sm-2 control-label">Icon</label>
       <div class="col-sm-10">
-        <div>Select an image file: <input type="file" id="fileInput" ng-model="fileName" onchange="angular.element(this).scope().handleFileSelect(event)"/></div>
+        <div>Select an image file: <input type="file" id="fileInput" onchange="angular.element(this).scope().handleFileSelect(event)"/></div>
         <div class="cropArea">
           <img-crop change-on-fly="true" image="myImage" result-image="myCroppedImage"></img-crop>
 

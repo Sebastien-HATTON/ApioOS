@@ -102,8 +102,7 @@ angular.module('ApioDashboardApplication')
               }
           ]
 
-      },
-      {
+      },{
           "id" : "1",
           "family" : "Arduino",
           "types" : [
@@ -130,7 +129,6 @@ angular.module('ApioDashboardApplication')
           ]
       }
   ];
-
 
   this.doneForm = function(isValid){
     var self = this;
@@ -170,8 +168,6 @@ angular.module('ApioDashboardApplication')
        
       });
   }; 
-
-
 
   this.makeForm = function(isValid){
     console.log('makeForm');

@@ -151,9 +151,10 @@ angular.module('ApioDashboardApplication')
       });
   };
 
+  
   this.sendFilesToServer = function(){
     //$scope.icon=$scope.$parent.icon;
-    $scope.icon=$scope.$parent.myCroppedImage;
+    var icon=$scope.$parent.myCroppedImage;
     console.log($scope.icon)
 
     $scope.createIsDisabled = true;
@@ -176,7 +177,7 @@ angular.module('ApioDashboardApplication')
       console.log('mongoObject Id: '+mongoObject.objectId)
       console.log('mongoObject Id: '+dao.objectId)
     }
-    $http.post('/apio/database/createNewApioApp',{object : dao, ino : $scope.ino, html : $scope.html, js : $scope.js, mongo : $scope.mongo, makefile : $scope.makefile, icon: $scope.icon})
+    $http.post('/apio/database/createNewApioApp',{object : dao, ino : $scope.ino, html : $scope.html, js : $scope.js, mongo : $scope.mongo, makefile : $scope.makefile, icon: icon})
       .success(function(){
         //$scope.switchPage('Objects');
         //$('#objectIdTrigger').trigger('click');        
