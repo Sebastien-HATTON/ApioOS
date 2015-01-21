@@ -304,9 +304,11 @@ angular.module('ApioDashboardApplication')
      this.html+=objectToParse.objectId +'" ng-app="ApioApplication' + objectToParse.objectId + '"  style="padding:10px;">\n';
      this.html+='\t<div ng-controller="defaultController">\n';
      this.html+='\t<topappapplication></topappapplication>\n';
-     var buttonEmpty = '';
+     this.html+='\t<div id="app" style="display:block;">\n';
+     var buttonEmpty;
      
      for(key in objectToParse.properties){
+      buttonEmpty = '';
       if(objectToParse.properties[key].type.toLowerCase()==='button'){
         //only button has the "apio" string on the beginning
         buttonEmpty = 'apio';
@@ -333,6 +335,7 @@ angular.module('ApioDashboardApplication')
 
      };
      this.html+='\t</div>\n';
+     this.html+='</div>\n';
      this.html+='</div>\n';
      this.html+='<script src="applications/' + objectToParse.objectId + '/' + objectToParse.objectId + '.js"></script>';
   };
