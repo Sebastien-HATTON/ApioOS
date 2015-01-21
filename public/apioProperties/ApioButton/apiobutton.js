@@ -10,6 +10,7 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
 	    link: function(scope, elem, attrs){
 	    	scope.object = currentObject.get();
 	    	scope.currentObject = currentObject;
+            scope.vale = attrs["value"] ? attrs["value"] : 1;
 	    	scope.isRecorded = function() {
 	    		return scope.currentObject.record(attrs['propertyname']);
 	    	}
@@ -59,7 +60,12 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
 		    		//
 	
 					//Se è stato definito un listener da parte dell'utente lo eseguo altrimenti richiamo currentObject.update che invia i dati al DB e alla seriale
-					scope.$parent.$eval(attrs["listener"]);
+                    if(attrs["listener"]){
+                        scope.$parent.$eval(attrs["listener"]);
+                    }
+                    else{
+                        currentObject.update(attrs["propertyname"], scope.value);
+                    }
 					//
 					
 					//Se è stata definita una correlazione da parte dell'utente la eseguo
