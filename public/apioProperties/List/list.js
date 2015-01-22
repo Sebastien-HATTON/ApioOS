@@ -74,13 +74,13 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 	    	if(attrs.hasOwnProperty("arraylist")){
 				scope.arr = currentObject.JSONToArray(scope.object.db[attrs["propertyname"]]);
 				scope.isValid = function(x){
-					return typeof x !== "undefined" ? true : false;
+					return typeof x !== "undefined";
 				};
 			}
 	    	else{
 				scope.arr = scope.object.db[attrs["propertyname"]];
 			}
-			scope.isArray = scope.arr instanceof Array ? true : false;
+			scope.isArray = scope.arr instanceof Array;
 	    	scope.label = attrs["label"];
 	    	scope.model = scope.isArray ? parseInt(scope.object.properties[attrs["propertyname"]]) : scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
