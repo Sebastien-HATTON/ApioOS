@@ -228,6 +228,7 @@ angular.module('ApioDashboardApplication')
   this.parserTable = function(objectToParse){
 
   };
+  
 
   this.parserMakefile = function(objectToParse){
     this.makefile = 'BOARD_TAG = ' + objectToParse.microType +'\n';
@@ -446,6 +447,11 @@ angular.module('ApioDashboardApplication')
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type=="Sensor"){
         this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
+        for(keyPin in objectToParse.pins){
+        	if(objectToParse.pins[keyPin].propertyType === 'Sensor' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
+        		this.ino+= '\t'+objectToParse.properties[key].name+'Val = analogRead('+objectToParse.pins[keyPin].name+');\n'
+        	}
+        }
         this.ino+='if (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n\t';
         this.ino+='\n\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
         this.ino+='\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t}}\n';
