@@ -106,8 +106,8 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
             }
             //
 
-            var event = attrs["event"] ? attrs["event"] : "mouseup touchend";
-	    	elem.on(event, function(){
+        var event = attrs["event"] ? attrs["event"] : "mouseup touchend";
+	    	elem.on(event, function($event){
 	    		//Aggiorna lo scope globale con il valore che è stato modificato nel template
 				scope.object.properties[attrs["propertyname"]] = scope.model;
 
@@ -120,7 +120,16 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 						scope.$parent.$eval(attrs["listener"]);
 					}
 					else{
-						currentObject.update(attrs["propertyname"], scope.model);
+						if (attrs["updatedataonce"] && event == 'input') {
+							console.log("Syncing with serial only");
+							currentObject.update(attrs["propertyname"], scope.model,false,true);
+							//scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
+						} else{
+							console.log("Syncing with database and serial");
+							
+							currentObject.update(attrs["propertyname"], scope.model);
+						}
+						
 						scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 					}
 					//
@@ -133,9 +142,16 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 
 					 //Esegue codice javascript contenuto nei tag angular; dovendo modificare i valori dell'input bisogna dare a scope.$apply la funzione read
 					scope.$apply(read);
-					//
+						
 	    		}	
 			});
+			elem.on('mouseup touchend',function($event){
+				if (attrs["updatedataonce"] && event == 'input') {
+					console.log("Syncing with database only");
+					currentObject.update(attrs["propertyname"], scope.model,true,false);
+					//scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
+				}
+			})
 		    
 
 		    //
