@@ -409,7 +409,7 @@ angular.module('ApioDashboardApplication')
         this.ino+='ApioList '+objectToParse.properties[key].name+'= new ApioListNode;\n';
         this.ino+='//You can use this variable for store the value of sensors\n';
         this.ino+='int '+objectToParse.properties[key].name+'Val;\n\n';
-        this.ino+='String lastValue = "";\n';
+        this.ino+='String lastValue'+objectToParse.properties[key].name+' = "";\n';
       }
      }
      for(key in objectToParse.pins){
@@ -445,16 +445,16 @@ angular.module('ApioDashboardApplication')
        this.ino+="\tapioLoop();\n";
      }
     for(key in objectToParse.properties){
-      if(objectToParse.properties[key].type=="Sensor"){
+      if(objectToParse.properties[key].type=="Sensor"){ 
         this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
         for(keyPin in objectToParse.pins){
         	if(objectToParse.pins[keyPin].propertyType === 'Sensor' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
         		this.ino+= '\t'+objectToParse.properties[key].name+'Val = analogRead('+objectToParse.pins[keyPin].name+');\n'
         	}
         }
-        this.ino+='if (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n\t';
-        this.ino+='\n\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
-        this.ino+='\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t}}\n';
+        this.ino+='\tif (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n';
+        this.ino+='\t\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
+        this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t\t}\n\t}\n';
       }
     }
      for(key in objectToParse.properties)
