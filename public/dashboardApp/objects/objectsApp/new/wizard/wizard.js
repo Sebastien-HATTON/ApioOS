@@ -317,13 +317,13 @@ angular.module('ApioDashboardApplication')
       this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
       
       if(objectToParse.properties[key].type.toLowerCase()==='trigger'){
-        this.html+='labelon="'+ objectToParse.properties[key].onLabel +'" labeloff="'+ objectToParse.properties[key].offLabel +'">';
+        this.html+='labelon="'+ objectToParse.properties[key].onLabel +'" labeloff="'+ objectToParse.properties[key].offLabel +'" valueon="'+objectToParse.properties[key].on+'" valueoff="'+objectToParse.properties[key].off+'">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='slider'){
         this.html+='label="'+ objectToParse.properties[key].sliderLabel+'" min="' + objectToParse.properties[key].min + '" max="' + objectToParse.properties[key].max + '" step="' + objectToParse.properties[key].step + '">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='list'){
         this.html+='label="'+ objectToParse.properties[key].listLabel+'" >';
       }else if(objectToParse.properties[key].type.toLowerCase()==='button'){
-        this.html+='label="'+ objectToParse.properties[key].buttonLabel+'" innertext= "'+objectToParse.properties[key].buttonLabel+'">';
+        this.html+='label="'+ objectToParse.properties[key].buttonLabel+'" innertext= "'+objectToParse.properties[key].buttonInnerText+'" value="'+objectToParse.properties[key].defaultValue+'">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='number'){
         this.html+='label="'+ objectToParse.properties[key].numberLabel+'">';
       }else if(objectToParse.properties[key].type.toLowerCase()==='text'){
