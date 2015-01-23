@@ -265,6 +265,16 @@ angular.module('ApioDashboardApplication')
     if((Object.keys(objectToParse.properties)).length!==0)
       this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
+    this.mongo += '"notifications": {\n';
+    for(key in objectToParse.properties){
+      if(objectToParse.properties[key].type.toLowerCase()==='physicalbutton'){
+        this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : {\n';
+        this.mongo += '\t\t\t"'+objectToParse.properties[key].PhysicalButtonValue+'" : "Button '+objectToParse.properties[key].name+' of '+objectToParse.objectName+' pressed"\n';
+        this.mongo += '\t\t},\n';
+      }
+    }
+    this.mongo = this.mongo.slice(0,this.mongo.length-2);
+    this.mongo += '},\n';
     this.mongo += '"db" : {\n';
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='list'){
@@ -314,25 +324,39 @@ angular.module('ApioDashboardApplication')
         //only button has the "apio" string on the beginning
         buttonEmpty = 'apio';
       }
-      this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
+      
       
       if(objectToParse.properties[key].type.toLowerCase()==='trigger'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='labelon="'+ objectToParse.properties[key].onLabel +'" labeloff="'+ objectToParse.properties[key].offLabel +'" valueon="'+objectToParse.properties[key].on+'" valueoff="'+objectToParse.properties[key].off+'">';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }else if(objectToParse.properties[key].type.toLowerCase()==='slider'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='label="'+ objectToParse.properties[key].sliderLabel+'" min="' + objectToParse.properties[key].min + '" max="' + objectToParse.properties[key].max + '" step="' + objectToParse.properties[key].step + '">';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }else if(objectToParse.properties[key].type.toLowerCase()==='list'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='label="'+ objectToParse.properties[key].listLabel+'" >';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }else if(objectToParse.properties[key].type.toLowerCase()==='button'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='label="'+ objectToParse.properties[key].buttonLabel+'" innertext= "'+objectToParse.properties[key].buttonInnerText+'" value="'+objectToParse.properties[key].defaultValue+'">';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }else if(objectToParse.properties[key].type.toLowerCase()==='number'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='label="'+ objectToParse.properties[key].numberLabel+'">';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }else if(objectToParse.properties[key].type.toLowerCase()==='text'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='label="'+ objectToParse.properties[key].textBuilderLabel+'">';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }else if(objectToParse.properties[key].type.toLowerCase()==='sensor'){
+        this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='label="'+ objectToParse.properties[key].sensorLabel+'">';
+        this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }
 
-      this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
+      
 
      };
      this.html+='\t</div>\n';
@@ -411,6 +435,10 @@ angular.module('ApioDashboardApplication')
         this.ino+='int '+objectToParse.properties[key].name+'Val;\n\n';
         this.ino+='String lastValue'+objectToParse.properties[key].name+' = "";\n';
       }
+      if(objectToParse.properties[key].type=="PhysicalButton"){
+        this.ino+='int '+objectToParse.properties[key].name+'Val =0;\n\n';
+      }
+
      }
      for(key in objectToParse.pins){
        //declare Pins type name = value
@@ -444,24 +472,12 @@ angular.module('ApioDashboardApplication')
      if(objectToParse.protocol=='z'){
        this.ino+="\tapioLoop();\n";
      }
-    for(key in objectToParse.properties){
-      if(objectToParse.properties[key].type=="Sensor"){ 
-        this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
-        for(keyPin in objectToParse.pins){
-        	if(objectToParse.pins[keyPin].propertyType === 'Sensor' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
-        		this.ino+= '\t'+objectToParse.properties[key].name+'Val = analogRead('+objectToParse.pins[keyPin].name+');\n'
-        	}
-        }
-        this.ino+='\tif (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n';
-        this.ino+='\t\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
-        this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t\t}\n\t}\n';
-      }
-    }
      for(key in objectToParse.properties)
      {
-       this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
+       
        if(objectToParse.properties[key].type=="Trigger")
        {
+        this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
         console.log(objectToParse.properties[key]);
          this.ino +='\t\tif(value=="'+objectToParse.properties[key].on+'"){\n';
          for(keyPin in objectToParse.pins){
@@ -477,27 +493,41 @@ angular.module('ApioDashboardApplication')
             }
          }
          this.ino += '\t\t\t//Do Something\n\t\t}\n';
+         this.ino += '\t}\n';
        }
        else if(objectToParse.properties[key].type=="List")
        {
+          this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
          for(keykey in objectToParse.properties[key].items)
          {
            this.ino +='\t\tif(value=="'+objectToParse.properties[key].items[keykey]+'"){\n';
            this.ino +='\t\t\t//Do Something\n\t\t}\n';
          }
+         this.ino += '\t}\n';
        }
        else if(objectToParse.properties[key].type=="Slider")
        {
+          this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
           for(keyPin in objectToParse.pins){
             if(objectToParse.pins[keyPin].propertyType === 'Slider' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
               this.ino += '\t\t\tanalogWrite('+objectToParse.pins[keyPin].name+',value.toInt());\n'
             }
          }
-          this.ino += '\t\t\t//Do Something\n\t\t';
+          this.ino += '\t}\n';
           
        }
        else if(objectToParse.properties[key].type=="Sensor")
        {
+        this.ino+='\t//Use the function for the read data from Sensor and save it in\n\t//'+objectToParse.properties[key].name+'Val\n ';
+        for(keyPin in objectToParse.pins){
+          if(objectToParse.pins[keyPin].propertyType === 'Sensor' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
+            this.ino+= '\t'+objectToParse.properties[key].name+'Val = analogRead('+objectToParse.pins[keyPin].name+');\n'
+          }
+        }
+        this.ino+='\tif (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n';
+        this.ino+='\t\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
+        this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t\t}\n\t}\n';
+        this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
         this.ino+='\t\tif(value=="/"){\n';
         this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n'
         this.ino+='\t\t} else if(!exists('+objectToParse.properties[key].name+', property, value, 0)){\n';
@@ -506,12 +536,27 @@ angular.module('ApioDashboardApplication')
         this.ino+='\t\t\tdeleteItem(&'+objectToParse.properties[key].name+', property, value);\n';
         this.ino+='\t\t\t}\n';
         this.ino+='\t\tproperty="";\n\t\t\n';
+        this.ino += '\t}\n';
+       }
+       else if(objectToParse.properties[key].type=="PhysicalButton")
+       {
+        for(keyPin in objectToParse.pins){
+          if(objectToParse.pins[keyPin].propertyType === 'PhysicalButton' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
+            this.ino+= '\t'+objectToParse.properties[key].name+'Val = digitalRead('+objectToParse.pins[keyPin].name+');\n'
+          }
+        }
+        this.ino+='\tif('+objectToParse.properties[key].name+'Val == HIGH){\n';
+        this.ino+='\t\tdelay(250);\n';
+        this.ino+='\t\tif('+objectToParse.properties[key].name+'Val == HIGH){\n';
+        this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':'+objectToParse.properties[key].PhysicalButtonValue+'-");\n\t\t}\n\t}\n';
        }
        else
        {
+        this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
          this.ino += '\t\t//Do Something\n\t';
+         this.ino += '\t}\n';
        }
-       this.ino += '\t}\n';       
+              
      }
      this.ino +="}";
     };
