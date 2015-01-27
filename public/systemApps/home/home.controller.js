@@ -58,6 +58,10 @@ angular.module('ApioApplication').controller('ApioHomeController',
         $scope.launchDashboard = function() {
             window.location = 'dashboard#/home'
         }
+
+        $scope.shutdown = function(){
+            $http.get('/apio/shutdown').success(function(){}).error(function(){});
+        };
         
 
         //Riferimento a tutti gli oggetti scaricati dal db

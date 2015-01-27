@@ -139,7 +139,18 @@ app.post('/apio/adapter',function(req,res){
 app.get("/dashboard",routes.dashboard.index);
 
 
-
+/*Shutdown*/
+    app.get('/apio/shutdown', function(req, res){
+        var sys = require('sys');
+        var exec = require('child_process').exec;
+        var child = exec("sudo shutdown -h now", function (error, stdout, stderr) {
+            //sys.print('stdout: '+stdout);
+            //sys.print('stderr: '+stderr);
+            if (error !== null) {
+                console.log('exec error: '+error);
+            }
+        });
+    });
 
 
 
