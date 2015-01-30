@@ -265,17 +265,20 @@ angular.module('ApioDashboardApplication')
     if((Object.keys(objectToParse.properties)).length!==0)
       this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
-    /*this.mongo += '"notifications": {\n';
+    this.mongo += '"notifications": {\n';
+    this.mongo += '"notifications": {\n';
+    var indexPhy=0;
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='physicalbutton'){
         this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : {\n';
         this.mongo += '\t\t\t"'+objectToParse.properties[key].PhysicalButtonValue+'" : "Button '+objectToParse.properties[key].name+' of '+objectToParse.objectName+' pressed"\n';
         this.mongo += '\t\t},\n';
+        indexPhy=indexPhy+1;
       }
     }
+    if(indexPhy!=0)
     this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
-    */
     this.mongo += '"db" : {\n';
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='list'){
