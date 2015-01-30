@@ -13,8 +13,6 @@ String valueArray[ARRAY_LENGTH];
 int numberkey=0;
 int j=0;
 
-
-char sendThis[109]; //if it does not work well declare local
 bool nwkDataReqBusy = false; 
 
 bool TX_has_gone; 
@@ -107,7 +105,7 @@ static void appDataConf(NWK_DataReq_t *req)
   }
   nwkDataReqBusy = false;
 
-  Serial1.println("");
+  //Serial1.println("");
   
 }
 
@@ -190,7 +188,8 @@ static bool apioReceive(NWK_DataInd_t *ind)
 void apioSend(String toSend)
 
 {
-  int len = toSend.length(); //if i use toSend.toCharArray() the packet does not arrive well
+  int len = toSend.length();
+  char sendThis[len];
   for(int g=0; g<len ;g++) 
   {
       sendThis[g]=toSend.charAt(g);
