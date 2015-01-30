@@ -266,7 +266,6 @@ angular.module('ApioDashboardApplication')
       this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
     this.mongo += '"notifications": {\n';
-    this.mongo += '"notifications": {\n';
     var indexPhy=0;
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='physicalbutton'){
