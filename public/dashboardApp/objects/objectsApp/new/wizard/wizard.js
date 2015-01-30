@@ -4,7 +4,7 @@ angular.module('ApioDashboardApplication')
   $scope.tab = 1;
   $scope.hide = false;
   this.progressBarValue = 0;
-  $scope.activeForm = 1;  
+  $scope.activeForm = 1;
 
   this.saveFamily = function(family){
     $scope.newObject.microFamily=family.family;
@@ -17,7 +17,7 @@ angular.module('ApioDashboardApplication')
       $scope.newObject.protocol='l';
     else
       $scope.newObject.protocol='';
-    
+
     $scope.newObject.microType=type.type;
     $scope.newObject.availablePins=type.pins
     console.log('pins:')
@@ -142,12 +142,12 @@ angular.module('ApioDashboardApplication')
         confirmButtonText: "Proceed to Apio Editor",
         cancelButtonText: "Stay on the Wizard",
         closeOnConfirm: false,
-        closeOnCancel: true 
-      }, 
-      function(isConfirm){   
-         if (isConfirm) { 
-          
-          //sweet.show("Done!", "Your wizard procedure is done. Proceed to The Apio editor", "success");   
+        closeOnCancel: true
+      },
+      function(isConfirm){
+         if (isConfirm) {
+
+          //sweet.show("Done!", "Your wizard procedure is done. Proceed to The Apio editor", "success");
           sweet.show({
                       title: "Done!",
                       text: "Your wizard procedure is done. Proceed to The Apio editor",
@@ -165,9 +165,9 @@ angular.module('ApioDashboardApplication')
                     });
 
         }
-       
+
       });
-  }; 
+  };
 
   this.makeForm = function(isValid){
     console.log('makeForm');
@@ -204,7 +204,7 @@ angular.module('ApioDashboardApplication')
       this.selectTab($scope.activeForm);
     };
   };
-  
+
   this.previousForm = function(){
     this.progressBarValue -= 20;
     console.log('progressBarValue: '+ this.progressBarValue);
@@ -228,7 +228,7 @@ angular.module('ApioDashboardApplication')
   this.parserTable = function(objectToParse){
 
   };
-  
+
 
   this.parserMakefile = function(objectToParse){
     this.makefile = 'BOARD_TAG = ' + objectToParse.microType +'\n';
@@ -256,7 +256,7 @@ angular.module('ApioDashboardApplication')
           break
         };
       }else{
-        this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : "'+objectToParse.properties[key].defaultValue+'",\n';   
+        this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : "'+objectToParse.properties[key].defaultValue+'",\n';
       }
 
     }
@@ -265,7 +265,7 @@ angular.module('ApioDashboardApplication')
     if((Object.keys(objectToParse.properties)).length!==0)
       this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
-    this.mongo += '"notifications": {\n';
+    /*this.mongo += '"notifications": {\n';
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='physicalbutton'){
         this.mongo += '\t\t"'+objectToParse.properties[key].name+'" : {\n';
@@ -275,6 +275,7 @@ angular.module('ApioDashboardApplication')
     }
     this.mongo = this.mongo.slice(0,this.mongo.length-2);
     this.mongo += '},\n';
+    */
     this.mongo += '"db" : {\n';
     for(key in objectToParse.properties){
       if(objectToParse.properties[key].type.toLowerCase()==='list'){
@@ -317,15 +318,15 @@ angular.module('ApioDashboardApplication')
      this.html+='\t<topappapplication></topappapplication>\n';
      this.html+='\t<div id="app" style="display:block;">\n';
      var buttonEmpty;
-     
+
      for(key in objectToParse.properties){
       buttonEmpty = '';
       if(objectToParse.properties[key].type.toLowerCase()==='button'){
         //only button has the "apio" string on the beginning
         buttonEmpty = 'apio';
       }
-      
-      
+
+
       if(objectToParse.properties[key].type.toLowerCase()==='trigger'){
         this.html+='\t\t\t<' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() +' propertyname="' + objectToParse.properties[key].name + '" ';
         this.html+='labelon="'+ objectToParse.properties[key].onLabel +'" labeloff="'+ objectToParse.properties[key].offLabel +'" valueon="'+objectToParse.properties[key].on+'" valueoff="'+objectToParse.properties[key].off+'">';
@@ -356,7 +357,7 @@ angular.module('ApioDashboardApplication')
         this.html+='</' + buttonEmpty + objectToParse.properties[key].type.toLowerCase() + '>\n';
       }
 
-      
+
 
      };
      this.html+='\t</div>\n';
@@ -442,7 +443,7 @@ angular.module('ApioDashboardApplication')
      }
      for(key in objectToParse.pins){
        //declare Pins type name = value
-       this.ino += "int "+objectToParse.pins[key].name+"="+objectToParse.pins[key].number+";\n";  
+       this.ino += "int "+objectToParse.pins[key].name+"="+objectToParse.pins[key].number+";\n";
      }
      this.ino += "void setup() {\n";
      if(objectToParse.microType=="General")
@@ -474,7 +475,7 @@ angular.module('ApioDashboardApplication')
      }
      for(key in objectToParse.properties)
      {
-       
+
        if(objectToParse.properties[key].type=="Trigger")
        {
         this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
@@ -514,7 +515,7 @@ angular.module('ApioDashboardApplication')
             }
          }
           this.ino += '\t}\n';
-          
+
        }
        else if(objectToParse.properties[key].type=="Sensor")
        {
@@ -556,7 +557,7 @@ angular.module('ApioDashboardApplication')
          this.ino += '\t\t//Do Something\n\t';
          this.ino += '\t}\n';
        }
-              
+
      }
      this.ino +="}";
     };

@@ -88,14 +88,16 @@ Apio.Util.ApioToJSON = function(str) {
 	var mess = match[4];
 		obj.properties = {};
 	mess = mess.split("-");
-	mess.pop();
-	mess.forEach(function(e){
-		console.log("Prima di splittare "+e);
+	//mess.pop();
+	//mess.forEach(function(e){
+		//newline
+		e = mess[0]; //Ignoring everything after the "-" character
+		console.log("Prima di splittare la stringa codificata"+e);
 		var t = e.split(":");
-		console.log("Dopo aver splittato");
+		console.log("Dopo aver splittato la stringa codificata");
 		console.log(t);
 		obj.properties[t[0]] = t[1];
-	});
+	//});
 
 	return obj;
 };
@@ -579,7 +581,8 @@ Apio.Database.updateProperty = function(data,callback) {
 		//db.collection("Objects").update({"objectId" : objectId},{ "$set" : packagedUpdate},function(error) {
 			Apio.Database.db.collection("Objects").findAndModify({"objectId" : objectId},[["name",1]],{ "$set" : packagedUpdate},function(err,result){
 			if(err) {
-				Apio.Util.debug("Apio.Database.updateProperty() encountered an error while trying to update the property on the database: "+error);
+				Apio.Util.debug("Apio.Database.updateProperty() encountered an error while trying to update the property on the database: ");
+				console.log(err)
 				throw new Apio.Database.Error("Apio.Database.updateProperty() encountered an error while trying to update the property on the database");
 			}
 			else if (null === result) {
