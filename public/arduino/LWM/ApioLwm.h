@@ -10,6 +10,8 @@ String property; // variables that are to be processed in the running loop
 String value;  // variables that are to be processed in the running loop
 String propertyArray[ARRAY_LENGTH];
 String valueArray[ARRAY_LENGTH];
+
+char sendThis[100];
 int numberkey=0;
 int j=0;
 
@@ -189,7 +191,7 @@ void apioSend(String toSend)
 
 {
   int len = toSend.length();
-  char sendThis[len];
+  
   for(int g=0; g<len ;g++) 
   {
       sendThis[g]=toSend.charAt(g);

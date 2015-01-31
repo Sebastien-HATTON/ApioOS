@@ -200,7 +200,7 @@ Apio.Serial.init = function() {
 
 		                        var tokens = serialString.split(":");
 		                        //Se la serialString è da meno di 4 token significa che non è wellformed (fatta bene)
-		                        if (tokens.length >= 4) {
+		                        if (tokens.length >= 2) {
 		                        	//Impacchetto la stringa ricevuta da seriale in un oggetto
 			                       	var dataObject = Apio.Util.ApioToJSON(serialString);
 
