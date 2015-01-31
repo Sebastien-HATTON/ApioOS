@@ -456,6 +456,7 @@ angular.module('ApioDashboardApplication')
      {
        //initialize LWM
        this.ino += "\tapioSetup("+objectToParse.address+");\n";
+       this.ino += '\tapioSend("'+objectToParse.address+':hi::-");\n';
 
      }else if(objectToParse.protocol=='z'){
        //initialize XBee

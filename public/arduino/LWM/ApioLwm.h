@@ -221,6 +221,8 @@ void apioSetup(uint16_t objectAddress)
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, apioReceive);
+  SYS_TaskHandler();
+  delay(500);
 
 }
 
