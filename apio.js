@@ -546,7 +546,7 @@ Apio.Database = {};
 //TODO carica dati da un file di configurazione, insieme ai dati della seriale ecc..
 Apio.Database.Configuration = {
 	hostname : "127.0.0.1",
-	database : "apio2",
+	database : "apio",
 	port : "27017"
 };
 /*
