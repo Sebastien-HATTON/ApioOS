@@ -109,7 +109,7 @@
 
 		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatiScatenati'">
 			<h1 style="text-align: center;">Selezione Stati scatenati</h1>
-			<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
+			<div ng-if="$parent.newEvent.triggerState != state.name" class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
 				<input type="checkbox" name="all_guestslistOfGuests" ng-click="checkedModel(state)" class="elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
 				<li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
 				<li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
