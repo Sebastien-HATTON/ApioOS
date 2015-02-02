@@ -88,8 +88,8 @@ Apio.Util.ApioToJSON = function(str) {
 	var mess = match[4];
 		obj.properties = {};
 	mess = mess.split("-");
-	//mess.pop();
-	//mess.forEach(function(e){
+	mess.pop();
+	mess.forEach(function(e){
 		//newline
 		var e = mess[0]; //Ignoring everything after the "-" character
 		console.log("Prima di splittare la stringa codificata"+e);
@@ -97,7 +97,7 @@ Apio.Util.ApioToJSON = function(str) {
 		console.log("Dopo aver splittato la stringa codificata");
 		console.log(t);
 		obj.properties[t[0]] = t[1];
-	//});
+	});
 
 	return obj;
 };
