@@ -77,7 +77,7 @@ Apio.Util.JSONToApio = function(obj) {
 */
 Apio.Util.ApioToJSON = function(str) {
 	//var regex = /(.[a-z0-9])*\:([a-z0-9]*\:[a-z0-9]*\-).*/gi;
-	var regex = /([lz])?(\w+)\:(send|update|register+)?\:?([\w+\:\w+\-]+)/;
+	var regex = /([lz])?(\w+)\:(send|update|hi|register+)?\:?([\w+\:\w+\-]+)/;
 	var match = regex.exec(str);
 	var obj = {};
 	if (Apio.Util.isSet(match[1]))
@@ -201,6 +201,7 @@ Apio.Serial.init = function() {
 		                        var tokens = serialString.split(":");
 		                        //Se la serialString è da meno di 4 token significa che non è wellformed (fatta bene)
 		                        if (tokens.length >= 4) {
+                                //if (tokens.length >= 1) {
 		                        	//Impacchetto la stringa ricevuta da seriale in un oggetto
 			                       	var dataObject = Apio.Util.ApioToJSON(serialString);
 
@@ -506,7 +507,25 @@ Apio.Serial.read = function(data) {
 				Apio.io.emit('apio_server_update',data);
 			});
 		break;
-		case "registration":
+		case "hi":
+            console.log("Ho riconosciuto la parola chiave hi");
+            console.log("L'indirizzo fisico dell'oggetto che si è appena connesso è "+data.objectId);
+            Apio.Database.db.collection('Objects').findOne({address : data.objectId},function(err,document){
+                if(err){
+                    console.log("non esiste un oggetto con address "+data.objectId);
+                }
+                else{
+                    console.log("l'oggetto con address "+data.objectId+" è "+document.objectId);
+                    var notifica = {
+                        objectId : document.objectId,
+                        objectName : document.name,
+                        message : document.name+" is now online",
+                        properties : 'online',
+                        timestamp : new Date().getTime()
+                    };
+                    Apio.System.notify(notifica);
+                }
+			});
 			//TODO
 		break;
 		default :
@@ -527,7 +546,7 @@ Apio.Database = {};
 //TODO carica dati da un file di configurazione, insieme ai dati della seriale ecc..
 Apio.Database.Configuration = {
 	hostname : "127.0.0.1",
-	database : "apio",
+	database : "apio2",
 	port : "27017"
 };
 /*
@@ -1022,65 +1041,71 @@ Apio.System.checkEvent = function(state) {
 
 }*/
 Apio.System.notify = function(notification,callback) {
-	var areJSONsEqual = function(a, b) {
-		function check(a, b) {
-			for (var attr in a) {
-				if (attr !== "timestamp" && a.hasOwnProperty(attr) && b.hasOwnProperty(attr)) {
-					if (a[attr] != b[attr]) {
-						switch (a[attr].constructor) {
-							case Object:
-								return areJSONsEqual(a[attr], b[attr]);
-							case Function:
-								if (a[attr].toString() != b[attr].toString()) {
-									return false;
-								}
-								break;
-							default:
-								return false;
-						}
-					}
-				} else {
-					return false;
-				}
-			}
-			return true;
-		}
-		return check(a, b) && check(b, a);
-	};
+    var areJSONsEqual = function (a, b) {
+        function check(a, b) {
+            for (var attr in a) {
+                if (attr !== "timestamp" && a.hasOwnProperty(attr) && b.hasOwnProperty(attr)) {
+                    if (a[attr] != b[attr]) {
+                        switch (a[attr].constructor) {
+                            case Object:
+                                return areJSONsEqual(a[attr], b[attr]);
+                            case Function:
+                                if (a[attr].toString() != b[attr].toString()) {
+                                    return false;
+                                }
+                                break;
+                            default:
+                                return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-	//Notifica a tutti gli utenti di un evento
-	//Questo viene fatto inviando una notifica ai client attivi
-	console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
-	notification.timestamp = (new Date()).getTime();
-	console.log(notification);
-	Apio.Database.db.collection("Users").find().toArray(function(err, data){
-		if(err){
-			console.log("Errore: "+err);
-		}
-		else {
-			for (var i in data) {
-				var flag = false;
-				for (var j in data[i].disabled_notification) {
-					if (typeof data[i].disabled_notification !== "undefined" && data[i].disabled_notification.length > 0 && areJSONsEqual(data[i].disabled_notification[j], notification)) {
-						flag = true;
-						break;
-					}
-				}
-				if (!flag) {
-					Apio.Database.db.collection('Users').update({"email": data[i].email}, {$push: {"unread_notifications": notification}}, function (err, data) {
-						if (err)
-							console.log("Apio.System.notify Error, unable to send the notification");
-						else {
-							console.log("Emitto la notifica");
-							Apio.io.emit('apio_notification', notification);
-							if (callback)
-								callback();
-						}
-					});
-				}
-			}
-		}
-	});
+        return check(a, b) && check(b, a);
+    };
+
+    //Notifica a tutti gli utenti di un evento
+    //Questo viene fatto inviando una notifica ai client attivi
+    console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
+    notification.timestamp = (new Date()).getTime();
+    console.log(notification);
+    if(notification.properties=="online") {
+        Apio.io.emit('apio_notification', notification);
+    }
+	else{
+        Apio.Database.db.collection("Users").find().toArray(function (err, data) {
+            if (err) {
+                console.log("Errore: " + err);
+            }
+            else {
+                for (var i in data) {
+                    var flag = false;
+                    for (var j in data[i].disabled_notification) {
+                        if (typeof data[i].disabled_notification !== "undefined" && data[i].disabled_notification.length > 0 && areJSONsEqual(data[i].disabled_notification[j], notification)) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (!flag) {
+                        Apio.Database.db.collection('Users').update({"email": data[i].email}, {$push: {"unread_notifications": notification}}, function (err, data) {
+                            if (err)
+                                console.log("Apio.System.notify Error, unable to send the notification");
+                            else {
+                                console.log("Emitto la notifica");
+                                Apio.io.emit('apio_notification', notification);
+                                if (callback)
+                                    callback();
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
 };
 
 Apio.System.jobs = {};
