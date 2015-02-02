@@ -77,7 +77,7 @@ Apio.Util.JSONToApio = function(obj) {
 */
 Apio.Util.ApioToJSON = function(str) {
 	//var regex = /(.[a-z0-9])*\:([a-z0-9]*\:[a-z0-9]*\-).*/gi;
-	var regex = /([lz])?(\w+)\:(send|update|hi|register+)?\:?([\w+\:\w+\-]+)/;
+	var regex = /([lz])?(\w+)\:(send|update|register+)?\:?([\w+\:\w+\-]+)/;
 	var match = regex.exec(str);
 	var obj = {};
 	if (Apio.Util.isSet(match[1]))
@@ -88,16 +88,16 @@ Apio.Util.ApioToJSON = function(str) {
 	var mess = match[4];
 		obj.properties = {};
 	mess = mess.split("-");
-	mess.pop();
-	mess.forEach(function(e){
+	//mess.pop();
+	//mess.forEach(function(e){
 		//newline
-		e = mess[0]; //Ignoring everything after the "-" character
+		var e = mess[0]; //Ignoring everything after the "-" character
 		console.log("Prima di splittare la stringa codificata"+e);
 		var t = e.split(":");
 		console.log("Dopo aver splittato la stringa codificata");
 		console.log(t);
 		obj.properties[t[0]] = t[1];
-	});
+	//});
 
 	return obj;
 };
@@ -200,7 +200,7 @@ Apio.Serial.init = function() {
 
 		                        var tokens = serialString.split(":");
 		                        //Se la serialString è da meno di 4 token significa che non è wellformed (fatta bene)
-		                        if (tokens.length >= 1) {
+		                        if (tokens.length >= 4) {
 		                        	//Impacchetto la stringa ricevuta da seriale in un oggetto
 			                       	var dataObject = Apio.Util.ApioToJSON(serialString);
 
@@ -506,28 +506,8 @@ Apio.Serial.read = function(data) {
 				Apio.io.emit('apio_server_update',data);
 			});
 		break;
-		case "hi":
+		case "registration":
 			//TODO
-			console.log("Ho riconosciuto la parola chiave hi");
-			console.log("L'indirizzo fisico dell'oggetto che si è appena connesso è "+data.objectId);
-			Apio.Database.db.collection('Objects').findOne({address : data.objectId},function(err,document){
-				if(err)
-				{
-					console.log("non esiste un oggetto con address "+data.objectId);
-				}
-				else
-				{
-					console.log("l'oggetto con address "+data.objectId+" è "+document.objectId);
-					var notifica = {
-						objectId : document.objectId,
-						objectName : document.name,
-						message : document.name+" is now online",
-						properties : 'online',
-						timestamp : new Date().getTime()
-					};
-					Apio.System.notify(notifica);
-				}
-			});
 		break;
 		default :
 			//Il
@@ -1073,14 +1053,6 @@ Apio.System.notify = function(notification,callback) {
 	console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
 	notification.timestamp = (new Date()).getTime();
 	console.log(notification);
-	//DA SPOSTARE
-	//C'è un bug nella funzione jsonEqual metto questa qua per vedere come funziona e perchè ci 
-	//devo lavorare
-	if(notification.properties=="online")
-	{
-		Apio.io.emit('apio_notification', notification);
-	}
-	else{
 	Apio.Database.db.collection("Users").find().toArray(function(err, data){
 		if(err){
 			console.log("Errore: "+err);
@@ -1109,7 +1081,6 @@ Apio.System.notify = function(notification,callback) {
 			}
 		}
 	});
-	}
 };
 
 Apio.System.jobs = {};
