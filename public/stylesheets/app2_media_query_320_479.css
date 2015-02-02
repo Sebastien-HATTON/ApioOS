@@ -12,6 +12,20 @@
     h1 {
     font-size:24px;
 }
+    .no_box_proprieta_iPhone {
+    display: block;
+    width: auto;
+    height: auto;
+    margin-bottom: 0;
+    padding: 0 0 0 0;
+    border: 0;
+    border-radius: 0;
+    line-height: 0;
+    vertical-align: top;
+    box-shadow: 0 0 0 0;
+    -webkit-transition: none;
+    transition: none;
+}
     input[type=checkbox] {
         width: 38px !important;
         height: 38px;
@@ -359,6 +373,18 @@ display: table;
         padding-bottom: 7px;
         font-size: 10px;
     }
+    .createNewEvent {
+width: 75px;
+height: 75px;
+line-height: 75px;
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+padding: 0;
+border-radius: 2000px;
+border: solid 1px rgb(88, 170, 220);
+font-size: 17px;
+}
 
     .create_new_event {
         width: 40px;
@@ -375,6 +401,11 @@ display: table;
         -webkit-transition: all 0.3s ease 0s;
         transition: all 0.3s ease 0s;
     }
+    .new_active_back_next {
+display: inline-block;
+margin-left: -6%;
+margin-right: -6%;
+}
 
     .create_new_active {
         color: #fff;
@@ -524,20 +555,14 @@ display: table;
         height: 0px !important;
         list-style: none !important;
     }
-    .no_box_proprieta_iPhone {
-    display: block;
-    width: auto;
-    height: auto;
-    margin-bottom: 0;
-    padding: 0 0 0 0;
-    border: 0;
-    border-radius: 0;
-    line-height: 0;
-    vertical-align: top;
-    box-shadow: 0 0 0 0;
-    -webkit-transition: none;
-    transition: none;
-}
+
+    .box_byStatus {
+        display: inline-block;
+        width: 49%;
+        margin-top: 15%;
+        margin-bottom: 15%;
+        opacity: 1;
+    }
     .elementGuests_invitati {
         display: block;
         width: 99%;
@@ -648,6 +673,12 @@ box-shadow: 0 0 2px -1px inset;
         margin-top: 2%;
     }
 
+#newEventNameinput {
+width: 170px;
+height: 40px;
+font-size: 15px;
+border-radius: 5px;
+}
 
 
 }
