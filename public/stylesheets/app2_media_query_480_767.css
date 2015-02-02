@@ -1,0 +1,440 @@
+/* Extra Small Devices, Phones */
+@media only screen and (min-width:480px) and (max-width:767px) {
+        input[type=button][name="iPhone"] {
+        -webkit-appearance: none;
+        width: 80px;
+        height: 80px;
+        border: 0 solid;
+        border-radius: 80px;
+        font-size: 1.1em;
+        box-shadow: 0 0 2px -1px inset;
+        transition: all 0.4s ease 0s;
+    }
+
+    input[type=checkbox] {
+        width: 80px !important;
+        height: 80px;
+        margin-left: 2%;
+        border: 0 solid;
+        border: solid 1px #000;
+        border-radius: 80px;
+        font-size: 1.1em;
+        box-shadow: 0 0 2px -1px inset;
+        transition: all 0.4s ease 0s;
+    }
+
+    input[type=checkbox]:checked {
+        border-radius: 80px;
+        background-color: rgba(71,206,38,0.53);
+    }
+
+    input[type=radio] {
+        width: 80px !important;
+        height: 80px;
+        margin-left: 2%;
+        border: 0 solid;
+        border: solid 1px #000;
+        border-radius: 100px;
+        font-size: 1.1em;
+        box-shadow: 0 0 2px -1px inset;
+        transition: all 0.4s ease 0s;
+    }
+
+    input[type=radio]:checked {
+        background-color: rgba(71,206,38,0.53);
+    }
+
+    input[type="datetime-local"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 80px;
+        margin-top: -10%;
+        margin-right: auto;
+        margin-left: auto;
+        font-size: 40px;
+        line-height: 80px;
+    }
+
+    input[type=range][name="iPhone"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 76px;
+        height: 76px;
+        margin-top: 10px;
+        border-radius: 36px;
+        opacity: 1;
+        background-color: #4197FF;
+        -webkit-transition: all 0.2s ease;
+    }
+    .nome_nuovo_oggetto_invitato {
+        margin-top: -30px;
+        margin-right: 20px;
+        font-size: 25px !important;
+    }
+
+    .elementGuests_invitati {
+        display: block;
+        width: 99%;
+        height: 90px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .elementGuests_invitati li {
+        float: left;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_invitati_state {
+        float: left !important;
+        position: static;
+        width: 80%;
+        -webkit-transform: translate(140%,-80%);
+        transform: translate(140%,-80%);
+    }
+
+    .option_invitati_state li {
+        float: left !important;
+    }
+
+    .delete_element {
+        width: 50%;
+        height: 180px;
+        margin-top: -10px;
+        text-align: center;
+        line-height: 160px;
+        color: #fff;
+        background-color: #CC2929;
+    }
+
+    .nome_stato_invitato {
+        width: 38%;
+        margin-top: -15px;
+        margin-right: 20px;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        border: none;
+        text-align: center;
+        font-size: 50px;
+        background: none;
+    }
+    .testo_proprietaiPhone {
+        float: left;
+        margin-left: 4.5px;
+        font-family: sans-serif;
+        font-size: 22px;
+        font-weight: 100;
+        color: #262626;
+    }
+
+
+
+    .systembutton {
+        float: right;
+        width: 60px;
+        height: 60px;
+        margin-right: 1%;
+        margin-left: 1%;
+        padding: 0;
+        border: solid 1px rgb(88,170,220);
+        border-radius: 2000px;
+        text-align: center;
+        line-height: 60px;
+    }
+
+    .openPanel {
+        width: 100% !important;
+    }
+
+    #apioMenu {
+        overflow-x: scroll;
+    }
+
+    .nav > li > a {
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .nav > li {
+        display: inline-block;
+    }
+
+    .innerHome {
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+    }
+
+    .homeAppIconName {
+        width: 80px;
+        font-size: 10px;
+    }
+
+    .dynamicPanel {
+        z-index: 1031;
+        position: fixed;
+        top: 50px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: scroll;
+    }
+
+    .content_pulsanteiPhone {
+        float: right;
+        width: 80px;
+        height: 40px;
+        border-radius: 40px;
+        background: none repeat scroll 0 0 #FFFFFF;
+    }
+
+    .box_proprietaiPhone {
+        display: table;
+        width: 100%;
+        padding: 40px 30px 40px 30px;
+        line-height: 36px;
+        box-shadow: 0 5px 4px -7px;
+        -webkit-transition: margin-left 0.6s ease 0s;
+        transition: margin-left 0.6s ease 0s;
+    }
+
+    
+    .name_object {
+        height: 5px;
+        margin-top: -10px;
+        margin-right: 9px;
+        font-size: 14px !important;
+    }
+
+    .active_on {
+        background-color: rgb(34,201,34);
+        box-shadow: 0 0 0 0;
+    }
+
+    .active_bacheca {
+        width: 30px;
+        height: 30px !important;
+        margin-top: 1px;
+        margin-right: 5%;
+        border: solid 2px rgb(255,255,255);
+        border-radius: 30px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .activeState {
+        width: 35px;
+        height: 35px !important;
+        margin-top: 9px;
+        margin-right: 5%;
+        border: solid 2px rgb(255,255,255);
+        border-radius: 100px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .modify {
+        float: right !important;
+        width: 50px;
+        height: 40px;
+        text-align: right;
+        font-size: 50px !important;
+    }
+
+    .elementBacheca {
+        display: block;
+        width: 98%;
+        height: 68px;
+        margin-left: 0px;
+        padding-top: 15px;
+        padding-bottom: 0;
+        padding-left: 6px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+      .elementBacheca li {
+      -webkit-transition: all 0.4s ease 0s;
+      transition: all 0.4s ease 0s;
+      font-family: sans-serif;
+      font-size: 18px;
+      height: 20px;
+      display: table-caption !important;
+      float: left;
+      list-style: none;
+      }
+
+    .option_Bacheca_id_state {
+        width: 80%;
+        -webkit-transform: translate(140%,-80%);
+        transform: translate(140%,-80%);
+    }
+
+    .option_Bacheca_id_state li {
+        float: left !important;
+    }
+
+    .delete {
+        position: absolute;
+        width: 50%;
+        height: 60px !important;
+        margin-top: -7px;
+        text-align: center;
+        font-size: 14px ! important;
+        line-height: 60px;
+        color: #ffffff;
+        background-color: #CC2929;
+    }
+
+    .tag {
+        position: absolute;
+        width: 50%;
+        height: 60px !important;
+        margin-top: -7px;
+        text-align: center;
+        font-size: 14px !important;
+        line-height: 60px;
+        color: #ffffff;
+        background-color: #29ADCC;
+        -webkit-transform: translateX(100%);
+    }
+
+    .statusName {
+        width: 66%;
+        height: 10px;
+        margin-top: -15px;
+        margin-right: 20px;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        border: none;
+        text-align: center;
+        font-size: 50px;
+        background: none;
+    }
+
+    /* eventi */
+
+    .dynvinput {
+            float: right;
+            font-family: sans-serif;
+            font-weight: 100;
+            color: #8e8e8e;
+            font-size: 50px;
+            line-height: 130%;
+        }
+
+    /* events* */
+    .infoEvent {
+        height: 10px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .create_new_event {
+        width: 80px;
+        height: 80px;
+        margin-top: 3%;
+        margin-right: auto;
+        margin-left: auto;
+        border: solid 1px;
+        border-radius: 100px;
+        text-align: center;
+        font-size: 40px !important;
+        line-height: 75px;
+        color: #2BA941;
+        -webkit-transition: all 0.3s ease 0s;
+        transition: all 0.3s ease 0s;
+    }
+
+    .create_new_active {
+        color: #fff;
+        background-color: rgba(255,3,3,0.5);
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    .modifica_Evento_id {
+        float: right !important;
+        width: 50px;
+        height: 90px;
+        text-align: left;
+        font-size: 50px !important;
+    }
+
+    .eventName {
+        width: 60%;
+        height: 10px;
+        line-height: 40px;
+    }
+
+    .elementEventi {
+        display: block;
+        width: 94%;
+        height: 130px;
+        margin-left: 20px;
+        padding-top: 15px;
+        padding-bottom: 0;
+        padding-left: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .elementEventi li {
+        float: left;
+        font-family: sans-serif;
+        font-size: 40px;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_Evento_id_state {
+        float: right !important;
+        position: relative;
+        width: 40%;
+        height: 90px;
+        -webkit-transform: translate(100%,-80%);
+        transform: translate(100%,-80%);
+    }
+
+    .option_Evento_id_state li {
+    }
+
+    .elimina_evento {
+        float: right;
+        position: relative;
+        width: 80%;
+        height: 160px;
+        margin-top: 11.9%;
+        margin-right: -28%;
+        text-align: center;
+        font-size: 30px;
+        line-height: 160px;
+        color: #fff;
+        background-color: #CC2929;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        border: none;
+        text-align: center;
+        font-size: 50px;
+        background: none;
+    }
+    
+}

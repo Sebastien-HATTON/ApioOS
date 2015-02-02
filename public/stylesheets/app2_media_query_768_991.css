@@ -1,0 +1,418 @@
+/* Small Devices, Tablets */
+@media only screen and (min-width:768px) and (max-width:991px) {
+        input[type=button][name="iPhone"] {
+        -webkit-appearance: none;
+        width: 80px;
+        height: 80px;
+        border: 0 solid;
+        border-radius: 80px;
+        font-size: 1.1em;
+        box-shadow: 0 0 2px -1px inset;
+        transition: all 0.4s ease 0s;
+    }
+
+    input[type=checkbox] {
+        width: 80px !important;
+        height: 80px;
+        margin-left: 2%;
+        border: 0 solid;
+        border: solid 1px #000;
+        border-radius: 80px;
+        font-size: 1.1em;
+        box-shadow: 0 0 2px -1px inset;
+        transition: all 0.4s ease 0s;
+    }
+
+    input[type=checkbox]:checked {
+        border-radius: 80px;
+        background-color: rgba(71,206,38,0.53);
+    }
+
+    input[type=radio] {
+        width: 80px !important;
+        height: 80px;
+        margin-left: 2%;
+        border: 0 solid;
+        border: solid 1px #000;
+        border-radius: 100px;
+        font-size: 1.1em;
+        box-shadow: 0 0 2px -1px inset;
+        transition: all 0.4s ease 0s;
+    }
+
+    input[type=radio]:checked {
+        background-color: rgba(71,206,38,0.53);
+    }
+
+    input[type="datetime-local"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 80px;
+        margin-top: -10%;
+        margin-right: auto;
+        margin-left: auto;
+        font-size: 40px;
+        line-height: 80px;
+    }
+
+    input[type=range][name="iPhone"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 76px;
+        height: 76px;
+        margin-top: 10px;
+        border-radius: 36px;
+        opacity: 1;
+        background-color: #4197FF;
+        -webkit-transition: all 0.2s ease;
+    }
+    .nome_nuovo_oggetto_invitato {
+        display: table;
+        float: none;
+        width: 100%;
+        height: 30px;
+        margin-top: 0;
+        margin-right: 7px;
+        font-size: 25px !important;
+        line-height: 30px;
+    }
+
+    .nome_stato_invitato {
+        width: auto;
+        margin-top: -15px;
+        margin-right: 20px;
+    }
+
+    .elementGuests_invitati {
+        display: block;
+        width: 99%;
+        height: 130px;
+        padding-left: 21px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .elementGuests_invitati li {
+        float: left;
+        width: 70%;
+        height: 40px;
+        margin-top: 3%;
+        font-family: sans-serif;
+        font-size: 43px;
+        line-height: 40px;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_invitati_state {
+    }
+
+    .option_invitati_state li {
+        float: left !important;
+    }
+
+    .elimina_invitati {
+        float: right;
+        width: 200px;
+        height: 120px;
+        margin-top: -95px;
+        margin-left: 40%;
+        text-align: center;
+        font-size: 41px;
+        line-height: 120px;
+        color: #fff;
+        background-color: #CC2929;
+        -webkit-transform: translateX(100%);
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        border: none;
+        text-align: center;
+        font-size: 50px;
+        background: none;
+    }
+
+    .testo_proprietaiPhone {
+        float: left;
+        margin-left: 10px;
+        font-family: sans-serif;
+        font-size: 50px;
+        font-weight: 100;
+        color: #262626;
+    }
+
+    .systembutton {
+        float: right;
+        width: 60px;
+        height: 60px;
+        margin-right: 1%;
+        margin-left: 1%;
+        padding: 0;
+        border: solid 1px rgb(88,170,220);
+        border-radius: 2000px;
+        text-align: center;
+        font-size: 12px;
+        line-height: 60px;
+    }
+
+    .openPanel {
+        width: 100% !important;
+    }
+
+    .nav > li {
+        display: inline-block;
+    }
+
+    .homeAppIconName {
+        font-size: 18px;
+    }
+
+    #ApioIconsContainer {
+        margin-left: 2.5%;
+    }
+
+    .content_pulsanteiPhone {
+        float: right;
+        width: 132px;
+        height: 60px;
+        border-radius: 40px;
+        background: none repeat scroll 0 0 #FFFFFF;
+    }
+    .active_bacheca {
+        width: 65px;
+        height: 65px !important;
+        margin-top: 9px;
+        margin-right: 5%;
+        border: solid 5px rgb(255,255,255);
+        border-radius: 100px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .name_object {
+        height: 10px;
+        margin-top: -10px;
+        margin-right: 20px;
+        font-size: 25px !important;
+    }
+
+    .active_on {
+        background-color: rgb(34,201,34);
+        box-shadow: 0 0 0 0;
+    }
+
+    .activeState {
+        width: 65px;
+        height: 65px !important;
+        margin-top: 9px;
+        margin-right: 5%;
+        border: solid 5px rgb(255,255,255);
+        border-radius: 100px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .modify {
+        float: right !important;
+        width: 50px;
+        height: 90px;
+        text-align: left;
+        font-size: 50px !important;
+    }
+
+    .statusName {
+        width: 66%;
+        height: 10px;
+        margin-top: -15px;
+        margin-right: 20px;
+    }
+
+    .elementBacheca {
+        display: block;
+        width: 98%;
+        height: 130px;
+        margin-left: 20px;
+        padding-top: 15px;
+        padding-bottom: 0;
+        padding-left: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .elementBacheca li {
+        display: table-caption !important;
+        float: left;
+        height: 90px;
+        font-family: sans-serif;
+        font-size: 40px;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_Bacheca_id_state {
+        width: 80%;
+        -webkit-transform: translate(140%,-80%);
+        transform: translate(140%,-80%);
+    }
+
+    .option_Bacheca_id_state li {
+        float: left !important;
+    }
+
+    .delete {
+        position: absolute;
+        width: 50%;
+        height: 130px !important;
+        margin-top: -15px;
+        text-align: center;
+        font-size: 30px;
+        line-height: 130px;
+        color: #fff;
+        background-color: #CC2929;
+    }
+
+    .tag {
+        position: absolute;
+        width: 50%;
+        height: 130px !important;
+        margin-top: -15px;
+        text-align: center;
+        font-size: 30px;
+        line-height: 130px;
+        color: #fff;
+        background-color: #29ADCC;
+        -webkit-transform: translateX(100%);
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        border: none;
+        text-align: center;
+        font-size: 50px;
+        background: none;
+    }
+    .dynvinput {
+            float: right;
+            font-family: sans-serif;
+            font-weight: 100;
+            color: #8e8e8e;
+            font-size: 50px;
+            line-height: 130%;
+
+        }
+    .eventname {
+            text-align: center;
+            font-family: helvetica;
+            font-weight: 300;
+            font-size: 50px;
+        }
+
+        .infoEvent {
+        height: 10px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .create_new_event {
+        width: 80px;
+        height: 80px;
+        margin-top: 3%;
+        margin-right: auto;
+        margin-left: auto;
+        border: solid 1px;
+        border-radius: 100px;
+        text-align: center;
+        font-size: 40px !important;
+        line-height: 75px;
+        color: #2BA941;
+        -webkit-transition: all 0.3s ease 0s;
+        transition: all 0.3s ease 0s;
+    }
+
+    .create_new_active {
+        color: #fff;
+        background-color: rgba(255,3,3,0.5);
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    .modifica_Evento_id {
+        float: right !important;
+        width: 50px;
+        height: 90px;
+        text-align: left;
+        font-size: 50px !important;
+    }
+
+    .eventName {
+        width: 60%;
+        height: 10px;
+        line-height: 40px;
+    }
+
+    .elementEventi {
+        display: block;
+        width: 94%;
+        height: 130px;
+        margin-left: 20px;
+        padding-top: 15px;
+        padding-bottom: 0;
+        padding-left: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .elementEventi li {
+        float: left;
+        font-family: sans-serif;
+        font-size: 40px;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_Evento_id_state {
+        float: right !important;
+        position: relative;
+        width: 40%;
+        height: 90px;
+        -webkit-transform: translate(100%,-80%);
+        transform: translate(100%,-80%);
+    }
+
+    .option_Evento_id_state li {
+    }
+
+    .elimina_evento {
+        float: right;
+        position: relative;
+        width: 80%;
+        height: 160px;
+        margin-top: 11.9%;
+        margin-right: -28%;
+        text-align: center;
+        font-size: 30px;
+        line-height: 160px;
+        color: #fff;
+        background-color: #CC2929;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        border: none;
+        text-align: center;
+        font-size: 50px;
+        background: none;
+    }
+}
