@@ -41,16 +41,14 @@ void divide_string(String stringToSplit) {
     if(stringToSplit.charAt(i)=='-')
       numberkey++;
   }
-  //Serial1.println(numberkey);
-  //-----------deviceAddr----------------  
-  
-  for(i=0; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
-  {
-    deviceAddr += String(stringToSplit.charAt(i));
-  }
-
+  i=0;
   for(j; j<numberkey ;j++)
   {
+    
+    for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
+    {
+      deviceAddr += String(stringToSplit.charAt(i));
+    }
     //-----------property----------------
 
     for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)

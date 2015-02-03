@@ -18,6 +18,16 @@
 				Apio.NotificationCenter.pushEvent(event);  //altrimenti lo faccio gestire dal centro notifiche
 			*/
 		});
+
+    Apio.socket.on('apio_object_offline',function(event){
+      alert('The object is not online');
+      //Se arriva un evento inerente ad una app aperta, la updato subito
+      /*if (Apio.Application.hasOwnProperty('current') && Apio.Application.getCurrentApplication().objectId == event.objectId)
+        Apio.Application.getApplicationById(event.objectId).update(event);
+      else
+        Apio.NotificationCenter.pushEvent(event);  //altrimenti lo faccio gestire dal centro notifiche
+      */
+    });
 	};
 
 
