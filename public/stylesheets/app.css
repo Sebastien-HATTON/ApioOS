@@ -1,6 +1,9 @@
 body {
     font-family: helvetica !important;
 }
+.fullscreen{
+	width: 100% !important;
+}
 /*Eventi*/
 @media (min-width: 320px) and (max-width: 600px) {
     .nome_oggetto_invitato {
