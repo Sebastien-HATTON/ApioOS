@@ -417,7 +417,7 @@ Apio.Serial.send = 	function(data, callback) {
 						})
 					clearInterval(timer);
 					})
-				},30);
+				},20);
 		}
 	})
 
