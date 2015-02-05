@@ -15,8 +15,20 @@ var jade = require("jade");
 var CronJob = require('cron').CronJob;
 var time = require('time');
 var fs = require("fs");
-
-
+var APIO_CONFIGURATION = {
+    port : 8083
+}
+var ENVIRONMENT = "production";
+if (process.argv.indexOf('--no-serial') > -1)
+    ENVIRONMENT = "development"
+if (process.argv.indexOf('--http-port') > -1) {
+    var index = process.argv.indexOf('--http-port');
+    APIO_CONFIGURATION.port = process.argv[index+1];
+}
+if (process.argv.indexOf('--serial-port') > -1) {
+    var index = process.argv.indexOf('--serial-port');
+    Apio.Serial.Configuration.port = process.argv[index+1];
+}
 /*
 	@module Apio
 */
@@ -992,32 +1004,157 @@ Apio.System.launchEvent = function(eventName,callback) {
 			}
 		);
 }
-Apio.System.applyState = function(stateName,callback) {
-	Apio.Database.db.collection('States')
-	.findOne({name : stateName},function(error,data){
-		if (error) {
-					console.log("applyState() Error while fetching event data");
-					callback(error);
-		}
-		if (data == null) {
-			console.log("applyState() the state "+stateName+" does not exist");
-			callback({message : "applyState() the state "+stateName+" does not exist"})
-		}
-		else {
-			//Ho trovato lo stato cercato
-			Apio.Database.updateProperty(data,function(){
-				console.log("Apio.System.applyState() state "+stateName+" successfully applied");
+Apio.System.applyState = function applyState(stateName,callback){
+    function pause(millis) {
+        var date = new Date();
+        var curDate = null;
+        do{
+            curDate = new Date();
+        }while(curDate-date < millis);
+    }
 
-				Apio.Serial.send(data);
+    
 
-				callback(null);
-			})
-		}
+        var stateHistory = {};
 
+        var getStateByName = function(stateName,callback) {
+            Apio.Database.db.collection('States').findOne({name : stateName},callback);
+        }
+        
+    var arr = [];
+    var applyStateFn = function(stateName, callback, eventFlag) {
+        console.log("***********Applico lo stato "+stateName+"************");
+        if (!stateHistory.hasOwnProperty(stateName)) { //se non è nella history allora lo lancio
+            getStateByName(stateName,function(err,state){
+                if (err) {
+                    console.log("applyState unable to apply state");
+                    console.log(err);
+                }
+                else if(eventFlag){
+                    arr.push(state);
+                    Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
+                        if (err) {
+                            console.log("Non ho potuto settare il flag a true");
+                        }
+                        else {
+                            var s = state;
+                            s.active = true;
+                            Apio.io.emit('apio_state_update',s);
+                        }
+                    });
+                    console.log("Lo stato che sto per applicare è "+state.name);
+                    //console.log(state);
+                    Apio.Database.updateProperty(state,function(){
+                        stateHistory[state.name] = 1;
+                        //Connected clients are notified of the change in the database
+                        Apio.io.emit("apio_server_update",state);
+                        Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
+                            if (err) {
+                                console.log("error while fetching events");
+                                console.log(err);
+                            }
+                            console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                            console.log(data);
+                            if(callback && data.length == 0){
+                                callback();
+                            }
+                            //data è un array di eventi
+                            data.forEach(function(ev,ind,ar){
+                                var states = ev.triggeredStates;
+                                console.log("states vale:");
+                                console.log(states)
+                                states.forEach(function(ee,ii,vv){
+                                    applyStateFn(ee.name, callback, true);
+                                })
+                            })
+                        });
+                    });
+                }
+                else{
+                    if (state.active == true){
+                        Apio.Database.db.collection('States').update({name : state.name},{$set : {active : false}},function(errOnActive){
+                            if (errOnActive) {
+                                console.log("Impossibile settare il flag dello stato");
+                                callback(new Error('Impossibile settare il flag dello stato'))
+                            } else {
+                                var s = state;
+                                s.active = false;
+                                Apio.io.emit('apio_state_update',s);
+                            }
+                        })
+                    }
+                    else {
+                        arr.push(state);
+                        Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
+                            if (err) {
+                                console.log("Non ho potuto settare il flag a true");
+                            }
+                            else {
+                                var s = state;
+                                s.active = true;
+                                Apio.io.emit('apio_state_update',s);
+                            }
+                        });
+                        console.log("Lo stato che sto per applicare è ");
+                        //console.log(state);
+                        Apio.Database.updateProperty(state,function(){
+                            stateHistory[state.name] = 1;
+                            //Connected clients are notified of the change in the database
+                            Apio.io.emit("apio_server_update",state);
+                            Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
+                                if (err) {
+                                    console.log("error while fetching events");
+                                    console.log(err);
+                                }
+                                console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                                console.log(data);
+                                if(callback && data.length == 0){
+                                    callback();
+                                }
+                                //data è un array di eventi
+                                data.forEach(function(ev,ind,ar){
+                                    var states = ev.triggeredStates;
+                                    console.log("states vale:");
+                                    console.log(states)
+                                    states.forEach(function(ee,ii,vv){
+                                        applyStateFn(ee.name, callback, true);
+                                    })
+                                })
+                            });
+                        });
+                    }
+                }
+            })
+        } else {
+            console.log("Skipping State application because of loop.")
+        }
+    }; //End of applyStateFn
+        applyStateFn(stateName, function(){
+            console.log("applyStateFn callback")
+            if(ENVIRONMENT == "production") {
+                var pause = function (millis) {
+                    var date = new Date();
+                    var curDate = null;
+                    do {
+                        curDate = new Date();
+                    } while (curDate - date < millis);
+                };
+                //console.log("arr vale:");
+                //console.log(arr);
+                for (var i in arr) {
+                    console.log("Mando alla seriale la roba numero "+i)
+                    Apio.Serial.send(arr[i], function () {
+                        pause(100);
+                    });
 
-	});
-}
-
+                }
+                callback(null);
+                arr = [];
+            } else {
+                callback(null);
+            }
+        }, false);
+    }
 Apio.System.checkEvent = function(state) {
 	//Se allo stato triggerato corrisponde un evento, lancia quell'evento
 };
