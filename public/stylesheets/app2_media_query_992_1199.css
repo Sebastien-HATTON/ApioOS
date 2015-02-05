@@ -1,51 +1,8 @@
 /* Medium Devices, Desktops */
-@media only screen and (min-width:992px) and (max-width:1199px) {
 
-        .byStatus {
-        width: 85px;
-        height: 85px;
-        margin-right: auto;
-        margin-left: auto;
-        padding: 0;
-        border: solid 1px rgb(88,170,220);
-        border-radius: 2000px;
-        text-align: center;
-        font-size: 17px;
-        line-height: 85px;
-    }
+@media only screen and (min-width:992px) and (max-width:1199px){
 
-    .box_byStatus {
-        float: left;
-        width: 48%;
-        border: 0;
-        opacity: 1 !important;
-    }
-
-    #byStatusinput {
-    }
-
-    .byDate {
-        width: 85px;
-        height: 85px;
-        margin-right: auto;
-        margin-left: auto;
-        padding: 0;
-        border: solid 1px rgb(88,170,220);
-        border-radius: 2000px;
-        text-align: center;
-        font-size: 17px;
-        line-height: 85px;
-    }
-
-    .box_byDate {
-        display: inline-table !important;
-        float: left;
-        width: 47%;
-        height: 100px;
-        border: 0;
-        opacity: 1 !important;
-    }
-        .nome_nuovo_oggetto_invitato {
+.nome_nuovo_oggetto_invitato {
         display: table;
         float: none;
         height: 20px;
@@ -162,7 +119,7 @@
         margin-right: 5px;
         margin-left: 10px;
         font-family: sans-serif;
-        font-size: 25px;
+        font-size: 17px;
         line-height: 50px;
         color: #262626;
     }
@@ -209,6 +166,9 @@
     .statusName {
         width: 80%;
         height: 10px;
+    }
+        #wallContainer {
+        margin-top:-30px;
     }
 
     .elementBacheca {
@@ -508,6 +468,17 @@
         font-size: 15px;
         line-height: 32px;
     }
+
+    .nome_oggetto_invitato {
+        display: table !important;
+        position: relative !important;
+        width: 200px !important;
+        height: 0 !important;
+        margin-top: 30px !important;
+        font-size: 15px !important;
+        list-style: none !important;
+    }
+
     .nome_nuovo_oggetto_invitato {
         display: table;
         float: none;
@@ -575,177 +546,167 @@
         font-size: 50px;
         background: none;
     }
-    .active_bacheca {
-        width: 25px;
-        height: 25px !important;
-        margin-right: 5%;
-        border: solid 2px rgb(255,255,255);
-        border-radius: 100px;
-        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
-    }
 
-    .testo_proprietaiPhone {
-        float: left;
-        margin-right: 5px;
-        margin-left: 10px;
-        font-family: sans-serif;
-        font-size: 25px;
-        line-height: 50px;
-        color: #262626;
-    }
-
-    .systembutton {
-        float: right;
-        width: 60px;
-        height: 60px;
-        margin-right: 1%;
-        margin-left: 1%;
+    .byStatus {
+        width: 85px;
+        height: 85px;
+        margin-right: auto;
+        margin-left: auto;
         padding: 0;
         border: solid 1px rgb(88,170,220);
         border-radius: 2000px;
         text-align: center;
-        font-size: 12px;
-        line-height: 60px;
+        font-size: 17px;
+        line-height: 85px;
     }
 
-    #ApioIconsContainer {
-        margin-left: 3%;
-    }
-
-    .testo_proprietaiPhone {
+    .box_byStatus {
         float: left;
-        margin-right: 5px;
-        margin-left: 10px;
-        font-family: sans-serif;
-        font-size: 25px;
-        line-height: 50px;
-        color: #262626;
+        width: 48%;
+        border: 0;
+        opacity: 1 !important;
+        border:0px;
     }
 
-    .box_proprietaiPhone {
-        display: table-caption;
-        display: inline-table;
-        width: 100%;
-        height: auto;
-        margin-bottom: 3%;
-        margin-left: 2%;
-        padding: 10px 10px 10px 10px;
-        border: solid 1px rgba(142,142,142,0.18);
-        border-radius: 5px;
-        font-family: helvetica;
-        line-height: 100px;
-        vertical-align: middle;
-        box-shadow: 0 0 2px -2px;
-        -webkit-transition: margin-left 0.6s ease 0s;
-        transition: margin-left 0.6s ease 0s;
+    #byStatusinput {
     }
 
-    .active_on {
-        background-color: rgb(34,201,34);
-        box-shadow: 0 0 0 0;
+    .byDate {
+        width: 85px;
+        height: 85px;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 0;
+        border: solid 1px rgb(88,170,220);
+        border-radius: 2000px;
+        text-align: center;
+        font-size: 17px;
+        line-height: 85px;
     }
 
-    .activeState {
-        width: 15px;
-        height: 15px !important;
-        margin-right: 5%;
-        border: solid 5px rgb(255,255,255);
-        border-radius: 100px;
-        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
-    }
-
-    .modify {
-        float: right !important;
-        width: 10px;
-        height: 10px;
-        text-align: right;
-        font-size: 20px !important;
-    }
-
-    .statusName {
-        width: 80%;
-        height: 10px;
-    }
-
-    .elementBacheca {
-        width: 250px !important;
-        height: 90px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        line-height: 28px !important;
-        -webkit-user-drag: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .elementBacheca li {
-        display: table-caption !important;
+    .box_byDate {
+        display: inline-table !important;
         float: left;
-        position: relative;
-        list-style: none;
-        -webkit-transition: all 0.4s ease 0s;
-        transition: all 0.4s ease 0s;
+        width: 47%;
+        height: 100px;
+        border: 0px;
+        opacity: 1 !important;
     }
 
-    .option_Bacheca_id_state {
-        float: left !important;
-        position: static;
-        width: 100%;
-        margin-left: 0 !important;
-    }
-
-    .option_Bacheca_id_state li {
-        float: left !important;
-    }
-
-    .delete {
-        width: 50%;
-        height: 50px;
-        margin-top: 20%;
-        text-align: center;
-        line-height: 50px;
-        color: #fff;
-        background-color: #CC2929;
-    }
-
-    .tag {
-        width: 50%;
-        height: 50px;
-        margin-top: 20%;
-        text-align: center;
-        line-height: 50px;
-        color: #fff;
-        background-color: #29ADCC;
-    }
-
-    #title_state {
-        width: 50%;
-        margin-top: 5%;
-        margin-bottom: 5%;
-        border: none;
-        text-align: center;
-        font-size: 25px;
-        background: none;
-    }
-
-    .name_object {
-        height: 10px;
-        margin-top: 10px;
-        margin-left: -30px !important;
-        text-align: center;
-        font-size: 15px !important;
-    }
-    .dynvinput {
-            float: right;
-            font-weight: 100;
-            color: #8e8e8e;
-            font-size: 50px;
-            line-height: 130%;
-
-        }
     .eventname {
-            text-align: center;
-            font-family: helvetica;
-            font-weight: 300;
-            font-size: 50px;
-        }
+        text-align: center;
+        font-size: 32px;
+        font-weight: 300;
+    }
+
+    .dynvinput {
+        float: right;
+        font-family: sans-serif;
+        font-size: 50px;
+        font-weight: 100;
+        line-height: 130%;
+        color: #8e8e8e;
+    }
+
+    .dynvinput {
+        float: right;
+        font-family: sans-serif;
+        font-size: 50px;
+        font-weight: 100;
+        line-height: 130%;
+        color: #8e8e8e;
+    }
+
+    .goBack {
+        width: 85px;
+        height: 85px;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 0;
+        border: solid 1px rgb(88,170,220);
+        border-radius: 2000px;
+        text-align: center;
+        font-size: 17px;
+        line-height: 85px;
+    }
+
+    .box_goBack {
+        display: block;
+        width: 100%;
+        margin-top: 20%;
+        margin-bottom: 20%;
+        opacity: 1;
+    }
+
+    #goBackinput {
+        margin-top: 2%;
+    }
+
+    .goForward {
+        position: relative;
+        width: 86px;
+        height: 86px;
+        margin-right: auto;
+        margin-left: auto;
+        border: solid 1px rgb(88,170,220);
+        border-radius: 2000px;
+        text-align: center;
+        line-height: 86px;
+    }
+
+    .box_goForward {
+        float: left;
+        width: 48%;
+        height: 100px;
+        opacity: 1 !important;
+    }
+
+    #goForwardinput {
+        margin-top: 2%;
+    }
+
+    #newEventName {
+        position: absolute;
+        width: 30%;
+        height: 50px;
+        margin-top: 10%;
+        margin-left: 36.5%;
+        line-height: 50px;
+    }
+
+    #newEventNameinput {
+        width: 350px;
+        height: 50px;
+        border-radius: 10px;
+        font-size: 30px;
+        line-height: 50px;
+    }
+
+    #newEventNamelabel {
+        margin-left: -6%;
+        text-align: center;
+    }
+
+    .createNewEvent {
+        position: relative;
+        width: 86px;
+        height: 86px;
+        margin-right: auto;
+        margin-left: auto;
+        border: solid 1px rgb(88,170,220);
+        border-radius: 2000px;
+        text-align: center;
+        line-height: 86px;
+    }
+
+    .box_createNewEvent {
+        float: left;
+        width: 48%;
+        height: 100px;
+        opacity: 1 !important;
+    }
+
+    #createNewEventinput {
+        margin-top: 2%;
+    }
 }

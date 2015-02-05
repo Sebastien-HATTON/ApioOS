@@ -1,6 +1,6 @@
 /* CSS MEDIA QUERY 1 */
 /* Custom, iPhone Retina */
-
+/* iphone black */
 
 .active_on {
     background-color: rgb(34,201,34);
@@ -12,6 +12,7 @@
     h1 {
     font-size:24px;
 }
+
     .no_box_proprieta_iPhone {
     display: block;
     width: auto;
@@ -349,8 +350,11 @@ display: table;
     .statusName {
         width: 66%;
         height: 10px;
-        margin-top: 0px;
+        margin-top: -15px;
         margin-right: 20px;
+    }
+    #wallContainer {
+        margin-top:-30px;
     }
 
     #title_state {
@@ -466,8 +470,8 @@ margin-right: -6%;
         float: right;
         position: relative;
         width: 80%;
-        height: 75px;
-        margin-top: 11.9%;
+        height: 65px;
+        margin-top: 15px;
         margin-right: -28%;
         text-align: center;
         font-size: 14px;
@@ -515,11 +519,12 @@ margin-right: -6%;
         margin-top: 15%;
         margin-bottom: 15%;
         opacity: 1;
+        border:0px;
     }
     .box_byDate {
         display: inline-block;
         opacity: 1;
-        width: 49%;
+        width: 48%;
         margin-top: 15%;
         margin-bottom: 15%;
     }
@@ -546,13 +551,31 @@ margin-right: -6%;
         font-size: 15px;
     }
 
-    .nome_oggetto_invitato {
+/*    .nome_oggetto_invitato {
       font-size: 15px !important;
         position: relative !important;
-        width: 200px !important;
-        margin-top: 30px !important;
+        width: 100% !important;
+        
         display: table !important;
         height: 0px !important;
+        list-style: none !important;
+        text-align: right;
+        margin-left:0px;
+        margin-top:0px;
+        padding-right:10px !important;
+    }*/
+    .nome_oggetto_invitato {
+        display: table !important;
+        position: relative !important;
+        width: 100% !important;
+        height: 0 !important;
+        margin-top: 0px;
+        margin-left:0px;
+        padding-left: 50px;
+        padding-right: 10px !important;
+        text-align: left;
+        font-size: 15px !important;
+        line-height: 15px !important;
         list-style: none !important;
     }
 
@@ -562,6 +585,7 @@ margin-right: -6%;
         margin-top: 15%;
         margin-bottom: 15%;
         opacity: 1;
+        border:0px;
     }
     .elementGuests_invitati {
         display: block;
