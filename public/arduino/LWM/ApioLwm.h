@@ -42,31 +42,7 @@ void divide_string(String stringToSplit) {
       numberkey++;
   }
   i=0;
-  if (numberkey==1)
-  {
-        for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
-        {
-          deviceAddr += String(stringToSplit.charAt(i));
-        }
-    //-----------property----------------
-
-        for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
-        {
-          property += String(stringToSplit.charAt(i));
-        }
-        
-         //-----------value----------------  
-    
-         for(i++; stringToSplit.charAt(i)!='-' && i<strlen ;i++)
-         {
-           value += String(stringToSplit.charAt(i)); 
-         }
-         Serial.println(property+":"+value);
-    
-  }
-  //Serial.println(numberkey);
-  else if(numberkey>1){
-  for(i; i<strlen ;j++)
+  for(j; j<numberkey ;j++)
   {
     
     for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
@@ -88,10 +64,6 @@ void divide_string(String stringToSplit) {
       valueArray[j] += String(stringToSplit.charAt(i)); 
     }
     
-    i=i+1;
-    
-  }
-  //select();
   }
 }
 
@@ -156,13 +128,13 @@ void select()
     flag=0;
     
   }
-  if(numberkey!=0 && numberkey!=1)
+  if(numberkey!=0)
   {
     property=propertyArray[x];
     value=valueArray[x];
     x++;
     flag=1;
-    Serial.println(property+":"+value);
+    //Serial.println(property+":"+value);
   }
 }
 
@@ -186,9 +158,10 @@ static bool apioReceive(NWK_DataInd_t *ind)
   {
     Buffer[i] = ind->data[i];
     //delay(10);
-    //Serial1.write(ind->data[i]);
+    //Serial.write(ind->data[i]);
    
   }
+  //Serial.println();
 
   divide_string(String(Buffer)); 
   
@@ -251,3 +224,4 @@ void apioSetup(uint16_t objectAddress)
   delay(500);
 
 }
+
