@@ -31,55 +31,66 @@ int x=0;//is used to keep track the running property:value in the loop
 //function that saves the pairs propiretà: value in their respective vectors or propertyArray [array_length] and valueArray [array_length]
 
 void divide_string(String stringToSplit) {
+  
   int strlen=stringToSplit.length();
-  //Serial.println(stringToSplit); //debug
+  //Serial1.println(stringToSplit); //debug
   int i; //counter
   deviceAddr=""; 
-  for(i=0; i<strlen ; i++){
+  for(i=0; i<strlen ; i++)
+  {
     if(stringToSplit.charAt(i)=='-')
       numberkey++;
   }
   i=0;
-  if (numberkey==1){
-        for(i; stringToSplit.charAt(i)!=':' && i<strlen;i++){
+  if (numberkey==1)
+  {
+        for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
+        {
           deviceAddr += String(stringToSplit.charAt(i));
         }
     //-----------property----------------
 
-        for(i++; stringToSplit.charAt(i)!=':' && i<strlen;i++){
+        for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
+        {
           property += String(stringToSplit.charAt(i));
         }
         
          //-----------value----------------  
     
-         for(i++; stringToSplit.charAt(i)!='-' && i<strlen;i++){
+         for(i++; stringToSplit.charAt(i)!='-' && i<strlen ;i++)
+         {
            value += String(stringToSplit.charAt(i)); 
          }
-         //Serial.println(property+":"+value);
+         Serial.println(property+":"+value);
     
   }
   //Serial.println(numberkey);
   else if(numberkey>1){
-    for(i; i<strlen ;j++){
-      for(i; stringToSplit.charAt(i)!=':' && i<strlen;i++){
-        deviceAddr += String(stringToSplit.charAt(i));
-      }
-      //-----------property----------------
-  
-      for(i++; stringToSplit.charAt(i)!=':' && i<strlen;i++){
-        propertyArray[j] += String(stringToSplit.charAt(i));
-      }
-  
-      
-      //-----------value----------------  
-      
-      for(i++; stringToSplit.charAt(i)!='-' && i<strlen;i++){
-        valueArray[j] += String(stringToSplit.charAt(i)); 
-      }
-      
-      i=i+1;
-      
+  for(i; i<strlen ;j++)
+  {
+    
+    for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
+    {
+      deviceAddr += String(stringToSplit.charAt(i));
     }
+    //-----------property----------------
+
+    for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
+    {
+      propertyArray[j] += String(stringToSplit.charAt(i));
+    }
+
+    
+    //-----------value----------------  
+    
+    for(i++; stringToSplit.charAt(i)!='-' && i<strlen ;i++)
+    {
+      valueArray[j] += String(stringToSplit.charAt(i)); 
+    }
+    
+    i=i+1;
+    
+  }
   //select();
   }
 }
@@ -129,11 +140,14 @@ static void appDataConf(NWK_DataReq_t *req)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 //This function choose property and value from propertyArray valueArray. This must be declared on every loop(Can be
 //placed in input?)
-void select(){
-  //int x=0;
-  if(x==numberkey && flag==1){
+void select()
+{
+
+  if(x==numberkey && flag==1)
+  {
     x=0;
-    for(int k=0; k<numberkey; k++){
+    for(int k=0; k<numberkey; k++)
+    {
       propertyArray[k]="";
       valueArray[k]="";
     }
@@ -142,12 +156,13 @@ void select(){
     flag=0;
     
   }
-  if(numberkey!=0 && numberkey!=1){
+  if(numberkey!=0 && numberkey!=1)
+  {
     property=propertyArray[x];
     value=valueArray[x];
     x++;
     flag=1;
-    //Serial.println(property+":"+value);
+    Serial.println(property+":"+value);
   }
 }
 
