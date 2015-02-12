@@ -39,6 +39,7 @@ module.exports = {
 			res.sendfile("public/dashboardApp/dashboard.html");
 		},
 	updateApioApp : function(req,res){
+		var icon = req.body.icon;
 	    var objectId = req.body.objectId;
 	    var newId = req.body.newId;
 	    var ino = req.body.ino;
@@ -48,9 +49,14 @@ module.exports = {
 	    var makefile = req.body.makefile;
 	    console.log('updating the object: '+objectId)+' with the new id '+newId;
 	    console.log('ino: '+ino);
+
+	    console.log('GUARDA QUAAAAAA IN UPDATEEEE')
+	    console.log(makefile)
+
 	    //si potrebbero usare writeFile (asincrono) annidati ed eliminare il try catch
 
 	    if(objectId === newId){
+	    	console.log("NEEEEEEEEEEEEEEEEEEEEEEEW")
 	    	Apio.Database.db.collection('Objects').update({'objectId':objectId},JSON.parse(mongo),function(error){
 	    		if(error){
 	    			console.log(error);
@@ -59,6 +65,7 @@ module.exports = {
 	    		}else{
 	    			fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/_' + newId + '.ino',ino);
 			        fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/Makefile',makefile);
+			        //fs.writeFileSync('public/applications/'+newId+'/icon.png',icon);
 			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.html',html);
 			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.js',js);
 			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.mongo',mongo);
@@ -67,6 +74,7 @@ module.exports = {
 	    		}
 	    	})
 	    }else{
+	    	console.log("ELSEEEEEEEEEEEEEEEEEEEEEEEEE")
 	    	Apio.Database.db.collection('Objects').insert(JSON.parse(mongo),function(error,count){
 	    		if(error){
 	    			console.log(error);
@@ -76,6 +84,7 @@ module.exports = {
 	    		else{
 		    		fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/_' + newId + '.ino',ino);
 			        fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/Makefile',makefile);
+			        fs.writeFileSync('public/applications/'+newId+'/icon.png',icon, {encoding:'base64'});
 			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.html',html);
 			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.js',js);
 			        fs.writeFileSync('public/applications/'+newId+'/' + newId + '.mongo',mongo);
@@ -107,6 +116,7 @@ module.exports = {
 	    console.log(path);
 	    var object = {};
 
+	    object.icon = fs.readFileSync('public/applications/'+id+'/icon.png', {encoding:'base64'});
 	    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
 	    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
 	    //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
@@ -114,6 +124,8 @@ module.exports = {
 	    path = 'public/applications/'+id+'/_'+id;
 	    object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
 	    object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
+	    console.log('GUARDA QUAAAAAA')
+	    console.log(object.makefile)
 	    
 	    /*console.log('js:\n'+object.js);
 	    console.log('html:\n'+object.html);
@@ -540,7 +552,7 @@ module.exports = {
                 }
                 else if(data){
                     console.log('data is: '+data);
-                    //qui rinomino i cazzetti nell'id attuale
+                    //qui rinomino i *_TMP_* nell'id attuale
 
                     var id = '*_TMP_*';
                     var path = './temp/'+id+'/'+id;
@@ -552,6 +564,11 @@ module.exports = {
                     object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
                     //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
                     object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
+
+                    
+                    
+                    console.log('STRONZISSIMO')
+                    console.log(object.mongo)
                     path = './temp/'+id+'/_'+id;
                     object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
                     object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
@@ -575,25 +592,36 @@ module.exports = {
                     //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
                     //object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"')
                     object.mongo=JSON.parse(object.mongo);
+                    console.log('STRONZISSIMO DUE')
+                    console.log(object.mongo)
                     console.log('"objectId before":"'+object.mongo.objectId+'"')
                     object.mongo.objectId=dummy;
+                    
+                    var appoggio = JSON.stringify(object.mongo); 
+
                     console.log('"objectId after":"'+object.mongo.objectId+'"')
                     
                     //Apio.Database.db.collection('Objects').insert(JSON.parse(object.json),function(err,data){
                     Apio.Database.db.collection('Objects').insert(object.mongo,function(err,data){
+                    	console.log()
                         if(err)
                             console.log(err);
                         else
                         {
                             var path = 'public/applications/';
                             console.log('path + dummy:'+path + dummy);
+                            console.log('STRONZO')
+                            console.log(object.mongo)
+                            console.log('STRONZO A STRINGA')
+                            console.log(JSON.stringify(object.mongo))
 
                             fs.mkdirSync(path +'/'+ dummy);
                             fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
                             fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
                             fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
                             fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
-                            fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',JSON.stringify(object.mongo));
+                            //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',JSON.stringify(object.mongo));
+                            fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',appoggio);
                             fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/_' + dummy + '.ino',object.ino);
                             fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/Makefile',object.makefile);
                             //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);

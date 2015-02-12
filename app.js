@@ -613,10 +613,10 @@ app.post('/apio/app/delete', routes.dashboard.deleteApioApp);
 /* APIO make an empty App folder */
 app.post('/apio/app/folder', routes.dashboard.folderApioApp);
 
-/* APIO modify of the App */
+/* APIO modify of the App (it's binded in launch.js and it's used to launch the editor with the updating parameters)*/
 app.post('/apio/app/modify', routes.dashboard.modifyApioApp);
 
-/*APIO update of the application for a specified object*/
+/*APIO update of the application for a specified object (it's binded in editor.js and do the actual update of an application)*/
 app.post('/apio/database/updateApioApp', routes.dashboard.updateApioApp);
 
 /*APIO creation of the new ino html js mongo files from the wizard*/

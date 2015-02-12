@@ -183,12 +183,14 @@ angular.module('ApioDashboardApplication')
 	      //devo settare anche i valori nello scope perchè altrimenti se viene
 	      //premuto update prima che sia stato dato il focus all'editor 
 	      //i relativi ng-model rimangono vuoti
+	      $scope.icon = data.icon;
 	      $scope.ino = data.ino;
 	      $scope.html = data.html;
 	      $scope.js = data.js;
 	      $scope.mongo = data.mongo;
 	      $scope.makefile = data.makefile;
 
+	      $rootScope.icon = data.icon;
 	      $rootScope.ino = data.ino;
 	      $rootScope.html = data.html;
 	      $rootScope.js = data.js;

@@ -49,8 +49,9 @@ angular.module('ApioDashboardApplication')
     console.log($scope.$parent.editorMongo);*/
   }
 
-  $scope.updateLaunch = function(oldId,newId,ino,html,js,mongo){
+  $scope.updateLaunch = function(oldId,newId,ino,html,js,mongo,makefile,icon){
     console.log('I am the updateLaunch updating the app: '+oldId)
+    console.log()
     $http.post('/apio/database/updateApioApp',
         {
           objectId : oldId,
@@ -58,7 +59,9 @@ angular.module('ApioDashboardApplication')
           ino   : ino,
           html  : html,
           js    : js,
-          mongo : mongo
+          mongo : mongo,
+          makefile : makefile,
+          icon : icon
         })
       .success(function(){
         // $scope.switchPage('Objects');
@@ -94,9 +97,10 @@ angular.module('ApioDashboardApplication')
     var actualId = $rootScope.currentApplication.objectId;
     var modifiedId = (JSON.parse($scope.mongo)).objectId;
 
+
     if(actualId===modifiedId){
       console.log('id has not been modified. It\'s just needed to update the file in the '+actualId+' folder')
-      $scope.updateLaunch(actualId,modifiedId,$scope.ino,$scope.html,$scope.js,$scope.mongo);
+      $scope.updateLaunch(actualId,modifiedId,$scope.ino,$scope.html,$scope.js,$scope.mongo,$scope.makefile,$scope.icon);
     }
     else{
       console.log('id has been modified.\n\tActualId: '+actualId+'\n\tModifiedId: '+modifiedId);
@@ -107,7 +111,19 @@ angular.module('ApioDashboardApplication')
         $http.post('/apio/app/folder',{id:modifiedId})
         .success(function(){
           console.log('folder '+modifiedId+'successfully created');
-          $scope.updateLaunch(actualId,modifiedId,$scope.ino,$scope.html,$scope.js,$scope.mongo);
+          //it's needed to modify the id in the files.
+          $scope.js=$scope.js.replace('ApioApplication'+actualId,'ApioApplication'+modifiedId+'');
+          $scope.js=$scope.js.replace('ApioApplication'+actualId,'ApioApplication'+modifiedId+'');
+          $scope.js=$scope.js.replace('ApioApplication'+actualId,'ApioApplication'+modifiedId+'');
+          
+          $scope.html=$scope.html.replace('ApioApplication'+actualId,'ApioApplication'+modifiedId+'');
+          $scope.html=$scope.html.replace('ApioApplication'+actualId,'ApioApplication'+modifiedId+'');
+          $scope.html=$scope.html.replace('applications/'+actualId+'/'+actualId+'.js','applications/'+modifiedId+'/'+modifiedId+'.js');
+
+          //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+          $scope.mongo=$scope.mongo.replace('"objectId":"'+actualId+'"','"objectId":"'+modifiedId+'"');
+
+          $scope.updateLaunch(actualId,modifiedId,$scope.ino,$scope.html,$scope.js,$scope.mongo,$scope.makefile,$scope.icon);
         })
         .error(function(){console.log('Error. Folder '+actualId+'not created')});
         })
