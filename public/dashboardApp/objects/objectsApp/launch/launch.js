@@ -14,6 +14,12 @@ angular.module('ApioDashboardApplication')
 
     });
 
+    $scope.exportInoFolder = function(){
+    	var id = $scope.currentApplication.objectId;
+    	console.log('exportInoFolder id '+id);
+    	window.open('/apio/app/exportIno?id='+id);
+    }
+
 	$scope.initApioDashboardObjectList = function() {
 	    //Carico gli oggetti
 	    objectService.list().then(function(d){

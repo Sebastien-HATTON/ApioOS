@@ -3,6 +3,7 @@ var targz = require('tar.gz');
 var formidable = require('formidable');
 var ncp = require('ncp').ncp;
 var Apio = require("../apio.js");
+var clone = require('git-clone');
 
 var deleteFolderRecursive = function(path) {
     console.log('deleting the directory '+path);
@@ -284,6 +285,7 @@ module.exports = {
 	    var object = {};
 	    var jsonObject = {};
 
+	    object.icon = fs.readFileSync('public/applications/'+id+'/icon.png');
 	    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
 	    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
 	    //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
@@ -317,6 +319,7 @@ module.exports = {
 	        fs.mkdirSync(path);
 	        fs.mkdirSync(path +'/'+ dummy);
 	        fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
+	        fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',object.mongo);
@@ -439,6 +442,7 @@ module.exports = {
 	                        var object = {};
 	                        var jsonObject = {};
 
+	                        object.icon = fs.readFileSync('upload/temp/'+id+'/icon.png');
 	                        object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
 	                        object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
 	                        //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
@@ -481,6 +485,7 @@ module.exports = {
 
 	                                fs.mkdirSync(path +'/'+ dummy);
 	                                fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
+	                                fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',JSON.stringify(object.mongo));
@@ -517,6 +522,90 @@ module.exports = {
 	        }
 	    });
 	
+	},
+	gitCloneApp : function(req,res){
+		console.log('/apio/app/gitCloneApp');
+		//clone(repo, targetPath, [options], cb)
+		var repo = req.body.gitPath;
+		var targetPath = "./temp";
+		deleteFolderRecursive("./temp"); // be sure temp folder does not exist. If exist it automatically delete it
+		fs.mkdirSync("./temp"); //create a new temp folder
+		clone(repo, targetPath, function(){
+			console.log('cloned repo '+repo+' in target '+targetPath);
+			console.log('uploading the app in the Apio Application folder');
+
+			Apio.Database.getMaximumObjectId(function(error, data){
+                if(error){
+                    console.log('error: '+error);
+                }
+                else if(data){
+                    console.log('data is: '+data);
+                    //qui rinomino i cazzetti nell'id attuale
+
+                    var id = '*_TMP_*';
+                    var path = './temp/'+id+'/'+id;
+                    var object = {};
+                    var jsonObject = {};
+
+                    object.icon = fs.readFileSync('./temp/'+id+'/icon.png');
+                    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
+                    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
+                    //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
+                    object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
+                    path = './temp/'+id+'/_'+id;
+                    object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
+                    object.makefile = fs.readFileSync(path+'/Makefile', {encoding: 'utf8'});
+
+                    //jsonObject = JSON.parse(object.json);
+                    jsonObject = JSON.parse(object.mongo);
+                    console.log('jsonObject.name: '+jsonObject.name);
+
+                    var dummy = (parseInt(data)+1).toString();
+                    console.log('new dummy is: '+ dummy)
+                    
+
+                    object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+                    object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+                    object.js=object.js.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+                    
+                    object.html=object.html.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+                    object.html=object.html.replace('ApioApplication'+id,'ApioApplication'+dummy+'');
+                    object.html=object.html.replace('applications/'+id+'/'+id+'.js','applications/'+dummy+'/'+dummy+'.js');
+
+                    //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
+                    //object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"')
+                    object.mongo=JSON.parse(object.mongo);
+                    console.log('"objectId before":"'+object.mongo.objectId+'"')
+                    object.mongo.objectId=dummy;
+                    console.log('"objectId after":"'+object.mongo.objectId+'"')
+                    
+                    //Apio.Database.db.collection('Objects').insert(JSON.parse(object.json),function(err,data){
+                    Apio.Database.db.collection('Objects').insert(object.mongo,function(err,data){
+                        if(err)
+                            console.log(err);
+                        else
+                        {
+                            var path = 'public/applications/';
+                            console.log('path + dummy:'+path + dummy);
+
+                            fs.mkdirSync(path +'/'+ dummy);
+                            fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
+                            fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
+                            fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
+                            fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
+                            fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',JSON.stringify(object.mongo));
+                            fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/_' + dummy + '.ino',object.ino);
+                            fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/Makefile',object.makefile);
+                            //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
+                            deleteFolderRecursive('./temp');
+                            res.send({id:dummy});
+                        }
+                    });
+				}
+
+			})
+			//res.send({data:'gitCloneApp has been executed'});	
+		})
 	}
 
 }

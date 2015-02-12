@@ -30,6 +30,33 @@ if (process.argv.indexOf('--serial-port') > -1) {
     Apio.Serial.Configuration.port = process.argv[index+1];
 }
 
+if (process.argv.indexOf('--profile') > -1) {
+    console.log("Profiling Apio Server")
+    var memwatch = require('memwatch');
+    var prettyjson = require('prettyjson');
+    var hd = new memwatch.HeapDiff();
+    memwatch.on('leak', function(info) {
+        console.log("\n\nMEMORY LEAK DETECTED")
+        console.log(prettyjson.render(info));
+        console.log("\n\n")
+    });
+    memwatch.on('stats', function(stats) {
+        console.log("Stats")
+        console.log(prettyjson.render(stats));
+        var diff = hd.end();
+        console.log(prettyjson.render(diff));
+        hd = new memwatch.HeapDiff();
+    });
+
+}
+
+if (process.argv.indexOf('--logmemory') > -1) {
+    fs.appendFileSync('memory.log',"--- "+(new Date()).toString()+"\n")
+    setInterval(function(){
+        fs.appendFileSync('memory.log', process.memoryUsage().heapUsed+"\n");
+    },5*1000)
+}
+
 
 var HOST = '192.168.1.109';
 var PORT = 6969;
@@ -123,16 +150,20 @@ app.post('/apio/adapter',function(req,res){
                 console.log(req_data);
                 console.log("\n\n")
                 var _req = request(req_data,function(error,response,body){
-
-                        if ('200' === response.statusCode || 200 === response.statusCode) {
+                        if ('undefined' !== typeof response){
+                            if ('200' === response.statusCode || 200 === response.statusCode) {
                             console.log("Apio Adapter method : got the following response from "+req.body.url)
                             console.log(body);
                             res.send(body)
+                            }
+                            else {
+                                console.log("Apio Adapter : Something went wrong ")
+                                res.status(response.statusCode).send(body);
+                            }
+                        } else {
+                            res.status(500).send();
                         }
-                        else {
-                            console.log("Apio Adapter : Something went wrong ")
-                            res.status(response.statusCode).send(body);
-                        }
+
                 });
 })
 
@@ -164,32 +195,15 @@ app.get('/apio/notifications/listDisabled',routes.core.notifications.listdisable
 app.post('/apio/notifications/markAsRead',routes.core.notifications.delete);
 app.post('/apio/notifications/disable',routes.core.notifications.disable);
 app.post('/apio/notifications/enable',routes.core.notifications.enable);
-app.get('/apio/notify/:message',function(req,res){
-    Apio.System.notify({objectId : "4545", objectName : "Piantana", message : "ciao", properties : {onoff : "1"}, timestamp : new Date().getTime()});
-    res.send({});
-});
+
 
     app.post('/apio/notify',function(req,res){
-        var numero_dita = req.body.finger;
-        var json;
-        if ('undefined' !== typeof numero_dita) {
-            json = {
-                objectId : '9',
-                objectName : 'ManoSve',
-                message : 'La Raspberry ha rilevato '+numero_dita+' dita.',
-                properties : {
-                    dita : numero_dita
-                },
-                timestamp : new Date().getTime()
-            };
-            Apio.System.notify(json)
-        } else {
-            console.log("Dita undefined")
-        }
-
-        res.send({});
 
 
+        console.log("REQ");
+        console.log(req.body);
+
+        var json = {};
 
         var incomingState = json;
         console.log("+++++++++++++++++++++++++++++\n\n")
@@ -417,6 +431,10 @@ app.put("/apio/event/:name",routes.core.events.update);
 ****************************************************************/
 
 app.post("/apio/state/apply",routes.core.states.apply);
+/*app.post("/apio/state/apply",function(req,res){
+    console.log("Ciao vorresti applicare uno stato, ma non puoi.")
+    res.send({});
+});*/
 
 app.delete("/apio/state/:name",function(req,res){
     console.log("Mi arriva da eliminare questo: "+req.params.name)
@@ -586,6 +604,9 @@ app.post('/apio/app/upload', routes.dashboard.uploadApioApp);
 /* APIO recovery of the actual maximum id in mongo -> apio -> Objects */
 app.post('/apio/app/maximumId', routes.dashboard.maximumIdApioApp);
 
+/* APIO clone from the git repo of a standard Apio App*/
+app.post('/apio/app/gitCloneApp', routes.dashboard.gitCloneApp);
+
 /* APIO delete of the App */
 app.post('/apio/app/delete', routes.dashboard.deleteApioApp);
 
@@ -611,6 +632,42 @@ app.get('/apio/database/getObject/:id',routes.core.objects.getById);
 app.patch('/apio/object/:id',routes.core.objects.update);
 app.put('/apio/object/:id',routes.core.objects.update);
 
+app.get("/apio/object/:obj", function(req, res){
+        Apio.Database.db.collection('Objects').findOne({objectId : req.params.obj},function(err, data){
+            if (err) {
+                console.log("Error while fetching object "+req.params.obj);
+                res.status(500).send({error : "DB"});
+            }
+            else {
+                res.status(200).send(data);
+            }
+        });
+    });
+
+    app.get("/apio/objects", function(req, res){
+        Apio.Database.db.collection('Objects').find().toArray(function(err, data){
+            if (err) {
+                console.log("Error while fetching objects");
+                res.status(500).send({error : "DB"});
+            }
+            else {
+                var json = {};
+                for(var i in data){
+                    json[i] = data[i];
+                }
+                res.status(200).send(json);
+            }
+        });
+    });
+
+    app.post("/apio/updateListElements", function(req, res){
+        console.log("REQ");
+        var b = req.body;
+        //b = eval('('+b+')')
+        console.log(b);
+        //console.log(req.body);
+        res.status(200).send("ricevuto");
+    });
 
 
 //Handling Serial events and emitting
@@ -628,10 +685,42 @@ Apio.io.on("connection", function(socket){
         Apio.Serial.send(data);
     });
 
+    //Streaming
+    socket.on("apio_client_stream", function(data){
+        socket.broadcast.emit("apio_server_update", data);
+        Apio.Serial.stream(data);
+    })
+
+
     console.log("a socket connected");
     socket.join("apio_client");
 
     socket.on("apio_client_update",function(data){
+        var x = data;
+        try{
+            data = eval('('+data+')');
+            var check = function(d){
+                for(var i in d){
+                    if(d[i] == 'true'){
+                        d[i] = true;
+                    }
+                    else if(d[i] == 'false'){
+                        d[i] = false;
+                    }
+                    else if(typeof d[i] === "number"){
+                        d[i] = d[i].toString();
+                    }
+                    else if(d[i] instanceof Object){
+                        check(d[i]);
+                    }
+                }
+            };
+            check(data);
+        }
+        catch(e){
+            data = x;
+        }
+
 
         console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         console.log("App.js on(apio_client_update)  received a message");
@@ -664,35 +753,8 @@ Apio.io.on("connection", function(socket){
             Apio.Util.debug("Skipping Apio.Serial.send");
 
 
-	//Controllo Se esiste uno stato che rispecchia lo stato attuale dell'oggetto
-	Apio.Database.db.collection('Objects')
-    .findOne({objectId:data.objectId},function(err,obj_data){
-        if (err || obj_data === null) {
-            console.log("An error has occurred while trying to figure out a state name")
-        } else {
-         Apio.Database.db.collection('States')
-        .find({objectId:obj_data.objectId}).toArray(function(error,states){
-            console.log("\n\n@@@@@@@@@@@@@@@@@@@")
-            console.log("Inizio controllo stati")
-            console.log("Ho "+states.length+" stati relativi all'oggetto "+obj_data.objectId);
-            states.forEach(function(state){
-                var test=true;
-                for(var key in state.properties)
-                    if (state.properties[key] !== obj_data.properties[key])
-                        test = false;
-                if (test === true) {
-                    console.log("Lo stato "+state.name+" corrisponde allo stato attuale dell'oggetto")
-                    Apio.System.applyState(state.name,function(err){
-                        if (err) {
-                            console.log("An error has occurred while applying the matched state")
-                        }
-                    })
-                }
-            })
-            console.log("Fine controllo degli stati\n\n@@@@@@@@@@@@@@@@@@@@@@@")
-        });   
-        }
-    })
+
+
 
     });
 });
@@ -711,6 +773,8 @@ Apio.io.listen(server);
 server.listen(APIO_CONFIGURATION.port,function() {
 console.log("APIO server started on port "+APIO_CONFIGURATION.port);
 });
+
+
 
 
 

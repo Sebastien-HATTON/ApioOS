@@ -40,7 +40,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 								throw new Error("The Push attribute must be a function name present in scope")
 							}
 						}
-						else{						
+						else{
 							scope.model = data.properties[attrs["propertyname"]];
 						}
 						//In particolare questa parte aggiorna il cloud nel caso siano state definite delle correlazioni
@@ -66,7 +66,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 	    	scope.propertyname = attrs["propertyname"];
 	    	scope.step = attrs["step"];
 	    	//
-	    	
+
 	    	//Variante: angular setta il value dell'input prima di settare max, min e step, questa procedura fa in modo di ri-settare questi attributi dopo che è cambiato il valore di model
 	    	scope.$watch('min', function(){
 	    		setValue();
@@ -83,7 +83,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
             scope.$on('propertyUpdate',function() {
             	scope.object = currentObject.get();
 			});
-			
+
 			//Se il controller modifica l'oggetto allora modifico il model;
 			scope.$watch("object.properties."+attrs["propertyname"], function(){
 			  	scope.model = scope.object.properties[attrs["propertyname"]];
@@ -96,10 +96,10 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
                     el.attr("min", scope.min);
                     el.attr("max", scope.max);
                     el.attr("step", scope.step);
-                    el.val(scope.model); 
+                    el.val(scope.model);
                 }
             }
-            
+
             function read(){
             	var el = $(elem).find("input");
                 scope.model = el.val();
@@ -112,7 +112,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 				scope.object.properties[attrs["propertyname"]] = scope.model;
 
 	    		if (!currentObject.isRecording()) {
-					
+
 					//
 
 					//Se è stato definito un listener da parte dell'utente lo eseguo altrimenti richiamo currentObject.update che invia i dati al DB e alla seriale
@@ -122,18 +122,19 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 					else{
 						if (attrs["updatedataonce"] && event == 'input') {
 							console.log("Syncing with serial only");
-							currentObject.update(attrs["propertyname"], scope.model,false,true);
+							currentObject.stream(attrs["propertyname"],scope.model)
+							//currentObject.update(attrs["propertyname"], scope.model,false,true);
 							//scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 						} else{
 							console.log("Syncing with database and serial");
-							
+
 							currentObject.update(attrs["propertyname"], scope.model);
 						}
-						
+
 						scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 					}
 					//
-					
+
 					//Se è stata definita una correlazione da parte dell'utente la eseguo
 					if(attrs["correlation"]){
 						scope.$parent.$eval(attrs["correlation"]);
@@ -142,8 +143,8 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 
 					 //Esegue codice javascript contenuto nei tag angular; dovendo modificare i valori dell'input bisogna dare a scope.$apply la funzione read
 					scope.$apply(read);
-						
-	    		}	
+
+	    		}
 			});
 			elem.on('mouseup touchend',function($event){
 				if (attrs["updatedataonce"] && event == 'input') {
@@ -152,7 +153,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 					//scope.$parent.object.properties[attrs["propertyname"]] = scope.model;
 				}
 			})
-		    
+
 
 		    //
 	    }

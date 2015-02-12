@@ -2,10 +2,41 @@
     <h3>Import</h3>
     <div class="">
         <div class="row">
+            <div class="col-md-3">
+                <h3>From Github</h3>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                  <input ng-model="gitPath" type="text" class="form-control" placeholder="Path to Github repo">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="gitImport(gitPath)">Import</button>
+                  </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+            <div id="modalGitClone" class="modal fade">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    
+                    <h4 class="modal-title">Cloning Application</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p>Cloning the Apio Application from the repo {{gitPath}}. Please wait.</p>
+                  </div>
+                  <div class="modal-footer">
+                   <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                    -->
+                  </div>
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+        </div>
+        <div class="row">
 
             <div class="col-md-3">
 
-                <h3>Select files</h3>
+                <h3>or select a local file</h3>
 
                 <!--<div ng-show="uploader.isHTML5">-->
                     <!-- 3. nv-file-over uploader="link" over-class="className" -->

@@ -25,7 +25,7 @@ angular.module('ApioApplication').controller('ApioHomeController',
  
 
        
-        socket.on('apio_notification', function(notification) {
+        /*socket.on('apio_notification', function(notification) {
 
             if (!("Notification" in window)) {
                 alert("Apio Notification : " + notification.message);
@@ -53,7 +53,7 @@ angular.module('ApioApplication').controller('ApioHomeController',
             }
 
 
-        });
+        });*/
 
         $scope.launchDashboard = function() {
             window.location = 'dashboard#/home'
@@ -114,6 +114,7 @@ angular.module('ApioApplication').controller('ApioHomeController',
                     if (window.innerWidth > 769) {
                         $("#ApioIconsContainer").css("width", "100%");
                     }
+                    document.getElementById("ApioApplicationContainer").classList.remove("fullscreen");
                     $location.path("/app#/home");
                     $scope.$apply();
                 });
@@ -141,6 +142,7 @@ angular.module('ApioApplication').controller('ApioHomeController',
                     if (window.innerWidth > 769) {
                         $("#ApioIconsContainer").css("width", "100%");
                     }
+                    document.getElementById("ApioApplicationContainer").classList.remove("fullscreen");
                     $location.path("/app#/home");
                     $scope.$apply();
                 });

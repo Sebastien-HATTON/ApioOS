@@ -11,4 +11,21 @@ angular.module('ApioDashboardApplication')
             	window.open('/apio/app/exportIno?id='+response.id);            	
             }
         });	
+      $scope.gitImport = function(path){
+            console.log("git path: "+path);
+            $('#modalGitClone').modal('show');
+            $http.post('/apio/app/gitCloneApp',{gitPath: path})
+              .success(function(data,status,headers){
+                $('#modalGitClone').modal('hide');
+                $state.go('objects.objectsLaunch',{'reload':true});
+                  console.log('response: ')
+                  console.log(data)
+                  alert('Application successfully uploaded! Keep in mind to deactivate the popup block to enable the firmware automatic download.')
+                  window.open('/apio/app/exportIno?id='+data.id);
+              })
+              .error(function(){
+                  $('#modalGitClone').modal('hide');
+                  console.log("An error has occurred while cloning the repo")
+              });
+      }
 }]);

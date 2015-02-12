@@ -18,16 +18,6 @@
 				Apio.NotificationCenter.pushEvent(event);  //altrimenti lo faccio gestire dal centro notifiche
 			*/
 		});
-
-    Apio.socket.on('apio_object_offline',function(event){
-      alert('The object is not online');
-      //Se arriva un evento inerente ad una app aperta, la updato subito
-      /*if (Apio.Application.hasOwnProperty('current') && Apio.Application.getCurrentApplication().objectId == event.objectId)
-        Apio.Application.getApplicationById(event.objectId).update(event);
-      else
-        Apio.NotificationCenter.pushEvent(event);  //altrimenti lo faccio gestire dal centro notifiche
-      */
-    });
 	};
 
 
@@ -175,7 +165,7 @@ Apio.Util.ApioToJSON = function(str) {
 },{}],2:[function(require,module,exports){
 var Apio = require ('./apio.client.js');
 //var q = require("./bower_components/q");
-//Trova un modo migliore per iniettare le dipendenze 
+//Trova un modo migliore per iniettare le dipendenze
 window.Apio = Apio;
 window.$ = $;
 Apio.Socket.init();
@@ -210,7 +200,7 @@ window.swipe = function(target, callback){
             }, 700, callback());
         }
     });
-    
+
     //Mouse event
     $("#"+target).on("mousedown", function(event){
         startX = event.pageX;
@@ -224,7 +214,7 @@ window.swipe = function(target, callback){
                 direction: 'right'
             }, 700, callback());
         }
-    });	
+    });
 }
 window.affix = function(targetScoll,target,top,bottom,callback,callback1){
 var startY;
@@ -238,7 +228,7 @@ var firstInteract = 1;
 var interact = 0;
  $("#"+targetScoll).on("touchstart", function(event){
  	//alert('');
-	touch = 0; 
+	touch = 0;
 	if(firstInteract == 1){
 	firstInteract = 0;
 		if(top === null){
@@ -249,7 +239,7 @@ var interact = 0;
  });
  $("#"+targetScoll).on("scroll", function(event){
  	//alert('');
-	touch = 0; 
+	touch = 0;
 	if(firstInteract == 1){
 	firstInteract = 0;
 		if(top === null){
@@ -284,7 +274,7 @@ var interact = 0;
             }
         }
     }, 100) ;
-   
+
 }
 
 
@@ -319,7 +309,7 @@ ApioApplication.config(['$routeProvider',
 ApioApplication.factory('socket', function ($rootScope) {
   return {
     on: function (eventName, callback) {
-      Apio.socket.on(eventName, function () {  
+      Apio.socket.on(eventName, function () {
         var args = arguments;
         $rootScope.$apply(function () {
           callback.apply(Apio.socket, args);
@@ -351,11 +341,11 @@ ApioApplication.factory('objectService', ['$rootScope','$http',function($rootSco
       var promise = $http.get('/apio/database/getObject/'+id).then(function(response){
         return response;
       })
-      return promise;      
+      return promise;
     }
   }
 }])
-	
+
 ApioApplication.directive('ngTouchEnd', function() {
     return function(scope, element, attrs) {
       var tapping;
@@ -376,7 +366,7 @@ ApioApplication.factory('DataSource', ['$http',function($http){
                       // it to the success function below
                         var x2js = new X2JS();
                         var json = x2js.xml_str2json( data );
-                        
+
                         console.log(json);
                         return json;
                         }
@@ -391,11 +381,11 @@ ApioApplication.factory('DataSource', ['$http',function($http){
        }
     }]);
 
-
 /*
+
 ApioApplication.controller('ApioNotificationController',['$scope','$http','socket',function($scope,$http,socket){
         socket.on('apio_notification', function(notification) {
-
+            console.log(notification)
             if (!("Notification" in window)) {
                 alert("Apio Notification : " + notification.message);
             }
@@ -406,6 +396,7 @@ ApioApplication.controller('ApioNotificationController',['$scope','$http','socke
                     body: notification.message,
                     icon : '/images/Apio_Logo.png'
                 });
+
             }
 
             // Otherwise, we need to ask the user for permission
@@ -429,18 +420,18 @@ ApioApplication.controller('ApioNotificationController',['$scope','$http','socke
 */
 
 ApioApplication.filter('removeUndefinedFilter',function(){
-  
+
   return function(items) {
     var filtered = [];
     items.forEach(function(x){
       if ('undefined' !== typeof x)
         filtered.push(x);
     })
-        
+
     return filtered;
   }
 });
-    
+
 var apioProperty = angular.module('apioProperty', ['ApioApplication']);
 
   ApioApplication.service('currentObject', ['$rootScope','$window','socket','objectService','$http',function($rootScope, $window,socket,objectService,$http){
@@ -486,6 +477,14 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
         else
           _recordingObjectName = name;
       },
+      stream : function(prop,value) {
+        var packet = {
+          objectId : obj.objectId,
+          properties : {}
+        }
+        packet.properties[prop] = value;
+        socket.emit('apio_client_stream',packet);
+      },
       update : function(prop,value,writeDb,writeSerial) {
         if ('undefined' == typeof writeDb)
           writeDb = true;
@@ -502,7 +501,7 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
         }
         o.properties[prop] = value;
         socket.emit('apio_client_update', o);
-  
+
 
       },
       updateMultiple : function(update,writeDb,writeSerial) {
@@ -544,7 +543,7 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
             if ('function' == typeof c)
               c()
           })
-        
+
       },
       JSONToArray : function(obj){
        var arr = [];
@@ -563,12 +562,5 @@ var apioProperty = angular.module('apioProperty', ['ApioApplication']);
 
     return $window.sharedService;
   }]);
-
-
-
-
-    
-
-
 
 },{"./apio.client.js":1}]},{},[2]);

@@ -1,4 +1,5 @@
 var Apio = require("../apio.js");
+var async = require('async');
 var APIO_CONFIGURATION = {
     port : 8083
 }
@@ -102,7 +103,8 @@ module.exports = {
 		delete : function(req,res) {
 
 		},
-		apply : function(req,res){
+		applyOld : function(req,res){
+
     function pause(millis) {
         var date = new Date();
         var curDate = null;
@@ -132,7 +134,7 @@ module.exports = {
                     arr.push(state);
                     Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
                         if (err) {
-                            console.log("Non ho potuto settare il flag a true");
+                            //console.log("Non ho potuto settare il flag a true");
                         }
                         else {
                             var s = state;
@@ -151,16 +153,16 @@ module.exports = {
                                 console.log("error while fetching events");
                                 console.log(err);
                             }
-                            console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                            console.log(data);
+                            //console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                            //console.log(data);
                             if(callback && data.length == 0){
                                 callback();
                             }
                             //data è un array di eventi
                             data.forEach(function(ev,ind,ar){
                                 var states = ev.triggeredStates;
-                                console.log("states vale:");
-                                console.log(states)
+                                //console.log("states vale:");
+                                //console.log(states)
                                 states.forEach(function(ee,ii,vv){
                                     applyStateFn(ee.name, callback, true);
                                 })
@@ -193,7 +195,7 @@ module.exports = {
                                 Apio.io.emit('apio_state_update',s);
                             }
                         });
-                        console.log("Lo stato che sto per applicare è ");
+                        //console.log("Lo stato che sto per applicare è ");
                         //console.log(state);
                         Apio.Database.updateProperty(state,function(){
                             stateHistory[state.name] = 1;
@@ -201,30 +203,40 @@ module.exports = {
                             Apio.io.emit("apio_server_update",state);
                             Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
                                 if (err) {
-                                    console.log("error while fetching events");
-                                    console.log(err);
+                                    //console.log("error while fetching events");
+                                    //console.log(err);
                                 }
-                                console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                                console.log(data);
+                                //console.log("Ho trovato eventi scatenati dallo stato "+state.name);
+                                //console.log(data);
                                 if(callback && data.length == 0){
                                     callback();
                                 }
                                 //data è un array di eventi
                                 data.forEach(function(ev,ind,ar){
                                     var states = ev.triggeredStates;
-                                    console.log("states vale:");
-                                    console.log(states)
-                                    states.forEach(function(ee,ii,vv){
+                                    //console.log("states vale:");
+                                    //console.log(states)
+                                    /*states.forEach(function(ee,ii,vv){
                                         applyStateFn(ee.name, callback, true);
+                                    })*/
+                                    async.each(states, function(state, thecallback) {
+                                      applyStateFn(state.name, callback, true);
+                                    },function(err){
+                                      if (err)
+                                        console.log("ERRORE")
+                                      res.send();
+                                      console.log("NON FACIO ALTRO PADRONE")
                                     })
+
                                 })
+                                
                             });
                         });
                     }
                 }
             })
         } else {
-            console.log("Skipping State application because of loop.")
+            //console.log("Skipping State application because of loop.")
         }
     }; //End of applyStateFn
         applyStateFn(incomingState.name, function(){
@@ -240,7 +252,7 @@ module.exports = {
                 //console.log("arr vale:");
                 //console.log(arr);
                 for (var i in arr) {
-                    console.log("Mando alla seriale la roba numero "+i)
+                    //console.log("Mando alla seriale la roba numero "+i)
                     Apio.Serial.send(arr[i], function () {
                         pause(100);
                     });
@@ -254,6 +266,12 @@ module.exports = {
               //res.send({});
             }
         }, false);
+    },
+    apply: function(req,res) {
+      var state = req.body.state;
+      console.log("Devo applicare "+state.name)
+      Apio.System.applyState(state.name);
+      res.send({});
     },
 		getByName : function(req,res){
 		    Apio.Database.db.collection("States").findOne({name : req.params.name},function(err,data){
