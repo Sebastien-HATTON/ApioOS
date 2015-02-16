@@ -6,13 +6,32 @@
                 <h3>From Github</h3>
             </div>
             <div class="col-md-6">
-                <div class="input-group">
-                  <input ng-model="gitPath" type="text" class="form-control" placeholder="Path to Github repo">
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="gitImport(gitPath)">Import</button>
-                  </span>
-                </div><!-- /input-group -->
+                <div class="row">
+                    <label for="officialRepo" class="col-sm-5 control-label">Official Apio App</label>
+                    <div class="input-group col-sm-10" style="margin-left:15px">
+                      <select ng-model="gitPathOfficial" class="form-control"  id="officialRepo">
+                        <option value="https://github.com/ApioLab/ServoMotor">ServoMotor</option>
+                        <option value="https://github.com/ApioLab/Stereo">Stereo</option>
+                        <option value="https://github.com/ApioLab/irrigationSystem">IrrigationSystem</option>
+                        <option value="https://github.com/ApioLab/LedStrip">LedStrip</option>                        
+                        <option value="https://github.com/ApioLab/MoistureSensor">MoistureSensor</option>
+                      </select>
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="gitImport(gitPathOfficial)">Import</button>
+                      </span>
+                    </div><!-- /input-group -->
+                </div>
+                <div class="row">
+                    <label for="officialRepoPath" class="col-sm-5 control-label">Any Compatible Repo</label>
+                    <div class="input-group col-sm-10" style="margin-left:15px">
+                      <input ng-model="gitPath" type="text" class="form-control" placeholder="Path to Github repo" id="officialRepoPath">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="gitImport(gitPath)">Import</button>
+                      </span>
+                    </div><!-- /input-group -->
+                </div>
             </div><!-- /.col-lg-6 -->
+
             <div id="modalGitClone" class="modal fade">
               <div class="modal-dialog">
                 <div class="modal-content">
