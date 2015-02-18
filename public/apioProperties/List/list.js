@@ -60,12 +60,25 @@ apioProperty.directive("list", ["currentObject", "socket", "$timeout", function(
 				}
 			});
 
+            socket.on("list_updated", function(data){
+                scope.object.db = data;
+                scope.object.db[attrs["propertyname"]]["-1"] = "";
+                scope.object.properties[attrs["propertyname"]] = "-1";
+                if(attrs.hasOwnProperty("arraylist")){
+                    scope.arr = currentObject.JSONToArray(scope.object.db[attrs["propertyname"]]);
+                }
+                else{
+                    scope.arr = scope.object.db[attrs["propertyname"]];
+                }
+                alert("List "+attrs["label"]+" successfully updated");
+            });
+
 			//Se il controller modifica l'oggetto allora modifico il model;
 			scope.$watch("object.properties."+attrs["propertyname"], function(){
 			  	scope.model = scope.isArray ? parseInt(scope.object.properties[attrs["propertyname"]]) : scope.object.properties[attrs["propertyname"]];
 	    	});
 	    	//
-	    	
+
             scope.$on('propertyUpdate',function() {
             	scope.object = currentObject.get();
 			});
