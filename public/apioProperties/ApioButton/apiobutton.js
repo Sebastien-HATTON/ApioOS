@@ -44,7 +44,6 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
 	    	//Inizializzo la proprietà con i dati memorizzati nel DB
 	    	scope.innertext = attrs["innertext"];
 	    	scope.label = attrs["label"];
-	    	scope.model = scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
 	    	//
 	    	
