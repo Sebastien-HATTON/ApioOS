@@ -6,7 +6,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 	    scope: {
 	    	model: "=propertyname"
 	    },
-	    templateUrl: "apioProperties/Slider/slider.html",
+	    templateUrl: "/apioProperties/Slider/slider.html",
 	    link: function(scope, elem, attrs){
 	    	scope.object = currentObject.get();
 	    	scope.currentObject = currentObject;
@@ -63,7 +63,7 @@ apioProperty.directive("slider", ["currentObject", "socket", "$timeout", functio
 	    	scope.max = attrs["max"];
 			scope.min = attrs["min"];
 	    	scope.model = scope.object.properties.hasOwnProperty(attrs["propertyname"]) ? scope.object.properties[attrs["propertyname"]] : attrs["value"];
-            alert(scope.model);
+            //alert(scope.model);
 	    	scope.propertyname = attrs["propertyname"];
 	    	scope.step = attrs["step"];
 	    	//
