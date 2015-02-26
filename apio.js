@@ -364,28 +364,44 @@
 
 
 
+        if(typeof data === "object"){
+            var keys = Object.keys(data.properties);
 
-        var keys = Object.keys(data.properties);
 
+            Apio.Database.db.collection('Objects').findOne({
+                objectId: data.objectId
+            }, function(err, doc) {
+                if (err) {
+                    console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
+                } else {
+                    data.address = doc.address;
+                    data.protocol = doc.protocol;
 
-        Apio.Database.db.collection('Objects').findOne({
-            objectId: data.objectId
-        }, function(err, doc) {
-            if (err) {
-                console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
-            } else {
-                data.address = doc.address;
-                data.protocol = doc.protocol;
+                    var counter = 0;
+                    var numberOfKeys = keys.length;
+                    var available = true;
+                    keys.forEach(function(key) {
+                        packageMessageAndAddToQueue(data.protocol, data.address, key, data.properties[key], function(err) {})
+                    })
 
-                var counter = 0;
-                var numberOfKeys = keys.length;
-                var available = true;
-                keys.forEach(function(key) {
-                    packageMessageAndAddToQueue(data.protocol, data.address, key, data.properties[key], function(err) {})
-                })
-
+                }
+            })
+        }
+        else if(typeof data === "string"){
+            var protocolAndAddress = data.split(":");
+            protocolAndAddress = protocolAndAddress[0];
+            var dataComponents = data.split("-");
+            for(var i in dataComponents){
+                if(dataComponents[i] !== ""){
+                    if(dataComponents[i].indexOf(protocolAndAddress) > -1){
+                        Apio.Serial.queue.push(dataComponents[i]+"-");
+                    }
+                    else{
+                        Apio.Serial.queue.push(protocolAndAddress+":"+dataComponents[i]+"-");
+                    }
+                }
             }
-        })
+        }
     }
     /*
      *	used when the Server Apio has received some message on the serial from

@@ -10,7 +10,7 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
 	    link: function(scope, elem, attrs){
 	    	scope.object = currentObject.get();
 	    	scope.currentObject = currentObject;
-            scope.vale = attrs["value"] ? attrs["value"] : 1;
+            scope.model = attrs["value"] ? attrs["value"] : 1;
 	    	scope.isRecorded = function() {
 	    		return scope.currentObject.record(attrs['propertyname']);
 	    	}
@@ -44,7 +44,6 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
 	    	//Inizializzo la proprietà con i dati memorizzati nel DB
 	    	scope.innertext = attrs["innertext"];
 	    	scope.label = attrs["label"];
-	    	scope.model = scope.object.properties[attrs["propertyname"]];
 	    	scope.propertyname = attrs["propertyname"];
 	    	//
 	    	
@@ -64,7 +63,7 @@ apioProperty.directive("apiobutton", ["currentObject", "socket", "$timeout", fun
                         scope.$parent.$eval(attrs["listener"]);
                     }
                     else{
-                        currentObject.update(attrs["propertyname"], scope.value);
+                        currentObject.update(attrs["propertyname"], scope.model);
                     }
 					//
 					
