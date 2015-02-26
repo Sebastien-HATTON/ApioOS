@@ -49,14 +49,10 @@ module.exports = {
 	    var makefile = req.body.makefile;
 	    console.log('updating the object: '+objectId)+' with the new id '+newId;
 	    console.log('ino: '+ino);
-
-	    console.log('GUARDA QUAAAAAA IN UPDATEEEE')
 	    console.log(makefile)
 
 	    //si potrebbero usare writeFile (asincrono) annidati ed eliminare il try catch
-
 	    if(objectId === newId){
-	    	console.log("NEEEEEEEEEEEEEEEEEEEEEEEW")
 	    	Apio.Database.db.collection('Objects').update({'objectId':objectId},JSON.parse(mongo),function(error){
 	    		if(error){
 	    			console.log(error);
@@ -74,7 +70,6 @@ module.exports = {
 	    		}
 	    	})
 	    }else{
-	    	console.log("ELSEEEEEEEEEEEEEEEEEEEEEEEEE")
 	    	Apio.Database.db.collection('Objects').insert(JSON.parse(mongo),function(error,count){
 	    		if(error){
 	    			console.log(error);
@@ -82,6 +77,11 @@ module.exports = {
 	       			res.status(500).send();
 	    		}
 	    		else{
+
+	    			if(req.body.hasOwnProperty('adapter')){
+						fs.writeFileSync(path+'/'+dummy+'/adapter.js',req.body.adapter);	    		
+			    	}
+
 		    		fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/_' + newId + '.ino',ino);
 			        fs.writeFileSync('public/applications/'+newId+'/_' + newId + '/Makefile',makefile);
 			        fs.writeFileSync('public/applications/'+newId+'/icon.png',icon, {encoding:'base64'});
@@ -115,6 +115,10 @@ module.exports = {
 	    var path = 'public/applications/'+id+'/'+id;
 	    console.log(path);
 	    var object = {};
+
+	    if( fs.existsSync('public/applications/'+id+'/adapter.js') ) {
+	    	object.adapter = fs.readFileSync('public/applications/'+id+'/adapter.js')
+	    }
 
 	    object.icon = fs.readFileSync('public/applications/'+id+'/icon.png', {encoding:'base64'});
 	    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
@@ -297,6 +301,10 @@ module.exports = {
 	    var object = {};
 	    var jsonObject = {};
 
+	    if( fs.existsSync('public/applications/'+id+'/adapter.js') ) {
+	    	object.adapter = fs.readFileSync('public/applications/'+id+'/adapter.js')
+	    }
+
 	    object.icon = fs.readFileSync('public/applications/'+id+'/icon.png');
 	    object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
 	    object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
@@ -331,6 +339,9 @@ module.exports = {
 	        fs.mkdirSync(path);
 	        fs.mkdirSync(path +'/'+ dummy);
 	        fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
+	    	if(object.hasOwnProperty('adapter')){
+				fs.writeFileSync(path+'/'+dummy+'/adapter.js',object.adapter);	    		
+	    	}
 	        fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
 	        fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
@@ -453,7 +464,9 @@ module.exports = {
 	                        var path = 'upload/temp/'+id+'/'+id;
 	                        var object = {};
 	                        var jsonObject = {};
-
+	                        if( fs.existsSync('upload/temp/'+id+'/adapter.js') ) {
+								object.adapter = fs.readFileSync('upload/temp/'+id+'/adapter.js')
+							}
 	                        object.icon = fs.readFileSync('upload/temp/'+id+'/icon.png');
 	                        object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
 	                        object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
@@ -497,6 +510,9 @@ module.exports = {
 
 	                                fs.mkdirSync(path +'/'+ dummy);
 	                                fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
+	                                if(object.hasOwnProperty('adapter')){
+										fs.writeFileSync(path+'/'+dummy+'/adapter.js',object.adapter);	    		
+									}
 	                                fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
 	                                fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
