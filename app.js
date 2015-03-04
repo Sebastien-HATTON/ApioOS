@@ -723,6 +723,15 @@ Apio.io.on("connection", function(socket){
 
 
     console.log("a socket connected");
+    var sys = require('sys');
+    var exec = require('child_process').exec;
+    var child = exec("hostname -I", function (error, stdout, stderr) {
+        sys.print("Your IP address is: "+stdout);
+        //sys.print('stderr: '+stderr);
+        if (error !== null) {
+            console.log('exec error: '+error);
+        }
+    });
     socket.join("apio_client");
 
     socket.on("apio_client_update",function(data){
