@@ -295,6 +295,7 @@ module.exports = {
 
 		},
 		list : function(req,res) {
+			/* OLD
 			var currentUser = 'matteo.di.sabatino.1989@gmail.com';
 
 			Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
@@ -306,8 +307,31 @@ module.exports = {
 					res.send(doc.unread_notifications);
 				}
 			})
+            */
+            //NEW
+            Apio.Database.db.collection("Users").find().toArray(function(err, data){
+                if(err){
+                    console.log("Unable to find collection Users");
+                }
+                else if(data.length === 1){
+                    var currentUser = data[0].email;
+                    Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
+                        if(err) {
+                            console.log("Un errore ");
+                            console.log(err);
+                            res.status(500).send({});
+                        } else {
+                            res.send(doc.unread_notifications);
+                        }
+                    });
+                }
+                else{
+                    console.log("Unable to find users");
+                }
+            });
 		},
 		listdisabled : function(req,res) {
+            /* OLD
 			var currentUser = 'matteo.di.sabatino.1989@gmail.com';
 
 			Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
@@ -319,6 +343,28 @@ module.exports = {
 					res.send(doc.disabled_notification);
 				}
 			})
+			*/
+            //NEW
+            Apio.Database.db.collection("Users").find().toArray(function(err, data){
+                if(err){
+                    console.log("Unable to find collection Users");
+                }
+                else if(data.length === 1){
+                    var currentUser = data[0].email;
+                    Apio.Database.db.collection('Users').findOne({email : currentUser},function(err,doc){
+                        if(err) {
+                            console.log("Un errore ");
+                            console.log(err);
+                            res.status(500).send({});
+                        } else {
+                            res.send(doc.disabled_notification);
+                        }
+                    });
+                }
+                else{
+                    console.log("Unable to find users");
+                }
+            });
 		},
 		delete : function(req,res){
 			var notif = req.body.notification;
