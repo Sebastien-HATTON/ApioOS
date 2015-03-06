@@ -497,6 +497,8 @@ angular.module('ApioDashboardApplication')
             }
          }
          this.ino += '\t\t\t//Do Something\n\t\t}\n';
+         this.ino += '\t\t\tproperty==""\n\t\t}\n';
+         this.ino += '\t\t\t//Do Something\n\t\t}\n';
          this.ino += '\t}\n';
        }
        else if(objectToParse.properties[key].type=="List")
@@ -507,6 +509,7 @@ angular.module('ApioDashboardApplication')
            this.ino +='\t\tif(value=="'+objectToParse.properties[key].items[keykey]+'"){\n';
            this.ino +='\t\t\t//Do Something\n\t\t}\n';
          }
+         this.ino += '\t\t\tproperty==""\n\t\t}\n';
          this.ino += '\t}\n';
        }
        else if(objectToParse.properties[key].type=="Slider")
@@ -517,6 +520,7 @@ angular.module('ApioDashboardApplication')
               this.ino += '\t\t\tanalogWrite('+objectToParse.pins[keyPin].name+',value.toInt());\n'
             }
          }
+         this.ino += '\t\t\tproperty==""\n\t\t}\n';
           this.ino += '\t}\n';
 
        }
@@ -558,6 +562,7 @@ angular.module('ApioDashboardApplication')
        {
         this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
          this.ino += '\t\t//Do Something\n\t';
+         this.ino += '\t\t\tproperty==""\n\t\t}\n';
          this.ino += '\t}\n';
        }
 
