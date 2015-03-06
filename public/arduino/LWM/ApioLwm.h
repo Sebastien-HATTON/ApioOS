@@ -1,15 +1,13 @@
+
 /*---------------------constants definition-----------------------------*/
 
 #define COORDINATOR_ADDRESS_LWM  0
-#define ARRAY_LENGTH 10
 
 /*---------------------variables definition-----------------------------*/
 
 String deviceAddr;
 String property; // variables that are to be processed in the running loop
 String value;  // variables that are to be processed in the running loop
-String propertyArray[ARRAY_LENGTH];
-String valueArray[ARRAY_LENGTH];
 
 char sendThis[100];
 int numberkey=0;
@@ -36,37 +34,23 @@ void divide_string(String stringToSplit) {
   //Serial1.println(stringToSplit); //debug
   int i; //counter
   deviceAddr=""; 
-  for(i=0; i<strlen ; i++)
+
+  //Serial1.println(numberkey);
+  //-----------deviceAddr----------------  
+  
+  for(i=0; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
   {
-    if(stringToSplit.charAt(i)=='-')
-      numberkey++;
+    deviceAddr += String(stringToSplit.charAt(i));
   }
-  i=0;
-  for(j; j<numberkey ;j++)
+  for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
   {
-    
-    for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
-    {
-      deviceAddr += String(stringToSplit.charAt(i));
-    }
-    //-----------property----------------
-
-    for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
-    {
-      propertyArray[j] += String(stringToSplit.charAt(i));
-    }
-
-    
-    //-----------value----------------  
-    
-    for(i++; stringToSplit.charAt(i)!='-' && i<strlen ;i++)
-    {
-      valueArray[j] += String(stringToSplit.charAt(i)); 
-    }
-    
+      property+= String(stringToSplit.charAt(i));
+  }
+  for(i++; stringToSplit.charAt(i)!='-' && i<strlen ;i++)
+  {
+    value += String(stringToSplit.charAt(i)); 
   }
 }
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
@@ -109,41 +93,13 @@ static void appDataConf(NWK_DataReq_t *req)
   
 }
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-//This function choose property and value from propertyArray valueArray. This must be declared on every loop(Can be
-//placed in input?)
-void select()
-{
-
-  if(x==numberkey && flag==1)
-  {
-    x=0;
-    for(int k=0; k<numberkey; k++)
-    {
-      propertyArray[k]="";
-      valueArray[k]="";
-    }
-    numberkey=0;
-    j=0;
-    flag=0;
-    
-  }
-  if(numberkey!=0)
-  {
-    property=propertyArray[x];
-    value=valueArray[x];
-    x++;
-    flag=1;
-    //Serial.println(property+":"+value);
-  }
-}
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 void apioLoop()
 {
     SYS_TaskHandler();
-    select();
+    //select();
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -215,12 +171,19 @@ void apioSend(String toSend)
 void apioSetup(uint16_t objectAddress)
 {
   SYS_Init();
+  NWK_Init();
+  pinMode(21, OUTPUT);
+  digitalWrite(21,HIGH);
+  delay(500);
+  digitalWrite(21,LOW);
+  delay(500);
   NWK_SetAddr(objectAddress);
   NWK_SetPanId(0x01);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, apioReceive);
   SYS_TaskHandler();
+  //NWK_Init();
   delay(500);
 
 }

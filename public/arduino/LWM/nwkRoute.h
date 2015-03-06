@@ -54,6 +54,8 @@ extern "C" {
 #include "nwkFrame.h"
 
 /*- Definitions ------------------------------------------------------------*/
+//This define enable Routing there is another parameters that allow DISCOVERY
+#define NWK_ENABLE_ROUTING              1
 #define NWK_ROUTE_UNKNOWN            0xffff
 #define NWK_ROUTE_NON_ROUTING        0x8000
 
