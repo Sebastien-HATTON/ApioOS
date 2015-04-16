@@ -596,15 +596,16 @@ module.exports = {
                     var object = {};
                     var jsonObject = {};
 
-                    object.icon = fs.readFileSync('./temp/'+id+'/icon.png');
+                    if( fs.existsSync('./temp/'+id+'/adapter.js') ) {
+						object.adapter = fs.readFileSync('./temp/'+id+'/adapter.js')
+					}
+
+                    object.icon = fs.readFileSync('./temp/'+id+'/icon.png', {encoding: 'base64'});
                     object.js = fs.readFileSync(path+'.js', {encoding: 'utf8'});
                     object.html = fs.readFileSync(path+'.html', {encoding: 'utf8'});
                     //object.json = fs.readFileSync(path+'.json', {encoding: 'utf8'});
                     object.mongo = fs.readFileSync(path+'.mongo', {encoding: 'utf8'});
 
-                    
-                    
-                    console.log('STRONZISSIMO')
                     console.log(object.mongo)
                     path = './temp/'+id+'/_'+id;
                     object.ino = fs.readFileSync(path+'/_'+id+'.ino', {encoding: 'utf8'});
@@ -629,7 +630,6 @@ module.exports = {
                     //object.json=object.json.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"');
                     //object.mongo=object.mongo.replace('"objectId":"'+id+'"','"objectId":"'+dummy+'"')
                     object.mongo=JSON.parse(object.mongo);
-                    console.log('STRONZISSIMO DUE')
                     console.log(object.mongo)
                     console.log('"objectId before":"'+object.mongo.objectId+'"')
                     object.mongo.objectId=dummy;
@@ -647,21 +647,22 @@ module.exports = {
                         {
                             var path = 'public/applications/';
                             console.log('path + dummy:'+path + dummy);
-                            console.log('STRONZO')
                             console.log(object.mongo)
-                            console.log('STRONZO A STRINGA')
                             console.log(JSON.stringify(object.mongo))
 
                             fs.mkdirSync(path +'/'+ dummy);
                             fs.mkdirSync(path +'/'+ dummy + '/_' + dummy);
-                            fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon);
+                            if(object.hasOwnProperty('adapter')){
+								fs.writeFileSync(path+dummy+'/adapter.js',req.body.adapter);	    		
+							}
+                            fs.writeFileSync(path+'/'+dummy+'/icon.png',object.icon, {encoding: 'base64'});
                             fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.html',object.html);
                             fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.js',object.js);
                             //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',JSON.stringify(object.mongo));
                             fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.mongo',appoggio);
                             fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/_' + dummy + '.ino',object.ino);
                             fs.writeFileSync(path+'/'+dummy+'/_' + dummy + '/Makefile',object.makefile);
-                            //fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
+                            fs.writeFileSync(path+'/'+dummy+'/' + dummy + '.json',object.json);
                             deleteFolderRecursive('./temp');
                             res.send({id:dummy});
                         }
@@ -672,5 +673,4 @@ module.exports = {
 			//res.send({data:'gitCloneApp has been executed'});	
 		})
 	}
-
 }
