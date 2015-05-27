@@ -11,6 +11,9 @@ String value;  // variables that are to be processed in the running loop
 String propertyArray[ARRAY_LENGTH];
 String valueArray[ARRAY_LENGTH];
 
+String messageStack[ARRAY_LENGTH];
+int indexStack=0;
+
 char sendThis[100];
 int numberkey=0;
 int j=0;
@@ -69,8 +72,8 @@ void divide_string(String stringToSplit) {
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
-//callback for the management of the confirmation (access the field message->opzioni) and verification of ack 
+//NEW: Se l'ack è ok allora riduce l'indice dello stack altrimenti rinvia quel messaggio con la funzione
+//ApioSend
 static void appDataConf(NWK_DataReq_t *req)
 {
   //Serial1.print("ACK: "); //debug
@@ -78,24 +81,43 @@ static void appDataConf(NWK_DataReq_t *req)
   {
     case NWK_SUCCESS_STATUS:
       //Serial1.print(1,DEC);
+      indexStack--;
+      //messageStack[indexStack]="";
       break;
     case NWK_ERROR_STATUS:
       //Serial1.print(2,DEC);
+      SYS_TaskHandler();
+      apioSend(messageStack[indexStack]);
       break;
     case NWK_OUT_OF_MEMORY_STATUS:
       //Serial1.print(3,DEC);
+      SYS_TaskHandler();
+      apioSend(messageStack[indexStack]);
+
       break;
     case NWK_NO_ACK_STATUS:
       //Serial1.print(4,DEC);
+      SYS_TaskHandler();
+      apioSend(messageStack[indexStack]);
+
       break;
     case NWK_NO_ROUTE_STATUS:
       //Serial1.print(5,DEC);
+      SYS_TaskHandler();
+      apioSend(messageStack[indexStack]);
+
       break;
     case NWK_PHY_CHANNEL_ACCESS_FAILURE_STATUS:
       //Serial1.print(6,DEC);
+      SYS_TaskHandler();
+      apioSend(messageStack[indexStack]);
+
       break;
     case NWK_PHY_NO_ACK_STATUS:
       //Serial1.print(7,DEC);
+      SYS_TaskHandler();
+      apioSend(messageStack[indexStack]);
+
       break;
 //    default:
 //      Serial1.print("nessuna corrispondenza nell ack");
@@ -183,12 +205,20 @@ static bool apioReceive(NWK_DataInd_t *ind)
 
   return true; 
 }
-
+//NEW: La funzione vede se il messaggio che sta inviando è nuovo lo inserisce nello stack.
+//Successivamente lo invia, la funzione di ACK quando è tutto ok elimina quel messaggio dallo STACK
+//Semplice semplice
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 //is used by objects to communicate with the coordinator
 void apioSend(String toSend)
 
 {
+  if(messageStack[indexStack]!=toSend)
+  {
+    indexStack++;
+    messageStack[indexStack]=toSend;
+  }
+
   int len = toSend.length();
   
   for(int g=0; g<len ;g++) 
