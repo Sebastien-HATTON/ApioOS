@@ -552,7 +552,7 @@ angular.module('ApioDashboardApplication')
             this.ino+= '\t'+objectToParse.properties[key].name+'Val = analogRead('+objectToParse.pins[keyPin].name+');\n'
           }
         }
-        this.ino+='\tif (lastValue !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue = String('+objectToParse.properties[key].name+'Val);\n';
+        this.ino+='\tif (lastValue'+objectToParse.properties[key].name+' !=  String('+objectToParse.properties[key].name+'Val)) {\n\t\tlastValue'+objectToParse.properties[key].name+' = String('+objectToParse.properties[key].name+'Val);\n';
         this.ino+='\t\tif(exists('+objectToParse.properties[key].name+', "'+objectToParse.properties[key].name+'", String('+objectToParse.properties[key].name+'Val), 1)){\n';
         this.ino+='\t\t\tapioSend("'+objectToParse.objectId+':update:'+objectToParse.properties[key].name+':"+String('+objectToParse.properties[key].name+'Val)+"-");\n\t\t}\n\t}\n';
         this.ino += '\tif(property=="'+objectToParse.properties[key].name+'"){\n';
@@ -568,9 +568,29 @@ angular.module('ApioDashboardApplication')
        }
        else if(objectToParse.properties[key].type=="PhysicalButton")
        {
+        /*
+               while(digitalRead(pin5) == LOW)
+              {
+                SYS_TaskHandler();
+                if(flagEnter==0){  
+                  if(toggle==0)
+                  {
+                    apioSend("6:update:onoff5:0-");
+                    toggle=1;
+                  }
+                  else
+                  {
+                    apioSend("6:update:onoff5:1-");
+                    toggle=0;
+                  }
+                delay(250);
+                flagEnter=1;
+                }  
+              }
+        */
         for(keyPin in objectToParse.pins){
           if(objectToParse.pins[keyPin].propertyType === 'PhysicalButton' && objectToParse.properties[key].name===objectToParse.pins[keyPin].propertyName){
-            this.ino+= '\t'+objectToParse.properties[key].name+'Val = digitalRead('+objectToParse.pins[keyPin].name+');\n'
+            this.ino+= '\twhile(digitalRead('+objectToParse.pins[keyPin].name+'==LOW){\n'
           }
         }
         this.ino+='\tif('+objectToParse.properties[key].name+'Val == HIGH){\n';
