@@ -39,6 +39,9 @@
     var CronJob = require('cron').CronJob;
     var time = require('time');
     var fs = require("fs");
+    var mqtt = require("mqtt");
+    var mosca = require('mosca')
+
     var APIO_CONFIGURATION = {
         port: 8083
     }
@@ -181,6 +184,33 @@
         }
     };
 
+    /*
+     *	Apio Mosca Service
+     *	@class Serial
+     */
+     Apio.Mosca = {};
+
+     Apio.Mosca.Ascoltatore = {
+       //using ascoltatore
+       type: 'mongo',
+       url: 'mongodb://localhost:27017/mqtt',
+       pubsubCollection: 'ascoltatori',
+       mongo: {}
+     };
+
+     Apio.Mosca.Settings = {
+       port: 1883,
+       backend: Apio.Mosca.Ascoltatore
+     };
+
+     Apio.Mosca.init = function(){
+       Apio.Mosca.server = new mosca.Server(Apio.Mosca.Settings);
+       Apio.Mosca.server.on('ready', setup);
+       function setup(){
+         console.log("Mosca server is up and running");
+       }
+     };
+
 
 
 
@@ -228,7 +258,7 @@
                 Apio.Serial.serialPort.on("data", function(serialString) {
                     serialString = serialString.toString();
                     Apio.Util.debug("Apio.Serial data received " + serialString);
-                    
+
                     //TODO add validation
                     //TODO Cambierà in futuro perchè saranno supportati messaggi del
 
@@ -519,12 +549,12 @@
                                 data.message = state.name
                                 Apio.System.notify(data);
                             } else {
-                               console.log("Lo stato "+state.name+" NON è relativo al sensore che sta mandando notifiche") 
+                               console.log("Lo stato "+state.name+" NON è relativo al sensore che sta mandando notifiche")
                             }
                         }
                     })
                 })
-                
+
                 Apio.Database.updateProperty(data, function() {
                     Apio.io.emit('apio_server_update', data);
 

@@ -114,6 +114,7 @@ if (ENVIRONMENT == 'production')
     Apio.Serial.init();
 
 Apio.Socket.init(http);
+Apio.Mosca.init();
 Apio.Database.connect(function(){
     /*
     Inizializzazione servizi Apio
@@ -721,6 +722,19 @@ app.get("/apio/object/:obj", function(req, res){
     });
 
 
+//Handling Mosca pub sub manager
+//
+//module.exports = app;
+/*
+*   Mosca listener instantiation
+*/
+Apio.Mosca.server.on('clientConnected', function(client) {
+  console.log('client connected', client.id);
+});
+
+Apio.Mosca.server.on('published', function(packet, client) {
+  console.log('Published', packet.payload);
+});
 //Handling Serial events and emitting
 //APIO Serial Port Listener
 //module.exports = app;
