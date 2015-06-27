@@ -40,7 +40,8 @@
     var time = require('time');
     var fs = require("fs");
     var mqtt = require("mqtt");
-    var mosca = require('mosca')
+    var mosca = require('mosca');
+    var request = require('request');
 
     var APIO_CONFIGURATION = {
         port: 8083
@@ -52,8 +53,6 @@
         var index = process.argv.indexOf('--http-port');
         APIO_CONFIGURATION.port = process.argv[index + 1];
     }
-
-
 
 
 
@@ -184,34 +183,32 @@
         }
     };
 
-    /*
-     *	Apio Mosca Service
-     *	@class Serial
-     */
-     Apio.Mosca = {};
+        /*
+         *	Apio Mosca Service
+         *	@class Serial
+         */
+         Apio.Mosca = {};
 
-     Apio.Mosca.Ascoltatore = {
-       //using ascoltatore
-       type: 'mongo',
-       url: 'mongodb://localhost:27017/mqtt',
-       pubsubCollection: 'ascoltatori',
-       mongo: {}
-     };
+         Apio.Mosca.Ascoltatore = {
+           //using ascoltatore
+           type: 'mongo',
+           url: 'mongodb://localhost:27017/mqtt',
+           pubsubCollection: 'ascoltatori',
+           mongo: {}
+         };
 
-     Apio.Mosca.Settings = {
-       port: 1883,
-       backend: Apio.Mosca.Ascoltatore
-     };
+         Apio.Mosca.Settings = {
+           port: 1883,
+           backend: Apio.Mosca.Ascoltatore
+         };
 
-     Apio.Mosca.init = function(){
-       Apio.Mosca.server = new mosca.Server(Apio.Mosca.Settings);
-       Apio.Mosca.server.on('ready', setup);
-       function setup(){
-         console.log("Mosca server is up and running");
-       }
-     };
-
-
+         Apio.Mosca.init = function(){
+           Apio.Mosca.server = new mosca.Server(Apio.Mosca.Settings);
+           Apio.Mosca.server.on('ready', setup);
+           function setup(){
+             console.log("Mosca server is up and running");
+           }
+         };
 
 
     /*
@@ -459,6 +456,7 @@
      * 	an external Apio Object (mostly a Sensor/Button) which is trying to
      *	update some information on the database
      */
+	//var mando = "0";
     Apio.Serial.read = function(data) {
 
         //I sensori invieranno le seguenti informazioni
@@ -616,8 +614,75 @@
                             timestamp: new Date().getTime()
                         };
                         Apio.System.notify(notifica);
+                        Apio.Database.db.collection('States').findOne({
+                          name : "Connected"+document.objectId
+                        }, function(err, doc){
+                          if(!doc){
+                            console.log("Lo stato non esiste, quindi lo creo");
+                            var req_data = {
+                                json : true,
+                                uri : "http://localhost:8083/apio/state",
+                                method : "POST",
+                                body : {
+                                    state : {
+                                      active : false,
+                                      name : "Connected: "+document.objectName,
+                                      objectName : document.objectName,
+                                      objectId : document.objectId
+                                    }
+                                }
+                            }
+                            var req = request(req_data,function(error,response,body){
+                                console.log("Try to launch state associated: ");
+                                console.log(body);
+                                if ("200" === response.statusCode || 200 === response.statusCode){
+                                    console.log("ok");
+                                    return true;
+                                }
+                                else{
+
+                                    console.log("no");
+                                    return false;
+                                }
+                            })
+
+                        }else{
+                          var o = {};
+                          o.name = "Connected"+document.objectId;
+                          var req_data = {
+                              json : true,
+                              uri : "http://localhost:8083/apio/state/apply",
+                              method : "POST",
+                              body : {
+                                  state : {
+                                    name : o.name
+                                  }
+                              }
+                          }
+                          var req = request(req_data,function(error,response,body){
+                              console.log("Try to launch state associated: ");
+                              console.log(body);
+                              if ("200" === response.statusCode || 200 === response.statusCode){
+                                  console.log("ok");
+                                  return true;
+                              }
+                              else{
+
+                                  console.log("no");
+                                  return false;
+                              }
+                          })
+
+}
+                        })
+
                     }
+
+                        //app.post("/apio/state/apply", o);
+
                 });
+                //Attivare lo stato Hi associato alla scheda che arriva:
+
                 //TODO
                 break;
             default:
@@ -1052,8 +1117,15 @@
                 };
                 //console.log("arr vale:");
                 //console.log(arr);
-
+                var contatore = 0;
                 for (var i in arr) {
+                  //Questo fix migliora gli eventi, c'è da verificare se comunque funziona tutto come dovrebbe.
+                  if(contatore==0){
+                    contatore= contatore+1;
+
+                  }else{
+
+
                 		if (hounsensore == true && i==0){
                 			console.log("Non mando la seguente cosa in seriale perchè ho un sensore")
                             console.log(arr[i])
@@ -1065,6 +1137,7 @@
                         pause(100);
                     });
                 		}
+                  }
 
 
                 }

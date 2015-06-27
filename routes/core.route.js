@@ -141,7 +141,7 @@ module.exports = {
         var getStateByName = function(stateName,callback) {
             Apio.Database.db.collection('States').findOne({name : stateName},callback);
         }
-        
+
     var arr = [];
     var applyStateFn = function(stateName, callback, eventFlag) {
         console.log("***********Applico lo stato "+stateName+"************");
@@ -250,7 +250,7 @@ module.exports = {
                                     })
 
                                 })
-                                
+
                             });
                         });
                     }
@@ -457,7 +457,7 @@ module.exports = {
 		    })
 		},
 		delete : function(req,res){
-    
+
 		    Apio.Database.db.collection("Events").remove({name : req.params.name},function(err){
 		        if (!err) {
 		            Apio.io.emit("apio_event_delete",{name : req.params.name});
@@ -542,7 +542,3 @@ module.exports = {
 		}
 	}
 }
-
-
-
-
