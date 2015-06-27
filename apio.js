@@ -42,6 +42,7 @@
     var mqtt = require("mqtt");
     var mosca = require('mosca');
     var request = require('request');
+    var async = require('async')
 
     var APIO_CONFIGURATION = {
         port: 8083

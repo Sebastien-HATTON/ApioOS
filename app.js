@@ -189,6 +189,21 @@ app.post('/apio/adapter',function(req,res){
                 });
 })
 
+//New: Rotta che gestisce il restore del database
+app.get('/apio/restore', function(req, res){
+      var sys = require('sys');
+      var exec = require('child_process').exec;
+      console.log("Qui");
+      var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio", function (error, stdout, stderr) {
+          //sys.print('stdout: '+stdout);
+          //sys.print('stderr: '+stderr);
+          if (error !== null) {
+              console.log('exec error: '+error);
+          }
+      });
+      res.status(200).send({});
+  });
+
 app.get("/dashboard",routes.dashboard.index);
 
 
@@ -551,8 +566,32 @@ Returns a state by its name
 app.get("/apio/state/:name",routes.core.states.getByName);
 
 
-
+//TODO sostituire l'oggetto 1 con un oggetto verify in maniera tale da evitare la presenza di un oggetto.
+//O guardare il discorso del pidfile.h
 app.get("/app",function(req,res){
+  Apio.Database.db.collection('Objects').findOne({
+         objectId: "1"
+       }, function(err, doc) {
+           if (err) {
+
+            } else {
+              if(doc){
+              console.log("Il database c'è faccio il dump");
+              var sys = require('sys');
+              var exec = require('child_process').exec;
+              var child = exec("mongodump --out ./data");
+
+
+
+              } else {
+            console.log("Il database non c'è faccio il restore");
+             var sys = require('sys');
+             var exec = require('child_process').exec;
+             var child = exec("mongorestore ./data/apio -d apio");
+              }
+
+            }
+     })
     res.sendfile("public/html/app.html");
 })
 
