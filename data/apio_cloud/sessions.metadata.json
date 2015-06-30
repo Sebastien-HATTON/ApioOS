@@ -1,0 +1,1 @@
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "name" : "_id_", "ns" : "apio_cloud.sessions" }, { "v" : 1, "key" : { "expires" : 1 }, "name" : "expires_1", "ns" : "apio_cloud.sessions", "expireAfterSeconds" : 0 } ] }
