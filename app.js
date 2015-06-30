@@ -569,8 +569,9 @@ app.get("/apio/state/:name",routes.core.states.getByName);
 //TODO sostituire l'oggetto 1 con un oggetto verify in maniera tale da evitare la presenza di un oggetto.
 //O guardare il discorso del pidfile.h
 app.get("/app",function(req,res){
-  Apio.Database.db.collection('Objects').findOne({
-         objectId: "1"
+  console.log("Richiesta /app")
+  Apio.Database.db.collection('Users').findOne({
+         name: "verify"
        }, function(err, doc) {
            if (err) {
 
