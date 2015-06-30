@@ -515,7 +515,7 @@
                                     Apio.Database.getObjectById(data.objectId, function(result) {
                                         var notifica = {
                                             objectId: data.objectId,
-                                            objectName: result.objectName,
+                                            objectName: result.name,
                                             message: document.notifications[prop][data.properties[prop]],
                                             properties: data.properties,
                                             timestamp: new Date().getTime()

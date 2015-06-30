@@ -10,14 +10,14 @@ String property; // variables that are to be processed in the running loop
 String value;  // variables that are to be processed in the running loop
 String propertyArray[ARRAY_LENGTH];
 String valueArray[ARRAY_LENGTH];
-
-char sendThis[100];
 int numberkey=0;
 int j=0;
 
-bool nwkDataReqBusy = false; 
 
-bool TX_has_gone; 
+char sendThis[109]; //if it does not work well declare local
+bool nwkDataReqBusy = false;
+
+bool TX_has_gone;
 bool RX_has_arrived;
 
 int flag; //flag which manages the logic of the select
@@ -31,24 +31,26 @@ int x=0;//is used to keep track the running property:value in the loop
 //function that saves the pairs propiretà: value in their respective vectors or propertyArray [array_length] and valueArray [array_length]
 
 void divide_string(String stringToSplit) {
-  
+
   int strlen=stringToSplit.length();
   //Serial1.println(stringToSplit); //debug
   int i; //counter
-  deviceAddr=""; 
+  deviceAddr="";
   for(i=0; i<strlen ; i++)
   {
     if(stringToSplit.charAt(i)=='-')
       numberkey++;
   }
-  i=0;
+  //Serial1.println(numberkey);
+  //-----------deviceAddr----------------
+
+  for(i=0; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
+  {
+    deviceAddr += String(stringToSplit.charAt(i));
+  }
+
   for(j; j<numberkey ;j++)
   {
-    
-    for(i; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
-    {
-      deviceAddr += String(stringToSplit.charAt(i));
-    }
     //-----------property----------------
 
     for(i++; stringToSplit.charAt(i)!=':' && i<strlen ;i++)
@@ -56,21 +58,21 @@ void divide_string(String stringToSplit) {
       propertyArray[j] += String(stringToSplit.charAt(i));
     }
 
-    
-    //-----------value----------------  
-    
+
+    //-----------value----------------
+
     for(i++; stringToSplit.charAt(i)!='-' && i<strlen ;i++)
     {
-      valueArray[j] += String(stringToSplit.charAt(i)); 
+      valueArray[j] += String(stringToSplit.charAt(i));
     }
-    
+
   }
 }
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-//callback for the management of the confirmation (access the field message->opzioni) and verification of ack 
+//callback for the management of the confirmation (access the field message->opzioni) and verification of ack
 static void appDataConf(NWK_DataReq_t *req)
 {
   //Serial1.print("ACK: "); //debug
@@ -100,13 +102,13 @@ static void appDataConf(NWK_DataReq_t *req)
 //    default:
 //      Serial1.print("nessuna corrispondenza nell ack");
 //      break;
-     
+
 
   }
   nwkDataReqBusy = false;
 
-  //Serial1.println("");
-  
+  Serial1.println("");
+
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -126,7 +128,7 @@ void select()
     numberkey=0;
     j=0;
     flag=0;
-    
+
   }
   if(numberkey!=0)
   {
@@ -134,7 +136,7 @@ void select()
     value=valueArray[x];
     x++;
     flag=1;
-    //Serial.println(property+":"+value);
+    //Serial1.println(property+":"+value);
   }
 }
 
@@ -148,8 +150,8 @@ void apioLoop()
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 //to receive a packet with LWM
-static bool apioReceive(NWK_DataInd_t *ind) 
-{ 
+static bool apioReceive(NWK_DataInd_t *ind)
+{
   int message_size=ind->size;
   int i;
   char Buffer[110];
@@ -158,17 +160,16 @@ static bool apioReceive(NWK_DataInd_t *ind)
   {
     Buffer[i] = ind->data[i];
     //delay(10);
-    //Serial.write(ind->data[i]);
-   
-  }
-  //Serial.println();
+    //Serial1.write(ind->data[i]);
 
-  divide_string(String(Buffer)); 
-  
+  }
+
+  divide_string(String(Buffer));
+
   for(int i=0; i<100; i++)
   {
     Buffer[i]=NULL;
-    
+
   }
 //  Serial1.print("Received message - ");
 //  Serial1.print("lqi: ");
@@ -181,7 +182,7 @@ static bool apioReceive(NWK_DataInd_t *ind)
 //  Serial1.println("  ");
   //NWK_SetAckControl(NWK_IND_OPT_ACK_REQUESTED);
 
-  return true; 
+  return true;
 }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -189,26 +190,25 @@ static bool apioReceive(NWK_DataInd_t *ind)
 void apioSend(String toSend)
 
 {
-  int len = toSend.length();
-  
-  for(int g=0; g<len ;g++) 
+  int len = toSend.length(); //if i use toSend.toCharArray() the packet does not arrive well
+  for(int g=0; g<len ;g++)
   {
       sendThis[g]=toSend.charAt(g);
   }
-  int16_t address = COORDINATOR_ADDRESS_LWM; 
+  int16_t address = COORDINATOR_ADDRESS_LWM;
 
   nwkDataReqBusy = true;
-  
+
   NWK_DataReq_t *message = (NWK_DataReq_t*)malloc(sizeof(NWK_DataReq_t));
   message->dstAddr = address; //object address
-  message->dstEndpoint = 1; 
+  message->dstEndpoint = 1;
   message->srcEndpoint = 1;
   message->options = NWK_OPT_ACK_REQUEST; //I require an ack
   message->size = len;
   message->data = (uint8_t*)(sendThis);
 
   message->confirm = appDataConf; //callback for the management of the confirmation (option field)
-                                  //and verification of ack required above 
+                                  //and verification of ack required above
   NWK_DataReq(message); //send message
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -220,8 +220,5 @@ void apioSetup(uint16_t objectAddress)
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, apioReceive);
-  SYS_TaskHandler();
-  delay(500);
 
 }
-

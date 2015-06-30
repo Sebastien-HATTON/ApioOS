@@ -872,7 +872,7 @@ Apio.io.on("connection", function(socket){
 
 
     });
-    socket.on('apio_notification', function(data) {
+        socket.on('apio_notification', function(data) {
                 console.log("> Arrivato un update, mando la notifica");
                 //Prima di tutto cerco la notifica nel db
                 console.log(data);
@@ -882,11 +882,14 @@ Apio.io.on("connection", function(socket){
                 console.log(typeof data);
 
                 Apio.Database.db.collection('Objects').findOne({
-                    objectId: data.objectId
+                    address : data.address
                 }, function(err, document) {
                     if (err) {
                         console.log('Apio.Serial.read Error while looking for notifications');
                     } else {
+                        console.log("Aggiorno data")
+                        data.objectId = document.objectId;
+                        
                         if (document.hasOwnProperty('notifications')) {
                             for (var prop in data.properties) //prop è il nome della proprietà di cui cerco notifiche
                                 if (document.notifications.hasOwnProperty(prop)) {
@@ -915,12 +918,12 @@ Apio.io.on("connection", function(socket){
                             }
                         }
                     }
-                })
-                Apio.Database.db.collection('States')
+                                    Apio.Database.db.collection('States')
                     .find({
                         objectId: data.objectId
                     })
-                    .toArray(function(err, states) {
+                    .toArray(
+                        function(err, states) {
                         console.log("CI sono " + states.length + " stati relativi all'oggetto " + data.objectId)
                         var sensorPropertyName = Object.keys(data.properties)[0]
                         states.forEach(function(state) {
@@ -935,53 +938,56 @@ Apio.io.on("connection", function(socket){
                                 }
                             }
                         })
+                        Apio.Database.updateProperty(data, function() {
+                        Apio.io.emit('apio_server_update', data);
+                        //Apio.Remote.socket.emit('apio.server.object.update', data);
+
+                        Apio.Database.db.collection('Objects')
+                            .findOne({
+                                objectId: data.objectId
+                            }, function(err, obj_data) {
+                                if (err || obj_data === null) {
+                                    console.log("An error has occurred while trying to figure out a state name")
+                                } else {
+                                    Apio.Database.db.collection('States')
+                                        .find({
+                                            objectId: obj_data.objectId
+                                        }).toArray(function(error, states) {
+                                            console.log("\n\n@@@@@@@@@@@@@@@@@@@")
+                                            console.log("Inizio controllo stati")
+                                            console.log("Ho " + states.length + " stati relativi all'oggetto " + obj_data.objectId);
+                                            states.forEach(function(state) {
+
+                                                var test = true;
+                                                for (var key in state.properties)
+                                                    if (state.properties[key] !== obj_data.properties[key])
+                                                        test = false;
+                                                if (test === true) {
+                                                    console.log("Lo stato " + state.name + " corrisponde allo stato attuale dell'oggetto")
+
+                                                    Apio.System.applyState(state.name, function(err) {
+
+                                                        if (err) {
+                                                            console.log("An error has occurred while applying the matched state")
+                                                        }
+                                                    }, true)
+
+
+                                                }
+                                            })
+
+                                            console.log("Fine controllo degli stati\n\n@@@@@@@@@@@@@@@@@@@@@@@")
+                                        });
+                                }
+                            })
+                        });
                     })
-
-                Apio.Database.updateProperty(data, function() {
-                    console.log(data);
-                    Apio.io.emit('apio_server_update', data);
-                    Apio.Remote.socket.emit('apio.server.object.update', data);
-
-                    Apio.Database.db.collection('Objects')
-                        .findOne({
-                            objectId: data.objectId
-                        }, function(err, obj_data) {
-                            if (err || obj_data === null) {
-                                console.log("An error has occurred while trying to figure out a state name")
-                            } else {
-                                Apio.Database.db.collection('States')
-                                    .find({
-                                        objectId: obj_data.objectId
-                                    }).toArray(function(error, states) {
-                                        console.log("\n\n@@@@@@@@@@@@@@@@@@@")
-                                        console.log("Inizio controllo stati")
-                                        console.log("Ho " + states.length + " stati relativi all'oggetto " + obj_data.objectId);
-                                        states.forEach(function(state) {
-
-                                            var test = true;
-                                            for (var key in state.properties)
-                                                if (state.properties[key] !== obj_data.properties[key])
-                                                    test = false;
-                                            if (test === true) {
-                                                console.log("Lo stato " + state.name + " corrisponde allo stato attuale dell'oggetto")
-
-                                                Apio.State.apply(state.name, function(err) {
-
-                                                    if (err) {
-                                                        console.log("An error has occurred while applying the matched state")
-                                                    }
-                                                }, true)
+                })
 
 
-                                            }
-                                        })
+                
 
-                                        console.log("Fine controllo degli stati\n\n@@@@@@@@@@@@@@@@@@@@@@@")
-                                    });
-                            }
-                        })
-                });
-    });
+        })
 
 });
 
