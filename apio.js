@@ -39,8 +39,8 @@
     var CronJob = require('cron').CronJob;
     var time = require('time');
     var fs = require("fs");
-    var mqtt = require("mqtt");
-    var mosca = require('mosca');
+    //var mqtt = require("mqtt");
+    //var mosca = require('mosca');
     var request = require('request');
     var async = require('async')
 
@@ -188,7 +188,7 @@
          *	Apio Mosca Service
          *	@class Serial
          */
-         Apio.Mosca = {};
+        /* Apio.Mosca = {};
 
          Apio.Mosca.Ascoltatore = {
            //using ascoltatore
