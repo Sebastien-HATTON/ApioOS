@@ -114,7 +114,7 @@ if (ENVIRONMENT == 'production')
     Apio.Serial.init();
 
 Apio.Socket.init(http);
-Apio.Mosca.init();
+//Apio.Mosca.init();
 Apio.Database.connect(function(){
     /*
     Inizializzazione servizi Apio
