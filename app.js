@@ -768,13 +768,13 @@ app.get("/apio/object/:obj", function(req, res){
 /*
 *   Mosca listener instantiation
 */
-Apio.Mosca.server.on('clientConnected', function(client) {
+/*Apio.Mosca.server.on('clientConnected', function(client) {
   console.log('client connected', client.id);
 });
 
 Apio.Mosca.server.on('published', function(packet, client) {
   console.log('Published', packet.payload);
-});
+});*/
 //Handling Serial events and emitting
 //APIO Serial Port Listener
 //module.exports = app;
