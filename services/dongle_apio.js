@@ -419,7 +419,7 @@ app.post("/apio/dongle/onoff", function (req, res) {
 
 app.get("/apio/dongle/updateDongle", function (req, res) {
 //images/simplefilemanager/56eb3fc274a821.96089346/Dongle_Oled_rev3.cpp.hex
-    var uri = "http://apio.cc/images/simplefilemanager/5728a406210095.90545480/DongleREV_3-6.cpp.hex";
+    var uri = "https://raw.githubusercontent.com/ApioLab/updates/master/Coordinator.cpp.hex";
     var path = "file.cpp.hex";
     request({uri: uri}).pipe(fs.createWriteStream(path)).on('close', function () {
         ////console.log("Downloaded Hex file");

@@ -18,7 +18,7 @@
  *                                                                          *
  ****************************************************************************/
 
-var Nightmare = require("nightmare");
+//var Nightmare = require("nightmare");
 var exec = require("child_process").exec;
 var fs = require("fs");
 var request = require("request");
@@ -202,7 +202,7 @@ module.exports = function (Apio) {
             });
         },
         installNgrok: function (req, res) {
-            var nightmare = Nightmare({show: false});
+            /*var nightmare = Nightmare({show: false});
             nightmare
                 .goto("https://dashboard.ngrok.com/user/signup")
                 .type("form[action*='/user/signup'] [name=name]", req.session.email)
@@ -283,7 +283,7 @@ module.exports = function (Apio) {
                     }, 0);
                     //}).catch(function (error) {
                     //    res.status(500).send(error);
-                });
+                });*/
         },
         toggleEnableCloud: function (req, res) {
             Apio.Configuration.remote.enabled = !Apio.Configuration.remote.enabled;
