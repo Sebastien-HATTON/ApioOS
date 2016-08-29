@@ -22,14 +22,22 @@ build/Release
 # Dependency directory
 # Commenting this out is preferred by some people, see
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
-Identifier.apio
 node_modules/*
 !node_modules/serialport/*
 public/bower_components/*
 public/applications/*
 !public/applications/README.md
+!public/applications/10
+!public/applications/10/*
 !public/applications/add/*
+!public/applications/timer/*
+!public/applications/loop/*
+!public/boards/*
+!public/users/*
+!public/applications/newfile
 public/sketchbook/*
+services/apio_logic/*
+Identifier.apio
 
 # Users Environment Variables
 .lock-wscript
