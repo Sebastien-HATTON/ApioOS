@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+<!---------------------------------- LICENSE --------------------------------
+-                                                                           -
+- This file is part of ApioOS.                                              -
+-                                                                           -
+- ApioOS is free software released under the GPLv2 license: you can         -
+- redistribute it and/or modify it under the terms of the GNU General       -
+- Public License version 2 as published by the Free Software Foundation.    -
+-                                                                           -
+- ApioOS is distributed in the hope that it will be useful, but             -
+- WITHOUT ANY WARRANTY; without even the implied warranty of                -
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+- GNU General Public License version 2 for more details.                    -
+-                                                                           -
+- To read the license either open the file COPYING.txt or                   -
+- visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+-                                                                           -
+---------------------------------------------------------------------------->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=0, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="yes"/>
+    <meta name="theme-color" content="#ffffff">
+    <title>ApioOS - Administration</title>
+    <link id="favicon" rel="apple-touch-icon" href="html/apple-touch-icon.png"/>
+    <link id="favicon1" rel="apple-touch-icon-precomposed" href="html/apple-touch-icon.png"/>
+    <link id="head" rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/bower_components/angular-material/angular-material.css">
+    <link rel="stylesheet" href="/stylesheets/fontApio.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_992_1199.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_768_991.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_480_767.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_320_479.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_1200.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/angular-material/angular-material.js"></script>
+
+    <style>
+        body {
+            height: 100%;
+            width: 100%;
+            color: #404040;
+        }
+
+        .panelContainer {
+            margin-top: 8%;
+        }
+
+        .panelTitle {
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        .formContainer {
+            margin-top: 20px;
+        }
+
+        .lockIcon {
+            color: #D43F3A;
+        }
+
+        .formLabel {
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        #form_container, p {
+            font-size: 15px;
+        }
+
+        @media only screen and (min-width: 320px) and (max-width: 479px) {
+            .panelTitle {
+                font-size: 25px;
+            }
+
+            .formLabel {
+                font-size: 14px;
+            }
+
+            #form_container, p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row panelContainer">
+        <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
+            <div id="form_container" class="form-group" ng-app="ApioApplicationBoardNameSelection"
+                 ng-controller="boardNameController">
+                <h2 class="panelTitle"><i class="fa fa-lock lockIcon" aria-hidden="true"></i> Aggiungi nuova board</h2>
+                <div>
+                    <p>Il <b>{{date}}</b> alle <b>{{time}}</b> si è connessa la board con id: <b>{{apioId}}</b>.</p>
+                </div>
+                <form id="board_name_form" class="formContainer">
+                    <div class="form-group">
+                        <label for="boardName" class="formLabel">Per abilitare i servizi Cloud assegna un nome
+                            e conferma:</label>
+                        <input id="boardName" class="form-control" type="text" ng-model="boardName"
+                               placeholder="Magazzino 1, Ufficio, Impianto 2...">
+                    </div>
+                    <button class="btn btn-danger btn-block" ng-click="enableBoard()">Conferma</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    angular.module("ApioApplicationBoardNameSelection", []).controller("boardNameController", ["$scope", "$location", "$http", function ($scope, $location, $http) {
+        $scope.boardName = "";
+        $scope.enableBoard = function () {
+            if ($scope.boardName) {
+                $http.post("/apio/assignToken", {
+                    apioId: $scope.apioId,
+                    name: $scope.boardName
+                }).success(function () {
+                    alert("Board Abilitata con successo!");
+                }).error(function (error) {
+                    alert("Error durante l'abilitazione della board: " + error.toString());
+                });
+            } else {
+                alert("Per poter abilitare una board bisogna inserire un nome");
+            }
+        };
+
+        var apioIdAndTs = $location.absUrl().split("/apio/enableSync/")[1];
+        var date = new Date(Number(apioIdAndTs.split("/")[1]));
+        $scope.apioId = apioIdAndTs.split("/")[0];
+        $scope.date = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + "-" + (date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1) + "-" + date.getFullYear();
+        $scope.time = (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":" + (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes());
+    }]);
+</script>
+</body>
+</html>

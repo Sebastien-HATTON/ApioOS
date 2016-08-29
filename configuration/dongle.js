@@ -1,0 +1,1 @@
+module.exports = {"panId":"1","dataRate":"3","firmwareVersion":"1"}

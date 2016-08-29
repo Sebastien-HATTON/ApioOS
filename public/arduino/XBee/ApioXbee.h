@@ -121,7 +121,7 @@ void apioSetupUno()
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-//This function receive from comunication channel(in this case XBee) launch divide string for populate proprietaArry
+//This function receive from communication channel(in this case XBee) launch divide string for populate proprietaArry
 //valueArray
 void apioReceive()
 {

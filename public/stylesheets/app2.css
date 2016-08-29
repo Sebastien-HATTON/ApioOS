@@ -1,31 +1,101 @@
 /*Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino*/
 
-/********************************* LICENSE *******************************
-*									 *
-* This file is part of ApioOS.						 *
-*									 *
-* ApioOS is free software released under the GPLv2 license: you can	 *
-* redistribute it and/or modify it under the terms of the GNU General	 *
-* Public License version 2 as published by the Free Software Foundation. *
-*									 *
-* ApioOS is distributed in the hope that it will be useful, but		 *
-* WITHOUT ANY WARRANTY; without even the implied warranty of		 *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 *
-* GNU General Public License version 2 for more details.		 *
-*									 *
-* To read the license either open the file COPYING.txt or		 *
-* visit <http://www.gnu.org/licenses/gpl2.txt>				 *
-*									 *
-*************************************************************************/
+/********************************** LICENSE *********************************
+ *                                                                          *
+ * This file is part of ApioOS.                                             *
+ *                                                                          *
+ * ApioOS is free software released under the GPLv2 license: you can        *
+ * redistribute it and/or modify it under the terms of the GNU General      *
+ * Public License version 2 as published by the Free Software Foundation.   *
+ *                                                                          *
+ * ApioOS is distributed in the hope that it will be useful, but            *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of               *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             *
+ * GNU General Public License version 2 for more details.                   *
+ *                                                                          *
+ * To read the license either open the file COPYING.txt or                  *
+ * visit <http://www.gnu.org/licenses/gpl2.txt>                             *
+ *                                                                          *
+ ****************************************************************************/
 
+a:focus, a:hover {
+    text-decoration: none !important;
+    outline: none !important;
+}
+
+[role=button] {
+    text-decoration: none !important;
+    outline: none !important;
+}
+
+[type=button] {
+    text-decoration: none !important;
+    outline: none !important;
+}
+
+#targetBody {
+    height: 100%;
+}
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.noSendMail {
+    color: red !important;
+}
+
+#ApioIconsContainer {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.verticalAlign {
+    display: table-cell;
+    vertical-align: middle;
+}
 
 .active_on {
-    background-color: rgb(34,201,34);
+    background-color: rgb(34, 201, 34);
+}
+
+.maxHeight {
+    height: 100%;
 }
 
 body {
-    font-family: helvetica,arial,sans-serif !important;
-    background-color: #E8E8E8;
+    font-family: helvetica, arial, sans-serif !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    background: -webkit-linear-gradient(90deg, #ECE9E6 10%, #e4e4e4 90%); /* Chrome 10+, Saf5.1+ */
+    background: -moz-linear-gradient(90deg, #ECE9E6 10%, #e4e4e4 90%); /* FF3.6+ */
+    background: -ms-linear-gradient(90deg, #ECE9E6 10%, #e4e4e4 90%); /* IE10 */
+    background: -o-linear-gradient(90deg, #ECE9E6 10%, #e4e4e4 90%); /* Opera 11.10+ */
+    background: linear-gradient(90deg, #ECE9E6 10%, #e4e4e4 90%); /* W3C */
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-appearance: none;
+    background: transparent;
+    height: 0;
+    overflow: visible;
+    width: 0;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    background: transparent;
+    height: 0;
+    overflow: visible;
+    width: 0;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
 }
 
 #menu_object_networkinput {
@@ -43,14 +113,32 @@ body {
 
 .box_proprietaiPhone {
     position: relative;
+    /* new */
+    background-color: rgba(255, 255, 255, 0.85);
+    -webkit-box-shadow: 0 1px 1px 0 rgba(50, 50, 50, 0.2) !important;
+    -moz-box-shadow: 0 1px 1px 0 rgba(50, 50, 50, 0.2) !important;
+    box-shadow: 0 1px 1px 0 rgba(50, 50, 50, 0.2) !important;
+    margin-bottom: 2%;
+    margin-top: 2%;
+    border: solid 1px rgba(142, 142, 142, 0.21);
+    padding: 2% 5.3% !important;
+}
+
+.apioApplicationNavbar {
+    width: 100%;
+    display: inline-flex;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: transparent;
 }
 
 .home {
     position: relative;
     margin-right: auto;
     margin-left: auto;
-    font-family: helvetica,arial,sans-serif;
-    font-size: large;
+    font-family: helvetica, arial, sans-serif;
+    /*font-size: large;*/
 }
 
 .icon_app {
@@ -59,17 +147,35 @@ body {
     margin-left: 0.45%;
 }
 
-.homeAppIconName {
-    width: 145px;
-    overflow: hidden;
-    text-align: center;
-    text-overflow: ellipsis;
-    font-size: 22px;
-    white-space: nowrap;
+.icon_width_menu a {
+    text-decoration: none;
+    cursor: pointer;
+    color: rgba(78, 78, 78, 0.88);
 }
 
-.systemAppContainer {
-    margin-top: 90px;
+.icon_width_menu a:hover {
+    color: #c93b30;
+}
+
+.logout_icon {
+    color: rgba(236, 181, 18, 0.79) !important;
+}
+
+.back_icon {
+    color: rgba(73, 92, 195, 0.95) !important;
+}
+
+#apioMenuMobile a {
+    text-decoration: none;
+}
+
+#apioMenuMobile a:focus, a:hover {
+    text-decoration: none;
+    color: #c93b30;
+}
+
+.navbar-default .navbar-toggle:hover {
+    background-color: none !important;
 }
 
 .nav > li > a {
@@ -85,7 +191,7 @@ body {
     top: 50px;
     top: 0;
     right: 0;
-    width: 27%;
+    width: 31%;
     height: 100%;
     padding: 0;
     overflow-y: scroll;
@@ -95,7 +201,11 @@ body {
 .topAppApplication {
     z-index: 20;
     width: 100%;
-    height: 56px;
+    min-height: 46px;
+    /*border-radius:10px;*/
+/ / padding-bottom: 3 %;
+/ / padding-top: 2 %;
+    /*margin-bottom: 2%;*/
     margin-right: auto;
     margin-left: auto;
     text-align: center;
@@ -105,20 +215,346 @@ body {
     line-height: 0;
     -webkit-transition: all 0.5s ease-in 0s;
     transition: all 0.5s ease-in 0s;
+    /* new */
+    border-bottom: solid 1px rgba(142, 142, 142, 0.23);
 }
 
+.testo_proprietaiPhone {
+    cursor: default;
+}
 
+.board_info {
+    color: #c93b30;
+}
 
+@keyframes rotationWaitLoading {
+    from {
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+    }
+}
 
+@-webkit-keyframes rotationWaitLoading {
+    from {
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+    }
+}
 
+#apioWaitLoading {
+    width: 100%;
+    top: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.87);
+    position: fixed;
+    text-align: center;
+    z-index: -90000;
+    display: none;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
+    opacity: 0;
+    display: table;
 
+}
 
+.apioWaitLoading {
+    display: table-cell;
+    vertical-align: middle;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 60pt;
+    color: rgba(255, 255, 255, 0.73);
+}
 
+.apioWaitLoadingOff {
+    opacity: 0;
+}
 
+.apioWaitLoadingOn {
+    z-index: 90000 !important;
+    opacity: 1 !important;
 
+}
 
+.apioWaitLoadingOn .apioWaitLoading {
+    animation-name: rotationWaitLoading;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    -webkit-animation-name: rotationWaitLoading;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+}
 
+.apioWaitLoadingOff .apioWaitLoading {
 
+}
 
+@keyframes cloudWaitLoading {
+    0% {
+        opacity: 0;
+        font-size: 0;
+    }
+    10% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    30% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    40% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    60% {
+        opacity: 0.3;
+        font-size: 500px;
+    }
+    80% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    100% {
+        opacity: 0;
+        font-size: 500px;
+    }
+}
 
+@-webkit-keyframes cloudWaitLoading {
+    0% {
+        opacity: 0;
+        font-size: 0;
+    }
+    10% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    30% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    40% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    60% {
+        opacity: 0.3;
+        font-size: 500px;
+    }
+    80% {
+        opacity: 1;
+        font-size: 500px;
+    }
+    100% {
+        opacity: 0;
+        font-size: 500px;
+    }
+}
 
+#apioWaitLoadingSystemOperation {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background-color: rgb(255, 255, 255);
+    position: fixed;
+    text-align: center;
+    z-index: -90000;
+    display: none;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
+    opacity: 0;
+    display: table;
+
+}
+
+.apioWaitLoadingSystemOperation {
+    display: table-cell;
+    vertical-align: middle;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    line-height: 400px;
+    right: 0;
+/ / font-size: 190 pt;
+    font-family: Apio;
+    color: #000;
+}
+
+.apioWaitLoadingSystemOperationOff {
+    opacity: 0;
+}
+
+.apioWaitLoadingSystemOperationOn {
+    z-index: 900000 !important;
+    opacity: 1 !important;
+
+}
+
+.apioWaitLoadingSystemOperationOn .apioWaitLoadingSystemOperation {
+    width: 100%;
+    margin: 0 auto;
+    animation-name: cloudWaitLoading;
+    animation-duration: 30s;
+    animation-iteration-count: 1;
+    -webkit-animation-name: cloudWaitLoading;
+    -webkit-animation-duration: 30s;
+    -webkit-animation-iteration-count: 1;
+}
+
+.apioWaitLoadingSystemOperationOff .apioWaitLoadingSystemOperation {
+
+}
+
+.configurationDefaultContainerApp {
+    height: 100%;
+    overflow: hidden;
+    /* new */
+    background-color: rgba(246, 245, 245, 1);
+    border-left: solid 2px rgba(142, 142, 142, 0.21);
+    border-right: solid 2px rgba(142, 142, 142, 0.21);
+    padding: 13px 0 0 0 !important;
+}
+
+#ApioApplicationContainer {
+    height: 100%;
+    overflow-y: hidden;
+}
+
+/* ---------------------------------------------------- waiting system loading --- */
+#loading {
+    -webkit-transition: all 0.4s linear;
+    transition: all 0.4s linear;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #fff;
+    margin: -1%;
+    padding: 0;
+    display: table;
+    opacity: 0.4;
+}
+
+#loadingRoller {
+    margin: 0 auto;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.loadingRoller {
+    background: url(../images/loader.png) no-repeat 50%;
+    width: 45px;
+    border-radius: 45px;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.loadingPlay {
+    animation-name: loadRoller;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    -webkit-animation-name: loadRoller;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@keyframes loadRoller {
+    0% {
+        -webkit-transform: rotateZ(0deg);
+        transform: rotateZ(0deg);
+    }
+    100% {
+        -webkit-transform: rotateZ(360deg);
+        transform: rotateZ(360deg)
+    }
+}
+
+@-webkit-keyframes loadRoller {
+    0% {
+        -webkit-transform: rotateZ(0deg);
+        transform: rotateZ(0deg);
+    }
+    100% {
+        -webkit-transform: rotateZ(360deg);
+        transform: rotateZ(360deg)
+    }
+}
+
+/* --------------------------------------------------- waiting data loading apps --- */
+.content_loader {
+    margin: 25px auto;
+    font-size: 9px;
+    position: relative;
+    text-indent: -9999em;
+    border: 1.1em solid rgba(200, 200, 200, 0.6);
+    border-left-color: rgba(120, 120, 120, 0.70);
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+
+.content_loader,
+.content_loader:after {
+    border-radius: 50%;
+    width: 6em;
+    height: 6em;
+}
+
+@-webkit-keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+/*
+.content_loader {
+	margin: 25px auto;
+	font-size: 9px;
+	position: relative;
+	text-indent: -9999em;
+	border-top: 1.1em solid rgba(200, 200, 200, 0.6);
+	border-right: 1.1em solid rgba(200, 200, 200, 0.6);
+	border-bottom: 1.1em solid rgba(200, 200, 200, 0.6);
+	border-left: 1.1em solid rgba(115, 115, 115, 0.70);
+	-webkit-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-animation: load8 1.1s infinite linear;
+	animation: load8 1.1s infinite linear;
+}
+.content_loader,
+.content_loader:after {
+	border-radius: 50%;
+	width: 6em;
+	height: 6em;
+}
+*/

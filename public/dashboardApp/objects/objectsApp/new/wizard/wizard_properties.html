@@ -1,50 +1,54 @@
-<form name="formPropertiesInfo" class="form-horizontal" role="form" novalidate>    
-<!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+<form name="formPropertiesInfo" class="form-horizontal" role="form" novalidate>
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
 
-<!---------------------------------- LICENSE -------------------------------
--									 -
-- This file is part of ApioOS.						 -
--									 -
-- ApioOS is free software released under the GPLv2 license: you can	 -
-- redistribute it and/or modify it under the terms of the GNU General	 -
-- Public License version 2 as published by the Free Software Foundation. -
--									 -
-- ApioOS is distributed in the hope that it will be useful, but		 -
-- WITHOUT ANY WARRANTY; without even the implied warranty of		 -
-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 -
-- GNU General Public License version 2 for more details.		 -
--									 -
-- To read the license either open the file COPYING.txt or		 -
-- visit <http://www.gnu.org/licenses/gpl2.txt>				 -
--									 -
--------------------------------------------------------------------------->
-
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
 
     <dl class="dl-horizontal">
         <dt>Description</dt>
-        <dd>The following form lets you add information about how to visualize the property. It will affect the range of possible values the property can represent.</dd>
+        <dd>The following form lets you add information about how to visualize the property. It will affect the range of
+            possible values the property can represent.
+        </dd>
     </dl>
 
     <div class="form-group">
-    <label for="inputPropertyName" class="col-sm-2 control-label">Name</label>
+        <label for="inputPropertyName" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
-          <input ng-model="newProperty.name" type="text" class="form-control" id="inputPropertyName" placeholder="Property name" >
+            <input ng-model="newProperty.name" type="text" class="form-control" id="inputPropertyName"
+                   placeholder="Property name">
         </div>
     </div>
     <div class="form-group">
         <label for="inputPropertyType" class="col-sm-2 control-label">Type</label>
         <div class="col-sm-10">
-          <select ng-model="newProperty.type" class="form-control input-lg"  id="inputPropertyType" placeholder="Property name" >
-            <option value="Trigger"> Trigger</option>
-            <option value="Slider"> Slider</option>
-            <option value="Button"> Button</option>
-            <option value="Text"> Text</option>
-            <option value="Number"> Number</option>
-            <option value="DynamicView"> DynamicView</option>
-            <option value="List">List</option>
-            <option value="Sensor">Sensor</option>
-            <option value="PhysicalButton">Physical Button</option>
-        </select>
+            <select ng-model="newProperty.type" class="form-control input-lg" id="inputPropertyType"
+                    placeholder="Property name">
+                <option value="Trigger"> Trigger</option>
+                <option value="Slider"> Slider</option>
+                <option value="Sensor">Sensor</option>
+                <!--<option value="Button"> Button</option>
+                <option value="Text"> Text</option>
+                <option value="Number"> Number</option>
+                <option value="DynamicView"> DynamicView</option>
+                <option value="List">List</option>
+                <option value="Sensor">Sensor</option>
+                <option value="PhysicalButton">Physical Button</option>-->
+            </select>
         </div>
     </div>
 
@@ -54,31 +58,36 @@
             <div class="form-group">
                 <label for="inputPropertyTriggerOnValue" class="col-sm-2 control-label">On value</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.on" type="text" class="form-control" id="inputPropertyTriggerOnValue" placeholder="Property trigger on value" >
+                    <input ng-model="newProperty.on" type="text" class="form-control" id="inputPropertyTriggerOnValue"
+                           placeholder="Property trigger on value">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyTriggerOnLabel" class="col-sm-2 control-label">On label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.onLabel" type="text" class="form-control" id="inputPropertyTriggerOnLabel" placeholder="Property trigger on label" >
+                    <input ng-model="newProperty.onLabel" type="text" class="form-control"
+                           id="inputPropertyTriggerOnLabel" placeholder="Property trigger on label">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyTriggerOffValue" class="col-sm-2 control-label">Off value</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.off" type="text" class="form-control" id="inputPropertyTriggerOffValue" placeholder="Property trigger off value" >
+                    <input ng-model="newProperty.off" type="text" class="form-control" id="inputPropertyTriggerOffValue"
+                           placeholder="Property trigger off value">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyTriggerOffLabel" class="col-sm-2 control-label">Off label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.offLabel" type="text" class="form-control" id="inputPropertyTriggerOffLabel" placeholder="Property trigger off label" >
+                    <input ng-model="newProperty.offLabel" type="text" class="form-control"
+                           id="inputPropertyTriggerOffLabel" placeholder="Property trigger off label">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyTriggerDefaultValue" class="col-sm-2 control-label">Default value</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.defaultValue" type="text" class="form-control" id="inputPropertyTriggerDefaultValue" placeholder="Property trigger default value" >
+                    <input ng-model="newProperty.defaultValue" type="text" class="form-control"
+                           id="inputPropertyTriggerDefaultValue" placeholder="Property trigger default value">
                 </div>
             </div>
         </div>
@@ -88,31 +97,36 @@
             <div class="form-group">
                 <label for="inputPropertySliderLabel" class="col-sm-2 control-label">Label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.sliderLabel" type="text" class="form-control" id="inputPropertySliderLabel" placeholder="Property slider label" >
+                    <input ng-model="newProperty.sliderLabel" type="text" class="form-control"
+                           id="inputPropertySliderLabel" placeholder="Property slider label">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertySliderMin" class="col-sm-2 control-label">Min</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.min" type="text" class="form-control" id="inputPropertySliderMin" placeholder="Property slider minimum" >
+                    <input ng-model="newProperty.min" type="text" class="form-control" id="inputPropertySliderMin"
+                           placeholder="Property slider minimum">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertySliderMax" class="col-sm-2 control-label">Max</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.max" type="text" class="form-control" id="inputPropertySliderMax" placeholder="Property slider maximum" >
+                    <input ng-model="newProperty.max" type="text" class="form-control" id="inputPropertySliderMax"
+                           placeholder="Property slider maximum">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertySliderStep" class="col-sm-2 control-label">Step</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.step" type="text" class="form-control" id="inputPropertySliderStep" placeholder="Property slider step" >
+                    <input ng-model="newProperty.step" type="text" class="form-control" id="inputPropertySliderStep"
+                           placeholder="Property slider step">
                 </div>
             </div>
-           <div class="form-group">
+            <div class="form-group">
                 <label for="inputPropertySliderDefault" class="col-sm-2 control-label">Default</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.defaultValue" type="text" class="form-control" id="inputPropertySliderDefault" placeholder="Property slider default" >
+                    <input ng-model="newProperty.defaultValue" type="text" class="form-control"
+                           id="inputPropertySliderDefault" placeholder="Property slider default">
                 </div>
             </div>
         </div>
@@ -122,19 +136,20 @@
             <div class="form-group">
                 <label for="inputPropertyListLabel" class="col-sm-2 control-label">Label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.listLabel" type="text" class="form-control" id="inputPropertyListLabel" placeholder="Property list label" >
+                    <input ng-model="newProperty.listLabel" type="text" class="form-control" id="inputPropertyListLabel"
+                           placeholder="Property list label">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyListItemName" class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-10">
-                  <input ng-model="newListItem.name" class="form-control input-sm" id="inputPropertyListItemName" />
+                    <input ng-model="newListItem.name" class="form-control input-sm" id="inputPropertyListItemName"/>
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyListItemValue" class="col-sm-2 control-label">Value</label>
                 <div class="col-sm-10">
-                  <input ng-model="newListItem.value" class="form-control input-sm" id="inputPropertyListItemValue" />
+                    <input ng-model="newListItem.value" class="form-control input-sm" id="inputPropertyListItemValue"/>
                 </div>
             </div>
 
@@ -160,20 +175,23 @@
             <div class="form-group">
                 <label for="inputPropertyButtonLabel" class="col-sm-2 control-label">Label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.buttonLabel" type="text" class="form-control" id="inputPropertyButtonLabel" placeholder="Property button label" >
+                    <input ng-model="newProperty.buttonLabel" type="text" class="form-control"
+                           id="inputPropertyButtonLabel" placeholder="Property button label">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyInnerTextButton" class="col-sm-2 control-label">Inner</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.buttonInnerText" type="text" class="form-control" id="inputPropertyInnerTextButton" placeholder="Property button inner text" >
+                    <input ng-model="newProperty.buttonInnerText" type="text" class="form-control"
+                           id="inputPropertyInnerTextButton" placeholder="Property button inner text">
                 </div>
             </div>
             <!--da ricontrollare-->
             <div class="form-group">
                 <label for="inputPropertyDefault" class="col-sm-2 control-label">Default</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.defaultValue" type="text" class="form-control" id="inputPropertyDefault" placeholder="Property Default" >
+                    <input ng-model="newProperty.defaultValue" type="text" class="form-control"
+                           id="inputPropertyDefault" placeholder="Property Default">
                 </div>
             </div>
         </div>
@@ -183,13 +201,15 @@
             <div class="form-group">
                 <label for="inputPropertyNumberLabel" class="col-sm-2 control-label">Label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.numberLabel" type="text" class="form-control" id="inputPropertyNumberLabel" placeholder="Property number label" >
+                    <input ng-model="newProperty.numberLabel" type="text" class="form-control"
+                           id="inputPropertyNumberLabel" placeholder="Property number label">
                 </div>
             </div>
-             <div class="form-group">
+            <div class="form-group">
                 <label for="inputPropertyNumberDefault" class="col-sm-2 control-label">Default</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.defaultValue" type="text" class="form-control" id="inputPropertyNumberDefault" placeholder="Property number default" >
+                    <input ng-model="newProperty.defaultValue" type="text" class="form-control"
+                           id="inputPropertyNumberDefault" placeholder="Property number default">
                 </div>
             </div>
         </div>
@@ -199,13 +219,15 @@
             <div class="form-group">
                 <label for="inputPropertyTextBuilderLabel" class="col-sm-2 control-label">Label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.textBuilderLabel" type="text" class="form-control" id="inputPropertyTextBuilderLabel" placeholder="Property slider label" >
+                    <input ng-model="newProperty.textBuilderLabel" type="text" class="form-control"
+                           id="inputPropertyTextBuilderLabel" placeholder="Property slider label">
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPropertyTextDefault" class="col-sm-2 control-label">Default</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.defaultValue" type="text" class="form-control" id="inputPropertyTextDefault" placeholder="Property text default" >
+                    <input ng-model="newProperty.defaultValue" type="text" class="form-control"
+                           id="inputPropertyTextDefault" placeholder="Property text default">
                 </div>
             </div>
         </div>
@@ -214,16 +236,38 @@
             <div class="form-group">
                 <label for="inputPropertySensorBuilderLabel" class="col-sm-2 control-label">Label</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.sensorLabel" type="text" class="form-control" id="inputPropertySensorBuilderLabel" placeholder="Property slider label" >
+                    <input ng-model="newProperty.sensorLabel" type="text" class="form-control"
+                           id="inputPropertySensorBuilderLabel" placeholder="Property slider label">
                 </div>
             </div>
+            <div class="form-group">
+
+                <label for="inputPropertySensorBuilderLabel" class="col-sm-2 control-label">Sensor Type</label>
+                <div class="col-sm-10">
+                    <select ng-model="newProperty.sensorType" class="form-control input-lg" id="sensorType"
+                            placeholder="Sensor Type">
+                        <option value="dht22"> dht22 Temperature and Humidity</option>
+                        <!--<option value="Slider"> Slider</option>
+                        <option value="Sensor">Sensor</option>-->
+                        <!--<option value="Button"> Button</option>
+                        <option value="Text"> Text</option>
+                        <option value="Number"> Number</option>
+                        <option value="DynamicView"> DynamicView</option>
+                        <option value="List">List</option>
+                        <option value="Sensor">Sensor</option>
+                        <option value="PhysicalButton">Physical Button</option>-->
+                    </select>
+                </div>
+            </div>
+
         </div>
         <!-- physical button -->
         <div id="PhysicalButtonBuilder" ng-show="newProperty.type == 'PhysicalButton'" class="propertyBuilderField">
             <div class="form-group">
                 <label for="inputPropertyPhysicalButtonBuilderValue" class="col-sm-2 control-label">Value</label>
                 <div class="col-sm-10">
-                  <input ng-model="newProperty.PhysicalButtonValue" type="text" class="form-control" id="inputPropertyPhysicalButtonBuilderValue" placeholder="Property physical button default" >
+                    <input ng-model="newProperty.PhysicalButtonValue" type="text" class="form-control"
+                           id="inputPropertyPhysicalButtonBuilderValue" placeholder="Property physical button default">
                 </div>
             </div>
         </div>
@@ -259,8 +303,12 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-primary" ng-disabled="formPropertiesInfo.$invalid" ng-click="panel.previousForm(formPropertiesInfo.$valid)">Previous</button>
-          <button type="submit" class="btn btn-primary" ng-disabled="formPropertiesInfo.$invalid" ng-click="panel.nextForm(formPropertiesInfo.$valid)">Next</button>
-        </div>   
+            <button type="submit" class="btn btn-primary" ng-disabled="formPropertiesInfo.$invalid"
+                    ng-click="panel.previousForm(formPropertiesInfo.$valid)">Previous
+            </button>
+            <button type="submit" class="btn btn-primary" ng-disabled="formPropertiesInfo.$invalid"
+                    ng-click="panel.nextForm(formPropertiesInfo.$valid)">Next
+            </button>
+        </div>
     </div>
 </form>

@@ -1,0 +1,15 @@
+<div id="ApioApplicationtestWifi" ng-app="ApioApplicationtestWifi"  style="padding:10px;">
+	<div ng-controller="defaultController">
+	    <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+            <trigger propertyname="onoff" labelon="On" labeloff="Off"></trigger>
+            <trigger propertyname="onoff1" labelon="On" labeloff="Off"></trigger>
+            <slider propertyname="green" label="Red" min="0" max="255" step="1" updatedataonce="true"></slider>
+            <slider propertyname="red" label="Green" min="0" max="255" step="1"  updatedataonce="true"></slider>
+            <slider propertyname="blue" label="Blue" min="0" max="255" step="1"  updatedataonce="true"></slider>
+            <!--<slider propertyname="strobo" label="Strobo" min="0" max="1000" step="1" event="input" updatedataonce="true"></slider>
+            <slider propertyname="games" label="Random Games" min="0" max="1000" step="1" event="input" updatedataonce="true"></slider>-->
+        </div>
+	</div>
+</div>
+<script src="products/testWifi/testWifi.js"></script>

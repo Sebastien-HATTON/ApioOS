@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="/stylesheets/marketplace.css"/>
+<div style="background: #E8E8E8">
+<div id="marketplace" ng-app="marketplace"  style="padding:10px;">
+
+  <div ng-controller="defaultController">
+    <div>
+      <div  href="" class=" backButton"><a class="glyphicon glyphicon-arrow-left" ng-click="returnBack()" style="font-size:200%;font-size: 200%;margin-left: 18%;margin-top: 15%;" href=""/></div>
+
+    <div id="marketplaceMenu" class="navbar navbar-default navbar-fixed-top" style="display: block;">Apio Store</div>
+
+      <div class="container-fluid">
+        <div class="menuMarketplace">
+        <div class="row">
+            <div class="col-md-4 singolaVoceFirst"><a><span class="glyphicon glyphicon-asterisk" style="margin-right:5%"/>New</a></div>
+            <div class="col-md-4 singolaVoce"><a><span class="glyphicon glyphicon-star" style="margin-right:5%"/>Starred</a></div>
+            <div class="col-md-4 singolaVoceLast"><a><span class="glyphicon glyphicon-th-list" style="margin-right:5%"/>All</a></div>
+        </div>
+        </div>
+   </div>
+        <div class="systemAppContainer" style = "position: fixed; margin-top:1%;">
+          <div class="app-content">
+                <div class="col-xs-4 col-sm-3 col-md-2" ng-repeat="obj in objects" ng-click="downloadApp(obj.name)" style="text-align: center;">
+                    <div style="display: inline-block;">
+                        <div class="home">
+                            <div class="image-dimensions" ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2'}" style="border: 1px solid #CCC; border-radius: 145px; background-color: #0CCD33; background-size: 100%; background-position: 50%; background-image: url({{MarketplaceServer}}/applications/{{obj.name}}/icon.png); cursor: pointer;"></div>
+                        </div>
+                        <div style="cursor: pointer; margin-top: 8px; width: 100%; height:40px;">
+                            <div class="homeAppIconName">{{obj.name}}</div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+
+
+<script src="systemApps/marketplace/marketplace.controller.js"></script>

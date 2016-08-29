@@ -1,0 +1,204 @@
+<style>
+    .form-signin {
+        padding: 15px;
+        margin: 0 auto;
+    }
+
+    .form-signin .form-signin-heading,
+    .form-signin .checkbox {
+        margin-bottom: 10px;
+    }
+
+    .form-signin .checkbox {
+        font-weight: normal;
+    }
+
+    .form-signin .form-control {
+        position: relative;
+        height: auto;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .form-signin .form-control:focus {
+        z-index: 2;
+    }
+
+    .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    .tab-pane {
+        padding: 10px;
+    }
+
+    .section_title {
+        background-color: #5cb85c;
+        color: white;
+        padding-left: 1.2%;
+    }
+
+    .section_title h1 {
+        font-weight: 400;
+    }
+
+    .section_menu {
+        padding: 1%;
+    }
+
+    .section_content {
+        padding-top: 1%;
+    }
+
+</style>
+
+<div id="Objects" class="container-fluid">
+
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <!--
+    <div class="row section_title">
+        <h1>Cloud Settings</h1>
+    </div>
+    -->
+    <!-- <div class="col-lg-6">
+
+       <div class="col-lg-2">
+         <h3>Cloud</h3>
+       </div>
+       <div class="col-lg-2">
+         <td style=" width:8%;"><button type="button" style=" margin-left:86%; margin-top:9%;" class="btn" ng-class="{'btn-success': active, 'btn-default': !active}" ng-click="activateDongle(true)" >On</button></td>
+       </div>
+       <div class="col-lg-2">
+         <td style="width:8%;"><button type="button" style="margin-top:9%;" class="btn" ng-class="{'btn-default': active, 'btn-danger': !active}"  ng-click="activateDongle(false)">Off</button></td>
+
+       </div>
+     </div>
+     -->
+
+    <div ng-if="settingsGateway" class="" ng-app="ApioDashboardApplication"
+         ng-controller="ApioDashboardCloudSettingsController">
+        <form class="form-signin" role="form" ng-hide="showSignupForm">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#cloudPanel" aria-controls="home" role="tab"
+                                                          data-toggle="tab">Cloud</a></li>
+                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab"
+                                           data-toggle="tab">Security</a></li>
+
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="cloudPanel">
+                    <div>
+
+                        <button ng-click="syncCloud()" style="float:right;" type="button"
+                                class="btn btn-default btn-lg">
+                            <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Sync
+                        </button>
+                    </div>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td><b>User email</b></td>
+                            <td><b>Actions</b></td>
+                        </tr>
+                        <tr ng-repeat="user in users">
+                            <td>{{user.email}}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" ng-show="user.enableCloud !== true"
+                                        ng-click="enableUserOnTheCloud(user)">Enable cloud
+                                </button>
+                                <button class="btn btn-sm btn-danger" ng-show="user.enableCloud == true"
+                                        ng-click="disableUserOnTheCloud(user)">Disable cloud
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="profile">...</div>
+                <div role="tabpanel" class="tab-pane" id="messages">...</div>
+                <div role="tabpanel" class="tab-pane" id="settings">...</div>
+            </div>
+
+    </div>
+    <div ng-if="settingsCloud" class="" ng-app="ApioDashboardApplication"
+         ng-controller="ApioDashboardCloudSettingsController">
+        <form class="form-signin" role="form" ng-hide="showSignupForm">
+
+            <h2 class="form-signin-heading">Settings</h2>
+
+            <div role="tabpanel">
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#cloudPanel" aria-controls="home" role="tab" data-toggle="tab">Cloud</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Security</a>
+                    </li>
+
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="cloudPanel">
+                        <div class="row">
+                            <div class="col-md-6"><b>User email</b></div>
+                            <div class="col-md-6"><b>Actions</b></div>
+                            <div ng-repeat=" a in users track by $index">
+                                <div class="row" ng-repeat="id in user.apioId">
+                                    <div class="col-md-6">
+                                        <div class="row">{{a.email}}</div>
+                                        <div class="row">{{id}}</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-sm btn-success" ng-show="!isBoardEnabled(id)"
+                                                ng-click="enableBoardOnTheCloud(id)">Enable cloud
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" ng-show="isBoardEnabled(id)"
+                                                ng-click="disableBoardOnTheCloud(id)">Disable cloud
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="profile">...</div>
+                    <div role="tabpanel" class="tab-pane" id="messages">...</div>
+                    <div role="tabpanel" class="tab-pane" id="settings">...</div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

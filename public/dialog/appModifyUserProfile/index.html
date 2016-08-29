@@ -1,0 +1,179 @@
+<style>
+    .editInfoProfile {
+        color: red;
+        padding: 1%;
+        cursor: pointer;
+    }
+
+    .editInfoProfile:hover {
+        color: white;
+        background: rgba(79, 79, 79, 0.95);
+    }
+
+    .hiProfile {
+        font-size: 30px;
+        font-weight: 100;
+    }
+
+    .customx {
+        top: 0;
+        font-size: 10px;
+        color: red;
+    }
+
+    .customy {
+        top: 0;
+        font-size: 10px;
+        color: green;
+    }
+
+    .conteinerButtonEditImge {
+        width: 100%;
+        height: 100%;
+        background: none;
+        position: absolute;
+        z-index: 1000;
+    }
+
+    .buttonEditImge {
+        top: 90%;
+        left: 90%;
+        position: absolute;
+        color: white !important;
+        cursor: pointer;
+    }
+
+    .discardButtonEditImge {
+        top: 90%;
+        left: 80%;
+        position: absolute;
+        color: red !important;
+        cursor: pointer;
+    }
+
+    .saveButtonEditImge {
+        top: 90%;
+        left: 90%;
+        position: absolute;
+        color: green !important;
+        cursor: pointer;
+    }
+
+    #imageChange {
+        top: 90%;
+        left: 90%;
+        position: absolute;
+        cursor: pointer;
+        opacity: 0;
+        width: 30px;
+    }
+
+    .progessBarUploadImage {
+        position: absolute;
+        bottom: 0%;
+    }
+
+    @media only screen and (min-width: 320px) and (max-width: 767px) {
+        .editProfileContentImage {
+            padding: 0;
+            height: 255px;
+        }
+
+        .roleProfile {
+            display: none;
+        }
+
+        .allContentEditProfile {
+            overflow: hidden;
+        }
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 997px) {
+        .editProfileContentImage {
+            padding: 0;
+            height: 555px;
+        }
+
+        .roleProfile {
+            display: none;
+        }
+
+        .allContentEditProfile {
+            overflow: hidden;
+        }
+    }
+
+    @media only screen and (min-width: 998px) {
+        .allContentEditProfile {
+            width: 600px;
+            height: 288px;
+            overflow-y: hidden;
+        }
+
+        .editProfileContentImage {
+            padding: 0;
+            height: 100%;
+            width: 50%;
+        }
+
+        .editProfileContentData {
+            height: 100%;
+        }
+    }
+</style>
+<md-dialog>
+    <!--<md-dialog-content style="width:600px; height:288px; overflow-y:hidden;" ng-controller="modifyUserProfile">-->
+    <md-dialog-content class="allContentEditProfile" style="">
+        <div class="col-md-6 editProfileContentImage">
+            <div class="conteinerButtonEditImge" ng-click="changeImmage()">
+                <input id="imageChange" nv-file-select="" uploader="uploader" class="" type="file">
+                <i class="material-icons buttonEditImge" ng-click="changeImmage()" ng-show="editImage">mode_edit</i>
+                <i class="material-icons saveButtonEditImge" ng-click="saveNewImage()" ng-hide="editImage">done</i>
+                <i class="material-icons discardButtonEditImge" ng-click="discardNewImage()"
+                   ng-hide="editImage">clear</i>
+            </div>
+            <img class="_s0 _44ma img" ng-src="/users/{{img.userImage}}" alt="user"  style="width:100%;height:100%; background-color: #5d5d5d;">
+            <md-progress-linear class="progessBarUploadImage" md-mode="determinate" ng-value="progressBarUploadImag" ng-show="showProgressBarUploadImag"></md-progress-linear>
+        </div>
+        <div class="col-md-6 editProfileContentData">
+            <div style="display:table; width:100%; height:100%;">
+                <div style="vertical-align:middle; display: table-cell; padding:5%;">
+                    <p class="hiProfile">Hi, {{ user.additional_info.userName }}!</p>
+                    <p class="roleProfile">Your role is: {{user.role}}</p>
+                    <p ng-hide="whatProfileEdit==1">Your mail is: {{user.email}} <br><span id="userMail" class="editInfoProfile" ng-click="editUserProfile($event)">edit</span>
+                    </p>
+                    <p>
+                    <div class="input-group" ng-show="whatProfileEdit==1">
+                        <span class="input-group-addon glyphicon glyphicon-remove customx"
+                              ng-click="discartEditProfile()"></span>
+                        <span class="input-group-addon glyphicon glyphicon-ok customy"
+                              ng-click="saveEditProfile()"></span>
+                        <input id="inputUserMail" value="{{user.email}}" type="text" class="form-control"
+                               placeholder="usermail" aria-describedby="basic-addon1">
+
+                    </div>
+                    </p>
+                    <p ng-hide="whatProfileEdit==2">You user name is: {{ user.additional_info.userName }} <br><span
+                            id="userName" class="editInfoProfile" ng-click="editUserProfile($event)">edit</span></p>
+                    <p>
+                    <div class="input-group" ng-show="whatProfileEdit==2">
+                        <span class="input-group-addon glyphicon glyphicon-remove customx"
+                              ng-click="discartEditProfile()"></span>
+                        <span class="input-group-addon glyphicon glyphicon-ok customy"
+                              ng-click="saveEditProfile()"></span>
+                        <input id="inputUserName" value="{{user.additional_info.userName}}" type="text"
+                               class="form-control" placeholder="username" aria-describedby="basic-addon1">
+
+                    </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </md-dialog-content>
+    <!--<md-dialog-actions>
+        <md-button ng-click="saveProfile()" class="md-primary">Save
+        </md-button>
+    </md-dialog-actions>-->
+</md-dialog>
+
+

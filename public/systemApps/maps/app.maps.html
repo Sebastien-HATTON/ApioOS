@@ -1,0 +1,1215 @@
+<style>
+    @media only screen and (min-width: 320px) and (max-width: 767px) {
+        .systemAppContainer {
+            height: 100%;
+            padding: 0 0 65px 0;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            -webkit-user-drag: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #objcetOutMap {
+            -webkit-transition: all 0.4s linear;
+            transition: all 0.4s linear;
+            height: 12.5%;
+        / / background-color: rgba(255, 255, 255, 0.86);
+            z-index: 1000;
+            bottom: 0;
+            right: 0;
+            margin-right: 0;
+            overflow: hidden;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #optionMap {
+            height: 40px;
+        }
+
+        #optionPlanimetry {
+            -webkit-transition: transform 0.1s ease-out;
+            transition: transform 0.1s ease-out;
+            position: absolute;
+            min-height: 33%;
+            width: 100%;
+            background-color: white;
+            z-index: 1001;
+            transform: translateY(65px);
+            overflow: hidden;
+            border-bottom: 1px solid #ababab;
+        }
+
+        .openChooseName {
+            padding: 1%;
+            transform: translateY(-120px) !important;
+            box-shadow: 0 -2px 78px -13px;
+            border-radius: 1%;
+        }
+
+        .insertNameOfPlanimetry {
+            width: 100%;
+        }
+
+        #namePlanimetry {
+            height: 100%;
+            width: auto;
+        }
+
+        #namePlanimetry > .md-raised {
+            float: right;
+        }
+
+        #namePlanimetry input[type="text"] {
+            height: 100%;
+            width: 56%;
+            margin-right: 2%;
+            float: left;
+            -webkit-appearance: none;
+            border: none;
+            padding: 1%;
+            font-size: 20px;
+        }
+
+        #namePlanimetry input[type="button"] {
+            height: 100%;
+            width: 19%;
+            margin-right: 2%;
+            float: left;
+            -webkit-appearance: none;
+            border: none;
+        }
+
+        #objcetOutMap .row {
+            height: 100%;
+        }
+
+        .plusContent {
+            height: 100%;
+            display: none;
+            padding: 2px;
+
+        }
+
+        .closeObjectContains {
+            width: 83% !important;
+        }
+
+        .closeObjectContains .plusContent {
+            text-align: center;
+            width: 100%;
+        }
+
+        .openObjectContains {
+            width: 100% !important;
+        }
+
+        .plusContent .glyphicon-plus {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 30px;
+            height: 100%;
+
+        }
+
+        .plusContent .glyphicon-chevron-left {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 30px;
+            height: 100%;
+        }
+
+        .planimetryClosed {
+            background-image: url('images/plancatastale.png');
+            background-color: #ede8f2;
+            border-radius: 145px;
+            background-repeat: no-repeat;
+        }
+
+        .planimetryOpened {
+            background-image: url('images/x.png');
+            background-color: #ede8f2;
+            border-radius: 145px;
+            background-repeat: no-repeat;
+        }
+
+        .objectContent {
+            height: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 0;
+            padding-right: 0;
+            width: 96%;
+        }
+
+        .image-dimensions {
+            height: 42px;
+            width: 42px;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 42px;
+        }
+
+        .text-dimensions {
+            width: 42px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+            font-size: 10px;
+        }
+
+        .displayNone {
+            display: none !important;
+        }
+
+        #searchBox {
+            width: 100%;
+            height: 42px;
+            padding: 1%;
+            display: none;
+        }
+
+        .positionSearchBox {
+            position: absolute;
+            width: 53%;
+            height: auto;
+            margin: 0 auto;
+            z-index: 1000;
+            margin-left: 10%;
+            padding-top: 1%;
+        }
+
+        #loadPlanimetry {
+            width: 30%;
+        }
+
+        #uploadPlanimetry {
+        / / width: 10 %;
+        }
+
+        .uploadPlanimetryWhiteSpace {
+            width: 10%;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+        }
+
+        /*input[type=file] {
+            content: '';
+            height: 42px;
+            width: 42px;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 42px;
+            background-image: url('images/plusPlanimetry.png');
+            filter: alpha(opacity=0);
+            overflow: hidden;
+        }*/
+        .inputPlanimetry {
+            content: '';
+            height: 42px;
+            width: 42px;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 42px;
+            background-image: url('images/plusPlanimetry.png');
+            filter: alpha(opacity=0);
+            overflow: hidden;
+        }
+
+        .uploadPlanimetryImage::before {
+            content: '';
+            height: 42px;
+            width: 42px;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 42px;
+            background-image: url('images/plusPlanimetry.png');
+            filter: alpha(opacity=0);
+            overflow: hidden;
+        }
+
+        #floorOpenEffect {
+            -webkit-transition: height 0.1s ease-out;
+            transition: height 0.1s ease-out;
+        }
+
+        #floorPlanimetryInMap {
+            width: 10.2%;
+            position: absolute;
+            height: auto;
+            overflow: hidden;
+            margin-right: 10px;
+            top: 0%;
+            right: 0;
+            height: 8.5%;
+        }
+
+        .floorPlanimetryInMapOpen {
+            height: auto !important;
+        }
+
+        #floorPlanimetryInMap .containsDivNumber {
+            width: 100%;
+            min-height: 25%;
+            margin-top: 10px;
+        / / display: table-cell;
+        / / vertical-align: middle;
+        }
+
+        .containsDivNumber div {
+            border-bottom: solid 1px rgba(127, 127, 127, 0.88);
+            background-color: rgba(255, 255, 255, 0.83);
+            text-align: center;
+            cursor: pointer;
+            padding: 10%;
+            border-radius: 5px;
+            margin: 4px 0px 4px 0px;
+        }
+
+        .containsDivNumber div:hover {
+            border-bottom: solid 1px rgba(127, 127, 127, 0.88);
+            background-color: #fff;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .floor:hover {
+            background-color: rgba(255, 255, 255, 0.83) !important;
+
+        }
+
+        .floor {
+            width: 100%;
+        }
+
+        .description {
+            height: 30px;
+            padding: 0;
+            text-align: center;
+        }
+
+        #selectFloorToInsertPlanimetry {
+            width: 100%;
+            height: 100%;
+            padding-top: 18%;
+            padding-bottom: 18%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #selectFloorToInsertPlanimetry .number div {
+            text-align: center;
+        / / border-left: solid 1 px rgba(127, 127, 127, 0.88);
+        / / border-right: solid 1 px rgba(127, 127, 127, 0.88);
+            cursor: pointer;
+            height: 100%;
+            background-color: darkgrey;
+            padding: 1%;
+            margin: 2%;
+            border-radius: 15%;
+        }
+
+        #selectFloorToInsertPlanimetry .number div:hover {
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        #guideForUser {
+            margin: 0 auto;
+            text-align: center;
+            display: table;
+            width: 100%;
+            height: 100%;
+            font-size: 13px;
+            line-height: 15px;
+        }
+
+        #textGuideForUser {
+            display: table-cell;
+            vertical-align: middle;
+            height: 50%;
+            padding-top: 18%;
+            padding-bottom: 18%;
+            margin: 0 auto;
+            font-size: 15px;
+            font-weight: 100;
+            line-height: 18px;
+        }
+
+        .progessBarUploadImage {
+            bottom: 12.5%;
+            position: absolute;
+        }
+
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 1199px) {
+        #systemAppContainer {
+            height: 100%;
+            padding-left: 0;
+            padding-right: 0;
+            padding-bottom: 142px;
+            padding-top: 0;
+            overflow-y: hidden;
+        }
+
+        #objcetOutMap {
+            -webkit-transition: all 0.4s linear;
+            transition: all 0.4s linear;
+            position: absolute;
+            height: 13.8%;
+            right: 0;
+        / / background-color: rgba(255, 255, 255, 0.86);
+            z-index: 1000;
+        / / bottom: 0;
+            overflow: hidden;
+        }
+
+        #optionMap {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #nameOptionMap {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #optionPlanimetry {
+            -webkit-transition: transform 0.2s ease-out;
+            transition: transform 0.2s ease-out;
+            position: absolute;
+            min-height: 23%;
+        / / display: none;
+            width: 100%;
+            background-color: white;
+            z-index: 1001;
+            transform: translateY(143px);
+            overflow: hidden;
+            border-bottom: 1px solid #ababab;
+        }
+
+        .openChooseName {
+        / / height: 14 % !important;
+        / / width: 100 % !important;
+            padding: 1%;
+        / / display: block !important;
+            transform: translateY(0px) !important;
+            box-shadow: 0 -2px 78px -13px;
+            border-radius: 1%;
+        }
+
+        #namePlanimetry {
+            height: 100%;
+            width: 81%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #namePlanimetry input[type="text"] {
+            height: 100%;
+            width: 30%;
+            margin-right: 2%;
+            float: left;
+            -webkit-appearance: none;
+            border: none;
+            padding: 1%;
+            font-size: 20px;
+        }
+
+        #namePlanimetry input[type="button"] {
+            height: 100%;
+            width: 10%;
+            margin-right: 2%;
+            float: left;
+            -webkit-appearance: none;
+            border: none;
+        }
+
+        #objcetOutMap .row {
+            height: 100%;
+        }
+
+        .plusContent {
+            height: 100%;
+            text-align: center;
+            display: none;
+        }
+
+        .closeObjectContains {
+            width: 93% !important;
+        }
+
+        .openObjectContains {
+            width: 93% !important;
+        }
+
+        .plusContent .glyphicon-plus {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 30px;
+            height: 100%;
+        }
+
+        .plusContent .glyphicon-chevron-left {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 30px;
+            height: 100%;
+        }
+
+        .planimetryClosed {
+            background-image: url('images/plancatastale.png');
+            background-color: #ede8f2;
+            border-radius: 145px;
+            background-repeat: no-repeat;
+        }
+
+        .planimetryOpened {
+            background-image: url('images/x.png');
+            background-color: #ede8f2;
+            border-radius: 145px;
+            background-repeat: no-repeat;
+        }
+
+        .objectContent {
+            height: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            white-space: nowrap;
+            width: 100%;
+            padding-left: 0;
+            padding-top: 2%;
+            padding-bottom: 2%;
+            padding-right: 0;
+        }
+
+        .image-dimensions {
+            height: 90px;
+            width: 90px;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+        }
+
+        .text-dimensions {
+        / / height: 90 px;
+            width: 90px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 2%;
+            margin-right: 2%;
+        / / background-size: 90 px;
+        }
+
+        .displayNone {
+            display: none !important;
+        }
+
+        #searchBox {
+            width: 100%;
+            height: 50px;
+            padding: 1%;
+
+        }
+
+        .positionSearchBox {
+            position: absolute;
+            width: 33%;
+            height: auto;
+            margin: 0 auto;
+            z-index: 1000;
+            margin-left: 33%;
+            padding-top: 1%;
+        }
+
+        #loadPlanimetry {
+            width: 30%;
+
+        }
+
+        #uploadPlanimetry {
+        / / width: 10 %;
+        }
+
+        .uploadPlanimetryWhiteSpace {
+            width: 10%;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+        }
+
+        .inputPlanimetry {
+            content: '';
+            height: 90px;
+            width: 90px;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+            background-image: url('images/plusPlanimetry.png');
+            filter: alpha(opacity=0);
+            overflow: hidden;
+        }
+
+        .uploadPlanimetryImage::before {
+            content: '';
+            height: 90px;
+            width: 90px;
+            filter: alpha(opacity=0);
+            overflow: hidden;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+            background-image: url('images/plusPlanimetry.png');
+        }
+
+        #floorPlanimetryInMap {
+            width: 4%;
+        / / display: table;
+            position: absolute;
+            height: auto;
+            margin-right: 10px;
+            top: 9%;
+            right: 0;
+        }
+
+        #floorPlanimetryInMap {
+            width: 3%;
+        / / display: table;
+            position: absolute;
+            height: auto;
+            margin-right: 10px;
+            top: 0%;
+            right: 0;
+        }
+
+        #floorPlanimetryInMap .containsDivNumber {
+            width: 100%;
+            min-height: 25%;
+            margin-top: 10px;
+        / / display: table-cell;
+        / / vertical-align: middle;
+        }
+
+        .containsDivNumber div {
+            border-bottom: solid 1px rgba(127, 127, 127, 0.88);
+            background-color: rgba(255, 255, 255, 0.83);
+            text-align: center;
+            cursor: pointer;
+            padding: 10%;
+            border-radius: 5px;
+            margin: 4px 0px 4px 0px;
+        }
+
+        .containsDivNumber div:hover {
+            border-bottom: solid 1px rgba(127, 127, 127, 0.88);
+            background-color: #fff;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .floor:hover {
+            background-color: rgba(255, 255, 255, 0.83) !important;
+
+        }
+
+        .description {
+            height: 100%;
+        }
+
+        #selectFloorToInsertPlanimetry {
+            width: 87%;
+            font-size: 15px;
+            height: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #selectFloorToInsertPlanimetry .number div {
+            text-align: center;
+            border-left: solid 1px rgba(127, 127, 127, 0.88);
+            border-right: solid 1px rgba(127, 127, 127, 0.88);
+            cursor: pointer;
+            height: 100%;
+            background-color: darkgrey;
+            padding: 1%;
+            margin: 1%;
+            border-radius: 15%;
+        }
+
+        #selectFloorToInsertPlanimetry .number div:hover {
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        #guideForUser {
+            margin: 0 auto;
+            text-align: center;
+            display: table;
+            width: 100%;
+            height: 100%;
+            font-size: 16pt;
+        }
+
+        #textGuideForUser {
+            display: table-cell;
+            vertical-align: middle;
+            height: 50%;
+            margin: 0 auto;
+        }
+
+        .progessBarUploadImage {
+            bottom: 13.8%;
+            position: absolute;
+        }
+    }
+
+    @media only screen and (min-width: 1200px) {
+        #systemAppContainer {
+            height: 100%;
+            padding-left: 0;
+            padding-right: 0;
+            padding-top: 60px;
+            padding-bottom: 0;
+            overflow-y: hidden;
+        }
+
+        #objcetOutMap {
+            -webkit-transition: all 0.4s linear;
+            transition: all 0.4s linear;
+            position: absolute;
+            height: 20%;
+            background-color: rgba(255, 255, 255, 0.86);
+            z-index: 1000;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        #optionPlanimetry {
+            -webkit-transition: all 0.4s linear;
+            transition: all 0.4s linear;
+            position: absolute;
+            height: 0%;
+            width: 0%;
+            background-color: rgba(255, 255, 255, 0.86);
+            z-index: 1000;
+            bottom: 20%;
+            overflow: hidden;
+            border-bottom: 1px solid #ababab;
+        }
+
+        #namePlanimetry {
+            height: 100%;
+            width: 55%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #namePlanimetry input[type="text"] {
+            height: 100%;
+            width: 30%;
+            margin-right: 2%;
+            float: left;
+            -webkit-appearance: none;
+            border: none;
+            padding: 1%;
+            font-size: 20px;
+        }
+
+        #namePlanimetry input[type="button"] {
+            height: 100%;
+            width: 10%;
+            margin-right: 2%;
+            float: left;
+            -webkit-appearance: none;
+            border: none;
+        }
+
+        .openChooseName {
+            height: 11% !important;
+            width: 100% !important;
+            padding: 1%;
+        }
+
+        #objcetOutMap .row {
+            height: 100%;
+        }
+
+        .plusContent {
+            height: 100%;
+            display: table;
+        }
+
+        .closeObjectContains {
+            width: 5% !important;
+        }
+
+        .openObjectContains {
+            width: 100% !important;
+        }
+
+        .plusContent .glyphicon-plus {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 30px;
+            height: 100%;
+        }
+
+        .plusContent .glyphicon-chevron-left {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 30px;
+            height: 100%;
+        }
+
+        .planimetryClosed {
+            background-image: url('images/plancatastale.png');
+            background-color: #ede8f2;
+            border-radius: 145px;
+            background-repeat: no-repeat;
+        }
+
+        .planimetryOpened {
+            background-image: url('images/x.png');
+            background-color: #ede8f2;
+            border-radius: 145px;
+            background-repeat: no-repeat;
+        }
+
+        .objectContent {
+            height: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-top: 1%;
+            padding-bottom: 1%;
+
+        }
+
+        .image-dimensions {
+            height: 90px;
+            width: 90px;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+        }
+
+        .text-dimensions {
+        / / height: 90 px;
+            width: 90px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 2%;
+            margin-right: 2%;
+        / / background-size: 90 px;
+        }
+
+        .displayNone {
+            display: none !important;
+        }
+
+        #searchBox {
+            width: 100%;
+            height: 50px;
+            padding: 1%;
+
+        }
+
+        .positionSearchBox {
+            position: absolute;
+            width: 33%;
+            height: auto;
+            margin: 0 auto;
+            z-index: 1000;
+            margin-left: 33%;
+            padding-top: 1%;
+        }
+
+        #loadPlanimetry {
+            width: 30%;
+
+        }
+
+        #uploadPlanimetry {
+        / / width: 10 %;
+        }
+
+        .uploadPlanimetryWhiteSpace {
+            width: 10%;
+            display: inline-block;
+            margin-left: 2%;
+            margin-right: 2%;
+        }
+
+        /*input[type=file] {
+            content: '';
+            height: 90px;
+            width: 90px;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+            background-image: url('images/plusPlanimetry.png');
+            filter: alpha(opacity=0);
+            overflow: hidden;
+        }*/
+        .inputPlanimetry {
+            content: '';
+            height: 90px;
+            width: 90px;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+            background-image: url('images/plusPlanimetry.png');
+            filter: alpha(opacity=0);
+            overflow: hidden;
+        }
+
+        .uploadPlanimetryImage::before {
+            content: '';
+            height: 90px;
+            width: 90px;
+            filter: alpha(opacity=0);
+            overflow: hidden;
+            display: inline-block !important;
+            -webkit-appearance: none;
+            margin-left: 2%;
+            margin-right: 2%;
+            background-size: 90px;
+            background-image: url('images/plusPlanimetry.png');
+        }
+
+        #floorPlanimetryInMap {
+            width: 3%;
+        / / display: table;
+            position: absolute;
+            height: auto;
+            margin-right: 10px;
+            top: 9%;
+            right: 0;
+        }
+
+        #floorPlanimetryInMap .containsDivNumber {
+            width: 100%;
+            min-height: 25%;
+            margin-top: 10px;
+        / / display: table-cell;
+        / / vertical-align: middle;
+        }
+
+        .containsDivNumber div {
+            border-bottom: solid 1px rgba(127, 127, 127, 0.88);
+            background-color: rgba(255, 255, 255, 0.83);
+            text-align: center;
+            cursor: pointer;
+            padding: 10%;
+            border-radius: 5px;
+            margin: 4px 0px 4px 0px;
+        }
+
+        .containsDivNumber div:hover {
+            border-bottom: solid 1px rgba(127, 127, 127, 0.88);
+            background-color: #fff;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .floor:hover {
+            background-color: rgba(255, 255, 255, 0.83) !important;
+
+        }
+
+        .description {
+            height: 100%;
+            line-height: 31px;
+        }
+
+        #selectFloorToInsertPlanimetry {
+            width: 63%;
+            margin-left: auto;
+            height: 100%;
+            margin-right: auto;
+        }
+
+        #selectFloorToInsertPlanimetry .number div {
+            text-align: center;
+            border-left: solid 1px rgba(127, 127, 127, 0.88);
+            border-right: solid 1px rgba(127, 127, 127, 0.88);
+            cursor: pointer;
+            height: 100%;
+            background-color: darkgrey;
+            padding: 1%;
+            margin: 1%;
+            border-radius: 15%;
+        }
+
+        #selectFloorToInsertPlanimetry .number div:hover {
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        #guideForUser {
+            margin: 0 auto;
+            text-align: center;
+            display: table;
+            width: 100%;
+            height: 100%;
+            font-size: 16pt;
+        }
+
+        #textGuideForUser {
+            display: table-cell;
+            vertical-align: middle;
+            height: 50%;
+            margin: 0 auto;
+        }
+
+        .progessBarUploadImage {
+            bottom: 20%;
+            position: absolute;
+        }
+    }
+
+    /*div[title~="prova"]{
+        width: 40px !important;
+        height: 40px !important;
+        border-radius:  50px !important;
+        background-color: #4fa7de !important;
+    }*/
+
+    .iconProfile {
+        right: 15px;
+        position: absolute;
+        z-index: 100;
+        top: 12px;
+        display: none;
+    }
+
+    .number > div {
+
+    }
+
+    #openMap {
+        height: 600px;
+        width: 350px;
+    }
+
+    .labelTriggerInInfoWindow {
+        width: 70%;
+        float: left;
+        height: 30px;
+        line-height: 28px;
+        margin-right: 16px;
+    }
+
+    .labelSensorInInfoWindow {
+        top: 5px;
+        height: 20px;
+    }
+
+    .labelSensorContainerInInfoWindow {
+        height: 37px !important;
+        width: 100% !important;
+        margin: 0;
+    }
+
+    .valueSensorInInfoWindow {
+        width: 20%;
+        float: right;
+        text-align: right;
+        color: black !important;
+    }
+
+    .labelSliderInInfoWindow {
+        padding-top: 7%;
+    }
+
+    .infoWindowsContainer {
+        width: 210px;
+        height: 300px;
+        padding: 2%;
+        overflow: scroll;
+    }
+
+    #planimetry {
+        -webkit-animation: none;
+        animation: none;
+    }
+
+    /*.maxHeight{
+         overflow:hidden;
+         height: 100%;
+    }*/
+</style>
+<!--<link rel="stylesheet" href="stylesheets/MapsApp.css"/>-->
+
+<div class="maxHeight">
+
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+    <div class="positionSearchBox"><input id="searchBox" type="text" placeholder=" inserisci un indirizzo o un luogo">
+    </div>
+    <div id="dvMap" style="width: 100%; height: 100%;"></div>
+    <div id="floorOpenEffect">
+        <div id="floorPlanimetryInMap" ng-click="openLayerPlanimetryInMap()">
+            <div class="containsDivNumber" ng-click="selectViewFloorPlanimetry($event)">
+                <div style="font-size:24px;" class="floor glyphicon glyphicon-align-right"></div>
+                <div data-floor="1">1</div>
+                <div data-floor="2">2</div>
+                <div data-floor="3">3</div>
+                <div data-floor="4">4</div>
+                <div data-floor="5">5</div>
+                <div data-floor="6">6</div>
+                <div data-floor="7">7</div>
+                <div data-floor="8">8</div>
+            </div>
+        </div>
+    </div>
+
+    <md-progress-linear class="progessBarUploadImage" md-mode="determinate" ng-value="progressBarUploadImag"
+                        ng-show="showProgressBarUploadPlanimetry"></md-progress-linear>
+    <div id="optionPlanimetry" class="">
+        <div id="namePlanimetry" class="displayNone">
+            <label>Seleziona un nome per la Planietria</label>
+            <md-input-container class="insertNameOfPlanimetry md-input-focused" style="margin:0;">
+                <input id="nameNewPlanimetry" aria-label="title" ng-model="title" md-no-autogrow="false">
+            </md-input-container>
+            <md-button ng-click="exitToAdNewPlanimetry()" class="md-raised">cancel</md-button>
+            <md-button ng-click="addNameForPlanimetry()" class="md-raised">save</md-button>
+            <!--<input type="button" ng-click="exitToAdNewPlanimetry()" style="background:rgba(255, 0, 0, 0.77);"
+                   value="annulla"/>-->
+            <!--<input type="button" style="background:rgba(0, 208, 29, 0.85);" value="salva"
+                   ng-click="addNameForPlanimetry()"/>-->
+        </div>
+        <div id="guideForUser" class="displayNone">
+            <div id="textGuideForUser"></div>
+        </div>
+        <div id="selectFloorToInsertPlanimetry" class="row">
+            <div class="description col-md-6 col-sm-6 col-xs-12">Seleziona il piano a cui associare la planimetria</div>
+            <div ng-click="selectFloor($event)" class="number col-md-6 col-sm-6 col-xs-12">
+                <div class="col-md-1 col-sm-1 col-xs-1">1</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">2</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">3</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">4</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">5</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">6</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">7</div>
+                <div class="col-md-1 col-sm-1 col-xs-1">8</div>
+            </div>
+        </div>
+    </div>
+    <div id="objcetOutMap" class="closeObjectContains container-fluid">
+        <div class="row">
+            <div class="plusContent col-md-1 col-sm-1 col-xs-1">
+                <div id="chevron" class="glyphicon glyphicon-plus" ng-click="click()"></div>
+            </div>
+            <div class="col-md-11 col-sm-11 col-xs-10 objectContent">
+                <div id="optionMap" class="col-md-12 col-sm-12 col-xs-12">
+                    <div id="planimetry" class="planimetryClosed image-dimensions" ng-click="addPlanimetry()"
+                         ng-class="{ 'planimetryClosed' : !viewPlanimetry, 'planimetryOpened' : viewPlanimetry}"></div>
+                    <div id="uploadPlanimetry" ng-show="viewPlanimetry" class="image-dimensions">
+                        <input id="loadNewPlanimetry" style="display:none;" type="file" nv-file-select
+                               uploader="uploader"
+                               onchange="angular.element(this).scope().loadNewPlanimetryImageInServer()" name=""
+                               class="uploadPlanimetryImage"/>
+                        <div class="inputPlanimetry" ng-click="launchLoadNewPlanimetry()"></div>
+                    </div>
+
+                    <div id="planimetry{{pla.planimetryId}}" ng-show="viewPlanimetry" ng-repeat="pla in planimetry"
+                         class="image-dimensions"
+                         style="background-image: url(images/planimetry/{{pla.url}}); cursor: pointer; background-color: #5e96dc; border-radius: 145px;      background-size: 100%; background-position: 50%; background-repeat: no-repeat;"
+                         ng-click="selecFloorForThisPla(pla)" data-planimetryId="{{pla.planimetryId}}"
+                         oncontextmenu="angular.element(this).scope().showDeletePlanymetry(event,angular.element(this).scope().pla)">
+                        <div id="removePlanimetryToMap{{pla.planimetryId}}"
+                             style="text-align: right; position: relative; top: 0; float: right; font-size: 22px; color: #C48E32; border: solid 2px; border-radius: 9px; background-color: rgba(255, 255, 255, 0.94);"
+                             class="glyphicon glyphicon-minus " ng-class="{ 'displayNone' : planimetryInMap(pla)}"
+                             ng-click="removePlanimetryToMap($event,pla)"></div>
+                    </div>
+
+                    <div ng-click="backToCategory()" ng-show="categorySelected && !viewPlanimetry"
+                         class="image-dimensions"
+                         style="background-image: url(/images/back-category.png); cursor: pointer; background-color: #5e96dc; border-radius: 145px; background-size: 100%; background-position: 50%; background-repeat: no-repeat;"></div>
+
+                    <div ng-click="categoryView(cat.id)" ng-show="!categorySelected && !viewPlanimetry"
+                         ng-repeat="cat in category" class="image-dimensions"
+                         style="background-image: url({{cat.path}}); cursor: pointer; background-color: #5e96dc; border-radius: 145px; background-size: 100%; background-position: 50%; background-repeat: no-repeat;"></div>
+
+                    <div id="object{{obj.objectId}}"
+                         ng-show="(!obj.hasOwnProperty('group') || obj.group.id == categorySelect || categorySelect == 'all') && (!viewPlanimetry && !asMarker[obj.objectId])"
+                         ng-click="addNewMarker(obj)" ng-repeat="obj in objects" class="image-dimensions"
+                         style="background-image: url(applications/{{obj.objectId}}/icon.png); cursor: pointer; background-color: #5e96dc; border-radius: 145px; background-size: 100%; background-position: 50%; background-repeat: no-repeat;"></div>
+                </div>
+                <div id="nameOptionMap" class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="text-dimensions" style="text-align:center;">
+                        Planimetrie
+                    </div>
+                    <div class="text-dimensions" ng-show="viewPlanimetry" style="text-align:center;">
+                        Carica Nuova
+                    </div>
+                    <div id="name{{pla.planimetryId}}" ng-show="viewPlanimetry" ng-repeat="pla in planimetry"
+                         class="text-dimensions" style="text-align:center;">
+                        {{pla.name}}
+                    </div>
+
+                    <div id="nameCategory{{cat.id}}" ng-show="categorySelected && !viewPlanimetry"
+                         class="text-dimensions" style="text-align:center;">
+                        Back to Category
+                    </div>
+
+                    <div id="nameCategory{{cat.id}}" ng-show="!categorySelected && !viewPlanimetry"
+                         ng-repeat="cat in category" class="text-dimensions" style="text-align:center;">
+                        {{cat.name}}
+                    </div>
+
+                    <div id="name{{obj.objectId}}"
+                         ng-show="(!obj.hasOwnProperty('group') || obj.group.id == categorySelect || categorySelect == 'all') && (!viewPlanimetry && !asMarker[obj.objectId])"
+                         ng-repeat="obj in objects" class="text-dimensions" style="text-align:center;">
+                        {{obj.name}}
+                    </div>
+                    <!--NAME OF CATEGORY-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

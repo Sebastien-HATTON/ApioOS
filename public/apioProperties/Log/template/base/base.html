@@ -1,0 +1,152 @@
+<style>
+    #ApioApplicationLog .table-hover tbody tr:hover td, #ApioApplicationLog .table-hover tbody tr:hover th {
+        background-color: rgba(244, 214, 48, 0.9);
+    }
+
+    #export_file .content_loader, #export_file .content_loader:after {
+        width: 4em;
+        height: 4em;
+        margin: 0;
+        border: 0.8em solid rgba(200, 200, 200, 0.6);
+        border-left-color: rgba(120, 120, 120, 0.70);
+    }
+
+    #export_file {
+        position: fixed;
+        top: 0;
+        height: 58px;
+        background-color: white;
+        border-bottom: solid 1px rgba(142, 142, 142, 0.35);
+        padding: 0.8% 1.5%;
+    }
+
+    .table_title_container {
+        margin: 57px 0 0 0;
+    }
+
+    .table_content {
+        margin-top: 77px;
+    }
+
+    @media only screen and (min-width: 320px) and (max-width: 479px) {
+        #export_file {
+            top: 50px;
+        }
+
+        .image-dim {
+            float: right;
+            height: 35px;
+        }
+
+        .table_title_container {
+            margin: 54px 0 0 0;
+        }
+
+        .table_content {
+            margin-top: 34px;
+        }
+
+        .table-font {
+            font-size: 12px;
+        }
+    }
+
+    @media only screen and (min-width: 480px) and (max-width: 767px) {
+        #export_file {
+            top: 50px;
+        }
+
+        .image-dim {
+            float: right;
+            height: 35px;
+        }
+
+        .table-font {
+            font-size: 12px;
+        }
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 991px) {
+        #export_file {
+            top: 50px;
+        }
+
+        .image-dim {
+            height: 35px;
+            line-height: 0;
+            float: right;
+        }
+
+        .table-font {
+            font-size: 11px !important;
+        }
+    }
+
+    @media only screen and (min-width: 992px) {
+        .image-dim {
+            height: 35px;
+            line-height: 0;
+            float: right;
+        }
+
+        .table-font {
+            font-size: 11px !important;
+        }
+    }
+</style>
+<div id="ApioApplicationLog" ng-app="ApioApplicationLog">
+    <div ng-controller="defaultController">
+        <div id="app_log" style="display: block;">
+            <div id="export_file" ng-click="exportToXLSX()" style="cursor: pointer;">
+                <div class="testo_proprietaiPhone" style="width: 100%; cursor: pointer !important;">
+                    Esporta su file (.xslx)
+                </div>
+                <div class="verticalAlign">
+                    <img id="img_export" src="images/export.png" ng-show="xslx_ready === true" class="image-dim">
+                    <div style="float: right;" ng-show="xslx_ready === false">
+                        <div class="content_loader"></div>
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div class="row table_title_container">
+	            <div class="table-responsive" style="position: fixed;">
+	                <table class="table table-font table-striped table-hover">
+	                    <tr class="firstTrTableLog">
+	                        <th>Data</th>
+	                        <th ng-repeat="l in tableLabels">{{l}}</th>
+	                    </tr>
+	                </table>
+	            </div>
+            </div>
+            
+            table_content
+            -->
+            <div style="margin-top: 58px;">
+                <table class="table table-font table-striped table-hover" id="logs-table">
+                    <thead>
+                    <tr class="firstTrTableLog">
+                        <th>Data</th>
+                        <th ng-repeat="l in tableLabels">{{l}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="gd in grouppedData">
+                        <td>{{gd.date}}</td>
+                        <td ng-repeat="p in tableProperties" on-finish-render>{{gd[p]}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="content_loader" ng-hide="log_ready"></div>
+            <div ng-hide="log_ready">
+                <p style="text-align: center; padding-bottom: 10px;">Aggiornamento dati in corso...</p>
+            </div>
+            <div ng-show="logsMessage !== ''">
+                <p style="text-align: center; padding-bottom: 10px;">{{logsMessage}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="apioProperties/Log/template/base/base.js"></script>

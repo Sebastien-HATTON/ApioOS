@@ -1,0 +1,80 @@
+<style>
+    .section_title {
+        background-color: #5cb85c;
+        color: white;
+        padding-left: 1.2%;
+    }
+
+    .section_title h1 {
+        font-weight: 400;
+    }
+</style>
+<div id="nwk" class="container-fluid">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <div class="row section_title">
+        <h1>Network Settings</h1>
+    </div>
+
+    <div ng-app="ApioDashboardApplication" ng-controller="ApioDashboardNetworkSettingsController">
+        <div>
+            <span>Wi-Fi</span>
+            <div>
+                <span>Status: </span>
+                <select ng-options="s for s in wifiStatuses" ng-model="status" ng-change="statusHasChanged()"></select>
+            </div>
+            <div ng-show="status === 'client' && wifiSSIDs.length">
+                <span>Select SSID [Current: <i>{{currentSsid === "" ? "none" : currentSsid}}</i>]:</span>
+                <select ng-options="s for s in wifiSSIDs" ng-model="ssid"></select>
+                <span>Type password:</span>
+                <input type="text" ng-model="password" placeholder="Leave empty if the Wi-Fi is free"/>
+                <button type="button" ng-click="setAsClient()">Submit!</button>
+            </div>
+        </div>
+        <div>
+            <span>3G</span>
+            <div>
+                <button type="button" ng-click="enable3g()">Click to {{status3g === "disabled" ? "enable" :
+                    "disable"}}
+                </button>
+            </div>
+            <div>
+                <span>APN:</span>
+                <input type="text" ng-model="apn" placeholder="Empty"/>
+            </div>
+            <div>
+                <span>Number:</span>
+                <input type="text" ng-model="number" placeholder="Empty"/>
+            </div>
+            <div>
+                <span>Username:</span>
+                <input type="text" ng-model="username" placeholder="Empty"/>
+            </div>
+            <div>
+                <span>Password:</span>
+                <input type="text" ng-model="password3g" placeholder="Empty"/>
+            </div>
+            <div>
+                <button type="button" ng-click="change3gSettings()">Change Settings</button>
+            </div>
+        </div>
+    </div>
+</div>

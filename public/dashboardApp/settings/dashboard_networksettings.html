@@ -1,0 +1,164 @@
+<style>
+    .section_title {
+        background-color: #5cb85c;
+        color: white;
+        padding-left: 1.2%;
+    }
+
+    .section_title h1 {
+        font-weight: 400;
+    }
+
+    #network_setting_container h4 {
+        font-weight: 400;
+        margin-bottom: 20px;
+    }
+
+    #network_setting_container .form-group label {
+        font-weight: 400;
+        margin-bottom: 8px;
+    }
+
+    #network_setting_container .form-control[disabled], #network_setting_container fieldset[disabled] .form-control {
+        cursor: default;
+    }
+
+</style>
+
+<div id="nwk" class="container-fluid">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <!--
+    <div class="row section_title">
+        <h1>Network Settings</h1>
+    </div>
+    -->
+
+    <div id="network_setting_container" class="row" ng-app="ApioDashboardApplication"
+         ng-controller="ApioDashboardNetworkSettingsController" style="margin-top: 20px;">
+
+        <div class="col-sm-6 col-md-5">
+            <h4><u>Wi-Fi</u></h4>
+
+            <div class="form-group">
+                <label for="wi-fi_configuration" class="control-label">Configured as:</label>
+                <select id="wi-fi_configuration" class="form-control" ng-options="s for s in wifiStatuses"
+                        ng-model="status" ng-change="statusHasChanged()"></select>
+            </div>
+            <div class="form-group" ng-hide="status === 'client'">
+                <label for="hotspot_name" class="control-label">Hotspot name:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="hotspot_name" ng-model="hotspot_name"
+                           placeholder="Hotspot name" ng-disabled="change_hotspot_name">
+                    <span class="input-group-btn">
+				        <button ng-hide="hide_change_button" class="btn btn-default" type="button"
+                                ng-click="changeHotspotName()">Change
+                        </button>
+				        <button ng-show="hide_change_button" class="btn btn-danger" type="button"
+                                ng-click="backHotspotName()"><span class="glyphicon glyphicon-remove"></span></button>
+				        <button ng-show="hide_change_button" class="btn btn-success" type="button"
+                                ng-click="saveHotspotName()"><span class="glyphicon glyphicon-ok"></span></button>
+				    </span>
+                </div>
+            </div>
+            <div class="alert alert-success" role="alert" ng-show="hotspotNameSaved">
+                <p><b>Well done!</b> You successfully changed your hotspot name.</p>
+            </div>
+
+            <div class="alert" ng-show="status === 'client' && !wifiSSIDs.length" style="text-align: center;">
+                <div class="content_loader"></div>
+                <p class="loader_text">Richiesta dati in corso...</p>
+            </div>
+            <div class="form-group" ng-show="status === 'client' && wifiSSIDs.length">
+                <label for="client_configuration" class="control-label">Select Network (current: <i>{{currentSsid === ""
+                    ? "none" : currentSsid}}</i>):</label>
+                <select id="client_configuration" class="form-control" ng-options="s for s in wifiSSIDs"
+                        ng-model="ssid"></select>
+            </div>
+            <div class="form-group" ng-show="status === 'client' && wifiSSIDs.length">
+                <label for="password" class="control-label">Type password:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="password" ng-model="password"
+                           placeholder="Leave empty if the Wi-Fi is free">
+                    <span class="input-group-btn">
+				        <button class="btn btn-success" type="button" ng-click="setAsClient()">Submit</button>
+				    </span>
+                </div>
+            </div>
+            <div class="alert alert-warning" role="alert" ng-show="clientNextReboot">
+                <p><b>Note:</b> network changes will be applied at the next reboot.</p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-5">
+            <h4><u>Mobile broadband</u></h4>
+
+            <h5>Mobile network settings
+                <small></small>
+            </h5>
+            <div class="alert alert-success" role="alert" ng-show="update_setting_success">
+                <p><b>Well done!</b> You successfully update the mobile broadband settings.</p>
+            </div>
+            <div class="form-group">
+                <label for="mb_apn" class="control-label">APN:</label>
+                <input id="mb_apn" class="form-control" type="text" ng-model="apn" placeholder="Empty">
+            </div>
+            <div class="form-group">
+                <label for="mb_number" class="control-label">Number:</label>
+                <input id="mb_number" class="form-control" type="text" ng-model="number" placeholder="Empty">
+            </div>
+            <div class="form-group">
+                <label for="mb_username" class="control-label">Username:</label>
+                <input id="mb_username" class="form-control" type="text" ng-model="username" placeholder="Empty">
+            </div>
+            <div class="form-group">
+                <label class="control-label">Password:</label>
+                <input id="apn_configuration" class="form-control" type="text" ng-model="password3g"
+                       placeholder="Empty">
+            </div>
+            <div class="btn-group btn-group-justified" role="group" aria-label="Mobile broadband setting"
+                 style="margin-top: 25px;">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" ng-click="change3gSettings()">Update settings</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn" ng-class="status3g === 'disabled' ? 'btn-success' : 'btn-danger'"
+                            ng-click="enable3g()">Click to {{status3g === "disabled" ? "enable" : "disable"}}
+                    </button>
+                </div>
+            </div>
+            <div class="btn-group btn-group-justified" role="group" aria-label="Mobile broadband setting-2"
+                 style="margin-top: 25px;">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn" ng-class="is3gRunning === 'active' ? 'btn-danger' : 'btn-success'"
+                            ng-disabled="status3g === 'disabled'" ng-click="runstop3g()">Click to {{is3gRunning ===
+                        "active" ? "stop" : "start"}}
+                    </button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" ng-disabled="status3g === 'disabled'"
+                            ng-click="restart3g()">Restart service
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

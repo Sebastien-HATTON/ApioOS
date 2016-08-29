@@ -1,100 +1,289 @@
-<div id="ObjectsList">
-<!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+<style>
+    .text_crop {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-top: 7px;
+        font-weight: 400;
+    }
 
-<!---------------------------------- LICENSE -------------------------------
--									 -
-- This file is part of ApioOS.						 -
--									 -
-- ApioOS is free software released under the GPLv2 license: you can	 -
-- redistribute it and/or modify it under the terms of the GNU General	 -
-- Public License version 2 as published by the Free Software Foundation. -
--									 -
-- ApioOS is distributed in the hope that it will be useful, but		 -
-- WITHOUT ANY WARRANTY; without even the implied warranty of		 -
-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 -
-- GNU General Public License version 2 for more details.		 -
--									 -
-- To read the license either open the file COPYING.txt or		 -
-- visit <http://www.gnu.org/licenses/gpl2.txt>				 -
--									 -
--------------------------------------------------------------------------->
+    .object_container {
+        margin-top: 13px;
+        /*border-radius: 80px;*/
+        text-align: center;
+    }
+
+    .object_button {
+        width: 90px;
+        height: 90px;
+        font-size: 48px;
+        color: whitesmoke;
+        text-align: center;
+        border-radius: 80px;
+        border: 2px solid rgba(92, 184, 92, 1);
+        background-color: rgba(92, 184, 92, 0.9);
+    }
+
+    #ObjectsList button:active {
+        outline: none;
+        border: none;
+    }
+
+    #ObjectsList button:focus {
+        outline: 0 !important;
+    }
+
+    /*---------- ALEX: new CSS classes --------- */
+    .form-group > label {
+        font-weight: 400;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        vertical-align: middle;
+    }
+
+    #object_launch_title h4 {
+        font-weight: 300;
+    }
+
+    .object_app {
+        width: 90px;
+        height: 90px;
+        border-radius: 140px;
+        margin-left: auto;
+        margin-right: auto;
+        background-size: 100%;
+        background-position: 50%;
+        -webkit-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9);
+        -moz-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9));
+        box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9);
+        cursor: pointer;
+    }
+
+    @media (max-width: 767px) {
+        /* -------------------------------- col-sm and col-xs */
+        .object_container {
+            margin-top: 10px;
+        }
+
+        .object_app {
+            width: 70px;
+            height: 70px;
+        }
+    }
+
+</style>
+
+<div id="ObjectsList" class="container-fluid">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="appModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" data-dismiss="modal" class="close">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 id="myModalLabel" class="modal-title">Manage {{currentApplication.name}}</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-responsive table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th style="font-weight: 400;">App shared with:</th>
+                            <th style="width: 8%;"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr id="email-{{user.email}}" ng-repeat="user in userToShow">
+                            <td>{{user.email}}</td>
+                            <td style="width: 8%;">
+                                <button type="button" class="btn btn-danger" aria-label="Delete"
+                                        ng-click="deleteUserOnApplication(user.email)">
+                                    <span class="fa fa-times" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-responsive table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th style="font-weight: 400;">Share App with a new user:</th>
+                            <th style="width: 8%;"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <select class="form-control input-md" ng-model="email">
+                                    <option ng-repeat="user in users" value="{{user.email}}">{{user.email}}</option>
+                                </select>
+                            </td>
+                            <td style="width: 8%;">
+                                <button type="button" class="btn btn-primary" aria-label="Delete"
+                                        ng-click="handleEnterKeyOnEmail(email, $event)">
+                                    <span class="fa fa-share-alt-square" aria-hidden="true">
+                                </span>
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-toolbar" role="toolbar" style="float: left;">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-danger" aria-label="Delete"
+                                    ng-click="deleteApioApplication()" style="font-weight: 300;">
+                                <i class="fa fa-times" aria-hidden="true"></i> <span class="hidden-xs">Delete</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" aria-label="Settings" ng-click="settings()"
+                                    style="font-weight: 300;">
+                                <i class="fa fa-cog" aria-hidden="true"></i> <span class="hidden-xs">Settings</span>
+                            </button>
+                            <button type="button" class="btn btn-default" aria-label="Edit App"
+                                    ng-click="modifyApioApplication()">
+                                <i class="fa fa-edit" aria-hidden="true"></i> <span class="hidden-xs">Edit App</span>
+                            </button>
+                            <button type="button" class="btn btn-default" aria-label="Export Apio App"
+                                    ng-click="exportApioApplication()">
+                                <i class="fa fa-cloud-download" aria-hidden="true"></i> <span class="hidden-xs">Export App</span>
+                            </button>
+                            <button type="button" class="btn btn-default" aria-label="Export Firmware"
+                                    ng-click="exportInoFolder()">
+                                <i class="fa fa-file-code-o" aria-hidden="true"></i> <span class="hidden-xs">Export Firmware</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="settingsModal"
+         class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" data-dismiss="modal" class="close">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 id="myModalLabel" class="modal-title">
+                        Settings of: {{currentApplication.name}} (id: {{currentApplication.objectId}})
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 20px;">Change one or more of the following field and then click
+                        "Submit".</p>
+                    <fieldset>
+                        <div class="form-group">
+                            <label>Name (Current: {{currentApplication.name}} )</label>
+                            <input class="form-control" ng-model="newName" placeholder="">
+
+                            <p class="help-block">Insert new Name</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Address (Current: {{currentApplication.address}} )</label>
+                            <input class="form-control" ng-model="newaddress" placeholder="">
+
+                            <p class="help-block">Insert new Address</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tag (Current: {{currentApplication.tag}} )</label>
+                            <input class="form-control" ng-model="newtag" placeholder="">
+
+                            <p class="help-block">Insert new tags</p>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <label>SleepTime (Current: {{currentApplication.sleepTime}} )</label>
+                            <input class="form-control" ng-model="newsleeptime" placeholder="">
+
+                            <p class="help-block">Insert new value for sleep time</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Services (list of)</label>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Service name</th>
+                                    <th>Associated</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="s in services">
+                                    <td>{{s.show}}</td>
+                                    <td>
+                                        <input type="checkbox" name="selected_services"/>
+                                        <!--ng-click="toggleServiceAssociation(s.name)" ng-checked="isServiceAssociated(s.name)"
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>-->
+                        <button type="submit" class="btn btn-warning" ng-click="changeSettings()"
+                                style="font-weight: 300; margin: 8px 0">Submit
+                        </button>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-	<div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="appModal" class="modal fade">
-	    <div class="modal-dialog">
-	        <div class="modal-content">
-	            <div class="modal-header">
-	                <button type="button" data-dismiss="modal" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span>
-	                </button>
-	                <h4 id="myModalLabel" class="modal-title"> {{currentApplication.name}}</h4>
-	            </div>
-	            <div class="modal-body">
-	                <p>Double click on a property value to change its value. Press Enter to save the new value.</p>
-	                <table class="table table-bordered">
-	                    <thead>
-	                        <tr>
-	                            <th>Property</th>
-	                            <th>Value </th>
-	                        </tr>
-	                    </thead>
-	                    <tbody>
-	                        <tr ng-repeat="(prop,value) in currentApplication.properties">
-	                            <td>{{prop}} </td>
-	                            <td>
-	                                <div ui-keypress="{enter:'handleEnterKeyOnProperty(prop,$event)'}" ng-dblclick="handleDoubleClickOnProperty($event)" class="propertyValueContainer">{{currentApplication.properties[prop]}}</div>
-	                            </td>
-	                        </tr>
-	                    </tbody>
-	                </table>
-	            </div>
-	            <div class="modal-footer">
-	               
-	               <div class="btn-toolbar" role="toolbar" style="float:left">
-	                  <div class="btn-group">
-	                    <button type="button" class="btn btn-default" aria-label="Delete" ng-click="deleteApioApplication()"><span class="fa fa-times" aria-hidden="true"></span></button>
-	                    <button type="button" class="btn btn-default" aria-label="Modify" ng-click="modifyApioApplication()"><span class="fa fa-edit" aria-hidden="true"></span></button>
-	                    <button type="button" class="btn btn-default" aria-label="Export" ng-click="exportInoFolder()"><span class="fa fa-cloud-download" aria-hidden="true"></span></button>
-	                    <button type="button" class="btn btn-default" aria-label="Export" ng-click="exportApioApplication()"><span class="fa fa-file-code-o" aria-hidden="true"></span></button>
-	                  </div>
-	               </div>
-	            </div>
-	        </div>
-	    </div>
-	</div>
+    <div id="object_launch_title" class="row" style="margin: 1.5%;">
+        <h4>Click on one of the object to see and/or change its settings.</h4>
+    </div>
+    <div class="row alert alert-warning" ng-hide="objects_ready">
+        <div class="content_loader"></div>
+        <p class="loader_text">Aggiornamento dati in corso...</p>
+    </div>
+    <div class="row" style="margin-top: 10px;margin-bottom: 20px">
+        <div ng-repeat="obj in objects track by $index" class="col-md-2 col-sm-3 col-xs-6 object_container">
+            <div id="{{obj.name}}" ng-click="launchApplication(obj)" ng-class="{virtual: virtualObject}"
+                 class="object_app"
+                 style="background-image: url(applications/{{obj.objectId}}/icon.png); background-size: cover;">
+            </div>
+            <div ng-click="launchApplication(obj)" style="cursor: pointer;">
+                <p class="text_crop">{{obj.name}}</p>
+            </div>
+        </div>
+    </div>
 
-	<div style="margin-top:100px;" class="row">
-	    <div ng-repeat="obj in objects track by $index" style="height:100px;text-align:center;margin-top:50px;" class="col-lg-2 col-xs-4">
-	        <button ng-click="launchApplication(obj)" ng-class="{virtual : virtualObject}" style="width:100px;height:100px;" class="btn btn-default btn-lg"><img class="launcherIcon" ng-src="/javascripts/applications/{{obj.objectId}}/icon.png" style="width:60px;" onError="this.onerror=null;this.src='/images/Apio_Logo.png';" />
-	        </button>
-	        <div>
-	        	<b style="font-size:12px;">{{obj.name}}</b>
-	        </div>
-	        <!--<div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade {{obj.objectId}}">
-	            <div class="modal-dialog">
-	                <div class="modal-content">
-	                    <div class="modal-header">
-	                        <button type="button" data-dismiss="modal" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span>
-	                        </button>
-	                        <h4 id="myModalLabel" class="modal-title"> {{obj.name}}</h4>
-	                    </div>
-	                    <div class="modal-body">
-	                        <div ng-repeat="(key,value) in obj.properties" style="border-bottom:1px solid #333;padding:5px;">
-	                            <div class="row">
-	                                <div class="col-xs-8"><b>{{key}}</b>
-	                                </div>
-	                                <div class="col-xs-4">
-	                                    <div ng-click="alert('')">{{value}}</div>
-	                                </div>
-	                            </div>
-	                        </div>
-	                    </div>
-	                    <div class="modal-footer">
-	                        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
-	                    </div>
-	                </div>
-	            </div>
-	        </div>-->
-	    </div>
-	</div>
+    <!--
+    <div class="row" style="margin-bottom: 18px">
+        <div ng-repeat="obj in objects track by $index" class="col-md-2 col-sm-3 col-xs-6 object_container">
+            <button id="{{obj.name}}" ng-click="launchApplication(obj)" ng-class="{virtual: virtualObject}"
+                    class="btn btn-success fa fa-cube object_button">
+            </button>
+            <div>
+                <p class="text_crop">{{obj.name}}</p>
+            </div>
+        </div>
+    </div>
+    -->
 
 </div>

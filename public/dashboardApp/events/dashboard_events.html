@@ -1,26 +1,24 @@
-<!--<div id="Events" class="dashboardPage container-fluid">-->
 <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
 
-<!---------------------------------- LICENSE -------------------------------
--									 -
-- This file is part of ApioOS.						 -
--									 -
-- ApioOS is free software released under the GPLv2 license: you can	 -
-- redistribute it and/or modify it under the terms of the GNU General	 -
-- Public License version 2 as published by the Free Software Foundation. -
--									 -
-- ApioOS is distributed in the hope that it will be useful, but		 -
-- WITHOUT ANY WARRANTY; without even the implied warranty of		 -
-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 -
-- GNU General Public License version 2 for more details.		 -
--									 -
-- To read the license either open the file COPYING.txt or		 -
-- visit <http://www.gnu.org/licenses/gpl2.txt>				 -
--									 -
--------------------------------------------------------------------------->
+<!---------------------------------- LICENSE --------------------------------
+-                                                                           -
+- This file is part of ApioOS.                                              -
+-                                                                           -
+- ApioOS is free software released under the GPLv2 license: you can         -
+- redistribute it and/or modify it under the terms of the GNU General       -
+- Public License version 2 as published by the Free Software Foundation.    -
+-                                                                           -
+- ApioOS is distributed in the hope that it will be useful, but             -
+- WITHOUT ANY WARRANTY; without even the implied warranty of                -
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+- GNU General Public License version 2 for more details.                    -
+-                                                                           -
+- To read the license either open the file COPYING.txt or                   -
+- visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+-                                                                           -
+---------------------------------------------------------------------------->
 
-
-<div id="Events" class="container-fluid">    
+<div id="Events" class="container-fluid">
     <h1>Events</h1>
     <ul role="tablist" class="nav nav-tabs">
         <li class="active"><a href="#EventsTab" role="tab" data-toggle="tab">Events</a>
@@ -52,7 +50,7 @@
                         <div style="" class="form">
                             <div class="form-group">
                                 <label>Event name</label>
-                                <input type="text" ng-model="event.name" class="form-control input-lg" />
+                                <input type="text" ng-model="event.name" class="form-control input-lg"/>
                             </div>
                             <div class="form-group">
                                 <label>Event type</label>
@@ -63,11 +61,11 @@
                             </div>
                             <div ng-hide="event.type !== 'stateTriggered'" class="form-group">
                                 <label>Trigger state</label>
-                                <input type="text" ng-model="event.triggerState" class="form-control input-lg" />
+                                <input type="text" ng-model="event.triggerState" class="form-control input-lg"/>
                             </div>
                             <div ng-hide="event.type !== 'timeTriggered'" class="form-group">
                                 <label>Timer</label>
-                                <input type="datetime-local" ng-model="event.timer" class="form-control input-lg" />
+                                <input type="datetime-local" ng-model="event.timer" class="form-control input-lg"/>
                                 <div id="timerContainer"></div>
                             </div>
                             <label>New Triggered states</label>
@@ -75,24 +73,27 @@
                                 <div class="row">
                                     <div class="col-xs-8">
                                         <select ng-model="newTriggeredState" class="form-control input-lg">
-                                            <option ng-repeat="state in states track by $index" value="{{state.name}}">{{state.name}}</option>
+                                            <option ng-repeat="state in states track by $index" value="{{state.name}}">
+                                                {{state.name}}
+                                            </option>
                                         </select>
                                     </div>
                                     <div class="col-xs-4">
-                                        <button ng-click="addTriggeredState()" class="btn btn-primary btn-lg">Add </button>
+                                        <button ng-click="addTriggeredState()" class="btn btn-primary btn-lg">Add
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label>Repeat</label>
-                                <input type="text" ng-model="event.repeat" class="form-control input-lg" />
+                                <input type="text" ng-model="event.repeat" class="form-control input-lg"/>
                             </div>
                             <div class="form-group">
                                 <label>Tag</label>
-                                <input type="text" ng-model="event.tag" class="form-control input-lg" />
+                                <input type="text" ng-model="event.tag" class="form-control input-lg"/>
                             </div>
                             <div class="form-group">
-                                <button ng-click="saveEvent()" class="btn btn-primary">Save </button>
+                                <button ng-click="saveEvent()" class="btn btn-primary">Save</button>
                             </div>
                         </div>
                     </div>
@@ -103,29 +104,31 @@
             <h3>Events</h3>
             <table style="margin-top:20px;" class="table table-bordered">
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Trigger</th>
-                        <th>Triggered States</th>
-                        <th>Date</th>
-                        <th>Repeat</th>
-                        <th>Tag</th>
-                        <th>Action</th>
-                    </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Trigger</th>
+                    <th>Triggered States</th>
+                    <th>Date</th>
+                    <th>Repeat</th>
+                    <th>Tag</th>
+                    <th>Action</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="event in events">
-                        <td>{{event.name}}</td>
-                        <td>{{event.triggerState}}</td>
-                        <td>{{event.triggeredStates}}</td>
-                        <td>{{event.date}}</td>
-                        <td>{{event.repeat}}</td>
-                        <td>{{event.tag}} </td>
-                        <td>
-                            <button ng-click="deleteEvent(event)" class="btn btn-danger btn-sm"><i>X</i> Delete </button>
-                            <button ng-click="launchEvent(event)" style="margin-left:5px;" class="btn btn-success btn-sm"><i class="fa fa-play"></i> Launch</button>
-                        </td>
-                    </tr>
+                <tr ng-repeat="event in events">
+                    <td>{{event.name}}</td>
+                    <td>{{event.triggerState}}</td>
+                    <td>{{event.triggeredStates}}</td>
+                    <td>{{event.date}}</td>
+                    <td>{{event.repeat}}</td>
+                    <td>{{event.tag}}</td>
+                    <td>
+                        <button ng-click="deleteEvent(event)" class="btn btn-danger btn-sm"><i>X</i> Delete</button>
+                        <button ng-click="launchEvent(event)" style="margin-left:5px;" class="btn btn-success btn-sm"><i
+                                class="fa fa-play"></i> Launch
+                        </button>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>

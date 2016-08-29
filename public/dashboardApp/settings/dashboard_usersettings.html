@@ -1,0 +1,89 @@
+<style>
+    .section_title {
+        background-color: rgba(228, 61, 61, 0.95);
+        color: white;
+        padding-left: 1.2%;
+    }
+
+    .section_title h1 {
+        font-weight: 400;
+    }
+
+    .section_menu {
+        padding: 1%;
+    }
+
+    .section_content {
+        padding-top: 1%;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <!--
+    <div class="row section_title">
+        <h1>Profile settings</h1>
+    </div>
+    -->
+
+    <div class="row">
+        <div class="col-lg-6">
+
+            <h1>Change Password</h1>
+
+            <form role="form">
+
+                <fieldset disabled>
+
+                    <div class="form-group">
+                        <label for="disabledSelect">Your Email</label>
+                        <input class="form-control" id="disabledInput" type="text"
+                               placeholder="{{currentUserActive.email}}" disabled>
+                    </div>
+
+                </fieldset>
+                <fieldset>
+
+
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input class="form-control" ng-model="exPassword">
+                        <p class="help-block">Insert Current Password</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input class="form-control" ng-model="newPassword">
+                        <p class="help-block">Insert Your New Password</p>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary" ng-click="confirmChange()">Submit</button>
+
+                </fieldset>
+
+            </form>
+        </div>
+    </div>
+
+</div>

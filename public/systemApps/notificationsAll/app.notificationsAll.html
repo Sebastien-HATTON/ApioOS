@@ -1,0 +1,687 @@
+<style>
+    @media only screen and (min-width: 320px) and (max-width: 479px) {
+	    .mobileLayoutStateContainer{
+		    margin-bottom: 12%;
+			box-shadow: 1px 0px 5px 2px rgba(0, 0, 0, 0.13);
+			overflow:hidden;
+	    }
+	    .openStateRow{
+		    height:40px;
+		    margin-bottom:12%;
+	    }
+        .alignIconStateOption {
+            display: table;
+            height: 36px;
+            padding: 0;
+            text-align: center;
+        }
+
+        .layoutIconStateOption {
+            padding-left: 0;
+            padding-right: 0;
+            height: 100%;
+        }
+
+        .wallSingleRow {
+            padding: 0;
+            height: 100%;
+            
+        }
+        .wallSingleRow .mobileHeight{
+            //padding: 0;
+            height: 100%;
+        }
+        .mobileHeight{
+	        height: 100%;
+        }
+
+        .nameApplicationState {
+            font-size: 20px;
+        }
+
+        .layoutIconStateOption .mobile {
+	        display: table;
+            transform: translateX(70%);
+            -webkit-transform: translateX(70%);
+            width: 100%;
+            height: 100%;
+        }
+
+        .layoutStateName {
+            display: table;
+            line-height: 16px;
+
+        }
+        .nameApplicationState {
+        font-family: sans-serif;
+        font-weight: 100;
+        padding: 2%;
+        border-bottom: solid 1px #cacaca;
+        margin-bottom: 2%;
+		}
+		.wallSingleRow {
+        height: 100%;
+    	}
+
+    }
+    @media only screen and (min-width: 480px) and (max-width: 767px) {
+	    .mobileLayoutStateContainer{
+		    margin-bottom: 12%;
+			box-shadow: 1px 0px 5px 2px rgba(0, 0, 0, 0.13);
+			overflow:hidden;
+	    }
+	    .openStateRow{
+		    height:40px;
+		    margin-bottom:12%;
+	    }
+        .alignIconStateOption {
+            display: table;
+            height: 36px;
+            padding: 0;
+            text-align: center;
+        }
+
+        .layoutIconStateOption {
+            padding-left: 0;
+            padding-right: 0;
+            height: 100%;
+        }
+
+        .wallSingleRow {
+            padding: 0;
+            height: 100%;
+            
+        }
+        .wallSingleRow .mobileHeight{
+            //padding: 0;
+            height: 100%;
+        }
+        .mobileHeight{
+	        height: 100%;
+        }
+
+        .nameApplicationState {
+            font-size: 20px;
+        }
+
+        .layoutIconStateOption .mobile {
+	        display: table;
+            transform: translateX(70%);
+            -webkit-transform: translateX(70%);
+            width: 100%;
+            height: 100%;
+        }
+
+        .layoutStateName {
+            display: table;
+            line-height: 16px;
+
+        }
+        .nameApplicationState {
+        font-family: sans-serif;
+        font-weight: 100;
+        padding: 2%;
+        border-bottom: solid 1px #cacaca;
+        margin-bottom: 2%;
+		}
+		.wallSingleRow {
+        height: 100%;
+    	}
+
+    }
+
+     @media only screen and (min-width: 768px) and (max-width: 991px) {
+	    .active_on {
+        background-color: rgb(34,201,34);
+    }
+
+    .activeState {
+        width: 15px;
+        height: 15px !important;
+        margin-right: 5%;
+        border: solid 5px rgb(255,255,255);
+        border-radius: 100px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .modify {
+        float: right !important;
+        width: 10px;
+        height: 10px;
+        text-align: right;
+        font-size: 20px !important;
+    }
+
+    .statusName {
+        width: 80%;
+        height: 10px;
+    }
+
+    .elementBacheca {
+	    width: 135px !important;
+		height: 135px;
+		overflow-x: auto;
+		padding: 12px;
+		border: none;
+		box-shadow: none;		
+    	overflow-y: hidden;
+		margin: 2% auto;
+		line-height: 28px !important;
+		-webkit-user-drag: none;
+		-webkit-overflow-scrolling: touch;
+    }
+
+    .elementBacheca li {
+        display: table-caption !important;
+        float: left;
+        position: relative;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_Bacheca_id_state {
+        width: 60%;
+		margin: 20px auto;
+    }
+
+    .option_Bacheca_id_state li {
+        float: left !important;
+    }
+
+    .delete {
+		width: 50%;
+		display: table-cell;
+		height: 50px;
+		margin-top: 20%;
+		text-align: center;
+		line-height: 50px;
+		color: #fff;
+		background-color: #CC2929;
+    }
+
+    .tag {
+        width: 50%;
+		height: 50px;
+		display: table-cell;
+		margin-top: 20%;
+		text-align: center;
+		line-height: 50px;
+		color: #fff;
+		background-color: #29ADCC;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        margin-bottom: 5%;
+        border: none;
+        text-align: center;
+        font-size: 25px;
+        background: none;
+    }
+
+	    .desktopLayoutStateContainer{
+		    box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.13);
+		    padding-left: 2%;
+		    padding-right: 2%;
+	    }
+        .layoutIconStateOption div {
+            font-size: 16px;
+            text-align: center;
+            padding: 0;
+            margin: 0 auto;
+
+        }
+
+        .layoutIconStateOption {
+            padding-top: 22%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .layoutStateName div {
+            line-height: 12px;
+            text-align: center;
+        }
+
+        .layoutStateName {
+            display: table;
+            vertical-align: middle;
+            width: 100%;
+            height: 40px;
+            padding: 0;
+        }
+
+        .alignIconStateOption {
+            display: table;
+            height: 36px;
+            text-align: center;
+        }
+
+        .nameApplicationState {
+            font-size: 30px;
+        }
+        .desktopAlignIcon{
+	        width: 10%;
+	        margin: 0 auto;
+        }
+        .nameApplicationState {
+        font-family: sans-serif;
+        font-weight: 100;
+        padding: 2%;
+        border-bottom: solid 1px #cacaca;
+        }
+		.wallSingleRow {
+	    height: 100%;
+	    padding: 0;
+	    margin: 0;
+	    width: auto;    	
+	    //border-radius: 152px;
+	    border: solid 1px #d7d7d7;
+	    background-color: rgba(247, 255, 240, 1);
+	    }
+	   #wallContainer{
+		    height: 87%;
+		    overflow-x: hidden;
+		    overflow-y: scroll;
+	    }
+    }
+	@media only screen and (min-width: 992px) and (max-width: 1199px) {
+	    .active_on {
+        background-color: rgb(34,201,34);
+    }
+
+    .activeState {
+        width: 15px;
+        height: 15px !important;
+        margin-right: 5%;
+        border: solid 5px rgb(255,255,255);
+        border-radius: 100px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .modify {
+        float: right !important;
+        width: 10px;
+        height: 10px;
+        text-align: right;
+        font-size: 20px !important;
+    }
+
+    .statusName {
+        width: 80%;
+        height: 10px;
+    }
+
+    .elementBacheca {
+	    width: 130px !important;
+		height: 130px;
+		overflow-x: auto;
+		padding: 17px;
+		border: none;
+		box-shadow: none;		
+    	overflow-y: hidden;
+		margin: 2% auto;
+		line-height: 28px !important;
+		-webkit-user-drag: none;
+		-webkit-overflow-scrolling: touch;
+    }
+
+    .elementBacheca li {
+        display: table-caption !important;
+        float: left;
+        position: relative;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_Bacheca_id_state {
+        width: 60%;
+		margin: 20px auto;
+    }
+
+    .option_Bacheca_id_state li {
+        float: left !important;
+    }
+
+    .delete {
+		width: 50%;
+		display: table-cell;
+		height: 50px;
+		margin-top: 20%;
+		text-align: center;
+		line-height: 50px;
+		color: #fff;
+		background-color: #CC2929;
+    }
+
+    .tag {
+        width: 50%;
+		height: 50px;
+		display: table-cell;
+		margin-top: 20%;
+		text-align: center;
+		line-height: 50px;
+		color: #fff;
+		background-color: #29ADCC;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        margin-bottom: 5%;
+        border: none;
+        text-align: center;
+        font-size: 25px;
+        background: none;
+    }
+
+	    .desktopLayoutStateContainer{
+		    box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.13);
+		    padding-left: 2%;
+		    padding-right: 2%;
+	    }
+        .layoutIconStateOption div {
+            font-size: 16px;
+            text-align: center;
+            padding: 0;
+            margin: 0 auto;
+
+        }
+
+        .layoutIconStateOption {
+            padding-top: 22%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .layoutStateName div {
+            line-height: 12px;
+            text-align: center;
+        }
+
+        .layoutStateName {
+            display: table;
+            vertical-align: middle;
+            width: 100%;
+            height: 40px;
+            padding: 0;
+        }
+
+        .alignIconStateOption {
+            display: table;
+            height: 36px;
+            text-align: center;
+        }
+
+        .nameApplicationState {
+            font-size: 30px;
+        }
+        .desktopAlignIcon{
+	        width: 10%;
+	        margin: 0 auto;
+        }
+        .nameApplicationState {
+        font-family: sans-serif;
+        font-weight: 100;
+        padding: 2%;
+        border-bottom: solid 1px #cacaca;
+        }
+		.wallSingleRow {
+	    height: 100%;
+	    padding: 0;
+	    margin: 0;
+	    width: auto;    	
+	    //border-radius: 152px;
+	    border: solid 1px #d7d7d7;
+	    background-color: rgba(247, 255, 240, 1);
+	    }
+	   #wallContainer{
+		    height: 87%;
+		    overflow-x: hidden;
+		    overflow-y: scroll;
+	    }
+    }
+    @media only screen and (min-width: 1200px) {
+	    .active_on {
+        background-color: rgb(34,201,34);
+    }
+
+    .activeState {
+        width: 15px;
+        height: 15px !important;
+        margin-right: 5%;
+        border: solid 5px rgb(255,255,255);
+        border-radius: 100px;
+        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+    }
+
+    .modify {
+        float: right !important;
+        width: 10px;
+        height: 10px;
+        text-align: right;
+        font-size: 20px !important;
+    }
+
+    .statusName {
+        width: 80%;
+        height: 10px;
+    }
+
+    .elementBacheca {
+	    width: 130px !important;
+		height: 130px;
+		overflow-x: auto;
+		padding: 17px;
+		border: none;
+		box-shadow: none;		
+    	overflow-y: hidden;
+		margin: 2% auto;
+		line-height: 28px !important;
+		-webkit-user-drag: none;
+		-webkit-overflow-scrolling: touch;
+    }
+
+    .elementBacheca li {
+        display: table-caption !important;
+        float: left;
+        position: relative;
+        list-style: none;
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+    }
+
+    .option_Bacheca_id_state {
+        width: 60%;
+		margin: 20px auto;
+    }
+
+    .option_Bacheca_id_state li {
+        float: left !important;
+    }
+
+    .delete {
+		width: 50%;
+		display: table-cell;
+		height: 50px;
+		margin-top: 20%;
+		text-align: center;
+		line-height: 50px;
+		color: #fff;
+		background-color: #CC2929;
+    }
+
+    .tag {
+        width: 50%;
+		height: 50px;
+		display: table-cell;
+		margin-top: 20%;
+		text-align: center;
+		line-height: 50px;
+		color: #fff;
+		background-color: #29ADCC;
+    }
+
+    #title_state {
+        width: 50%;
+        margin-top: 5%;
+        margin-bottom: 5%;
+        border: none;
+        text-align: center;
+        font-size: 25px;
+        background: none;
+    }
+
+	    .desktopLayoutStateContainer{
+		    box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.13);
+		    padding-left: 2%;
+		    padding-right: 2%;
+	    }
+        .layoutIconStateOption div {
+            font-size: 16px;
+            text-align: center;
+            padding: 0;
+            margin: 0 auto;
+
+        }
+
+        .layoutIconStateOption {
+            padding-top: 22%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .layoutStateName div {
+            line-height: 12px;
+            text-align: center;
+        }
+
+        .layoutStateName {
+            display: table;
+            vertical-align: middle;
+            width: 100%;
+            height: 40px;
+            padding: 0;
+        }
+
+        .alignIconStateOption {
+            display: table;
+            height: 36px;
+            text-align: center;
+        }
+
+        .nameApplicationState {
+            font-size: 30px;
+        }
+        .desktopAlignIcon{
+	        width: 10%;
+	        margin: 0 auto;
+        }
+        .nameApplicationState {
+        font-family: sans-serif;
+        font-weight: 100;
+        padding: 2%;
+        border-bottom: solid 1px #cacaca;
+        }
+		.wallSingleRow {
+	    height: 100%;
+	    padding: 0;
+	    margin: 0;
+	    width: auto;    	
+	    //border-radius: 152px;
+	    border: solid 1px #d7d7d7;
+	    background-color: rgba(247, 255, 240, 1);
+	    }
+	   #wallContainer{
+		    height: 87%;
+		    overflow-x: hidden;
+		    overflow-y: scroll;
+	    }
+    }
+    
+
+     .dropWallMenu{
+	    left: -60% !important;
+    }
+
+    
+</style>
+
+<div class="maxHeight">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+
+    <link rel="stylesheet" href="stylesheets/BachecaApp.css"/>
+    <!-- MENU NOTIFICHE -->
+    <div class="container-fluid">
+	    <div class="menuGestioneNotifiche">
+            <div class="row">
+                <!--<div class="col-md-4 singolaVoceFirst"><a>Sistema</a></div>-->
+                 <div class="col-md-4 col-xs-4 col-sm-4 singolaVoceFirst"><a href="#/notificationsAll">Sistema</a></div>
+                <div class="col-md-4 col-xs-4 col-sm-4 singolaVoce"><a href="#/wall">Personalizzate</a></div>
+                <div class="col-md-4 col-xs-4 col-sm-4 singolaVoceLast"><a href="#/events">Logiche</a></div>
+            </div>
+	    </div>
+    </div>
+    
+    <!--VIEW PERSONALIZZATE -->
+    <div id="wallContainer" class="app_home openAppIconStyle">
+        <div class="row desktopLayoutStateContainer mobileLayoutStateContainer" ng-repeat="app in notificationsNames">
+            <div class="col-md-12 col-xs-12 col-sm-12">
+                <div class="nameApplicationState">{{app}}</div>
+            </div>
+            <div class="col-md-2 col-xs-12 col-sm-12 wallSingleRow" ng-repeat="n in notifications[$index]">
+                <div class="elementBacheca box_proprietaiPhone row"> 
+                    <div class="col-md-12 col-xs-12 col-sm-12 mobileHeight">
+                        <div class="layoutStateName col-xs-6 mobileHeight" >
+                            <div class="verticalAlign" style="height:100%;">{{n.name}}</div>
+                        </div>
+                        <div class="col-md-12 col-xs-6 col-sm-12 layoutIconStateOption">
+                            <div class="row mobile">
+	                           <div class="verticalAlign mobileHeight desktopAlignIcon">
+                                <div class="col-xs-2 col-md-2 col-sm-2"></div>
+                                <div class="col-xs-4 col-md-4 col-sm-4 alignIconStateOption">
+                                	<div class="dropup dropNotifyPup verticalAlign">
+										<button class="dropdown-toggle glyphicon glyphicon-send" style="background:none; border:none; -webkit-apparance:none; padding: 0px;" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										</button>
+										<ul class="dropdown-menu dropNotifyMenu dropWallMenu" aria-labelledby="dropdownMenu2">
+											<li><a class="glyphicon glyphicon-envelope" ng-click="enableSendMail(n)" ng-class="{'noSendMail' : !n.sendMail}" style="text-align:center;"></a></li>
+											<li><a class="glyphicon glyphicon-comment" ng-click="enableSendSMS(n)" ng-class="{'noSendMail' : !n.sendSMS}" style="text-align: center;"></a></li>
+										</ul>
+									</div>
+                                </div>
+                                <div class="col-xs-4 col-md-4 col-sm-4 alignIconStateOption">
+	                                <div class="verticalAlign glyphicon glyphicon-share" ng-click="publishNotify(n, app)"></div>
+                                </div>
+                                <div class="col-xs-2 col-md-2 col-sm-2"></div>
+	                           </div>
+                            </div>
+                            <div class="col-md-6 col-xs-2 col-sm-6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

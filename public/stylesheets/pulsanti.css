@@ -279,7 +279,7 @@ background: none repeat scroll 0 0 rgb(198, 198, 198);
 
 /*SMARTPHONE 2 (IPHONE E TABLET)*/
 
-@media only screen and (min-width: 601px) and (max-width: 1000px) {
+@media only screen and (min-width: 667px) and (max-width: 1000px) {
 
 
 
@@ -1055,7 +1055,7 @@ z-index: 20;
 	color: #262626;
     float: left;
     font-family: sans-serif;
-    font-size: 25px;
+    font-size: 19px;
     margin-left: 10px;
 	line-height: 50px;
 	margin-right: 5px;

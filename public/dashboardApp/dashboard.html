@@ -1,98 +1,410 @@
-<html>
-<!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
-
-<!---------------------------------- LICENSE -------------------------------
--									 -
-- This file is part of ApioOS.						 -
--									 -
-- ApioOS is free software released under the GPLv2 license: you can	 -
-- redistribute it and/or modify it under the terms of the GNU General	 -
-- Public License version 2 as published by the Free Software Foundation. -
--									 -
-- ApioOS is distributed in the hope that it will be useful, but		 -
-- WITHOUT ANY WARRANTY; without even the implied warranty of		 -
-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 -
-- GNU General Public License version 2 for more details.		 -
--									 -
-- To read the license either open the file COPYING.txt or		 -
-- visit <http://www.gnu.org/licenses/gpl2.txt>				 -
--									 -
--------------------------------------------------------------------------->
-
-
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Apio Developer Dashboard</title>
-    <!-- Bootstrap Core CSS -->
-    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="/bootstrapModal/css/bootstrap-modal.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap-sweetalert/lib/sweet-alert.css">
-    <link rel="stylesheet" type="text/css" href="/stylesheets/marketcloud-dashboard-sidebar.css">
 
-    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-    <link href="javascripts/ngImgCrop_theBliz/ng-img-crop.css" rel="stylesheet" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Apio Dashboard</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" type="text/css" href="dashboardApp/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="dashboardApp/css/sb-admin.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link rel="stylesheet" type="text/css" href="dashboardApp/css/plugins/morris.css" rel="stylesheet">
+
+    <!-- Terminal JQuery CSS -->
+    <link rel="stylesheet" href="/bower_components/jquery.terminal/css/jquery.terminal.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="dashboardApp/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!--Other module-->
+    <!--<link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />-->
+    <link href="/bootstrapModal/css/bootstrap-modal.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap-sweetalert/dist/sweetalert.css">
+    <!--<link rel="stylesheet" type="text/css" href="/stylesheets/marketcloud-dashboard-sidebar.css">-->
+
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="javascripts/ngImgCrop_theBliz/ng-img-crop.css" rel="stylesheet"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="/bower_components/angular/angular.js"></script>
     <style>
-      .cropArea {
-        background: #E4E4E4;
-        overflow: hidden;
-        width:500px;
-        height:350px;
-      }
+        .cropArea {
+            background: #E4E4E4;
+            overflow: hidden;
+            width: 500px;
+            height: 350px;
+        }
+
+        .maxHeight {
+            height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .customLabelHeaderInfo {
+            font-size: 11px !important;
+            font-weight: 200;
+        }
+
+        @font-face {
+            font-family: 'Apio';
+            src: url('/font/APIO.ttf') format('truetype');
+        }
+
+        .no_link {
+            cursor: default !important;
+        }
+
+        .page_title {
+            color: whitesmoke;
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .side-nav > li > a {
+            padding: 10px 23px;
+        }
+
+        /*----------------- CSS media to close the side nav in Ipad ---------*/
+        @media (max-width: 768px) {
+            .navbar-header {
+                float: none;
+            }
+
+            .navbar-left, .navbar-right {
+                float: none !important;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+
+            .navbar-collapse {
+                border-top: 1px solid transparent;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            .navbar-fixed-top {
+                top: 0;
+                border-width: 0 0 1px;
+            }
+
+            .navbar-collapse.collapse {
+                display: none !important;
+            }
+
+            .navbar-nav {
+                float: none !important;
+                margin-top: 7.5px;
+            }
+
+            .navbar-nav > li {
+                float: none;
+            }
+
+            .navbar-nav > li > a {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+
+            .collapse.in {
+                display: block !important;
+            }
+        }
     </style>
+
 </head>
 
 <body ng-app="ApioDashboardApplication" ng-controller="ApioDashboardGeneralController" class="container-fluid">
-<div class="row">
-  <div style="padding:0px;" class="col-xs-2">
-    <div class="marketcloud-dashboard-sidebar">
-        <ul style="list-style-image:none;padding-left:0px;" class="marketcloud-dashboard-sidebar-list">
-            <li><a ui-sref="home"><i class="fa fa-home" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Home</span></a>
+
+<div id="wrapper" class="maxHeight">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <div class="navbar-brand" style="font-family:Apio; font-size:42px; color:whitesmoke;">a</div>
+            <div style="padding-top:11px; width: 200%;">
+                <span class="page_title" ng-model="dashboard_location_title">{{dashboard_location_title}}</span>
+            </div>
+
+        </div>
+        <!-- Top Menu Items -->
+        <ul class="nav navbar-right top-nav">
+            <li class="dropdown">
+                <a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cogs"></i> <span
+                        class="hidden-xs">sys config</span> <b class="caret"></b></a>
+                <ul class="dropdown-menu alert-dropdown">
+                    <li>
+                        <a class="no_link" href="" ng-if="config.type === 'cloud'">Board name: <br/><span
+                                class="bg-warning">{{boardName}}</span></a>
+                    </li>
+                    <li>
+                        <a class="no_link" href="">Local IP: <br/><span class="bg-warning">{{localIP}}</span></a>
+                    </li>
+                    <li>
+                        <a class="no_link" href="">Public IP: <br/><span class="bg-warning">{{publicIP}}</span></a>
+                    </li>
+                    <li>
+                        <a class="no_link" href="">Remote Address: <br/><span
+                                class="bg-warning">{{remoteAddr}}</span></a>
+                    </li>
+                    <li>
+                        <a class="no_link" href="">Token: <br/><span class="bg-warning">{{token}}</span></a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li>
+                        <a href="/dashboard#/systems">System settings</a>
+                    </li>
+                    <li>
+                        <a href="/dashboard#/dongle_settings">Dongle settings</a>
+                    </li>
+                    <li>
+                        <a href="/dashboard#/network">Network settings</a>
+                    </li>
+                </ul>
             </li>
-            <li><a ui-sref="objects.objectsLaunch"><i class="fa fa-th" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Objects</span></a>
+            <!--<li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> <b class="caret"></b></a>
+                <ul class="dropdown-menu message-dropdown">
+                    <li class="message-preview">
+                        <a href="#">
+                            <div class="media">
+                                <span class="pull-left">
+                                    <img class="media-object" src="http://placehold.it/50x50" alt="">
+                                </span>
+                                <div class="media-body">
+                                    <h5 class="media-heading"><strong>{{currentUserActive}}</strong>
+                                    </h5>
+                                    <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                                    <p>Lorem ipsum dolor sit amet, consectetur...</p>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="message-preview">
+                        <a href="#">
+                            <div class="media">
+                                <span class="pull-left">
+                                    <img class="media-object" src="http://placehold.it/50x50" alt="">
+                                </span>
+                                <div class="media-body">
+                                    <h5 class="media-heading"><strong>John Smith</strong>
+                                    </h5>
+                                    <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                                    <p>Lorem ipsum dolor sit amet, consectetur...</p>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="message-preview">
+                        <a href="#">
+                            <div class="media">
+                                <span class="pull-left">
+                                    <img class="media-object" src="http://placehold.it/50x50" alt="">
+                                </span>
+                                <div class="media-body">
+                                    <h5 class="media-heading"><strong>John Smith</strong>
+                                    </h5>
+                                    <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                                    <p>Lorem ipsum dolor sit amet, consectetur...</p>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="message-footer">
+                        <a href="#">Read All New Messages</a>
+                    </li>
+                </ul>
             </li>
-            <li><a ng-click="switchToApioOS()" href=""><i  class="fa fa-bell" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Apio OS</span></a>
-            </li>
-            <li><a href="http://www.apio.cc/en/wiki"><i class="fa fa-book" style="margin-right:10px;"></i><span class="marketcloud-dasboard-sidebar-hide">Documentation</span></a>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell"></i> <b class="caret"></b></a>
+                <ul class="dropdown-menu alert-dropdown">
+                    <li>
+                        <a href="#">Alert Name <span class="label label-default">Alert Badge</span></a>
+                    </li>
+                    <li>
+                        <a href="#">Alert Name <span class="label label-primary">Alert Badge</span></a>
+                    </li>
+                    <li>
+                        <a href="#">Alert Name <span class="label label-success">Alert Badge</span></a>
+                    </li>
+                    <li>
+                        <a href="#">Alert Name <span class="label label-info">Alert Badge</span></a>
+                    </li>
+                    <li>
+                        <a href="#">Alert Name <span class="label label-warning">Alert Badge</span></a>
+                    </li>
+                    <li>
+                        <a href="#">Alert Name <span class="label label-danger">Alert Badge</span></a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="#">View All</a>
+                    </li>
+                </ul>
+            </li>-->
+            <li class="dropdown">
+                <a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <span
+                        class="hidden-xs">{{currentUserSurname}}</span> <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <!--<li>
+                        <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
+                    </li>-->
+                    <li>
+                        <a ui-sref="user_settings"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a ng-click="logout()" href=""><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                    </li>
+                </ul>
             </li>
         </ul>
-    </div>
-  </div>
-</div>
+        <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+        <div id="navbar-ex1-collapse" class="collapse navbar-collapse navbar-ex1-collapse">
+            <div id="apio-os-offline" class="row" ng-show="systemOffline" style="color: #FFFFFF; margin: 0; position: absolute; text-align:center; width: 100%;">
+                <div style="margin-left: auto; margin-right: auto; text-align: center;">
+                    <svg height="12" width="12">
+                        <circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="red"/>
+                    </svg>
+                    <span>ApioOS offline</span>
+                </div>
+            </div>
 
-  <div class="dashboard-right-pane">
-    <div class="row">
-      <div class="col-xs-12">
-          <h2 style="text-align:center;"><i class="fa fa-code"></i> Developer Dashboard</h2>
+            <ul class="nav navbar-nav side-nav">
+                <li>
+                    <a ui-sref="home"><i class="fa fa-home" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Home</span></a>
+                </li>
+                <li>
+                    <a ui-sref="users"><i class="fa fa-users" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Users</span></a>
+                </li>
+                <li>
+                    <a ui-sref="objects.objectsLaunch"><i class="fa fa-th" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Apps</span></a>
+                </li>
+                <li>
+                    <a ui-sref="logic"><i class="fa fa-code" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Rules</span></a>
+                </li>
+                <li ng-if="cloud">
+                    <a ui-sref="boards"><i class="fa fa-globe" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Systems</span></a>
+                </li>
+                <li>
+                    <a ui-sref="services"><i class="fa fa-puzzle-piece" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Services</span></a>
+                </li>
+                <li>
+                    <a href="javascript:;" class="sub_menu" data-toggle="collapse" data-target="#demo"><i
+                            class="fa fa-fw fa-cogs"></i>
+                        Settings <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="demo" class="collapse">
+                        <li>
+                            <a ui-sref="system"><i class="fa fa-fw fa-gear"></i>System</a>
+                        </li>
+                        <li>
+                            <a ui-sref="dongle_settings"><i class="fa fa-fw fa-gear"></i>Dongle</a>
+                        </li>
+                        <!--<li>-->
+                        <!--<a ui-sref="cloud"><i class="fa fa-fw fa-gear"></i>Cloud</a>-->
+                        <!--</li>-->
+                        <li>
+                            <a ui-sref="network"><i class="fa fa-fw fa-gear"></i>Network</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a ng-click="switchToApioOS()" href=""><i class="fa fa-cloud" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Apio OS</span></a>
+                </li>
+
+                <li ng-if="!cloud">
+                    <a ng-click="shutdown()" href=""><i class="fa fa-power-off" style="margin-right:10px;"></i><span
+                            class="marketcloud-dasboard-sidebar-hide">Shutdown</span></a>
+                </li>
+                <!--<li>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="demo" class="collapse">
+                        <li>
+                            <a href="#">Dropdown Item</a>
+                        </li>
+                        <li>
+                            <a href="#">Dropdown Item</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="dashboardApp/blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
+                </li>
+                <li>
+                    <a href="dashboardApp/index-rtl.html"><i class="fa fa-fw fa-dashboard"></i> RTL Dashboard</a>
+                </li>-->
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </nav>
+
+    <div class="container-fluid page_container">
+        <div class="row">
+            <div ui-view></div>
+        </div>
     </div>
-  </div>
-    <!--this is where the code is injected-->
-      <div class="container-fluid">
-        <div ui-view></div>
-      </div>
-  </div>
+    <!-- /#page-wrapper           style="margin-left:0px;margin-right:0px;"      -->
+
+</div>
+<!-- /#wrapper -->
 
 </body>
-
+<script src="dashboardApp/js/plugins/morris/raphael.min.js"></script>
 <script src="/javascripts/socket.io.js"></script>
-<script src="/bower_components/angular/angular.js"></script>
-<script src="/bower_components/angular-ui-utils/ui-utils.js"></script>
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="/bower_components/jquery.terminal/js/jquery.terminal-min.js"></script>
+<script src="/bower_components/angular-terminal/angular-terminal.js"></script>
+<script src="/bower_components/angular-ui-utils/ui-utils.js"></script>
 <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="bootstrapModal/js/bootstrap-modalmanager.js"></script>
-<script type="text/javascript" src="bootstrapModal/js/bootstrap-modal.js"></script> 
+<script type="text/javascript" src="bootstrapModal/js/bootstrap-modal.js"></script>
 <script src="/javascripts/jquery-cron/cron/jquery-cron.js"></script>
-
 <script type="text/javascript" src="/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
 <script type="text/javascript" src="/javascripts/ngImgCrop_theBliz/ng-img-crop.js"></script>
-
-
 <script src="/dashboardApp/dashboard.bundle.js"></script>
 <script src="/dashboardApp/home/dashboard_home.js"></script>
+<script src="/dashboardApp/users/users.js"></script>
+<script src="/dashboardApp/Logic/logic.js"></script>
+<script src="/dashboardApp/boards/boards.js"></script>
 <script src="/dashboardApp/objects/objectsApp/launch/launch.js"></script>
 <script src="/dashboardApp/objects/objectsApp/import/import.js"></script>
 <script src="/dashboardApp/objects/objectsApp/new/new.js"></script>
@@ -100,14 +412,21 @@
 <script src="/dashboardApp/objects/objectsApp/new/wizard/editor.js"></script>
 <script src="/dashboardApp/events/dashboard_events.js"></script>
 <script src="/dashboardApp/states/dashboard_states.js"></script>
-
-
+<script src="/dashboardApp/services/dashboard_services.js"></script>
+<script src="/dashboardApp/services/servicesApp/report/report.js"></script>
+<script src="/dashboardApp/services/servicesApp/sms/sms.js"></script>
+<script src="/dashboardApp/services/servicesApp/mail/mail.js"></script>
+<script src="/dashboardApp/services/servicesApp/notification/notification.js"></script>
+<script src="/dashboardApp/settings/dashboard_usersettings.js"></script>
+<script src="/dashboardApp/settings/dashboard_donglesettings.js"></script>
+<!--<script src="/dashboardApp/settings/dashboard_cloudsettings.js"></script>-->
+<script src="/dashboardApp/settings/dashboard_networksettings.js"></script>
+<script src="/dashboardApp/settings/dashboard_system.js"></script>
 <script type="text/javascript" src="/bower_components/angular-ui-ace/ui-ace.js"></script>
-<script type="text/javascript" src="/bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+<script type="text/javascript" src="/bower_components/ace-builds/src-min/ace.js"></script>
 <script type="text/javascript" src="javascripts/ace-arduino-syntax/mode-arduino.js"></script>
-<script type="text/javascript" src="/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
+<script type="text/javascript" src="/bower_components/bootstrap-sweetalert/dist/sweetalert.min.js"></script>
 <script type="text/javascript" src="/bower_components/angular-h-sweetalert/dist/ngSweetAlert.min.js"></script>
 <script type="text/javascript" src="/bower_components/angular-file-upload/angular-file-upload.min.js"></script>
-
-
+<script type="text/javascript" src="/bower_components/validator-js/validator.min.js"></script>
 </html>

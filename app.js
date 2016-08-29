@@ -1,1014 +1,1572 @@
 //Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino
 
-/********************************* LICENSE *******************************
-*									 *
-* This file is part of ApioOS.						 *
-*									 *
-* ApioOS is free software released under the GPLv2 license: you can	 *
-* redistribute it and/or modify it under the terms of the GNU General	 *
-* Public License version 2 as published by the Free Software Foundation. *
-*									 *
-* ApioOS is distributed in the hope that it will be useful, but		 *
-* WITHOUT ANY WARRANTY; without even the implied warranty of		 *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 *
-* GNU General Public License version 2 for more details.		 *
-*									 *
-* To read the license either open the file COPYING.txt or		 *
-* visit <http://www.gnu.org/licenses/gpl2.txt>				 *
-*									 *
-*************************************************************************/
-
+/********************************** LICENSE *********************************
+ *                                                                          *
+ * This file is part of ApioOS.                                             *
+ *                                                                          *
+ * ApioOS is free software released under the GPLv2 license: you can        *
+ * redistribute it and/or modify it under the terms of the GNU General      *
+ * Public License version 2 as published by the Free Software Foundation.   *
+ *                                                                          *
+ * ApioOS is distributed in the hope that it will be useful, but            *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of               *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             *
+ * GNU General Public License version 2 for more details.                   *
+ *                                                                          *
+ * To read the license either open the file COPYING.txt or                  *
+ * visit <http://www.gnu.org/licenses/gpl2.txt>                             *
+ *                                                                          *
+ ****************************************************************************/
 
 "use strict";
-var express = require("express");
-var path = require("path");
-var logger = require("morgan");
-var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
+var domain = require("domain");
+var exec = require("child_process").exec;
+var express = require("express");
+var fs = require("fs");
 var http = require("http");
+//var logger = require("morgan");
+var path = require("path");
+var request = require("request");
+var session = require("express-session");
+var util = require("util");
+
+var Slack = require('node-slack');
+var webhook_url = "https://hooks.slack.com/services/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";
+var slack = new Slack(webhook_url);
+
+var nodemailer = require("nodemailer");
+var smtpTransport = require("nodemailer-smtp-transport");
+//var transporter = nodemailer.createTransport(smtpTransport({
+//    host: "smtp.gmail.com",
+//    port: 465,
+//    secure: true,
+//    auth: {
+//        user: "apioassistance@gmail.com",
+//        pass: "Apio22232425."
+//    }
+//}));
+
+var transporter = nodemailer.createTransport(smtpTransport({
+    host: "smtps.aruba.it",
+    port: 465,
+    secure: true,
+    auth: {
+        user: "info@apio.cc",
+        pass: "@Pio22232425."
+    }
+}));
+
 var app = express();
-var Apio = require("./apio.js");
-var fs = require('fs');
-var domain = require('domain');
-var async = require('async');
-var request = require('request');
-var net = require('net');
-var targz = require('tar.gz');
-var formidable = require('formidable');
+var configuration = {};
 
-var APIO_CONFIGURATION = {
-    port : 8083
-}
-var ENVIRONMENT = "production";
-if (process.argv.indexOf('--no-serial') > -1)
-    ENVIRONMENT = "development"
-if (process.argv.indexOf('--http-port') > -1) {
-    var index = process.argv.indexOf('--http-port');
-    APIO_CONFIGURATION.port = process.argv[index+1];
-}
-if (process.argv.indexOf('--serial-port') > -1) {
-    var index = process.argv.indexOf('--serial-port');
-    Apio.Serial.Configuration.port = process.argv[index+1];
+if (process.argv.indexOf("--config") > -1) {
+    configuration = require(process.argv[process.argv.indexOf("--config") + 1]);
+} else {
+    configuration = require("./configuration/default.js");
 }
 
-if (process.argv.indexOf('--profile') > -1) {
-    console.log("Profiling Apio Server")
-    var memwatch = require('memwatch');
-    var prettyjson = require('prettyjson');
-    var hd = new memwatch.HeapDiff();
-    memwatch.on('leak', function(info) {
-        console.log("\n\nMEMORY LEAK DETECTED")
-        console.log(prettyjson.render(info));
-        console.log("\n\n")
+configuration.dongle = require("./configuration/dongle.js");
+
+if (process.argv.indexOf("--use-remote") > -1) {
+    configuration.remote.enabled = true;
+    configuration.remote.uri = process.argv[process.argv.indexOf("--use-remote") + 1]
+}
+if (process.argv.indexOf("--no-serial") > -1) {
+    configuration.serial.enabled = false;
+}
+
+if (process.argv.indexOf("--http-port") > -1) {
+    configuration.http.port = process.argv[process.argv.indexOf("--http-port") + 1];
+}
+
+if (process.argv.indexOf("--serial-port") > -1) {
+    configuration.serial.port = process.argv[process.argv.indexOf("--serial-port") + 1];
+}
+
+var Apio = require("./apio.js")(configuration);
+
+var sessionMiddleware = session({
+    cookie: {
+        expires: false,
+        maxAge: 0,
+        name: "apioCookie"
+    },
+    resave: true,
+    saveUninitialized: true,
+    secret: "e8cb0757-f5de-4c109-9774-7Bf45e79f285"
+});
+
+app.use(express.static(path.join(__dirname, "public")));
+//app.use(logger("dev"));
+app.use(bodyParser.json({
+    limit: "50mb"
+}));
+app.use(bodyParser.urlencoded({
+    extended: true,
+    limit: "50mb"
+}));
+app.use(cookieParser());
+
+//app.use(session({
+//    cookie: {
+//        expires: false,
+//        maxAge: 0,
+//        name: "apioCookie"
+//    },
+//    resave: true,
+//    saveUninitialized: true,
+//    secret: "e8cb0757-f5de-4c109-9774-7Bf45e79f285"
+//}));
+
+app.use(sessionMiddleware);
+app.use(function (req, res, next) {
+    if (req.headers.host.indexOf("localhost") > -1 || req.headers.host.indexOf("127.0.0.1") > -1) {
+        next();
+    } else {
+        if (req.path === "/" || (req.path.indexOf("template") > -1 && (req.path.indexOf("logo.png") > -1 || req.path.indexOf("background.jpg") > -1)) || req.path === "/apio/user/authenticate" || req.path.indexOf("/apio/sync") > -1 || req.path.indexOf("/apio/enableSync") > -1 || req.path === "/apio/user" || req.path === "/apio/assignToken" || req.headers.hasOwnProperty("cookie")) {
+            next();
+        } else {
+            res.redirect("/");
+        }
+    }
+});
+
+if (typeof Apio === "undefined") {
+    Apio = {};
+}
+if (typeof Apio.user === "undefined") {
+    Apio.user = {};
+}
+if (typeof Apio.user.email === "undefined") {
+    Apio.user.email = [];
+}
+
+app.use(function (req, res, next) {
+    if (req.session.email && Apio.user.email.indexOf(req.session.email) === -1) {
+        Apio.user.email.push(req.session.email);
+    }
+    next();
+});
+
+if (Apio.Configuration.type === "cloud") {
+    app.use(function (req, res, next) {
+        var p = req.path.toString();
+        if (p.indexOf("applications") > -1) {
+            p = p.replace("applications", "boards%2F" + req.session.apioId);
+            res.redirect(p);
+        } else if (p.indexOf("planimetry") > -1 && p.indexOf(req.session.apioId) === -1) {
+            p = p.replace("planimetry", "planimetry%2F" + req.session.apioId);
+            res.redirect(p);
+        } else {
+            next();
+        }
     });
-    memwatch.on('stats', function(stats) {
-        console.log("Stats")
-        console.log(prettyjson.render(stats));
-        var diff = hd.end();
-        console.log(prettyjson.render(diff));
-        hd = new memwatch.HeapDiff();
-    });
-
 }
 
-if (process.argv.indexOf('--logmemory') > -1) {
-    fs.appendFileSync('memory.log',"--- "+(new Date()).toString()+"\n")
-    setInterval(function(){
-        fs.appendFileSync('memory.log', process.memoryUsage().heapUsed+"\n");
-    },5*1000)
-}
+var routes = {
+    boards: require("./routes/boards.js")(Apio),
+    cloud: require("./routes/cloud.js")(Apio),
+    core: require("./routes/core.route.js")(Apio),
+    dashboard: require("./routes/dashboard.route.js")(Apio),
+    dongleApio: require("./routes/dongleapio.js")(Apio),
+    events: require("./routes/events.js")(Apio),
+    mail: require("./routes/mail.js")(Apio),
+    marketplace: require("./routes/marketplace.js")(Apio),
+    notifications: require("./routes/notifications.js")(Apio),
+    objects: require("./routes/objects.js")(Apio),
+    planimetry: require("./routes/planimetry.js")(Apio),
+    services: require("./routes/services.js")(Apio),
+    states: require("./routes/states.js")(Apio),
+    users: require("./routes/users.js")(Apio)
+};
 
-
-var HOST = '192.168.1.109';
-var PORT = 6969;
-
-var routes = {};
-routes.dashboard = require('./routes/dashboard.route.js');
-routes.core = require('./routes/core.route.js');
-
-
+process.on("SIGINT", function () {
+    console.log("About to exit");
+    Apio.Database.db.close();
+    process.exit();
+});
 
 var d = domain.create();
-// Because req and res were created before this domain existed,
-    // we need to explicitly add them.
-    // See the explanation of implicit vs explicit binding below.
-
-
-    //Il domain è un "ambiente chiuso" in cui far finire gli errori per non crashare il server
-    //L'alternativa è fail fast e restart ma non mi piace
-d.on('error',function(err){
-    //Apio.Util.debug("Apio.Server error : "+err);
-    //Apio.Util.debug(err.stack);
+d.on("error", function (err) {
     Apio.Util.printError(err);
 });
 
-d.run(function(){
-
-
-function puts(error, stdout, stderr) {
-    sys.puts(stdout);
-}
-
-
-if (ENVIRONMENT == 'production')
-    Apio.Serial.init();
-
-Apio.Socket.init(http);
-//Apio.Mosca.init();
-Apio.Database.connect(function(){
-    /*
-    Inizializzazione servizi Apio
-    Fatti nel callback della connessione al db perchè ovviamente devo avere il db pronto come prima cosa
-    */
-
-    Apio.System.resumeCronEvents(); //Ricarica dal db tutti i cron events
-});
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
-
-
-app.use(logger("dev"));
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-/*
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-*/
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-
-
-app.get('/',function(req,res){
-    res.sendfile('public/html/index.html');
-})
-app.post('/apio/authenticate',function(req,res){
-    var user = req.body.user;
-    var password = req.body.password;
-
-    if (user === 'apio' && password === 'apio')
-        res.send({
-            status : true
-        })
-    else
-        res.status(401).send({
-            status : false,
-            errors : [{
-                code : 401,
-                message : 'Username or password did not match.'
-            }]
-        })
-})
-
-app.post('/apio/adapter',function(req,res){
-                var req_data = {
-                        json : true,
-                        uri : req.body.url,
-                        method : "POST",
-                        body : req.body.data
-                }
-                console.log("\n\n /apio/adapter sending the following request")
-                console.log(req_data);
-                console.log("\n\n")
-                var _req = request(req_data,function(error,response,body){
-                        if ('undefined' !== typeof response){
-                            if ('200' === response.statusCode || 200 === response.statusCode) {
-                            console.log("Apio Adapter method : got the following response from "+req.body.url)
-                            console.log(body);
-                            res.send(body)
-                            }
-                            else {
-                                console.log("Apio Adapter : Something went wrong ")
-                                res.status(response.statusCode).send(body);
-                            }
-                        } else {
-                            res.status(500).send();
-                        }
-
-                });
-})
-
-//New: Rotta che gestisce il restore del database
-app.get('/apio/restore', function(req, res){
-      var sys = require('sys');
-      var exec = require('child_process').exec;
-      console.log("Qui");
-      var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio", function (error, stdout, stderr) {
-          //sys.print('stdout: '+stdout);
-          //sys.print('stderr: '+stderr);
-          if (error !== null) {
-              console.log('exec error: '+error);
-          }
-      });
-      res.status(200).send({});
-  });
-
-app.get("/dashboard",routes.dashboard.index);
-
-
-/*Shutdown*/
-    app.get('/apio/shutdown', function(req, res){
-        var sys = require('sys');
-        var exec = require('child_process').exec;
-        var child = exec("sudo shutdown -h now", function (error, stdout, stderr) {
-            //sys.print('stdout: '+stdout);
-            //sys.print('stderr: '+stderr);
-            if (error !== null) {
-                console.log('exec error: '+error);
-            }
-        });
-    });
-
-
-
-/*
-*   Crea un nuovo evento
-**/
-app.post("/apio/event",routes.core.events.create);
-
-app.get('/apio/notifications',routes.core.notifications.list);
-app.get('/apio/notifications/listDisabled',routes.core.notifications.listdisabled);
-app.post('/apio/notifications/markAsRead',routes.core.notifications.delete);
-app.post('/apio/notifications/disable',routes.core.notifications.disable);
-app.post('/apio/notifications/enable',routes.core.notifications.enable);
-
-
-    app.post('/apio/notify',function(req,res){
-        console.log("REQ");
-        console.log(req.body);
-
-        Apio.Database.db.collection('Objects').findOne({objectId : req.body.objectId}, function(err, data){
-        //Apio.Database.db.collection('Objects').findOne({objectId : "1000"}, function(err, data){
-            if(err){
-                console.log("Unable to find object with id "+req.body.objectId);
-                //console.log("Unable to find object with id 1000");
-            }
-            else{
-                var notifica = {
-                    objectId : req.body.objectId,
-                    //objectId : "1000",
-                    timestamp : new Date().getTime(),
-                    objectName : data.name,
-                    properties : {}
-                };
-                for(var i in req.body){
-                    if(i !== "objectId"){
-                        notifica.properties[i] = req.body[i];
-                        notifica.message = data.notifications[i][req.body[i]];
-                    }
-                }
-                Apio.System.notify(notifica);
-                Apio.Database.db.collection("States").findOne({objectId : notifica.objectId, properties : notifica.properties}, function(err, foundState){
-                    if(err){
-                        console.log("Unable to find States for objectId "+notifica.objectId);
-                    }
-                    else if(foundState){
-                        var stateHistory = {};
-
-                        var getStateByName = function(stateName,callback) {
-                            Apio.Database.db.collection('States').findOne({name : stateName},callback);
-                        };
-                        //Mi applica lo stato se non è già stato applicato
-                        /*var applyStateFn = function(stateName) {
-
-                         console.log("\n\nApplico lo stato "+stateName+"\n\n")
-                         if (!stateHistory.hasOwnProperty(stateName)) { //se non è nella history allora lo lancio
-                         getStateByName(stateName,function(err,state){
-                         if (err) {
-                         console.log("applyState unable to apply state")
-                         console.log(err);
-                         }
-                         else if(state){
-                         if (state.active == true){
-                         Apio.Database.db.collection('States').update({name : state.name},{$set : {active : false}},function(errOnActive){
-                         if (errOnActive) {
-                         console.log("Impossibile settare il flag dello stato");
-                         res.status(500).send({error : "Impossibile settare il flag dello stato"})
-                         } else {
-                         var s = state;
-                         s.active = false;
-                         Apio.io.emit('apio_state_update',s);
-                         res.send({error:false});
-                         }
-                         })
-                         }
-                         else {
-                         Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
-                         if (err)
-                         console.log("Non ho potuto settare il flag a true");
-                         })
-                         console.log("Lo stato che sto per applicare è ")
-                         console.log(state)
-                         Apio.Database.updateProperty(state,function(){
-                         stateHistory[state.name] = 1;
-                         //Connected clients are notified of the change in the database
-                         Apio.io.emit("apio_server_update",state);
-                         if (ENVIRONMENT == 'production') {
-                         Apio.Serial.send(state, function(){
-                         console.log("SONO LA CALLBACK");
-                         //Ora cerco eventuali eventi
-                         Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
-                         if (err) {
-                         console.log("error while fetching events");
-                         console.log(err);
-                         }
-                         console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                         console.log(data)
-                         //data è un array di eventi
-                         data.forEach(function(ev,ind,ar){
-                         var states = ev.triggeredStates;
-                         states.forEach(function(ee,ii,vv){
-                         applyStateFn(ee.name);
-                         })
-                         })
-                         res.send({});
-                         })
-                         pause(500);
-                         });
-                         }
-                         else{
-                         Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
-                         if (err) {
-                         console.log("error while fetching events");
-                         console.log(err);
-                         }
-                         console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                         console.log(data)
-                         //data è un array di eventi
-                         data.forEach(function(ev,ind,ar){
-                         var states = ev.triggeredStates;
-                         states.forEach(function(ee,ii,vv){
-                         applyStateFn(ee.name);
-                         })
-                         })
-                         res.send({});
-                         })
-                         pause(500);
-                         }
-                         });
-                         }
-                         }
-                         })
-                         } else {
-                         console.log("Skipping State application because of loop.")
-                         }
-                         } //End of applyStateFn*/
-                        var arr = [];
-                        var applyStateFn = function(stateName, callback, eventFlag) {
-                            console.log("\n\nApplico lo stato "+stateName+"\n\n")
-                            if (!stateHistory.hasOwnProperty(stateName)) { //se non è nella history allora lo lancio
-                                getStateByName(stateName,function(err,state){
-                                    if (err) {
-                                        console.log("applyState unable to apply state")
-                                        console.log(err);
-                                    }
-                                    else if(eventFlag){
-                                        arr.push(state);
-                                        Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
-                                            if (err)
-                                                console.log("Non ho potuto settare il flag a true");
-                                        });
-                                        console.log("Lo stato che sto per applicare è ");
-                                        console.log(state);
-                                        Apio.Database.updateProperty(state,function(){
-                                            stateHistory[state.name] = 1;
-                                            //Connected clients are notified of the change in the database
-                                            Apio.io.emit("apio_server_update",state);
-                                            Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
-                                                if (err) {
-                                                    console.log("error while fetching events");
-                                                    console.log(err);
-                                                }
-                                                console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                                                console.log(data);
-                                                if(callback && data.length == 0){
-                                                    callback();
-                                                }
-                                                //data è un array di eventi
-                                                data.forEach(function(ev,ind,ar){
-                                                    var states = ev.triggeredStates;
-                                                    states.forEach(function(ee,ii,vv){
-                                                        applyStateFn(ee.name, callback, true);
-                                                    })
-                                                });
-                                                res.send({});
-                                            });
-                                        });
-                                    }
-                                    else{
-                                        if (state.active == true){
-                                            Apio.Database.db.collection('States').update({name : state.name},{$set : {active : false}},function(errOnActive){
-                                                if (errOnActive) {
-                                                    console.log("Impossibile settare il flag dello stato");
-                                                    res.status(500).send({error : "Impossibile settare il flag dello stato"})
-                                                } else {
-                                                    var s = state;
-                                                    s.active = false;
-                                                    Apio.io.emit('apio_state_update',s);
-                                                    res.send({error:false});
-                                                }
-                                            })
-                                        }
-                                        else {
-                                            arr.push(state);
-                                            Apio.Database.db.collection('States').update({name : state.name},{$set : {active : true}},function(err){
-                                                if (err)
-                                                    console.log("Non ho potuto settare il flag a true");
-                                            });
-                                            console.log("Lo stato che sto per applicare è ");
-                                            console.log(state);
-                                            Apio.Database.updateProperty(state,function(){
-                                                stateHistory[state.name] = 1;
-                                                //Connected clients are notified of the change in the database
-                                                Apio.io.emit("apio_server_update",state);
-                                                Apio.Database.db.collection("Events").find({triggerState : state.name}).toArray(function(err,data){
-                                                    if (err) {
-                                                        console.log("error while fetching events");
-                                                        console.log(err);
-                                                    }
-                                                    console.log("Ho trovato eventi scatenati dallo stato "+state.name);
-                                                    console.log(data);
-                                                    if(callback && data.length == 0){
-                                                        callback();
-                                                    }
-                                                    //data è un array di eventi
-                                                    data.forEach(function(ev,ind,ar){
-                                                        var states = ev.triggeredStates;
-                                                        states.forEach(function(ee,ii,vv){
-                                                            applyStateFn(ee.name, callback, true);
-                                                        })
-                                                    });
-                                                    res.send({});
-                                                });
-                                            });
-                                        }
-                                    }
-                                })
-                            } else {
-                                console.log("Skipping State application because of loop.")
-                            }
-                        }; //End of applyStateFn
-
-                        applyStateFn(foundState.name, function(){
-                            if(ENVIRONMENT == "production") {
-                                var pause = function (millis) {
-                                    var date = new Date();
-                                    var curDate = null;
-                                    do {
-                                        curDate = new Date();
-                                    } while (curDate - date < millis);
-                                };
-                                console.log("arr vale:");
-                                console.log(arr);
-                                for (var i in arr) {
-                                    Apio.Serial.send(arr[i], function () {
-                                        pause(100);
-                                    });
-                                }
-                                arr = [];
-                            }
-                        }, false);
-                    }
-                });
-            }
-        });
-    });
-
-/* Returns all the events */
-app.get("/apio/event",routes.core.events.list)
-/* Return event by name*/
-app.get("/apio/event/:name",routes.core.events.getByName)
-
-app.delete("/apio/event/:name",routes.core.events.delete)
-
-app.put("/apio/event/:name",routes.core.events.update);
-
-/****************************************************************
-****************************************************************/
-
-app.post("/apio/state/apply",routes.core.states.apply);
-/*app.post("/apio/state/apply",function(req,res){
-    console.log("Ciao vorresti applicare uno stato, ma non puoi.")
-    res.send({});
-});*/
-
-app.delete("/apio/state/:name",function(req,res){
-    console.log("Mi arriva da eliminare questo: "+req.params.name)
-    Apio.Database.db.collection("States").findAndRemove({name : req.params.name}, function(err,removedState){
-        if (!err) {
-            Apio.io.emit("apio_state_delete", {name : req.params.name});
-            Apio.Database.db.collection("Events").remove({triggerState : req.params.name}, function(err){
-                if(err){
-                    res.send({error : 'DATABASE_ERROR'});
-                }
-                else{
-                    Apio.io.emit("apio_event_delete", {name : req.params.name});
-                }
-            });
-            if (removedState.hasOwnProperty('sensors')) {
-
-              removedState.sensors.forEach(function(e,i,a){
-                var props = {};
-                props[e] = removedState.properties[e];
-                Apio.Serial.send({
-                  'objectId' : removedState.objectId,
-                  'properties' : props
-                })
-
-              })
-
-
-            }
-
-            res.send({error : false});
-        }
-        else
-            res.send({error : 'DATABASE_ERROR'});
-    })
-})
-
-
-app.put("/apio/state/:name",function(req,res){
-    console.log("Mi arriva da modificare questo stato: "+req.params.name);
-    console.log("Il set di modifiche è ")
-    console.log(req.body.state);
-
-    var packagedUpdate = { properties : {}};
-    for (var k in req.body.state) {
-        packagedUpdate.properties[k] = req.body.state[k];
+d.run(function () {
+    if (!fs.existsSync("./uploads")) {
+        fs.mkdirSync("./uploads");
     }
-
-    Apio.Database.db.collection("States").update({name : req.params.name},{$set : packagedUpdate},function(err){
-        if (!err) {
-            Apio.io.emit("apio_state_update",{name : req.params.name, properties : req.body.state});
-            res.send({error : false});
-        }
-        else
-            res.send({error : 'DATABASE_ERROR'});
-    })
-})
-
-
-/*
-    Creazione stato
- */
-app.post("/apio/state",routes.core.states.create);
-
-
-/*
-    Returns state list
- */
-app.get("/apio/state",routes.core.states.get);
-/*
-Returns a state by its name
- */
-app.get("/apio/state/:name",routes.core.states.getByName);
-
-
-//TODO sostituire l'oggetto 1 con un oggetto verify in maniera tale da evitare la presenza di un oggetto.
-//O guardare il discorso del pidfile.h
-app.get("/app",function(req,res){
-  console.log("Richiesta /app")
-  Apio.Database.db.collection('Users').findOne({
-         name: "verify"
-       }, function(err, doc) {
-           if (err) {
-
+    Apio.Socket.init(http, sessionMiddleware);
+    Apio.Database.connect(function () {
+        Apio.Database.db.collectionNames("Events", function (err, names) {
+            if (err) {
+                console.log("Error while check existence of Events: ", err);
+            } else if (names.length) {
+                console.log("Collection Events Exists");
             } else {
-              if(doc){
-              console.log("Il database c'è faccio il dump");
-              var sys = require('sys');
-              var exec = require('child_process').exec;
-              var child = exec("mongodump --out ./data");
-
-
-
-              } else {
-            console.log("Il database non c'è faccio il restore");
-             var sys = require('sys');
-             var exec = require('child_process').exec;
-             var child = exec("mongorestore ./data/apio -d apio");
-              }
-
+                console.log("Collection Events DOESN'T Exists, creating....");
+                Apio.Database.db.createCollection("Events", function (error, collection) {
+                    if (error) {
+                        console.log("Error while creating collection Events");
+                    } else if (collection) {
+                        console.log("Collection Events successfully created");
+                    }
+                });
             }
-     })
-    res.sendfile("public/html/app.html");
-})
-
-
-/*
-*   Lancia l'evento
-*/
-app.get("/apio/event/launch",routes.core.events.launch)
-/*
-*   restituisce la lista degli eventi
-*/
-app.get("/apio/event",routes.core.events.list)
-
-/// error handlers
-
-// development error handler
-// will print stacktrace
-/*
-if (app.get("env") === "development" || ENVIRONMENT === "development") {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        console.log("========== ERROR DETECTED ===========")
-        console.log(err);
-        res.send({
-            status : false,
-            errors: [{message : err.message}]
         });
-        //Da testare
-        next();
-    });
-}
-
-
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.send({status : false});
-    console.log(err);
-    //Da testare
-    next();
-});
-*/
-
-
-//FIXME andrebbero fatte in post per rispettare lo standard REST
-/*
-app.post('/apio/serial/send',function(req,res){
-
-         var keyValue = req.body.message;
-            if (req.body.isSensor === true)
-                keyValue = 'r'+keyValue;
-            var keyValue = keyValue.slice(0,-1);
-            var tokens = keyValue.split(":");
-            var props = {};
-            props[tokens[0]] = tokens[1];
-
-            var obj = {
-                objectId: req.body.objectId,
-                properties : props
-            };
-            console.log("Questo è loggetto che arriva da /apio/serial/send")
-            console.log(obj);
-
-            Apio.Serial.send(obj);
-            res.send();
-});
-*/
-app.post('/apio/serial/send',function(req,res){
-
-            var obj = req.body.data;
-            console.log("\n\n%%%%%%%%%%\nAl seria/send arriva questp")
-            console.log(obj)
-            console.log("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n")
-            Apio.Serial.send(obj);
-            res.send({status : true});
-});
-
-
-
-/* APIO creation and export of the .tar container of the App */
-app.get('/apio/app/export', routes.dashboard.exportApioApp);
-
-/* APIO export of the arduino sketchbook file NUOVA*/
-app.get('/apio/app/exportIno', routes.dashboard.exportInoApioApp);
-
-/* APIO upload of the App */
-app.post('/apio/app/upload', routes.dashboard.uploadApioApp);
-
-/* APIO recovery of the actual maximum id in mongo -> apio -> Objects */
-app.post('/apio/app/maximumId', routes.dashboard.maximumIdApioApp);
-
-/* APIO clone from the git repo of a standard Apio App*/
-app.post('/apio/app/gitCloneApp', routes.dashboard.gitCloneApp);
-
-/* APIO delete of the App */
-app.post('/apio/app/delete', routes.dashboard.deleteApioApp);
-
-/* APIO make an empty App folder */
-app.post('/apio/app/folder', routes.dashboard.folderApioApp);
-
-/* APIO modify of the App (it's binded in launch.js and it's used to launch the editor with the updating parameters)*/
-app.post('/apio/app/modify', routes.dashboard.modifyApioApp);
-
-/*APIO update of the application for a specified object (it's binded in editor.js and do the actual update of an application)*/
-app.post('/apio/database/updateApioApp', routes.dashboard.updateApioApp);
-
-/*APIO creation of the new ino html js mongo files from the wizard*/
-app.post('/apio/database/createNewApioAppFromEditor', routes.dashboard.createNewApioAppFromEditor);
-
-/*APIO creation of the new ino html js mongo files from the wizard*/
-app.post('/apio/database/createNewApioApp', routes.dashboard.createNewApioApp);
-
-
-app.get('/apio/database/getObjects',routes.core.objects.get);
-app.get('/apio/database/getObject/:id',routes.core.objects.getById);
-
-app.patch('/apio/object/:id',routes.core.objects.update);
-app.put('/apio/object/:id',routes.core.objects.update);
-
-app.get("/apio/object/:obj", function(req, res){
-        Apio.Database.db.collection('Objects').findOne({objectId : req.params.obj},function(err, data){
+        Apio.Database.db.collectionNames("Objects", function (err, names) {
             if (err) {
-                console.log("Error while fetching object "+req.params.obj);
-                res.status(500).send({error : "DB"});
-            }
-            else {
-                res.status(200).send(data);
-            }
-        });
-    });
-
-    app.get("/apio/objects", function(req, res){
-        Apio.Database.db.collection('Objects').find().toArray(function(err, data){
-            if (err) {
-                console.log("Error while fetching objects");
-                res.status(500).send({error : "DB"});
-            }
-            else {
-                var json = {};
-                for(var i in data){
-                    json[i] = data[i];
-                }
-                res.status(200).send(json);
-            }
-        });
-    });
-
-    app.post("/apio/updateListElements", function(req, res){
-        for(var i in req.body){
-            if(i != "objectId"){
-                var update = {};
-                update[i] = req.body[i];
-            }
-        }
-        Apio.Database.db.collection('Objects').update({objectId : req.body.objectId}, {$set : {'db' : update, 'notifications' : update}}, function(err){
-        //Apio.Database.db.collection('Objects').update({objectId : "1000"}, {$set : {'db' : update, 'notifications' : update}}, function(err){
-            if (err) {
-                res.status(500).send({status : false});
-            }
-            else {
-                res.status(200).send({status : true});
-                Apio.io.emit("list_updated", update);
-            }
-        });
-    });
-
-
-//Handling Mosca pub sub manager
-//
-//module.exports = app;
-/*
-*   Mosca listener instantiation
-*/
-/*Apio.Mosca.server.on('clientConnected', function(client) {
-  console.log('client connected', client.id);
-});
-
-Apio.Mosca.server.on('published', function(packet, client) {
-  console.log('Published', packet.payload);
-});*/
-//Handling Serial events and emitting
-//APIO Serial Port Listener
-//module.exports = app;
-/*
-*   Socket listener instantiation
-*/
-Apio.io.on("connection", function(socket){
-    socket.on("input", function(data){
-        console.log(data);
-        Apio.Database.updateProperty(data, function(){
-            socket.broadcast.emit("apio_server_update_", data);
-        });
-        Apio.Serial.send(data);
-    });
-
-    //Streaming
-    socket.on("apio_client_stream", function(data){
-        socket.broadcast.emit("apio_server_update", data);
-        Apio.Serial.stream(data);
-    })
-
-
-    console.log("a socket connected");
-    var sys = require('sys');
-    var exec = require('child_process').exec;
-    var child = exec("hostname -I", function (error, stdout, stderr) {
-        sys.print("Your IP address is: "+stdout);
-        //sys.print('stderr: '+stderr);
-        if (error !== null) {
-            console.log('exec error: '+error);
-        }
-    });
-    socket.join("apio_client");
-
-    socket.on("apio_client_update",function(data){
-        var x = data;
-        try{
-            data = eval('('+data+')');
-            var check = function(d){
-                for(var i in d){
-                    if(d[i] == 'true'){
-                        d[i] = true;
-                    }
-                    else if(d[i] == 'false'){
-                        d[i] = false;
-                    }
-                    else if(typeof d[i] === "number"){
-                        d[i] = d[i].toString();
-                    }
-                    else if(d[i] instanceof Object){
-                        check(d[i]);
-                    }
-                }
-            };
-            check(data);
-        }
-        catch(e){
-            data = x;
-        }
-
-
-
-        console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        console.log("App.js on(apio_client_update)  received a message");
-
-        //Loggo ogni richiesta
-        //Commentato per capire cosa fare con sti log
-        //Apio.Logger.log("EVENT",data);
-
-        //Scrivo sul db
-        if (data.writeToDatabase === true) {
-            Apio.Database.updateProperty(data, function () {
-                //Connected clients are notified of the change in the database
-                socket.broadcast.emit("apio_server_update", data);
-                console.log("data vale: ");
-                console.log(data);
-                console.log("data.properties vale:");
-                console.log(data.properties);
-
-            });
-        }
-        else
-            Apio.Util.debug("Skipping write to Database");
-
-
-        //Invio i dati alla seriale se richiesto
-        if (data.writeToSerial === true && ENVIRONMENT == 'production') {
-            Apio.Serial.send(data);
-        }
-        else
-            Apio.Util.debug("Skipping Apio.Serial.send");
-
-
-
-
-
-    });
-        socket.on('apio_notification', function(data) {
-                console.log("> Arrivato un update, mando la notifica");
-                //Prima di tutto cerco la notifica nel db
-                console.log(data);
-                //Controllo Se esiste uno stato che rispecchia lo stato attuale dell'oggetto
-                if ('string' === typeof data)
-                    data = JSON.parse(data)
-                console.log(typeof data);
-
-                Apio.Database.db.collection('Objects').findOne({
-                    address : data.address
-                }, function(err, document) {
-                    if (err) {
-                        console.log('Apio.Serial.read Error while looking for notifications');
-                    } else {
-                        console.log("Aggiorno data")
-                        data.objectId = document.objectId;
-                        
-                        if (document.hasOwnProperty('notifications')) {
-                            for (var prop in data.properties) //prop è il nome della proprietà di cui cerco notifiche
-                                if (document.notifications.hasOwnProperty(prop)) {
-                                //Ho trovato una notifica da lanciare
-                                if (document.notifications[prop].hasOwnProperty(data.properties[prop])) {
-                                    console.log("Ho trovato una notifica per la proprietà " + prop + " e per il valore corrispondente " + data.properties[prop])
-                                    Apio.Database.getObjectById(data.objectId, function(result) {
-                                        var notifica = {
-                                            objectId: data.objectId,
-                                            objectName: result.objectName,
-                                            message: document.notifications[prop][data.properties[prop]],
-                                            properties: data.properties,
-                                            timestamp: new Date().getTime()
-                                        };
-                                        console.log("Mando la notifica");
-                                        Apio.System.notify(notifica);
-                                    });
-                                } //Se ha una notifica per il valore attuale
-                                else {
-                                    console.log("Ho una notifica registarata per quella property ma non per quel valore")
+                console.log("Error while check existence of Objects: ", err);
+            } else if (names.length) {
+                console.log("Collection Objects Exists");
+            } else {
+                console.log("Collection Objects DOESN'T Exists, creating....");
+                Apio.Database.db.createCollection("Objects", function (error, collection) {
+                    if (error) {
+                        console.log("Error while creating collection Objects");
+                    } else if (collection) {
+                        console.log("Collection Objects successfully created");
+                        if (Apio.Configuration.type === "gateway") {
+                            var date = new Date();
+                            var d = date.getFullYear() + "-" + (date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1) + "-" + (date.getDate() < 10 ? "0" + date.getDate() : date.getDate());
+                            Apio.Database.db.collection("Objects").insert({
+                                address: "10",
+                                connected: true,
+                                created: d,
+                                db: {},
+                                log: {},
+                                marker: {},
+                                name: "Analytics",
+                                notifications: {},
+                                objectId: "10",
+                                properties: {},
+                                protocol: "l",
+                                status: "1",
+                                tag: " ",
+                                type: "service",
+                                user: []
+                            }, function (error, result1) {
+                                if (error) {
+                                    console.log("Error while inserting App Analytics: ", error);
+                                } else if (result1) {
+                                    console.log("App Analytics successfully installed");
                                 }
-
-
-                            } else {
-                                console.log("L'oggetto non ha una notifica registrata per la proprietà " + prop)
-                            }
+                            });
                         }
                     }
-                                    Apio.Database.db.collection('States')
-                    .find({
-                        objectId: data.objectId
-                    })
-                    .toArray(
-                        function(err, states) {
-                        console.log("CI sono " + states.length + " stati relativi all'oggetto " + data.objectId)
-                        var sensorPropertyName = Object.keys(data.properties)[0]
-                        states.forEach(function(state) {
-                            if (state.hasOwnProperty('sensors') && state.sensors.length > 0) {
-                                if (state.sensors.indexOf(sensorPropertyName) > -1 && state.properties[sensorPropertyName] == data.properties[sensorPropertyName]) {
+                });
+            }
+        });
+        Apio.Database.db.collectionNames("Planimetry", function (err, names) {
+            if (err) {
+                console.log("Error while check existence of Planimetry: ", err);
+            } else if (names.length) {
+                console.log("Collection Planimetry Exists");
+            } else {
+                console.log("Collection Planimetry DOESN'T Exists, creating....");
+                Apio.Database.db.createCollection("Planimetry", function (error, collection) {
+                    if (error) {
+                        console.log("Error while creating collection Planimetry");
+                    } else if (collection) {
+                        console.log("Collection Planimetry successfully created");
+                    }
+                });
+            }
+        });
 
-                                    console.log("Lo stato " + state.name + " è relativo al sensore che sta mandando notifiche ed il valore corrisponde")
-                                    data.message = state.name
-                                    Apio.System.notify(data);
-                                } else {
-                                    console.log("Lo stato " + state.name + " NON è relativo al sensore che sta mandando notifiche")
+        Apio.Database.db.collectionNames("Communication", function (err, names) {
+            if (err) {
+                console.log("Error while check existence of Communication: ", err);
+            } else if (names.length) {
+                console.log("Collection Communication Exists");
+            } else {
+                console.log("Collection Communication DOESN'T Exists, creating....");
+                Apio.Database.db.createCollection("Communication", function (error, collection) {
+                    if (error) {
+                        console.log("Error while creating collection Communication");
+                    } else if (collection) {
+                        console.log("Collection Communication successfully created");
+
+                        if (Apio.Configuration.type === "gateway") {
+                            Apio.Database.db.collection("Communication").insert({
+                                name: "addressBindToProperty",
+                                apio: {},
+                                enocean: {},
+                                zwave: {}
+                            }, function (error, result1) {
+                                if (error) {
+                                    console.log("Error while inserting Communication addressBindToProperty: ", error);
+                                } else if (result1) {
+                                    console.log("Communication addressBindToProperty successfully installed");
                                 }
-                            }
-                        })
-                        Apio.Database.updateProperty(data, function() {
-                        Apio.io.emit('apio_server_update', data);
-                        //Apio.Remote.socket.emit('apio.server.object.update', data);
+                            });
 
-                        Apio.Database.db.collection('Objects')
-                            .findOne({
-                                objectId: data.objectId
-                            }, function(err, obj_data) {
-                                if (err || obj_data === null) {
-                                    console.log("An error has occurred while trying to figure out a state name")
-                                } else {
-                                    Apio.Database.db.collection('States')
-                                        .find({
-                                            objectId: obj_data.objectId
-                                        }).toArray(function(error, states) {
-                                            console.log("\n\n@@@@@@@@@@@@@@@@@@@")
-                                            console.log("Inizio controllo stati")
-                                            console.log("Ho " + states.length + " stati relativi all'oggetto " + obj_data.objectId);
-                                            states.forEach(function(state) {
+                            Apio.Database.db.collection("Communication").insert({
+                                name: "integratedCommunication",
+                                apio: {},
+                                enocean: {},
+                                zwave: {}
+                            }, function (error, result1) {
+                                if (error) {
+                                    console.log("Error while inserting Communication integratedCommunication: ", error);
+                                } else if (result1) {
+                                    console.log("Communication integratedCommunication successfully installed");
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
 
-                                                var test = true;
-                                                for (var key in state.properties)
-                                                    if (state.properties[key] !== obj_data.properties[key])
-                                                        test = false;
-                                                if (test === true) {
-                                                    console.log("Lo stato " + state.name + " corrisponde allo stato attuale dell'oggetto")
-
-                                                    Apio.System.applyState(state.name, function(err) {
-
-                                                        if (err) {
-                                                            console.log("An error has occurred while applying the matched state")
-                                                        }
-                                                    }, true)
-
-
-                                                }
-                                            })
-
-                                            console.log("Fine controllo degli stati\n\n@@@@@@@@@@@@@@@@@@@@@@@")
+        if (configuration.type === "gateway") {
+            var startGatewayService = function (service) {
+                if (configuration.dependencies.gateway[service].hasOwnProperty("startAs") && configuration.dependencies.gateway[service].hasOwnProperty("version")) {
+                    if (service === "dongle") {
+                        exec("ps aux | grep dongle_apio | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
                                         });
+                                    }
                                 }
-                            })
+
+                                if (fs.existsSync("./dongle_flag.txt")) {
+                                    var hiFlag = Number(String(fs.readFileSync("./dongle_flag.txt")).trim());
+                                    if (hiFlag === 0) {
+                                        fs.writeFileSync("./dongle_flag.txt", "1");
+                                    }
+                                } else {
+                                    fs.writeFileSync("./dongle_flag.txt", "1");
+                                }
+                                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_apio.js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
                         });
-                    })
-                })
+                    } else if (service === "zwave") {
+                        exec("ps aux | grep zwave | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
+                                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_zwave.js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (service === "enocean") {
+                        // require("./services/dongle_enocean.old.js")(require("./apioLibraries.js"));
+                        exec("ps aux | grep enocean | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
-                
+                                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_enocean.js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (service === "notification") {
+                        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
-        })
+                                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (configuration.dependencies.gateway[service].startAs === "process") {
+                        exec("ps aux | grep " + service + " | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
-});
+                                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' " + service + ".js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (configuration.dependencies.gateway[service].startAs === "require") {
+                        require("./services/" + service + ".js")(require("./apioLibraries.js"));
+                    }
+                }
+            };
 
+            Apio.Database.db.collectionNames("Services", function (err, names) {
+                if (err) {
+                    console.log("Error while check existence of Services: ", err);
+                } else if (names.length) {
+                    console.log("Collection Services Exists");
+                    for (var i in configuration.dependencies.gateway) {
+                        startGatewayService(i);
+                        //if (i !== "logic" && i !== "mail" && i !== "sms") {
+                        //    if (i === "dongle") {
+                        //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                if (fs.existsSync("./dongle_flag.txt")) {
+                        //                    var hiFlag = Number(String(fs.readFileSync("./dongle_flag.txt")).trim());
+                        //                    if (hiFlag === 0) {
+                        //                        fs.writeFileSync("./dongle_flag.txt", "1");
+                        //                    }
+                        //                } else {
+                        //                    fs.writeFileSync("./dongle_flag.txt", "1");
+                        //                }
+                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "log") {
+                        //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "zwave") {
+                        //        exec("ps aux | grep zwave | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' zwave.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "notification") {
+                        //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else {
+                        //        require("./services/" + i + ".js")(require("./apioLibraries.js"));
+                        //    }
+                        //}
+                    }
+                } else {
+                    console.log("Collection Services DOESN'T Exists, creating....");
+                    Apio.Database.db.createCollection("Services", function (error, collection) {
+                        if (error) {
+                            console.log("Error while creating collection Services");
+                        } else if (collection) {
+                            console.log("Collection Services successfully created");
+                            for (var i in configuration.dependencies.gateway) {
+                                startGatewayService(i);
+                                //if (i !== "logic" && i !== "mail" && i !== "sms") {
+                                //    if (i === "dongle") {
+                                //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                if (fs.existsSync("./dongle_flag.txt")) {
+                                //                    var hiFlag = Number(String(fs.readFileSync("./dongle_flag.txt")).trim());
+                                //                    if (hiFlag === 0) {
+                                //                        fs.writeFileSync("./dongle_flag.txt", "1");
+                                //                    }
+                                //                } else {
+                                //                    fs.writeFileSync("./dongle_flag.txt", "1");
+                                //                }
+                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else if (i === "log") {
+                                //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else if (i === "zwave") {
+                                //        exec("ps aux | grep zwave | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' zwave.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else if (i === "notification") {
+                                //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else {
+                                //        require("./services/" + i + ".js")(require("./apioLibraries.js"));
+                                //    }
+                                //}
+                            }
+                        }
+                    });
+                }
+            });
+        } else if (configuration.type === "cloud") {
+            var startCloudService = function (service) {
+                if (configuration.dependencies.cloud[service].hasOwnProperty("startAs") && configuration.dependencies.cloud[service].hasOwnProperty("version")) {
+                    if (service === "dongle") {
+                        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
-Apio.io.on("disconnect",function(){
-    console.log("Apio.Socket.event A client disconnected");
-});
+                                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (service === "notification") {
+                        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
+                                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (configuration.dependencies.cloud[service].startAs === "process") {
+                        exec("ps aux | grep " + service + " | awk '{print $2}'", function (error, stdout, stderr) {
+                            if (error) {
+                                console.log("exec error: " + error);
+                            } else if (stdout) {
+                                stdout = stdout.split("\n");
+                                stdout.pop();
+                                if (stdout.length > 2) {
+                                    for (var i in stdout) {
+                                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                            if (error) {
+                                                console.log("exec error: " + error);
+                                            } else {
+                                                console.log("Process with PID " + stdout[i] + " killed");
+                                            }
+                                        });
+                                    }
+                                }
 
+                                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' " + service + ".js", function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log("exec error: " + error);
+                                    } else {
+                                        console.log(i + " server corretly start");
+                                    }
+                                });
+                            }
+                        });
+                    } else if (configuration.dependencies.cloud[service].startAs === "require") {
+                        require("./servicesCloud/" + service + ".js")(require("./apioLibraries.js"));
+                    }
+                }
+            };
 
-var server = http.createServer(app);
+            Apio.Database.db.collectionNames("Services", function (err, names) {
+                if (err) {
+                    console.log("Error while check existence of Services: ", err);
+                } else if (names.length) {
+                    console.log("Collection Services Exists");
+                    for (var i in configuration.dependencies.cloud) {
+                        startCloudService(i);
+                        //if (i !== "logic" && i !== "mail" && i !== "sms") {
+                        //    if (i === "dongle") {
+                        //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "log") {
+                        //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "notification") {
+                        //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "objectWs") {
+                        //        exec("ps aux | grep objectWS | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //
+                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' objectWS.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else if (i === "boardSync") {
+                        //        exec("ps aux | grep boardSync | awk '{print $2}'", function (error, stdout, stderr) {
+                        //            if (error) {
+                        //                console.log("exec error: " + error);
+                        //            } else if (stdout) {
+                        //                stdout = stdout.split("\n");
+                        //                stdout.pop();
+                        //                if (stdout.length > 2) {
+                        //                    for (var i in stdout) {
+                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                        //                            if (error) {
+                        //                                console.log("exec error: " + error);
+                        //                            } else {
+                        //                                console.log("Process with PID " + stdout[i] + " killed");
+                        //                            }
+                        //                        });
+                        //                    }
+                        //                }
+                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' boardSync.js", function (error, stdout, stderr) {
+                        //                    if (error) {
+                        //                        console.log("exec error: " + error);
+                        //                    } else {
+                        //                        console.log(i + " server corretly start");
+                        //                    }
+                        //                });
+                        //            }
+                        //        });
+                        //    } else {
+                        //        require("./servicesCloud/" + i + ".js")(require("./apioLibraries.js"));
+                        //    }
+                        //}
+                    }
+                } else {
+                    console.log("Collection Services DOESN'T Exists, creating....");
+                    Apio.Database.db.createCollection("Services", function (error, collection) {
+                        if (error) {
+                            console.log("Error while creating collection Services");
+                        } else if (collection) {
+                            console.log("Collection Services successfully created");
+                            for (var i in configuration.dependencies.cloud) {
+                                startCloudService(i);
+                                //if (i !== "logic" && i !== "mail" && i !== "sms") {
+                                //    if (i === "dongle") {
+                                //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else if (i === "log") {
+                                //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else if (i === "notification") {
+                                //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else if (i === "objectWs") {
+                                //        exec("ps aux | grep objectWS | awk '{print $2}'", function (error, stdout, stderr) {
+                                //            if (error) {
+                                //                console.log("exec error: " + error);
+                                //            } else if (stdout) {
+                                //                stdout = stdout.split("\n");
+                                //                stdout.pop();
+                                //                if (stdout.length > 2) {
+                                //                    for (var i in stdout) {
+                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
+                                //                            if (error) {
+                                //                                console.log("exec error: " + error);
+                                //                            } else {
+                                //                                console.log("Process with PID " + stdout[i] + " killed");
+                                //                            }
+                                //                        });
+                                //                    }
+                                //                }
+                                //
+                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' objectWS.js", function (error, stdout, stderr) {
+                                //                    if (error) {
+                                //                        console.log("exec error: " + error);
+                                //                    } else {
+                                //                        console.log(i + " server corretly start");
+                                //                    }
+                                //                });
+                                //            }
+                                //        });
+                                //    } else {
+                                //        require("./servicesCloud/" + i + ".js")(require("./apioLibraries.js"));
+                                //    }
+                                //}
+                            }
+                        }
+                    });
+                }
+            });
+        }
 
+        Apio.Database.db.collectionNames("States", function (err, names) {
+            if (err) {
+                console.log("Error while check existence of States: ", err);
+            } else if (names.length) {
+                console.log("Collection States Exists");
+            } else {
+                console.log("Collection States DOESN'T Exists, creating....");
+                Apio.Database.db.createCollection("States", function (error, collection) {
+                    if (error) {
+                        console.log("Error while creating collection States");
+                    } else if (collection) {
+                        console.log("Collection States successfully created");
+                    }
+                });
+            }
+        });
+        Apio.Database.db.collectionNames("Users", function (err, names) {
+            if (err) {
+                console.log("Error while check existence of Users: ", err);
+            } else if (names.length) {
+                console.log("Collection Users Exists");
+                Apio.Database.db.collection("Users").find({token: {$exists: false}}).toArray(function (error, users) {
+                    if (error) {
+                        console.log("Error while getting Users: ", error);
+                    } else if (users) {
+                        for (var i = 0; i < users.length; i++) {
+                            if (!users[i].hasOwnProperty("email") || !users[i].hasOwnProperty("password")) {
+                                users.splice(i--, 1);
+                            }
+                        }
 
-Apio.io.listen(server);
-server.listen(APIO_CONFIGURATION.port,function() {
-console.log("APIO server started on port "+APIO_CONFIGURATION.port);
-});
+                        users.forEach(function (user) {
+                            var hash = user.password;
+                            while (hash.length < 32) {
+                                hash += "0";
+                            }
 
+                            var key = hash.substring(0, 32);
 
+                            Apio.Database.db.collection("Users").update({email: user.email}, {$set: {token: Apio.Token.getFromText(user.email, key)}}, function (err_) {
+                                if (err_) {
+                                    console.log("Error while updating user with email " + user.email + ": ", err_);
+                                } else {
+                                    console.log("Token on user with email " + user.email + " successfully added");
+                                }
+                            });
+                        });
+                    }
+                });
+            } else {
+                console.log("Collection Users DOESN'T Exists, creating....");
+                Apio.Database.db.createCollection("Users", function (error, collection) {
+                    if (error) {
+                        console.log("Error while creating collection Users");
+                    } else if (collection) {
+                        console.log("Collection Users successfully created");
+                    }
+                });
+            }
+        });
+        Apio.io.emit("started");
 
+        if (configuration.type === "gateway") {
+            Apio.Database.db.collection("Users").find().toArray(function (err, users) {
+                if (err) {
+                    console.log("Error while getting Users: ", err);
+                } else if (users) {
+                    var u = [];
+                    for (var x in users) {
+                        if (users[x].email) {
+                            u.push(users[x].email + " (" + users[x].role + ")");
+                        }
+                    }
+                    var name = "";
+                    if (configuration.hasOwnProperty('name')) {
+                        name = configuration.name;
 
+                    } else {
+                        name = Apio.System.getApioIdentifier();
+                    }
 
+                    exec("ifconfig -a | grep 'Link encap' | awk '{print $1}'", function (error, stdout) {
+                        if (error) {
+                            console.log("exec error (1): " + error);
+                        } else if (stdout) {
+                            var next = true, peripherals = stdout.split("\n"), peripheralsIP = {};
+                            peripherals.pop();
+                            var interval = setInterval(function () {
+                                if (peripherals.length) {
+                                    if (next) {
+                                        next = false;
+                                        var p = peripherals[0];
+                                        if (p !== "" && p !== "lo") {
+                                            exec("ifconfig " + p.trim() + " | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}'", function (error, stdout) {
+                                                if (error) {
+                                                    console.log("exec error (2): " + error);
+                                                } else if (stdout) {
+                                                    peripheralsIP[p] = stdout.trim();
+                                                }
 
+                                                peripherals.splice(0, 1);
+                                                next = true;
+                                            });
+                                        } else {
+                                            peripherals.splice(0, 1);
+                                            next = true;
+                                        }
+                                    }
+                                } else {
+                                    clearInterval(interval);
+                                    exec("wget http://ipinfo.io/ip -qO -", function (error, stdout) {
+                                        var publicIP = "";
+                                        if (error) {
+                                            console.log("exec error (3): " + error);
+                                        } else if (stdout) {
+                                            publicIP = stdout.trim();
+                                        }
+
+                                        exec("curl http://localhost:4040/inspect/http | grep window.common", function (error1, stdout1, stderr1) {
+                                            clearInterval(interval);
+                                            var remoteAccess = "";
+                                            if (error1) {
+                                                console.log("Error while getting remote access: ", error1)
+                                            } else if (stdout1) {
+                                                var result = stdout1.split(" ");
+                                                var index = -1;
+                                                var obj = "";
+                                                for (var i = 0; index === -1 && i < result.length; i++) {
+                                                    if (result[i] === "window.common") {
+                                                        index = i
+                                                    }
+                                                }
+
+                                                if (index > -1) {
+                                                    for (var i = index + 2; i < result.length; i++) {
+                                                        if (obj === "") {
+                                                            obj = result[i];
+                                                        } else {
+                                                            obj += " " + result[i];
+                                                        }
+                                                    }
+
+                                                    obj = eval(obj);
+                                                    var url = obj.Session.Tunnels.command_line.URL;
+                                                    url = url.split("/");
+                                                    url = url[url.length - 1];
+                                                    url = url.split(":");
+                                                    var port = url[1];
+                                                    url = url[0];
+                                                    console.log("url: ", url, "port: ", port);
+                                                    remoteAccess = "ssh pi@" + url + " -p " + port;
+                                                }
+                                            }
+
+                                            var IPtext = "Local IP: ";
+                                            for (var p in peripheralsIP) {
+                                                if (IPtext === "Local IP: ") {
+                                                    IPtext += peripheralsIP[p] + " (" + p + ")"
+                                                } else {
+                                                    IPtext += ", " + peripheralsIP[p] + " (" + p + ")"
+                                                }
+                                            }
+
+                                            IPtext += ", Public IP: " + publicIP;
+
+                                            if (remoteAccess) {
+                                                IPtext += ", Remote IP: " + remoteAccess;
+                                            }
+
+                                            slack.send({
+                                                text: "Il sistema " + configuration.name + " è connesso.Gli utenti abilitati sono:\n\r " + u.join("\n\r") + "\n\r" + IPtext,
+                                                username: configuration.name
+                                            });
+                                        });
+                                    });
+                                }
+                            }, 0);
+                        }
+                    });
+                }
+            });
+        }
+
+        //Apio.System.resumeCronEvents();
+        /*
+
+         if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
+         Apio.Remote.setupRemoteConnection();
+         }*/
+    });
+
+    //Core Routes
+    app.post("/apio/manage/file", routes.core.manageDriveFile);
+    app.post("/apio/file/delete", routes.core.fileDelete);
+    app.post("/apio/log", routes.core.log); //Rotta non più usata
+    app.get("/", routes.core.index);
+    app.get("/admin", routes.core.admin);
+    app.get("/app", routes.core.login, routes.core.redirect);
+    app.post("/apio/user/setCloudAccess", routes.core.setCloudAccess);
+    app.post("/apio/adapter", routes.core.adapter);
+    app.get("/apio/restore", routes.core.restore);
+    app.post("/apio/serial/send", routes.core.serialSend);
+    app.get("/apio/getFiles/:folder", routes.core.getFiles);
+    app.get("/apio/getAllLogs/:app", routes.core.getAllLogs);
+    app.get("/apio/shutdown", routes.core.shutdownBoard);
+    app.get("/apio/getPlatform", routes.core.getPlatform);
+    app.get("/apio/getServices", routes.core.getServices);
+    app.get("/apio/getService/:name", routes.core.getServiceByName);
+    app.get("/apio/configuration/return", routes.core.returnConfig);
+    app.post("/apio/configuration/toggleEnableCloud", routes.core.toggleEnableCloud);
+    app.get("/apio/getIP", routes.core.getIP);
+    app.get("/apio/getIPComplete", routes.core.getIPComplete);
+    app.post("/apio/process/monitor", routes.core.monitor);
+    app.post("/apio/launchPropertiesAdder", routes.core.launchPropertiesAdder);
+    app.post("/apio/rebootBoard", routes.core.rebootBoard);
+    app.post("/apio/restartSystem", routes.core.restartSystem);
+    app.post("/apio/shutdownBoard", routes.core.shutdownBoard);
+    app.post("/apio/ngrok/install", routes.core.installNgrok);
+    app.get("/apio/communication/bindToProperty", routes.core.getBindToProperty);
+    app.post("/apio/communication/bindToProperty", routes.core.modifyBindToProperty);
+    app.get("/apio/communication/integrated", routes.core.getIntegrated);
+    app.post("/apio/communication/integrated", routes.core.modifyIntegrated);
+    //Cloud Routes
+    app.post("/apio/user/allowCloud", routes.cloud.allowCloud);
+    app.post("/apio/sync/:uuid", routes.cloud.sync);
+    app.post("/apio/syncLogics", routes.cloud.syncLogics);
+    app.get("/apio/enableSync/:apioId/:timestamp", routes.cloud.enableSync);
+    app.post("/apio/assignToken", routes.cloud.assignToken);
+    //Marketplace Routes
+    app.get("/marketplace/applications/download/:name", routes.marketplace.download);
+    app.post("/marketplace/applications/autoinstall", routes.marketplace.autoInstall);
+    app.post("/marketplace/hex/installHex", routes.marketplace.installHex);
+    //Notifications Routes
+    app.get("/apio/notifications/:user", routes.notifications.list);
+    app.get("/apio/notifications/listDisabled/:user", routes.notifications.listdisabled);
+    app.post("/apio/notifications/markAsRead", routes.notifications.delete);
+    app.post("/apio/notifications/disable", routes.notifications.disable);
+    app.post("/apio/notifications/enable", routes.notifications.enable);
+    app.post("/apio/notifications/readAll", routes.notifications.deleteAll);
+    app.post("/apio/notify", routes.notifications.notify);
+    app.put("/apio/notifications/sendMail/:user", routes.notifications.sendMail);
+    app.put("/apio/notifications/sendSMS/:user", routes.notifications.sendSMS);
+    //Routes Users
+    app.post("/apio/user", routes.users.create);
+    app.post("/apio/user/uploadImage", routes.users.uploadImage);
+    app.post("/apio/user/saveLastUploadImage", routes.users.saveLastUploadImage);
+    app.get("/apio/user", routes.users.list);
+    app.get("/apio/user/getSession", routes.users.getSession);
+    app.get("/apio/user/getSessionComplete", routes.users.getSessionComplete);
+    app.get("/apio/user/getSessionToken", routes.users.getSessionToken);
+    app.post("/apio/user/authenticate", routes.users.authenticate);
+    app.get("/apio/user/logout", routes.users.logout);
+    app.post("/apio/database/updateUserOnApplication", routes.users.updateUserOnApplication);
+    app.post("/apio/user/delete", routes.users.delete);
+    app.post("/apio/user/changePassword", routes.users.changePassword);
+    app.post("/apio/user/setAdminPermission", routes.users.setAdminPermission);
+    app.post("/apio/user/assignUser", routes.users.assignUser);
+    app.post("/apio/user/getUser", routes.users.getUser);
+    app.post("/apio/user/modifyAdditionalInfo", routes.users.modifyAdditionalInfo);
+    app.post("/apio/user/:email/editAccess", routes.users.editAccess);
+    //Routes Dongle apio
+    app.get("/apio/dongle/getSettings", routes.dongleApio.getSettings);
+    app.post("/apio/dongle/changeSettings", routes.dongleApio.changeSettings);
+    app.post("/apio/dongle/onoff", routes.dongleApio.onoff);
+    //States Routes
+    app.post("/apio/state/apply", routes.states.apply);
+    app.delete("/apio/state/:name", routes.states.deleteState);
+    app.put("/apio/state/:name", routes.states.modify);
+    app.post("/apio/state", routes.states.create);
+    app.get("/apio/state", routes.states.list);
+    app.get("/apio/state/:name", routes.states.getByName);
+    //Dashboard Routes
+    app.get("/dashboard", routes.dashboard.index);
+    app.get("/apio/app/export", routes.dashboard.exportApioApp);
+    app.get("/apio/app/exportIno", routes.dashboard.exportInoApioApp);
+    app.post("/apio/app/upload", routes.dashboard.uploadApioApp);
+    app.post("/apio/app/maximumId", routes.dashboard.maximumIdApioApp);
+    app.post("/apio/app/gitCloneApp", routes.dashboard.gitCloneApp);
+    app.post("/apio/app/delete", routes.dashboard.deleteApioApp);
+    app.post("/apio/app/folder", routes.dashboard.folderApioApp);
+    app.post("/apio/app/modify", routes.dashboard.modifyApioApp);
+    app.post("/apio/database/updateApioApp", routes.dashboard.updateApioApp);
+    app.post("/apio/database/createNewApioAppFromEditor", routes.dashboard.createNewApioAppFromEditor);
+    app.post("/apio/database/createNewApioApp", routes.dashboard.createNewApioApp);
+    app.post("/apio/app/changeSettings", routes.dashboard.changeSettingsObject);
+    //Events Routes
+    app.get("/apio/event", routes.events.list);
+    app.get("/apio/event/launch", routes.events.launch);
+    app.get("/apio/event/:name", routes.events.getByName);
+    app.delete("/apio/event/:name", routes.events.delete);
+    app.put("/apio/event/:name", routes.events.update);
+    app.post("/apio/event", routes.events.create);
+    //Planimetry Routes
+    app.get("/apio/database/getPlanimetry", routes.planimetry.list);
+    app.post("/apio/database/insertInDbPlanimetry/", routes.planimetry.insertInDb);
+    app.post("/apio/database/modifyInDbPlanimetry/", routes.planimetry.modifyInDb);
+    app.post("/apio/database/removeById/", routes.planimetry.removeById);
+    app.post("/apio/file/uploadPlanimetry", routes.planimetry.uploadPlanimetry);
+    //Objects Routes
+    app.get("/apio/database/getObjects", routes.objects.list);
+    app.get("/apio/database/getAllObjects", routes.objects.listCloud);
+    app.get("/apio/database/getObject/:id", routes.objects.getById);
+    app.patch("/apio/object/:id", routes.objects.update);
+    app.put("/apio/object/:id", routes.objects.update);
+    app.put("/apio/modifyObject/:id", routes.objects.modify);
+    app.post("/apio/object/addNotification", routes.objects.addNotification);
+    app.get("/apio/object/:obj", routes.objects.requireOne);
+    app.get("/apio/objects", routes.objects.listAll);
+    app.post("/apio/updateListElements", routes.objects.updateListElements);
+    app.post("/apio/object/updateLog", routes.objects.updateLog);
+    app.post("/apio/object/updateAll", routes.objects.updateAll);
+    app.put("/apio/object/updateProperties/:id", routes.objects.updateProperties);
+    //Mail Routes
+    app.get("/apio/mail/registration/:mail", routes.mail.sendMailRegistration);
+    app.post("/apio/service/mail/send", routes.mail.sendSimpleMail);
+
+    //Boards Routes
+    app.get("/apio/boards", routes.boards.show);
+    app.get("/apio/boards/getDetailsFor/:boardsArr", routes.boards.getDetails);
+    app.post("/apio/boards/change", routes.boards.change);
+    app.post("/apio/boards/setName", routes.boards.setName);
+    //Services Routes
+    app.get("/apio/services", routes.services.getAll);
+    app.post("/apio/service/:service/route/:route/data/:data", routes.services.postRequest);
+    app.get("/apio/service/:service/route/:route", routes.services.getRequest);
+
+    //Custom Routes
+    //routes.custom = require("./public/applications/routes/customRoutes.js")(Apio, app);
+
+    //http.globalAgent.maxSockets = Infinity;
+    var server = http.createServer(app);
+
+    Apio.io.listen(server);
+    server.listen(configuration.http.port, function () {
+        Apio.Util.log("APIO server started on port " + configuration.http.port + " using the configuration:");
+        console.log(util.inspect(configuration, {colors: true}));
+
+        exec("cd ./services && node apio_properties_adder.js", function (error, stdout, stderr) {
+            if (error || stderr) {
+                console.log("apio_properties_adder, error: ", error || stderr);
+            } else {
+                console.log("apio_properties_adder, success: ", stdout);
+            }
+        });
+
+        var gc = require("./services/garbage_collector.js");
+        gc();
+
+        /*setInterval(function(){
+         Apio.Database.db.stats(function(err, stats){
+         if(err){
+         console.log("Error while getting stats: ", err);
+         } else if(Number(stats.storageSize)/1024/1024 >= 35) {
+         console.log("DB reached to maximum size, appending data to file");
+         Apio.Database.db.collection("Objects").find().toArray(function(error, objs){
+         if(error){
+         console.log("Error while getting objects: ", error);
+         } else if(objs){
+         for(var i in objs){
+         var date = new Date(), day = date.getDate(), month = date.getMonth() + 1, year = date.getFullYear();
+         if(fs.existsSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json")){
+         var read = String(fs.readFileSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json"));
+         var data = JSON.parse(read === "" ? "{}" : read);
+         } else {
+         var data = {};
+         }
+
+         for(var j in objs[i].log){
+         if(typeof data[j] === "undefined"){
+         data[j] = {};
+         }
+
+         for(var k in objs[i].log[j]) {
+         data[j][k] = objs[i].log[j][k];
+         }
+         }
+         fs.writeFileSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json", JSON.stringify(data));
+         }
+         Apio.Database.db.collection("Objects").update({}, { $set : { log : {} } }, { multi: true }, function(e, r){
+         if(e){
+         console.log("Error while updating logs", e);
+         } else if(r){
+         Apio.Database.db.command({ compact: "Objects", paddingFactor: 1 }, function(er, re){
+         if(er){
+         console.log("Unable to compact collection Objects");
+         } else if(re){
+         console.log("Return of compact is: ", re);
+         }
+         });
+         }
+         });
+         }
+         });
+         }
+         });
+         }, 60000);*/
+
+        //BOT PER MODIFICA FILES, POTREBBE TORNARE UTILE DI NUOVO
+        /*setTimeout(function(){
+         Apio.Database.db.collection("Objects").find().toArray(function(error, objs){
+         if(error){
+         console.log("Error while getting objects: ", error);
+         } else if(objs){
+         for(var i in objs){
+         var files = fs.readdirSync("public/applications/"+objs[i].objectId);
+         var toWrite = {};
+         for(var j in files){
+         if(files[j].indexOf("_") === -1 && files[j].indexOf("logs ") > -1 && files[j].indexOf(".json") > -1){
+         var read = String(fs.readFileSync("public/applications/"+objs[i].objectId+"/"+files[j]));
+         var data = JSON.parse(read === "" ? "{}" : read);
+
+         for(var k in data){
+         for(var l in data[k]){
+         var date = new Date(Number(l));
+         var day = date.getDate();
+         var month = date.getMonth() + 1;
+         var year = date.getFullYear();
+
+         if(typeof toWrite[year+"-"+month+"-"+day] === "undefined"){
+         toWrite[year+"-"+month+"-"+day] = {};
+         }
+
+         if(typeof toWrite[year+"-"+month+"-"+day][k] === "undefined"){
+         toWrite[year+"-"+month+"-"+day][k] = {};
+         }
+
+         toWrite[year+"-"+month+"-"+day][k][l] = data[k][l];
+         }
+         }
+         }
+         }
+
+         for(var j in toWrite) {
+         fs.writeFileSync("public/applications/" + objs[i].objectId + "/logs " + j + ".json", JSON.stringify(toWrite[j]));
+         console.log("File public/applications/" + objs[i].objectId + "/logs " + j + ".json successfully overwrited");
+         }
+         }
+         }
+         });
+         }, 1000);*/
+    });
 });

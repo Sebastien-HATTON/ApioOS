@@ -1,504 +1,460 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
 
-<!---------------------------------- LICENSE -------------------------------
--									 -
-- This file is part of ApioOS.						 -
--									 -
-- ApioOS is free software released under the GPLv2 license: you can	 -
-- redistribute it and/or modify it under the terms of the GNU General	 -
-- Public License version 2 as published by the Free Software Foundation. -
--									 -
-- ApioOS is distributed in the hope that it will be useful, but		 -
-- WITHOUT ANY WARRANTY; without even the implied warranty of		 -
-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 -
-- GNU General Public License version 2 for more details.		 -
--									 -
-- To read the license either open the file COPYING.txt or		 -
-- visit <http://www.gnu.org/licenses/gpl2.txt>				 -
--									 -
--------------------------------------------------------------------------->
-
+<!---------------------------------- LICENSE --------------------------------
+-                                                                           -
+- This file is part of ApioOS.                                              -
+-                                                                           -
+- ApioOS is free software released under the GPLv2 license: you can         -
+- redistribute it and/or modify it under the terms of the GNU General       -
+- Public License version 2 as published by the Free Software Foundation.    -
+-                                                                           -
+- ApioOS is distributed in the hope that it will be useful, but             -
+- WITHOUT ANY WARRANTY; without even the implied warranty of                -
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+- GNU General Public License version 2 for more details.                    -
+-                                                                           -
+- To read the license either open the file COPYING.txt or                   -
+- visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+-                                                                           -
+---------------------------------------------------------------------------->
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <link rel="shortcut icon" type="image/x-icon" href="public/apio_assets/img/favicon.ico"/>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=0.45, minimum-scale=0, maximum-scale=1">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="yes" />
-        <title>APIO</title>
-        <link rel="apple-touch-icon" href="html/apple-touch-icon.png"/>
-		<link rel="apple-touch-icon-precomposed" href="html/apple-touch-icon.png"/>
-        <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
-        <link rel="stylesheet" href="/stylesheets/pulsanti.css"/>
-        <link rel="stylesheet" href="/stylesheets/app.css"/>
-        <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap-sweetalert/lib/sweet-alert.css">
-    </head>
-    <body>
-    <script>
-    if(!window.navigator.standalone){
-    };
-    </script>
-        <div id="targetBody" ng-app="ApioApplication">
-            <nav id="apioMenu" class="navbar navbar-default navbar-fixed-top" role="navigation">
-                <div class="container-fluid">
-                    <!-- Brand and toggle get grouped for better mobile display -->
-                    <div class="navbar-header">
-                        <h5 class="menuTitle">{{currentPage}}</h5>
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#apioBarCollapseContainer">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+<head>
+    <style>
+        .dropNotifyMenu {
+            bottom: auto !important;
+            min-width: 100% !important;
+        }
+
+        .dropNotifyPup {
+            background: none !important;
+        }
+
+        #img_logo {
+            height: 32px;
+            width: 100px;
+            background: url("images/logo.png") no-repeat;
+            background-size: contain;
+        }
+
+        .drawer_active_link {
+            background-color: #e0e0e0;
+        }
+
+        @font-face {
+            font-family: 'Apio';
+            src: url('/font/APIO.ttf') format('truetype');
+        }
+
+        i.material-icons {
+        / / font-family: Apio !important;
+        / / height: 40 px;
+        / / width: 40 px;
+        / / line-height: 48 px;
+        / / border: 0;
+        / / color: rgba(255, 255, 255, 0);
+        / / background: url("images/logo.png") no-repeat;
+        / / background-size: contain;
+            color: rgba(0, 0, 0, 0.67);
+        }
+
+        .user_button {
+            width: 42px !important;
+            height: 42px !important;
+            -webkit-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.6);
+            -moz-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.6);
+            box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.6);
+        }
+
+        .mdl-navigation__link {
+            cursor: pointer;
+        }
+    </style>
+    <!--<link id="favicon" rel="shortcut icon" type="image/x-icon" href="public/apio_assets/img/favicon.ico"/>-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=0, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="yes"/>
+    <meta name="theme-color" content="#ffffff">
+    <title>ApioOS</title>
+    <link id="favicon" rel="apple-touch-icon" href="html/apple-touch-icon.png"/>
+    <link id="favicon1" rel="apple-touch-icon-precomposed" href="html/apple-touch-icon.png"/>
+    <link id="head" rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap-sweetalert/dist/sweetalert.css"/>
+
+    <link rel="stylesheet" type="text/css" href="/bower_components/morris.js/morris.css"/>
+
+    <link rel="stylesheet" type="text/css" href="/bower_components/vis/dist/vis.min.css"/>
+
+    <link rel="stylesheet"
+          href="/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.standalone.min.css"/>
+    <link rel="stylesheet" href="/bower_components/angular-material/angular-material.css">
+    <link rel="stylesheet" href="/stylesheets/fontApio.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_992_1199.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_768_991.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_480_767.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_320_479.css"/>
+    <link rel="stylesheet" href="/stylesheets/app2_media_query_1200.css"/>
+
+    <link rel="stylesheet" href="/bower_components/material-design-lite/material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <link rel="stylesheet" type="text/css" href="/stylesheets/addtohomescreen.css">
+
+</head>
+<body>
+<div id="apioWaitLoading" class="apioWaitLoadingOff">
+    <div class="glyphicon glyphicon-refresh apioWaitLoading"></div>
+</div>
+<div id="apioWaitLoadingSystemOperation" class="apioWaitLoadingSystemOperationOn">
+    <div class=" apioWaitLoadingSystemOperation">a</div>
+</div>
+
+<div id="targetBody" ng-app="ApioApplication">
+    <div ng-controller="ApioMainController">
+        <div id="apio-os-offline" class="row" ng-show="systemOffline" style="margin: 0; position: absolute; text-align:center; width: 100%;">
+            <div style="margin-left: auto; margin-right: auto; text-align: center;">
+                <svg height="12" width="12">
+                    <circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="red"/>
+                </svg>
+                <span>ApioOS offline</span>
+            </div>
+        </div>
+
+        <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="incomingNewBoard"
+             class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" data-dismiss="modal" class="close">
+                            <span aria-hidden="true">×</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 id="myModalLabel" class="modal-title">Richiesta di sincronizzazione...</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="">
+                            La board con id <span class="board_info">{{newIncomingApioId}}</span> si è connessa il <span
+                                class="board_info">{{newIncomingDate}}</span> alle <span class="board_info">{{newIncomingTime}}</span>,
+                            la vuoi abilitare?
+                        </p>
+                        <div id="board-name-div">
+                            <p class="board-name-span">Assegnale un nome:</p>
+                            <input class="board-name-input form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="cancel btn btn-default" tabindex="2" ng-click="cancel()">
+                            Annulla
+                        </button>
+                        <button class="confirm btn btn-primary" tabindex="1" ng-click="confirm()">
+                            Conferma
                         </button>
                     </div>
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse">
-                         <ul class="nav navbar-nav apioApplicationNavbar">
-                            <li><a href="#/home" >Home</a></li>
-                            <li><a href="#/wall" >Wall</a></li>
-                            <li><a href="#/events" >Events</a></li>
-                            <li><a id="notificationTrigger" >Notifications</a></li>
-                        </ul>
-                        </div><!-- /.navbar-collapse -->
-                        </div><!-- /.container-fluid -->
-                    </nav>
-                    <nav id="apioMenuMobile" class="navbar center navbar-default navbar-fixed-top" role="navigation">
-                        <div class="container-fluid">
-                            <ul class="nav navbar-nav apioApplicationNavbar">
-                            <li><a href="#/home" >Home</a></li>
-                            <li><a href="#/wall" >Bacheca</a></li>
-                            <li><a href="#/events" >Eventi</a></li>
-                            <li><a id="notificationTrigger_mobile">Notifiche</a></li>
-                        </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="navbar" class="mdl-layout mdl-js-layout mdl-layout--fixed-header ">
+            <header id="headerNav" class="mdl-layout__header mdl-layout__header--transparent " style="">
+                <div class="mdl-layout__header-row" style="padding:0;">
+                    <!-- Title -->
+                    <span id="" class="mdl-layout-title"></span>
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+                </div>
+
+            </header>
+
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">Apio</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link" menu-close
+                       ng-class="{'drawer_active_link' : drawer_active_link === 'home'}" href="#/home" active><span
+                            class="glyphicon glyphicon-th"></span> Home</a>
+                    <a class="mdl-navigation__link" menu-close
+                       ng-class="{'drawer_active_link' : drawer_active_link === 'home_scada'}" href="#/home_scada"
+                       active><span class="glyphicon glyphicon-stats"></span> Scada</a>
+                    <a class="mdl-navigation__link" menu-close
+                       ng-class="{'drawer_active_link' : drawer_active_link === 'maps'}" href="#/maps"><span
+                            class="glyphicon glyphicon-map-marker"></span> Maps</a>
+                    <!--<a class="mdl-navigation__link" menu-close
+                       ng-class="{'drawer_active_link' : drawer_active_link === 'notification'}"
+                       id="notificationTrigger"><span class="glyphicon glyphicon-bell"></span> Notification</a>-->
+                    <a class="mdl-navigation__link" menu-close
+                       ng-class="{'drawer_active_link' : drawer_active_link === 'operators'}" ng-if="role !== 'guest'"
+                       ng-click="launchDashboard()"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a>
+                    <!--<a class="mdl-navigation__link" menu-close ng-class="{'drawer_active_link' : drawer_active_link === 'requests'}" ng-if="!cloudShowBoard" ng-click="userDetails()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>-->
+                    <a class="mdl-navigation__link" menu-close
+                       ng-class="{'drawer_active_link' : drawer_active_link === 'requests'}" ng-if="cloudShowBoard"
+                       ng-click="launchBoardSimple('Continue to Cloud')"><span
+                            class="glyphicon glyphicon-chevron-left"></span> Back to Cloud</a>
+
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content maxHeight" style="overflow:hidden;">
+                <div class="page-content maxHeight">
+                    <!--Your content goes here-->
+                    <!--era all'interno del tag seguente, prima di cambiare grafica in Material Designonclick="angular.element(this).scope().closePopOver(event)"-->
+                    <div id="systemAppContainer" class="systemAppContainer container-fluid">
+                        <div class="app-content maxHeight">
+                            <style>
+                                html, body {
+                                    height: 100%;
+                                    overflow: hidden;
+                                }
+
+                                .scrollable {
+                                    -webkit-overflow-scrolling: touch;
+                                    height: 100%;
+                                    overflow-y: scroll;
+                                    overflow-x: hidden;
+                                }
+                            </style>
+
+                            <div ng-view class="maxHeight"></div>
                         </div>
-                    </nav>
-                    <div class="systemAppContainer">
-                        <div class="app-content" style="padding-top:25px;">
-<style>
-@media (min-width: 320px) and (max-width: 600px){
-    #notificationsCenter{
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-        top: 50px;
-        background-color: black;
-        color: white;
-        display: none;
-        z-index: 1045;
-    }
+                    </div>
 
-    .more_notification_{
-        width: 105px;
-        height: 105px;
-        line-height: 100px;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        padding: 0;
-        border-radius: 2000px;
-        border: solid 1px rgb(88, 170, 220);
-        font-size: 35px;
-    }
+                </div>
+            </main>
+        </div>
+        <!-- User options -->
+        <div class="iconProfile">
+            <button id="demo-menu-lower-right" class="mdl-button mdl-js-button mdl-button--icon user_button">
+                <img class="_s0 _44ma img" id="parentImg" ng-src="/users/{{img.userImage}}" alt="user"
+                     style="width:42px;height:42px;">
+            </button>
+            <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect viewDesktop"
+                for="demo-menu-lower-right">
+	            <li id="notificationTrigger" class="mdl-menu__item">Notification</li>
+                <li class="mdl-menu__item" ng-click="openUserProfile()">Profile</li>
+                <!--<li class="mdl-menu__item">Invite new users</li>-->
+                <li class="mdl-menu__item" ng-click="userDetails()">Logout</li>
+                
+                
+            </ul>
+            <ul class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect viewMobile"
+                for="demo-menu-lower-right">
+	            <li id="notificationTrigger" class="mdl-menu__item">Notification</li>
+                <li class="mdl-menu__item" ng-click="openUserProfile()">Profile</li>
+                <!--<li class="mdl-menu__item">Invite new users</li>-->
+                <li class="mdl-menu__item" ng-click="userDetails()">Logout</li>
+            </ul>
+        </div>
 
-    .notifica{
-        -webkit-overflow-scrolling: touch;
-        -webkit-user-drag: none;
-        height: 130px;
-        width: 98%;
-        padding-top: 15px;
-        overflow-y: hidden;
-        overflow-x: auto;
-        display: block;
-        padding-bottom: 0px;
-        padding-left: 12px;
-        margin-left: 20px;
-    }
-
-    .notifycontainer{}
-
-    .notifymassage{
-        -webkit-transition: all 0.4s ease 0s;
-        transition: all 0.4s ease 0s;
-        font-family: sans-serif;
-        font-size: 35px;
-        height: 90px;
-        display: table-caption !important;
-        float: left;
-        list-style: none;
-        width: 66%;
-        margin-right: 20px;
-        margin-top: -15px;
-
-    }
-
-    .notifytimestamp{
-        -webkit-transition: all 0.4s ease 0s;
-        transition: all 0.4s ease 0s;
-        font-family: sans-serif;
-        display: table-caption !important;
-        float: left;
-        list-style: none;
-        font-size: 20px !important;
-        margin-right: 85%;
-        height: 10px;
-        margin-left: -68.5%;
-        margin-top: 2%
-    }
-
-    .notifypublishbutton{
-        background-color: rgba(30, 208, 55, 0.82);
-        width: 50%;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        height: 160px !important;
-        margin-top: -80px;
-        line-height: 160px;
-        font-size: 30px;
-        -webkit-transform: translateX(100%);
-    }
-
-    .notifyenablebutton{
-        background-color: rgba(30, 208, 55, 0.82);
-        width: 50%;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        height: 160px !important;
-        margin-top: -80px;
-        line-height: 160px;
-        font-size: 30px;
-        -webkit-transform: translateX(100%);
-    }
-
-    .notifydisablebutton{
-        background-color: #CC2929;
-        width: 50%;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        height: 160px !important;
-        margin-top: -80px;
-        line-height: 160px;
-        font-size: 30px;
-    }
-
-    .showdisabled{
-        -webkit-transform: rotate(45deg);
-        color: #ff0000;
-        border: solid 1px #fff;
-    }
-}
-@media (min-width: 601px) and (max-width: 1000px){
-    #notificationsCenter{
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-        top: 50px;
-        background-color: black;
-        color: white;
-        display: none;
-        z-index: 1045;
-    }
-
-    .more_notification_{
-        width: 105px;
-        height: 105px;
-        line-height: 100px;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        padding: 0;
-        border-radius: 2000px;
-        border: solid 1px rgb(88, 170, 220);
-        font-size: 35px;
-    }
-
-    .notifica{
-        -webkit-overflow-scrolling: touch;
-        -webkit-user-drag: none;
-        height: 130px;
-        width: 98%;
-        padding-top: 15px;
-        overflow-y: hidden;
-        overflow-x: auto;
-        display: block;
-        padding-bottom: 0px;
-        padding-left: 12px;
-        margin-left: 20px;
-    }
-
-    .notifycontainer{}
-
-    .notifymassage{
-        -webkit-transition: all 0.4s ease 0s;
-        transition: all 0.4s ease 0s;
-        font-family: sans-serif;
-        font-size: 35px;
-        height: 90px;
-        display: table-caption !important;
-        float: left;
-        list-style: none;
-        width: 66%;
-        margin-right: 20px;
-        margin-top: -15px;
-    }
-
-    .notifytimestamp {
-        -webkit-transition: all 0.4s ease 0s;
-        transition: all 0.4s ease 0s;
-        font-family: sans-serif;
-        display: table-caption !important;
-        float: left;
-        list-style: none;
-        font-size: 20px !important;
-        margin-right: 85%;
-        height: 10px;
-        margin-left: -68.5%;
-        margin-top: 2%
-    }
-
-    .notifypublishbutton{
-        background-color: rgba(30, 208, 55, 0.82);
-        width: 50%;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        height: 160px !important;
-        margin-top: -80px;
-        line-height: 160px;
-        font-size: 30px;
-        -webkit-transform: translateX(100%);
-    }
-
-    .notifyenablebutton{
-        background-color: rgba(30, 208, 55, 0.82);
-        width: 50%;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        height: 160px !important;
-        margin-top: -80px;
-        line-height: 160px;
-        font-size: 30px;
-        -webkit-transform: translateX(100%);
-    }
-
-    .notifydisablebutton{
-        background-color: #CC2929;
-        width: 50%;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        height: 160px !important;
-        margin-top: -80px;
-        line-height: 160px;
-        font-size: 30px;
-    }
-
-    .showdisabled{
-        -webkit-transform: rotate(45deg);
-        color: #ff0000;
-        border: solid 1px #fff;
-    }
-}
-@media (min-width: 1001px){
-    #notificationsCenter{
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-        top: 50px;
-        background-color: black;
-        color: white;
-        display: none;
-        z-index: 1045;
-    }
-
-    .more_notification_{
-        margin: 0;
-        text-align: center;
-        padding: 0;
-        width: 86px;
-        height: 86px;
-        line-height: 86px;
-        border-radius: 2000px;
-        border: solid 1px rgb(88, 170, 220);
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .notifica{
-        display: inline-table;
-        width: 23%;
-        margin-right: 1%;
-        margin-top: 1%;
-    }
-
-    .notifycontainer{
-        padding-left: 9%;
-    }
-
-    .notifymassage{
-        line-height: 100%;
-        margin-bottom: 5%;
-        width: 55%;
-        float: left;
-        font-size: 15px;
-    }
-
-    .notifytimestamp{
-        line-height: 100%;
-        margin-bottom: 5%;
-        width: 40%;
-        float: right;
-        font-size: 15px;
-    }
-
-    .notifypublishbutton{
-        background-color: rgba(30, 208, 55, 0.82);
-        padding: 6px 12px;
-        margin-bottom: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-    }
-
-    .notifyenablebutton{
-        background-color: rgba(30, 208, 55, 0.82);
-        padding: 6px 12px;
-        margin-bottom: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-        margin-left: 35%;
-    }
-
-    .notifydisablebutton{
-        color: #fff;
-        background-color: #d9534f;
-        border-color: #d43f3a;
-        padding: 6px 12px;
-        margin-bottom: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-    }
-
-    .showdisabled{
-        -webkit-transform: rotate(45deg);
-        color: #ff0000;
-        border: solid 1px #fff;
-    }
-}
-</style>
-                            <div id="notificationsCenter" ng-controller="ApioNotificationController">
-                                <div id="more_notificationinput" class="more_notification_" ng-click="toggleShowDisabled()" ng-class="{'showdisabled' : showDisabled}"><span id="more_notificationspan">+</span></div>
-                                <div class="notifica" ng-repeat="n in notifications" ng-click="markAsRead(n)" ng-show="!showDisabled">
-                                    <div class="box_proprietaiPhone notifycontainer">
-                                        <div class="notifymassage">{{n.message}}</div>
-                                        <div class="notifytimestamp">{{getTimeFromTimestamp(n.timestamp)}}</div>
-                                        <button class="notifypublishbutton" ng-click="publishNotify(n)">Pubblica In Bacheca</button>
-                                        <button class="notifydisablebutton" ng-click="disableNotify(n)">Disabilita</button>
-                                    </div>
+        <div id="notificationsCenter" ng-controller="ApioNotificationController">
+            <div class="row optionMenuNotification viewDesktop">
+                <div id="more_notificationinput" class="col-md-6 col-xs-6 more_notification_ "
+                     ng-class="{'showdisabled' : showDisabled}" ng-click="toggleShowDisabled()">
+                    <a class="glyphicon glyphicon-eye-close"></a>
+                </div>
+                <!--<div class="col-md-6 more_notification_ col-xs-6"><a class="glyphicon glyphicon-cog" href="#/wall"></a>-->
+                <div class="col-md-6 more_notification_ col-xs-6"><a class="glyphicon glyphicon-cog"></a>
+                </div>
+            </div>
+            <div id="disabled_notifications" class="containerOnlySingleRow" ng-show="showDisabled">
+                <div class="row singleRowNotification " ng-repeat="n in disabledNotifications">
+                    <div data-message="{{n.message}}" data-objectId="{{n.objectId}}"
+                         class="disabledNotify col-md-12 col-xs-12 box_proprietaiPhone notifycontainer">
+                        <div class="col-md-9 col-xs-9 notifyMassageDisable">
+                            <div class="verticalAlign">{{n.message}}</div>
+                        </div>
+                        <div class="col-md-3 col-xs-3 notificationOption">
+                            <div class="col-md-12 col-xs-12 notifypublishbutton  glyphicon glyphicon-remove-circle"
+                                 ng-click="publishNotify(n)"></div>
+                            <!--<div class="col-md-12 col-xs-12 notifyenablebutton glyphicon glyphicon-send"
+                                 ng-click="enableSendMail(n)" ng-class="{'noSendMail' : !n.sendMail}"></div>-->
+                            <div class="col-md-12 col-xs-12 notifyenablebutton">
+                                <div class="dropup dropNotifyPup">
+                                    <button class="dropdown-toggle glyphicon glyphicon-send"
+                                            style="background:none; border:none; -webkit-apparance:none;" type="button"
+                                            id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                    </button>
+                                    <ul class="dropdown-menu dropNotifyMenu" aria-labelledby="dropdownMenu2">
+                                        <li><a class="glyphicon glyphicon-envelope" ng-click="enableSendMail(n)"
+                                               ng-class="{'noSendMail' : !n.sendMail}" style="text-align:center;"></a>
+                                        </li>
+                                        <li><a class="glyphicon glyphicon-comment" ng-click="enableSendSMS(n)"
+                                               ng-class="{'noSendMail' : !n.sendSMS}" style="text-align: center;"></a>
+                                        </li>
+                                    </ul>
                                 </div>
+                            </div>
+                            <div class="col-md-12 col-xs-12 notifyenablebutton glyphicon glyphicon-eye-open"
+                                 ng-click="enableNotify(n)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="unread_notifications" class="containerOnlySingleRow" ng-show="!showDisabled">
+                <div class="row singleRowNotification" ng-repeat="n in notifications">
+                    <div data-message="{{n.message}}" data-objectId="{{n.objectId}}"
+                         class="enabledNotify col-md-12 col-xs-12 box_proprietaiPhone notifycontainer">
+                        <div class="col-md-3 col-xs-3 notifytimestamp">
+                            <div class="verticalAlign">{{getTimeFromTimestamp(n.timestamp)}}</div>
+                        </div>
+                        <div class="col-md-6 col-xs-6 notifymassage" ng-mousedown="readAll()"
+                             ng-click="markAsRead(n, $event)">
+                            <div class="verticalAlign">{{n.message}}</div>
+                        </div>
+                        <div class="col-md-3 col-xs-3 notificationOption">
+                            <div id="publish-notification"
+                                 class="col-md-12 col-xs-12 notifypublishbutton glyphicon glyphicon-remove-circle"
+                                 ng-click="publishNotify(n)">
+                            </div>
 
-                                <div class="notifica" ng-repeat="n in disabledNotifications" ng-show="showDisabled">
-                                    <div class="box_proprietaiPhone notifycontainer">
-                                        <div class="notifymassage">{{n.message}}</div>
-                                        <div class="notifytimestamp">{{getTimeFromTimestamp(n.timestamp)}}</div>
-                                        <button class="notifyenablebutton" ng-click="enableNotify(n)">Abilita</button>
-                                    </div>
+                            <div class="col-md-12 col-xs-12 notifyenablebutton">
+                                <div class="dropup dropNotifyPup">
+                                    <button class="dropdown-toggle glyphicon glyphicon-send"
+                                            style="background:none; border:none; -webkit-apparance:none;" type="button"
+                                            id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                    </button>
+                                    <ul class="dropdown-menu dropNotifyMenu" aria-labelledby="dropdownMenu2">
+                                        <li><a class="glyphicon glyphicon-envelope" ng-click="enableSendMail(n)"
+                                               ng-class="{'noSendMail' : !n.sendMail}" style="text-align:center;"></a>
+                                        </li>
+                                        <li><a class="glyphicon glyphicon-comment" ng-click="enableSendSMS(n)"
+                                               ng-class="{'noSendMail' : !n.sendSMS}" style="text-align: center;"></a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
 
-                            <div ng-view></div>
-                            
-                        </div> <!-- /appcontent -->
-                        
+                            <div id="disable-notification"
+                                 class="col-md-12 col-xs-12 notifydisablebutton glyphicon glyphicon-eye-close"
+                                 ng-click="disableNotify(n)"></div>
+                        </div>
                     </div>
-                    
-                </div> <!-- fine app -->
-                
-                <div id="ApioApplicationContainer" class="dynamicPanel" style=""></div>
-            </body>
-            
-            
+                </div>
+            </div>
 
-            <script src="/javascripts/socket.io.js"></script>
-            <script src="/bower_components/angular/angular.js"></script>
-            <script src="/bower_components/later/later.js"></script>
-            <!--<script src="/bower_components/q/q.js"></script>-->
-            <script src="/bower_components/angular-route/angular-route.js"></script>
-            <script src="/bower_components/hammerjs/hammer.js"></script>
-            
-            <!--<script src="/bower_components/angular-gestures/gestures.js"></script>-->
-            <script src="/bower_components/jquery/dist/jquery.js"></script>
-            <script src="/bower_components/jqueryui/jquery-ui.js"></script>
-            <script src="/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
-            <script src="/bower_components/angular-css-injector/angular-css-injector.js"></script>
-            <!--<script src="javascripts/xml2json.js"></script>-->
-            <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
-    <script type="text/javascript" src="/bower_components/angular-h-sweetalert/dist/ngSweetAlert.min.js"></script>
-            <!--<script src="/bower_components/mobile-angular-ui/dist/js/mobile-angular-ui.js"></script>-->
-            <script src="javascripts/app.apio.bundle.js"></script>
-            <script src="systemApps/home/home.controller.js"></script>
-            <script src="systemApps/wall/wall.controller.js"></script>
-            <script src="systemApps/notifications/notifications.controller.js"></script>
-            <script src="systemApps/events/events.controller.js"></script>
-            <!--<script src="javascripts/draggabilly.pkgd.min.js"></script>-->
-            <script src="/javascripts/jquery-cron/cron/jquery-cron.js"></script>
-            <script src="apioProperties/Trigger/trigger.js"></script>
-            <script src="apioProperties/Slider/slider.js"></script>
-            <script src="apioProperties/List/list.js"></script>
-            <script src="apioProperties/Text/text.js"></script>
-            <script src="apioProperties/Number/number.js"></script>
-            <script src="apioProperties/ApioButton/apiobutton.js"></script>
-            <script src="apioProperties/Sensor/sensor.js"></script>
-            <script src="apioProperties/DynamicView/dynamicview.js"></script>
-            <script src="apioProperties/Property/property.js"></script>
-            <script src="apioProperties/AsyncDisplay/asyncdisplay.js"></script>
-            <script src="systemApps/topAppApplication/topAppApplication.js"></script>
+            <div class="row optionMenuNotification viewMobile">
+                <div id="more_notificationinput" class="col-md-6 col-xs-6 more_notification_ "
+                     ng-class="{'showdisabled' : showDisabled}" ng-click="toggleShowDisabled()">
+                    <a class="glyphicon glyphicon-eye-close"></a>
+                </div>
+                <div class="col-md-6 more_notification_ col-xs-6"><a class="glyphicon glyphicon-cog" href="#/wall"></a>
+                </div>
+            </div>
+
+            <div class="exitNotificationCenter glyphicon glyphicon-chevron-up" style="display:none;"
+                 ng-click="exitNotificationCenter()"></div>
+
+        </div>
+
+        <!--<div class="col-md-1 width_colon_for_menu"></div>
+        <div class="systemAppContainer container-fluid width_colon_for_systemApp"
+             onclick="angular.element(this).scope().closePopOver(event)">
+            <div class="app-content maxHeight">
+                <style>
+                    html, body {
+                        height: 100%;
+                        overflow: hidden;
+                    }
+
+                    .scrollable {
+                        -webkit-overflow-scrolling: touch;
+                        height: 100%;
+                        overflow-y: scroll;
+                        overflow-x: hidden;
+                    }
+                </style>
+
+                <div ng-view class="maxHeight"></div>
+            </div>
+        </div>-->
+    </div>
+</div>
+<div id="ApioApplicationContainer" class="dynamicPanel scrollable"></div>
+
+<div id="autoInstall"></div>
+</body>
+
+<script src="/javascripts/socket.io.js"></script>
+<script src="/bower_components/angular/angular.js"></script>
+<script src="/bower_components/later/later.js"></script>
+<script src="/bower_components/angular-route/angular-route.js"></script>
+<script src="/bower_components/hammerjs/hammer.js"></script>
+<script src="/bower_components/jquery/dist/jquery.js"></script>
+<script src="/bower_components/jqueryui/jquery-ui.js"></script>
+<script src="/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+<script src="/bower_components/angular-css-injector/angular-css-injector.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+        src="/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="/bower_components/bootstrap-sweetalert/dist/sweetalert.js"></script>
+<script type="text/javascript" src="/bower_components/angular-h-sweetalert/dist/ngSweetAlert.js"></script>
+<script type="text/javascript" src="/bower_components/angular-file-upload/angular-file-upload.min.js"></script>
+<script type="text/javascript" src="/bower_components/file-saver.js/FileSaver.js"></script>
+<script type="text/javascript" src="/bower_components/angular-file-saver/dist/angular-file-saver.min.js"></script>
+<script type="text/javascript" src="/bower_components/js-xlsx/dist/xlsx.full.min.js"></script>
+<script type="text/javascript" src="/bower_components/ngFileReader/vendor/jquery.FileReader.js"></script>
+<script type="text/javascript" src="/bower_components/ngFileReader/src/ngFileReader.js"></script>
+<script type="text/javascript" src="/bower_components/jszip/dist/jszip.min.js"></script>
+
+<script type="text/javascript" src="/bower_components/raphael/raphael.min.js"></script>
+<script type="text/javascript" src="/bower_components/morris.js/morris.min.js"></script>
+
+<script type="text/javascript" src="/bower_components/vis/dist/vis.min.js"></script>
+<script src="/bower_components/Snap.svg/dist/snap.svg-min.js"></script>
+
+<script src="/bower_components/angular-aria/angular-aria.js"></script>
+<script src="/bower_components/angular-animate/angular-animate.js"></script>
+<script src="/bower_components/angular-material/angular-material.js"></script>
+
+<script src="javascripts/app.apio.bundle.js"></script>
+<script src="/systemApps/maps/loadingNewPlanimetry/index.js"></script>
+<script src="systemApps/home2/home.controller_2.js"></script>
+<script src="dialog/appModifyUserProfile/index.js"></script>
+<script src="/systemApps/maps/loadingNewPlanimetry/index.js"></script>
+<script src="/applications/newfile/DIN8/template_modal.js"></script>
+<script src="/applications/newfile/a5-06-01/template_modal.js"></script>
+<script src="/applications/newfile/a5-02-05/template_modal.js"></script>
+<script src="/applications/newfile/a5-20-01/template_modal.js"></script>
+<script src="/applications/newfile/d2-01-0b/template_modal.js"></script>
+<script src="systemApps/home_scada/home.controller.js"></script>
+<script src="/applications/newfile/FGWPE/template_modal.js"></script>
+<script src="systemApps/home/home.controller.js"></script>
+<script src="systemApps/home2/home.controller_2.js"></script>
+<script src="systemApps/maps/maps.controller.js"></script>
+<script src="systemApps/wall/wall.controller.js"></script>
+<script src="systemApps/events/events.controller.js"></script>
+<script src="systemApps/notifications/notifications.controller.js"></script>
+<script src="/javascripts/jquery-cron/cron/jquery-cron.js"></script>
+<script src="apioProperties/Trigger/trigger.js"></script>
+<script src="apioProperties/UploadImage/uploadimage.js"></script>
+<script src="apioProperties/Slider/slider.js"></script>
+<script src="apioProperties/List/list.js"></script>
+<script src="apioProperties/ListNew/listnew.js"></script>
+<script src="apioProperties/Text/text.js"></script>
+<script src="apioProperties/Collapse/collapse.js"></script>
+<script src="apioProperties/Number/number.js"></script>
+<script src="apioProperties/ApioButton/apiobutton.js"></script>
+<script src="apioProperties/Sensor/sensor.js"></script>
+<script src="apioProperties/Ranking/ranking.js"></script>
+<script src="apioProperties/DynamicView/dynamicview.js"></script>
+<script src="apioProperties/Property/property.js"></script>
+<script src="apioProperties/AsyncDisplay/asyncdisplay.js"></script>
+<script src="apioProperties/UnlimitedSensor/unlimitedsensor.js"></script>
+<script src="apioProperties/TextBox/textbox.js"></script>
+<script src="apioProperties/Note/note.js"></script>
+<script src="apioProperties/Battery/battery.js"></script>
+<script src="apioProperties/ApioLink/apiolink.js"></script>
+<script src="apioProperties/UnclickableTrigger/unclickabletrigger.js"></script>
+<script src="apioProperties/Log/log.js"></script>
+<script src="apioProperties/Graph/graph.js"></script>
+<script src="apioProperties/MoreInfo/moreinfo.js"></script>
+<script src="apioProperties/Paint/paint.js"></script>
+<script src="systemApps/topAppApplication/topAppApplication.js"></script>
+<!--<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3.21&libraries=places&sensor=false"></script>-->
+<script src="/bower_components/material-design-lite/material.min.js"></script>
+<script src="javascripts/addtohomescreen.js"></script>
 </html>

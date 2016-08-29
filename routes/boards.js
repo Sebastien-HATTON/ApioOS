@@ -1,0 +1,67 @@
+module.exports = function (Apio) {
+    return {
+        change: function (req, res) {
+            console.log(req.body.id);
+            req.session.apioId = req.body.id;
+            Apio.Database.db.collection("Users").findOne({email: req.session.email}, function (err, user) {
+                if (err) {
+                    res.status(500).send(err);
+                } else if (user) {
+                    if (req.session.email === "info@apio.cc") {
+                        req.session.priviligies = "superAdmin";
+                    } else {
+                        for (var i = 0, found = false; !found && i < user.apioId.length; i++) {
+                            if (user.apioId[i].code === req.session.apioId) {
+                                req.session.priviligies = user.apioId[i].role;
+                                found = true;
+                            }
+                        }
+                    }
+
+                    res.status(200).send();
+                } else {
+                    res.sendStatus(404);
+                }
+            });
+        },
+        getDetails: function (req, res) {
+            var arr = req.params.boardsArr.split(",");
+            var queryArr = [];
+            for (var i in arr) {
+                queryArr.push({apioId: arr[i]});
+            }
+            Apio.Database.db.collection("systems").find({$or: queryArr}).toArray(function (err, data) {
+                if (err) {
+                    res.status(500).send(err);
+                } else if (data) {
+                    res.status(200).send(data);
+                } else {
+                    res.sendStatus(404);
+                }
+            });
+        },
+        setName: function (req, res) {
+            console.log(req.body);
+            Apio.Database.db.collection("systems").findAndModify({apioId: req.body.apioId}, {}, {$set: {name: req.body.name}}, function (err, result) {
+                if (err) {
+                    res.status(500).send(err);
+                } else if (result) {
+                    res.sendStatus(200);
+                } else {
+                    res.sendStatus(404);
+                }
+            });
+        },
+        show: function (req, res) {
+            Apio.Database.db.collection("systems").find().toArray(function (err, result) {
+                if (err) {
+                    res.status(500).send();
+                } else if (result) {
+                    res.status(200).send(result);
+                } else {
+                    res.status(404).send();
+                }
+            });
+        }
+    }
+};

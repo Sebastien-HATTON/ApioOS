@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Apio Administration</title>
+        <link rel="shortcut icon" type="image/x-icon" href="public/apio_assets/img/favicon.ico"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, email-scalable=no, initial-scale=0.45, minimum-scale=0, maximum-scale=1">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="yes" />
+        <title>APIO</title>
+        
+        <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+        <style>
+        body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #fff;
+        }
+        .form-signin {
+        max-width: 330px;
+        padding: 15px;
+        margin: 0 auto;
+        }
+        .form-signin .form-signin-heading,
+        .form-signin .checkbox {
+        margin-bottom: 10px;
+        }
+        .form-signin .checkbox {
+        font-weight: normal;
+        }
+        .form-signin .form-control {
+        position: relative;
+        height: auto;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 16px;
+        }
+        .form-signin .form-control:focus {
+        z-index: 2;
+        }
+        .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        }
+        .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        }
+        .tab-pane {
+            padding:10px;
+        }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container" ng-app="ApioLoginApplication" ng-controller="LoginController">
+            <form class="form-signin" role="form" ng-hide="showSignupForm">
+                <img src="images/Apio_Logo.png" style="display:block;width:300px;margin:0px auto;"/>
+                <h2 class="form-signin-heading">Settings</h2>
+                <div role="tabpanel">
+
+                  <!-- Nav tabs -->
+                  <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#cloudPanel" aria-controls="home" role="tab" data-toggle="tab">Cloud</a></li>
+                    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Security</a></li>
+                    
+                  </ul>
+
+                  <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="cloudPanel">
+                        <table class="table table-bordered">
+                    <tr><td><b>User email</b></td><td><b>Actions</b></td></tr>
+                    <tr ng-repeat="user in users">
+                        <td>{{user.email}}</td>
+                        <td>
+                        <button class="btn btn-sm btn-success" ng-show="user.enableCloud !== true" ng-click="enableUserOnTheCloud(user)">Enable cloud</button>
+                        <button class="btn btn-sm btn-danger" ng-show="user.enableCloud == true" ng-click="disableUserOnTheCloud(user)">Disable cloud</button>
+                        </td>
+                    </tr>
+                </table>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="profile">...</div>
+                    <div role="tabpanel" class="tab-pane" id="messages">...</div>
+                    <div role="tabpanel" class="tab-pane" id="settings">...</div>
+                  </div>
+
+</div>
+                
+                                
+            </form>
+            
+            
+            </div> <!-- /container -->
+        </body>
+        <script src="/bower_components/angular/angular.js"></script>
+        <script src="/bower_components/jquery/dist/jquery.js"></script>
+        <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+var app = angular.module('ApioLoginApplication', []);
+app.controller('LoginController', ['$scope', '$http', function($scope, $http) {
+        $scope.users = [];
+
+        $http.get('/apio/user')
+        .success(function(data){
+            $scope.users = data.users;
+        })
+
+        $scope.enableUserOnTheCloud = function(user) {
+            //Qui devo fare una chiamata alla board che fa una chiamata al cloud
+            $http
+            .post('/apio/user/setCloudAccess',{
+                user : user,
+                cloudAccess : true
+            })
+            .success(function(data){
+                if (data.status == true) {
+                    user.enableCloud = true;
+                } else {
+                    alert("An error has occurred (status:false)")
+                }
+            })
+            .error(function(){
+                alert("An error has occurred")
+            })
+        }
+
+        $scope.disableUserOnTheCloud = function(user) {
+            $http
+            .post('/apio/user/setCloudAccess',{
+                user : user,
+                cloudAccess : false
+            })
+            .success(function(data){
+                if (data.status == true) {
+                    user.enableCloud = true;
+                } else {
+                    alert("An error has occurred (status:false)")
+                }
+            })
+            .error(function(){
+                alert("An error has occurred")
+            })
+        }
+}])
+        </script>
+    </html>

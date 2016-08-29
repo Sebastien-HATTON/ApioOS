@@ -1,0 +1,125 @@
+/*Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino*/
+
+/********************************** LICENSE *********************************
+ *                                                                          *
+ * This file is part of ApioOS.                                             *
+ *                                                                          *
+ * ApioOS is free software released under the GPLv2 license: you can        *
+ * redistribute it and/or modify it under the terms of the GNU General      *
+ * Public License version 2 as published by the Free Software Foundation.   *
+ *                                                                          *
+ * ApioOS is distributed in the hope that it will be useful, but            *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of               *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             *
+ * GNU General Public License version 2 for more details.                   *
+ *                                                                          *
+ * To read the license either open the file COPYING.txt or                  *
+ * visit <http://www.gnu.org/licenses/gpl2.txt>                             *
+ *                                                                          *
+ ****************************************************************************/
+
+.containerUnlimetedSensor {
+    width: 100%;
+}
+
+.modify_sensor_container {
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 6%;
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+    .sensorinput {
+        float: none;
+        line-height: 16px;
+        height: 22px;
+        font-size: 16px;
+        font-weight: 100 !important;
+        margin: auto;
+        vertical-align: middle;
+        display: table-cell;
+        padding-left: 1%;
+        width: 90%;
+        text-align: right;
+    }
+
+    .modify-sensor {
+        margin: auto;
+        float: none;
+        width: 100%;
+        height: 83px;
+        text-align: center;
+        font-size: 40px;
+        border-radius: 16px;
+        -webkit-appearance: none;
+        font-family: sans-serif;
+        font-weight: 100;
+        border: 1px solid;
+        box-shadow: 0 0 3px -1px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 1000px) {
+    .sensorinput {
+        float: none;
+        font-weight: 100 !important;
+        line-height: 70px;
+        font-size: 25px;
+        text-align: right;
+        display: table-cell;
+        vertical-align: middle;
+        width: 6%;
+    }
+}
+
+@media (min-width: 1001px) {
+    .sensorinput {
+        float: none;
+        display: table-cell;
+        font-weight: 100 !important;
+        line-height: 25px;
+        font-size: 24px;
+        font-weight: 400;
+        width: 36%;
+        text-align: right;
+        vertical-align: middle;
+    }
+
+    .desktopRuleTable {
+        width: 100%;
+        display: table;
+        margin-top: 2.5%;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .modify-sensor {
+        margin: auto;
+        float: none;
+        width: 100%;
+        height: 83px;
+        text-align: center;
+        font-size: 23px;
+        border-radius: 16px;
+        -webkit-appearance: none;
+        font-family: sans-serif;
+        font-weight: 100;
+        border: 1px solid;
+        box-shadow: 0 0 3px -1px;
+    }
+}
+
+@media (min-width: 769px) {
+    .modify-sensor {
+        width: 100%;
+        height: 50px;
+        text-align: center;
+        font-size: 25px;
+        float: right;
+        border-radius: 10px;
+        line-height: 0;
+        border: 1px solid #4197FF;
+        box-shadow: 0 0 3px -1px;
+        color: rgba(3, 3, 3, 0.7);
+    }
+}

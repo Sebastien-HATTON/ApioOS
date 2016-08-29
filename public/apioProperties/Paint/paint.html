@@ -1,0 +1,134 @@
+<div id="{{propertyname}}" class="box_proprietaiPhone" ng-model="model" role="button" style="padding: 0 !important;"
+     ng-hide="currentObject.isRecording()">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <style>
+        @media (min-width: 320px) and (max-width: 479px) {
+            .plug_img {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 480px) and (max-width: 767px) {
+            .plug_img {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .plug_img {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .plug_img {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .plug_img {
+                width: 100%;
+            }
+        }
+    </style>
+    <link type="text/css" rel="stylesheet" href="apioProperties/Paint/paint.css"/>
+    <!--<md-grid-list md-cols="{{grid}}" md-row-height="fit" style="display: table-row; text-align: center;">-->
+    <!--<md-grid-tile ng-class="{{classes}}" ng-model="model[drawElement]" ng-repeat="drawElement in draw" ng-switch on="object.propertiesAdditionalInfo[drawElement].type">-->
+    <!--<md-grid-tile-header>-->
+    <!--<h5>{{drawElement}}</h5>-->
+    <!--</md-grid-tile-header>-->
+    <!--<apiobutton ng-switch-when="apiobutton" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}" innertext="{{object.propertiesAdditionalInfo[drawElement].innertext}}" value="{{object.propertiesAdditionalInfo[drawElement].value}}"></apiobutton>-->
+    <!--<apiolink ng-switch-when="apiolink" propertyname="{{drawElement}}" url="{{object.propertiesAdditionalInfo[drawElement].url}}" innertext="{{object.propertiesAdditionalInfo[drawElement].innertext}}"></apiolink>-->
+    <!--<asyncdisplay ng-switch-when="asyncdisplay" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}"></asyncdisplay>-->
+    <!--<battery ng-switch-when="battery" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}" max="{{object.propertiesAdditionalInfo[drawElement].max}}" min="{{object.propertiesAdditionalInfo[drawElement].min}}" step="{{object.propertiesAdditionalInfo[drawElement].step}}"></battery>-->
+    <!--<list ng-switch-when="list" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}" arraylist="{{object.propertiesAdditionalInfo[drawElement].arraylist}}"></list>-->
+    <!--<note ng-switch-when="note" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}"></note>-->
+    <!--<number ng-switch-when="number" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}"></number>-->
+    <!--<sensor ng-switch-when="sensor" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}" min="{{object.propertiesAdditionalInfo[drawElement].min}}" max="{{object.propertiesAdditionalInfo[drawElement].max}}" step="{{object.propertiesAdditionalInfo[drawElement].step}}"></sensor>-->
+    <!--<slider ng-switch-when="slider" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}" min="{{object.propertiesAdditionalInfo[drawElement].min}}" max="{{object.propertiesAdditionalInfo[drawElement].max}}" step="{{object.propertiesAdditionalInfo[drawElement].step}}" value="{{object.propertiesAdditionalInfo[drawElement].value}}"></slider>-->
+    <!--<text ng-switch-when="text" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}"></text>-->
+    <!--<textbox ng-switch-when="textbox" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}"></textbox>-->
+    <!--<trigger ng-switch-when="trigger" propertyname="{{drawElement}}" labelon="{{object.propertiesAdditionalInfo[drawElement].labelon}}" labeloff="{{object.propertiesAdditionalInfo[drawElement].labeloff}}" valueon="{{object.propertiesAdditionalInfo[drawElement].valueon}}" valueoff="{{object.propertiesAdditionalInfo[drawElement].valueoff}}"></trigger>-->
+    <!--<unclickabletrigger ng-switch-when="unclickabletrigger" propertyname="{{drawElement}}" labelon="{{object.propertiesAdditionalInfo[drawElement].labelon}}" labeloff="{{object.propertiesAdditionalInfo[drawElement].labeloff}}" valueon="{{object.propertiesAdditionalInfo[drawElement].valueon}}" valueoff="{{object.propertiesAdditionalInfo[drawElement].valueoff}}"></unclickabletrigger>-->
+    <!--<unlimitedsensor ng-switch-when="unlimitedsensor" propertyname="{{drawElement}}" label="{{object.propertiesAdditionalInfo[drawElement].label}}"></unlimitedsensor>-->
+    <!--<div ng-if="transclude" ng-transclude></div>-->
+    <!--</md-grid-tile>-->
+    <!--<md-grid-tile ng-click="createNewBind()" style="width: 100%;">-->
+    <!--<img src="/images/plus.png" class="plug_img"/>-->
+    <!--</md-grid-tile>-->
+    <!--</md-grid-list>-->
+
+    <div ng-class="{{classes}}" ng-model="model[drawElement]" ng-repeat="drawElement in draw" ng-switch
+         on="object.propertiesAdditionalInfo[drawElement].type" style="display: table-row; text-align: center;">
+        <!--<h5 style="margin: 2%;">{{drawElement}}</h5>-->
+        <apiobutton ng-switch-when="apiobutton" propertyname="{{drawElement}}"
+                    label="{{object.propertiesAdditionalInfo[drawElement].label}}"
+                    innertext="{{object.propertiesAdditionalInfo[drawElement].innertext}}"
+                    value="{{object.propertiesAdditionalInfo[drawElement].value}}"></apiobutton>
+        <apiolink ng-switch-when="apiolink" propertyname="{{drawElement}}"
+                  url="{{object.propertiesAdditionalInfo[drawElement].url}}"
+                  innertext="{{object.propertiesAdditionalInfo[drawElement].innertext}}"></apiolink>
+        <asyncdisplay ng-switch-when="asyncdisplay" propertyname="{{drawElement}}"
+                      label="{{object.propertiesAdditionalInfo[drawElement].label}}"></asyncdisplay>
+        <battery ng-switch-when="battery" propertyname="{{drawElement}}"
+                 label="{{object.propertiesAdditionalInfo[drawElement].label}}"
+                 max="{{object.propertiesAdditionalInfo[drawElement].max}}"
+                 min="{{object.propertiesAdditionalInfo[drawElement].min}}"
+                 step="{{object.propertiesAdditionalInfo[drawElement].step}}"></battery>
+        <list ng-switch-when="list" propertyname="{{drawElement}}"
+              label="{{object.propertiesAdditionalInfo[drawElement].label}}"
+              arraylist="{{object.propertiesAdditionalInfo[drawElement].arraylist}}"></list>
+        <note ng-switch-when="note" propertyname="{{drawElement}}"
+              label="{{object.propertiesAdditionalInfo[drawElement].label}}"></note>
+        <number ng-switch-when="number" propertyname="{{drawElement}}"
+                label="{{object.propertiesAdditionalInfo[drawElement].label}}"></number>
+        <sensor ng-switch-when="sensor" propertyname="{{drawElement}}"
+                label="{{object.propertiesAdditionalInfo[drawElement].label}}"
+                min="{{object.propertiesAdditionalInfo[drawElement].min}}"
+                max="{{object.propertiesAdditionalInfo[drawElement].max}}"
+                step="{{object.propertiesAdditionalInfo[drawElement].step}}"></sensor>
+        <slider ng-switch-when="slider" propertyname="{{drawElement}}"
+                label="{{object.propertiesAdditionalInfo[drawElement].label}}"
+                min="{{object.propertiesAdditionalInfo[drawElement].min}}"
+                max="{{object.propertiesAdditionalInfo[drawElement].max}}"
+                step="{{object.propertiesAdditionalInfo[drawElement].step}}"
+                value="{{object.propertiesAdditionalInfo[drawElement].value}}"></slider>
+        <text ng-switch-when="text" propertyname="{{drawElement}}"
+              label="{{object.propertiesAdditionalInfo[drawElement].label}}"></text>
+        <textbox ng-switch-when="textbox" propertyname="{{drawElement}}"
+                 label="{{object.propertiesAdditionalInfo[drawElement].label}}"></textbox>
+        <trigger ng-switch-when="trigger" propertyname="{{drawElement}}"
+                 labelon="{{object.propertiesAdditionalInfo[drawElement].labelon}}"
+                 labeloff="{{object.propertiesAdditionalInfo[drawElement].labeloff}}"
+                 valueon="{{object.propertiesAdditionalInfo[drawElement].valueon}}"
+                 valueoff="{{object.propertiesAdditionalInfo[drawElement].valueoff}}"></trigger>
+        <unclickabletrigger ng-switch-when="unclickabletrigger" propertyname="{{drawElement}}"
+                            labelon="{{object.propertiesAdditionalInfo[drawElement].labelon}}"
+                            labeloff="{{object.propertiesAdditionalInfo[drawElement].labeloff}}"
+                            valueon="{{object.propertiesAdditionalInfo[drawElement].valueon}}"
+                            valueoff="{{object.propertiesAdditionalInfo[drawElement].valueoff}}"></unclickabletrigger>
+        <unlimitedsensor ng-switch-when="unlimitedsensor" propertyname="{{drawElement}}"
+                         label="{{object.propertiesAdditionalInfo[drawElement].label}}"></unlimitedsensor>
+        <div ng-if="transclude" ng-transclude></div>
+    </div>
+</div>

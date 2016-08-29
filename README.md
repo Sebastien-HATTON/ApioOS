@@ -1,7 +1,26 @@
-ApioOS
+Apio-VIP
 ==========
 
 This repository contains the apio server application and the client application.
+This is the new Version of Apio Server.
+
+# Changes:
+* Improved Serial algorithm
+* Cloud Sync
+* User
+* Configuration File
+
+# Features:
+* Runnable on PC, [Raspberry](https://www.raspberrypi.org), [Acqua](http://www.acmesystems.it/acqua), [Beaglebone Black](http://beagleboard.org/BLACK) and others embedded linux board
+* Cloud Sync
+* User Management
+* Google Maps Full Integration 
+* Connect your Wifi/Ethernet Objects
+* Create your Mesh Network with Apio Dongle and Apio General
+* SDK for create Objects without coding
+* If and then Logics
+* View it through smartphone/tablet and PC
+
 
 # Build and Run
 
@@ -11,12 +30,15 @@ To install and run the Apio Server application you will need:
 * NPM
 * MongoDB
 
+You need to update the Apio Dongle with this firmware:
+https://github.com/ApioLab/library-arduino
+
 ===========
 ### Install
 
 * `cd /path/to/your/directory`
-* `git clone https://github.com/ApioLab/ApioServer.git`
-* `cd ApioServer`
+* `git clone https://github.com/ApioLab/Apio-VIP.git`
+* `cd Apio-VIP`
 * `npm install && bower install`
 
 The apio server application is now installed and configured
@@ -30,9 +52,7 @@ From the server folder run:
 ### Use it:
 Open your browser and digit this URL:
 
-* `localhost:8083/app`
+* From Pc `localhost:8083/app`
+* Frmo smartphone `yourip:8083/app`
 
-If you want more information please visit: http://www.apio.cc
-
-
-
+If you want more information please visit: [Apio](http://www.apio.cc)

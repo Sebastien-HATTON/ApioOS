@@ -1,55 +1,410 @@
 /*Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino*/
 
-/********************************* LICENSE *******************************
-*									 *
-* This file is part of ApioOS.						 *
-*									 *
-* ApioOS is free software released under the GPLv2 license: you can	 *
-* redistribute it and/or modify it under the terms of the GNU General	 *
-* Public License version 2 as published by the Free Software Foundation. *
-*									 *
-* ApioOS is distributed in the hope that it will be useful, but		 *
-* WITHOUT ANY WARRANTY; without even the implied warranty of		 *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 *
-* GNU General Public License version 2 for more details.		 *
-*									 *
-* To read the license either open the file COPYING.txt or		 *
-* visit <http://www.gnu.org/licenses/gpl2.txt>				 *
-*									 *
-*************************************************************************/
-
+/********************************** LICENSE *********************************
+ *                                                                          *
+ * This file is part of ApioOS.                                             *
+ *                                                                          *
+ * ApioOS is free software released under the GPLv2 license: you can        *
+ * redistribute it and/or modify it under the terms of the GNU General      *
+ * Public License version 2 as published by the Free Software Foundation.   *
+ *                                                                          *
+ * ApioOS is distributed in the hope that it will be useful, but            *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of               *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             *
+ * GNU General Public License version 2 for more details.                   *
+ *                                                                          *
+ * To read the license either open the file COPYING.txt or                  *
+ * visit <http://www.gnu.org/licenses/gpl2.txt>                             *
+ *                                                                          *
+ ****************************************************************************/
 
 /* Extra Small Devices, Phones */
-@media only screen and (min-width:480px) and (max-width:767px) {
+@media (min-width: 480px) and (max-width: 767px) {
+    #headerNav {
+        position: absolute;
+        width: auto;
+        bottom: 0;
+    }
+
+    .iconProfile {
+        right: 15px;
+        position: absolute;
+        z-index: 100;
+        bottom: 12px;
+    }
+
+    .viewDesktop {
+        display: none !important;
+    }
+
+    .viewMobile {
+        display: block !important;
+    }
+
+    .optionMenuNotification {
+        margin-top: 4%;
+    }
+
+    .menuGestioneNotifiche {
+        width: 90%;
+        margin: 0 auto;
+        text-align: center;
+        margin-top: 2%;
+        margin-bottom: 2%;
+    }
+
+    .menuGestioneNotifiche .row {
+        line-height: 30px;
+
+    }
+
+    .singolaVoceFirst {
+        border-left: solid 1px;
+        border-right: solid 1px;
+        border-radius: 5px 0px 0px 5px;
+        border-bottom: solid 1px;
+        border-top: solid 1px;
+        padding-left: 0;
+        padding-right: 0;
+        overflow: hidden;
+    }
+
+    .singolaVoceLast {
+        border-right: solid 1px;
+        border-radius: 0px 5px 5px 0px;
+        border-bottom: solid 1px;
+        border-top: solid 1px;
+        padding-left: 0;
+        padding-right: 0;
+        overflow: hidden;
+    }
+
+    .singolaVoce {
+        border-right: solid 1px;
+        border-top: solid 1px;
+        border-bottom: solid 1px;
+        padding-left: 0;
+        padding-right: 0;
+        overflow: hidden;
+    }
+
+    .singolaVoce a,
+    .singolaVoceFirst a,
+    .singolaVoceLast a {
+        -webkit-transition: all 0.5s;
+        transition: all 0.5s;
+        height: 30px !important;
+        background-color: #fff !important;
+        color: #000 !important;
+        text-decoration: none !important;
+        display: block;
+        width: 100%;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .singolaVoce a:hover,
+    .singolaVoceFirst a:hover,
+    .singolaVoceLast a:hover {
+        background-color: rgba(255, 255, 255, 0) !important;
+    }
+
+    .singolaVoce a:active {
+        background-color: rgba(255, 255, 255, 0) !important;
+    }
+
+    .apioApplicationNavbar {
+        padding: 0;
+        margin: 0;
+        display: block !important;
+    }
+
+    .mobile_icon_navbar {
+        background: none;
+        padding: 2.5%;
+        margin: auto 0;
+        border-radius: 0;
+        border-bottom: 0;
+        border-top: 0;
+        font-size: 46px;
+        color: #4E4E4E;
+    }
+
+    #ulSottomenuMobile p {
+        padding-left: 4%;
+    }
+
+    #apioMenuMobile {
+        background-color: rgba(246, 245, 245, 0.98);
+        -webkit-box-shadow: 0px 0px 2px 0px rgba(50, 50, 50, 0.26);
+        -moz-box-shadow: 0px 0px 2px 0px rgba(50, 50, 50, 0.26);
+        box-shadow: 0px 0px 2px 0px rgba(50, 50, 50, 0.26);
+        border-color: rgba(247, 247, 247, 0.92);
+    }
+
+    #menuMobileContratto li, #menuMobileContratto a {
+        list-style: none;
+        font-size: 32px;
+        color: #000;
+        text-align: center;
+    }
+
+    #notificationsCenter {
+        position: fixed;
+        left: 0px;
+        padding-left: 4%;
+        padding-right: 4%;
+        padding-bottom: 4%;
+        right: 0px;
+        bottom: 0px;
+        top: 0px;
+        width: 100% !important;
+        height: 100%;
+        margin: 0 auto;
+        background-color: rgba(0, 0, 0, 0.86);
+        color: white;
+        display: none;
+        z-index: 1050;
+        overflow: hidden;
+    }
+
+    .newLogicNotification {
+        text-align: center;
+        height: 50px;
+        padding: 5%;
+        border-bottom: 1px solid;
+    }
+
+    .newLogicNotification a {
+        list-style: none;
+        text-decoration: none;
+        color: white;
+    }
+
+    .newLogicNotification a:hover {
+        list-style: none;
+        text-decoration: none;
+        color: white;
+    }
+
+    .exitNotificationCenter {
+        display: block !important;
+        font-size: 15px;
+        text-align: center;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    .more_notification_ {
+        margin: 0;
+        text-align: center;
+        padding: 0;
+        font-size: 30px;
+        line-height: 40px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1%;
+        border-right: 1px solid #fff;
+        border-bottom: 1px solid #fff;
+        height: 50px;
+    }
+
+    .more_notification_ a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0;
+        padding: 0;
+        line-height: 40px;
+        height: 50px;
+        display: block;
+    }
+
+    .notifica {
+        display: inline-table;
+        width: 23%;
+        margin-right: 1%;
+        margin-top: 1%;
+    }
+
+    .notifycontainer {
+        margin: 0 !important;
+        height: 100%;
+        padding-left: 1% !important;
+        padding-top: 1% !important;
+        padding-bottom: 1% !important;
+        padding-right: 0% !important;
+        background-color: inherit;
+    }
+
+    .notifymassage {
+        line-height: 17px;
+        font-size: 17px;
+        height: 100%;
+        display: table;
+        padding: 0%;
+    }
+
+    .singleRowNotification {
+        height: 60px;
+        margin: 0;
+    }
+
+    .notifytimestamp {
+        line-height: 16px;
+        font-size: 17px;
+        height: 100%;
+        display: table;
+        padding: 0px;
+        text-align: center;
+    }
+
+    .notificationOption {
+        padding: 0;
+        display: table;
+        height: 100%;
+    }
+
+    .notifypublishbutton {
+        color: rgba(208, 30, 30, 0.82);
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+    / / border-left: 1 px solid #fff !important;
+        height: 100%;
+    }
+
+    .notifyenablebutton {
+        color: rgba(29, 102, 209, 0.82);
+        margin-bottom: 0;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        display: table-cell;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+    / / border-left: 1 px solid #fff !important;
+        height: 100%;
+    }
+
+    .notifydisablebutton {
+        height: 100%;
+        color: #d9534f;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        display: table-cell;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+
+    }
+
+    .showdisabled {
+        color: #ff0000;
+        background: rgba(255, 33, 36, 0.54);
+    }
+
+    .containerOnlySingleRow {
+        height: 85%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .notifyMassageDisable {
+        line-height: 17px;
+        font-size: 17px;
+        height: 100%;
+        display: table;
+        padding-left: 3%;
+
+    }
+
+    .newEventFormSection {
+        height: 78%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    .systemAppContainer {
+        height: 98%;
+        padding: 0 0 58px 0;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        -webkit-user-drag: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
     h1 {
-    font-size:24px;
-}
+        font-size: 24px;
+    }
+
+    .testoProprietaNomeStato {
+        width: 100%;
+        display: table-cell;
+        text-align: right;
+    }
 
     .no_box_proprieta_iPhone {
-    display: block;
-    width: auto;
-    height: auto;
-    margin-bottom: 0;
-    padding: 0 0 0 0;
-    border: 0;
-    border-radius: 0;
-    line-height: 0;
-    vertical-align: top;
-    box-shadow: 0 0 0 0;
-    -webkit-transition: none;
-    transition: none;
-}
+        display: block;
+        width: auto;
+        height: auto;
+        margin-bottom: 0;
+        padding: 0 0 0 0;
+        border: 0;
+        border-radius: 0;
+        line-height: 0;
+        vertical-align: top;
+        box-shadow: 0 0 0 0;
+        -webkit-transition: none;
+        transition: none;
+    }
+
     input[type=checkbox] {
-        width: 38px !important;
-        height: 38px;
+        /*width: 38px !important;
+        height: 38px;*/
         margin-left: 2%;
         border: 0 solid;
         border: solid 1px #000;
         border-radius: 38px;
         font-size: 1.1em;
-        box-shadow: 0 0 2px -1px inset;
+        box-shadow: 0 0 0 0;
         transition: all 0.4s ease 0s;
     }
+
     .elenco_invitati {
         display: table;
         width: 100%;
@@ -84,58 +439,31 @@
         list-style: none;
     }
 
-
-
-
-    
-    .delete_element {
-        width: 50%;
-        height: 180px;
-        margin-top: -10px;
-        text-align: center;
-        line-height: 160px;
-        color: #fff;
-        background-color: #CC2929;
-    }
-
     .nome_stato_invitato {
         width: 38%;
         margin-top: -15px;
         margin-right: 20px;
     }
 
-    #title_state {
-        width: 50%;
-        margin-top: 5%;
-        border: none;
-        text-align: center;
-        font-size: 50px;
-        background: none;
-    }
     .dynvinput {
-            float: right;
-            font-weight: 100;
-            color: #8e8e8e;
-            font-size: 24px;
-            line-height: 100%;
+        float: right;
+        font-weight: 100;
+        color: #8e8e8e;
+        font-size: 24px;
+        line-height: 100%;
 
-        }
+    }
+
     .nome_nuovo_oggetto_invitato {
         font-size: 13px !important;
-margin-right: 7px;
-margin-top: 0px;
-height: 15px;
-width: 100%;
-float: none;
-line-height: 15px;
-display: table;
+        margin-right: 7px;
+        margin-top: 0px;
+        height: 15px;
+        width: 100%;
+        float: none;
+        line-height: 15px;
+        display: table;
     }
-
-
-
-
-
-
 
     .delete_element {
         width: 50%;
@@ -161,13 +489,18 @@ display: table;
         font-size: 50px;
         background: none;
     }
+
     .testo_proprietaiPhone {
-        float: left;
-        margin-left: 4.5px;
         font-family: sans-serif;
-        font-size: 22px;
-        font-weight: 100;
-        color: #262626;
+        font-size: 15px;
+        font-weight: 200;
+        color: #585858;
+        display: table-cell;
+        line-height: 21px;
+        vertical-align: middle;
+        height: 40px;
+        margin: auto;
+        padding: 2%;
     }
 
     .systembutton {
@@ -177,7 +510,7 @@ display: table;
         margin-right: 1%;
         margin-left: 1%;
         padding: 0;
-        border: solid 1px rgb(88,170,220);
+        border: solid 1px rgb(88, 170, 220);
         border-radius: 45px;
         text-align: center;
         line-height: 45px;
@@ -215,12 +548,14 @@ display: table;
     }
 
     .homeAppIconName {
-        width: 65px;
-        font-size: 12px;
     }
 
     #ApioIconsContainer {
-        margin-left: 5%;
+        padding-top: 2.5% !important;
+    }
+
+    #apioMenu {
+        display: none !important;
     }
 
     .openPanel {
@@ -230,35 +565,38 @@ display: table;
     .box_proprietaiPhone {
         display: table;
         width: 100%;
-        padding: 20px 14px 20px 14px;
+        /*padding: 20px 14px 20px 14px;
+        padding: 20px 0 20px 0;*/
         line-height: 36px;
-        box-shadow: 0 5px 4px -7px;
+        box-shadow: 0 4px 4px -7px;
         -webkit-transition: margin-left 0.6s ease 0s;
         transition: margin-left 0.6s ease 0s;
+    }
+
+    #ApioApplicationContainer {
+        overflow-x: hidden;
     }
 
     .dynamicPanel {
         z-index: 1031;
         position: fixed;
-        top: 50px;
+        /*top: 50px;*/
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
         overflow-y: scroll;
-        width:100%;
+        width: 100%;
     }
 
-    .content_pulsanteiPhone {
+    /*.content_pulsanteiPhone {
         float: right;
         width: 132px;
         height: 60px;
         border-radius: 40px;
         background: none repeat scroll 0 0 #FFFFFF;
-    }
-
+    }*/
     /* wall*/
-
     .name_object {
         height: 5px;
         margin-top: -10px;
@@ -267,18 +605,17 @@ display: table;
     }
 
     .active_on {
-        background-color: rgb(34,201,34);
+        background-color: rgb(34, 201, 34);
         box-shadow: 0 0 0 0;
     }
 
     .active_bacheca {
         width: 30px;
         height: 30px !important;
-        margin-top: 1px;
+        border-radius: 100px;
+        border: solid 5px rgb(255, 255, 255);
+        box-shadow: 0 0 1px 1px rgba(3, 3, 3, 0.57);
         margin-right: 5%;
-        border: solid 2px rgb(255,255,255);
-        border-radius: 30px;
-        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
     }
 
     .activeState {
@@ -286,9 +623,9 @@ display: table;
         height: 35px !important;
         margin-top: 9px;
         margin-right: 5%;
-        border: solid 2px rgb(255,255,255);
+        border: solid 2px rgb(255, 255, 255);
         border-radius: 100px;
-        box-shadow: 0 0 1px 1px rgba(3,3,3,0.57);
+        box-shadow: 0 0 1px 1px rgba(3, 3, 3, 0.57);
     }
 
     .modify {
@@ -302,32 +639,58 @@ display: table;
     .elementBacheca {
         display: block;
         width: 98%;
-        height: 68px;
+        height: 50px;
         margin-left: 0px;
-        padding-top: 15px;
+    / / padding-top: 15 px;
         padding-bottom: 0;
-        padding-left: 6px;
-        overflow-x: auto;
+    / / padding-left: 6 px;
+        overflow-x: inherit;
         overflow-y: hidden;
-        -webkit-user-drag: none;
-        -webkit-overflow-scrolling: touch;
+    / / -webkit-user-drag: none;
+    / / -webkit-overflow-scrolling: touch;
+        margin: 0% auto;
+        padding: 0;
     }
 
-      .elementBacheca li {
-      -webkit-transition: all 0.4s ease 0s;
-      transition: all 0.4s ease 0s;
-      font-family: sans-serif;
-      font-size: 18px;
-      height: 20px;
-      display: table-caption !important;
-      float: left;
-      list-style: none;
-      }
+    .elementBachecaLogic {
+        display: block;
+        width: 98%;
+        height: 50px;
+        margin-left: 0px;
+    / / padding-top: 15 px;
+        padding-bottom: 0;
+    / / padding-left: 6 px;
+        overflow-x: inherit;
+        overflow-y: hidden;
+    / / -webkit-user-drag: none;
+    / / -webkit-overflow-scrolling: touch;
+        margin: 0% auto;
+        padding: 0;
+    }
+
+    .elementBacheca::-webkit-scrollbar {
+        -webkit-appearance: none;
+        background: transparent;
+        height: 0px;
+        overflow: visible;
+        width: 0px;
+    }
+
+    .elementBacheca li {
+        -webkit-transition: all 0.4s ease 0s;
+        transition: all 0.4s ease 0s;
+        font-family: sans-serif;
+        font-size: 18px;
+        height: 20px;
+        display: table-caption !important;
+        float: left;
+        list-style: none;
+    }
 
     .option_Bacheca_id_state {
         width: 80%;
-        -webkit-transform: translate(140%,-80%);
-        transform: translate(140%,-80%);
+        -webkit-transform: translate(140%, -80%);
+        transform: translate(140%, -80%);
     }
 
     .option_Bacheca_id_state li {
@@ -362,8 +725,15 @@ display: table;
     .statusName {
         width: 66%;
         height: 10px;
-        margin-top: 0px;
         margin-right: 20px;
+        margin-top: -3%;
+    }
+
+    #wallContainer {
+    / / margin-top: - 25 %;
+        height: 87%;
+        overflow-x: hidden;
+        overflow-y: scroll;
     }
 
     #title_state {
@@ -374,11 +744,12 @@ display: table;
         font-size: 25px;
         background: none;
     }
+
     .eventname {
-            text-align: center;
-            font-weight: 300;
-            font-size: 25px;
-        }
+        text-align: center;
+        font-weight: 300;
+        font-size: 25px;
+    }
 
     .infoEvent {
         height: 10px;
@@ -386,18 +757,27 @@ display: table;
         padding-bottom: 7px;
         font-size: 10px;
     }
+
+    /* OLD
+	#ApioEventsContainer{
+        margin-top: -20%;
+    }*/
+    p {
+        margin: 0 0;
+    }
+
     .createNewEvent {
-width: 75px;
-height: 75px;
-line-height: 75px;
-margin-left: auto;
-margin-right: auto;
-text-align: center;
-padding: 0;
-border-radius: 2000px;
-border: solid 1px rgb(88, 170, 220);
-font-size: 17px;
-}
+        width: 75px;
+        height: 75px;
+        line-height: 75px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        padding: 0;
+        border-radius: 2000px;
+        border: solid 1px rgb(88, 170, 220);
+        font-size: 17px;
+    }
 
     .create_new_event {
         width: 40px;
@@ -414,15 +794,16 @@ font-size: 17px;
         -webkit-transition: all 0.3s ease 0s;
         transition: all 0.3s ease 0s;
     }
+
     .new_active_back_next {
-display: inline-block;
-margin-left: -6%;
-margin-right: -6%;
-}
+        display: inline-block;
+        margin-left: -6%;
+        margin-right: -6%;
+    }
 
     .create_new_active {
         color: #fff;
-        background-color: rgba(255,3,3,0.5);
+        background-color: rgba(255, 3, 3, 0.5);
         -webkit-transform: rotate(45deg);
         transform: rotate(45deg);
     }
@@ -448,7 +829,7 @@ margin-right: -6%;
         margin-left: 10px;
         padding-top: 7px;
         padding-bottom: 0;
-        padding-left:6px;
+        padding-left: 6px;
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-user-drag: none;
@@ -468,8 +849,8 @@ margin-right: -6%;
         position: relative;
         width: 40%;
         height: 44px;
-        -webkit-transform: translate(100%,-80%);
-        transform: translate(100%,-80%);
+        -webkit-transform: translate(100%, -80%);
+        transform: translate(100%, -80%);
     }
 
     .option_Evento_id_state li {
@@ -479,8 +860,8 @@ margin-right: -6%;
         float: right;
         position: relative;
         width: 80%;
-        height: 75px;
-        margin-top: 11.9%;
+        height: 65px;
+        margin-top: 15px;
         margin-right: -28%;
         text-align: center;
         font-size: 14px;
@@ -489,14 +870,6 @@ margin-right: -6%;
         background-color: #CC2929;
     }
 
-    #title_state {
-        width: 50%;
-        margin-top: 5%;
-        border: none;
-        text-align: center;
-        font-size: 50px;
-        background: none;
-    }
     .byDate {
         width: 70px;
         height: 70px;
@@ -509,33 +882,26 @@ margin-right: -6%;
         border: solid 1px rgb(88, 170, 220);
         font-size: 16px;
     }
+
     .byStatus {
         width: 70px;
         height: 70px;
         margin-right: auto;
         margin-left: auto;
         padding: 0;
-        border: solid 1px rgb(88,170,220);
+        border: solid 1px rgb(88, 170, 220);
         border-radius: 70px;
         text-align: center;
         font-size: 16px;
         line-height: 70px;
     }
 
-    .box_byStatus {
-        display: inline-block;
-        width: 49%;
-        margin-top: 15%;
-        margin-bottom: 15%;
-        opacity: 1;
-    }
     .box_byDate {
         display: inline-block;
         opacity: 1;
         width: 48%;
-        margin-top: 15%;
         margin-bottom: 15%;
-        border:0px;
+        box-shadow: 0 0 0 0;
     }
 
     .box_event_organization {
@@ -561,26 +927,29 @@ margin-right: -6%;
     }
 
     .nome_oggetto_invitato {
-      font-size: 15px !important;
+        display: table !important;
         position: relative !important;
         width: 100% !important;
-        display: table !important;
-        height: 0px !important;
+        height: 0 !important;
+        margin-top: 0px;
+        margin-left: 0px;
+        padding-left: 50px;
+        padding-right: 10px !important;
+        text-align: left;
+        font-size: 15px !important;
+        line-height: 15px !important;
         list-style: none !important;
-        text-align: right;
-        margin-left:0px;
-        margin-top:0px;
-        padding-right:10px !important;
     }
 
     .box_byStatus {
         display: inline-block;
         width: 49%;
-        margin-top: 15%;
         margin-bottom: 15%;
         opacity: 1;
-        border:0px;
+        border: 0px;
+        box-shadow: 0 0 0 0;
     }
+
     .elementGuests_invitati {
         display: block;
         width: 99%;
@@ -589,62 +958,62 @@ margin-right: -6%;
         overflow-y: hidden;
         -webkit-user-drag: none;
         -webkit-overflow-scrolling: touch;
-        padding-left:10px;
+        padding-left: 10px;
     }
-
 
     .elementGuests_invitati li {
         -webkit-transition: all 0.4s ease 0s;
-transition: all 0.4s ease 0s;
-
-font-size: 20px;
-height: 20px;
-line-height: 20px;
-width: 70%;
-float: left;
-list-style: none;
-margin-top: 3%;
+        transition: all 0.4s ease 0s;
+        font-size: 20px;
+        height: 20px;
+        line-height: 20px;
+        width: 70%;
+        float: left;
+        list-style: none;
+        margin-top: 3%;
     }
 
-        /*
-    .option_invitati_state {
-        float: left !important;
-        position: static;
-        width: 80%;
-        -webkit-transform: translate(140%,-80%);
-        transform: translate(140%,-80%);
-    }
-    */
+    /*
+.option_invitati_state {
+    float: left !important;
+    position: static;
+    width: 80%;
+    -webkit-transform: translate(140%,-80%);
+    transform: translate(140%,-80%);
+}
+*/
     .option_invitati_state li {
         float: left !important;
     }
 
     .elimina_invitati {
-background-color: #CC2929;
-width: 100px;
-text-align: center;
-color: #fff;
-height: 60px;
-float: right;
-margin-top: -45px;
-margin-left: 40%;
-line-height: 60px;
-font-size: 20px;
--webkit-transform: translateX(100%);
-}
-input[type=radio] {
-/* -webkit-appearance: none; */
-border: 0 solid;
-border-radius: 100px;
-font-size: 1.1em;
-height: 35px;
-margin-left: 2%;
-border: solid 1px #000;
-transition: all 0.4s ease 0s;
-width: 35px !important;
-box-shadow: 0 0 2px -1px inset;
-}
- .goBack {
+        background-color: #CC2929;
+        width: 100px;
+        text-align: center;
+        color: #fff;
+        height: 60px;
+        float: right;
+        margin-top: -45px;
+        margin-left: 40%;
+        line-height: 60px;
+        font-size: 20px;
+        -webkit-transform: translateX(100%);
+    }
+
+    input[type=radio] {
+        /* -webkit-appearance: none; */
+        border: 0 solid;
+        border-radius: 100px;
+        font-size: 1.1em;
+        height: 35px;
+        margin-left: 2%;
+        border: solid 1px #000;
+        transition: all 0.4s ease 0s;
+        width: 35px !important;
+        box-shadow: 0 0 0 0;
+    }
+
+    .goBack {
         width: 75px;
         height: 75px;
         line-height: 75px;
@@ -664,9 +1033,11 @@ box-shadow: 0 0 2px -1px inset;
         margin-top: 20%;
         margin-bottom: 20%;
     }
+
     #goBackinput {
         margin-top: 2%;
     }
+
     .goForward {
         width: 75px;
         height: 75px;
@@ -687,16 +1058,15 @@ box-shadow: 0 0 2px -1px inset;
         margin-top: 20%;
         margin-bottom: 20%;
     }
-     #goForwardinput {
+
+    #goForwardinput {
         margin-top: 2%;
     }
 
-#newEventNameinput {
-width: 170px;
-height: 40px;
-font-size: 15px;
-border-radius: 5px;
-}
-
-    
+    #newEventNameinput {
+        width: 170px;
+        height: 40px;
+        font-size: 15px;
+        border-radius: 5px;
+    }
 }

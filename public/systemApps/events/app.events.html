@@ -1,230 +1,894 @@
-<div>
-<!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+<div class="maxHeight">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
 
-<!---------------------------------- LICENSE -------------------------------
--									 -
-- This file is part of ApioOS.						 -
--									 -
-- ApioOS is free software released under the GPLv2 license: you can	 -
-- redistribute it and/or modify it under the terms of the GNU General	 -
-- Public License version 2 as published by the Free Software Foundation. -
--									 -
-- ApioOS is distributed in the hope that it will be useful, but		 -
-- WITHOUT ANY WARRANTY; without even the implied warranty of		 -
-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the		 -
-- GNU General Public License version 2 for more details.		 -
--									 -
-- To read the license either open the file COPYING.txt or		 -
-- visit <http://www.gnu.org/licenses/gpl2.txt>				 -
--									 -
--------------------------------------------------------------------------->
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ----------------------------------------------------------------------------->
 
 
-	<style>
-	select[name]{
-		float: none !important;
-	}
+    <style>
+        select[name] {
+            float: none !important;
+        }
 
-	@media (min-width: 320px) and (max-width: 600px) {
-		.eventname {
-			text-align: center;
-			font-family: helvetica;
-			font-weight: 300;
-			font-size: 50px;
-		}
-	}
-	@media (min-width: 601px) and (max-width: 1000px){
-		.eventname {
-			text-align: center;
-			font-family: helvetica;
-			font-weight: 300;
-			font-size: 50px;
-		}
-	}
-	@media (min-width: 1001px) {
-		.eventname {
-			text-align: center;
-			font-family: helvetica;
-			font-weight: 300;
-			font-size: 50px;
-		}
-	}
-	@media only screen and (min-width: 481px) and (max-width: 768px) {
-		.dynvinput {
-			float: right;
-			font-family: sans-serif;
-			font-weight: 100;
-			color: #8e8e8e;
-			font-size: 50px;
-			line-height: 130%;
-		}
-	}
+        .r-blue {
+            color: #3A5FCD;
+        }
 
-	@media only screen and (min-width: 769px) {
-		.dynvinput {
-			float: right;
-			font-family: sans-serif;
-			font-weight: 100;
-			color: #8e8e8e;
-			font-size: 50px;
-			line-height: 130%;
+        @media (min-width: 320px) and (max-width: 600px) {
+            .eventname {
+                text-align: center;
+                font-family: helvetica;
+                font-weight: 300;
+                font-size: 50px;
+            }
+        }
 
-		}
-	}
-	</style>
-	<div id="ApioEventsContainer" class="">
-		<section class="nav_event">
-			<div id="goBack" class="box_byDate" style="opacity: 1;" ng-show="currentFormStep !== 'sceltaTipo' && currentFormStep !== ''" ng-click="goBack()" ng-show="showBack()">
-				<div id="goBackinput" class="goBack"><span id="goBackspan">Indietro</span></div>
-			</div>
+        @media (min-width: 601px) and (max-width: 1000px) {
+            .eventname {
+                text-align: center;
+                font-family: helvetica;
+                font-weight: 300;
+                font-size: 50px;
+            }
+        }
 
-			<div id="new_event" class="create_new create_new_event"  ng-class="{'create_new_active' : currentFormStep !== ''}" ng-click="reset()"><p>+</p></div>
+        @media (min-width: 1001px) {
+            .eventname {
+                text-align: center;
+                font-family: helvetica;
+                font-weight: 300;
+                font-size: 50px;
+            }
+        }
 
-			<div id="goForward" class="box_byDate" style=" opacity: 1;" ng-show="showForward()">
-				<div id="goForwardinput" class="goForward" ng-click="goForward()"><span id="goForwardspan">Avanti</span></div>
-			</div>
+        @media only screen and (min-width: 481px) and (max-width: 768px) {
+            .dynvinput {
+                float: right;
+                font-family: sans-serif;
+                font-weight: 100;
+                color: #8e8e8e;
+                font-size: 50px;
+                line-height: 130%;
+            }
+        }
 
-			<div id="createNewEvent" class="box_byDate" style="opacity: 1;" ng-show="eventNameIsValid()">
-				<div id="createNewEventinput" class="createNewEvent crea" ng-click="saveEvent()"><span id="createNewEventspan">Crea!</span></div>
-			</div>
-		</section>
+        @media only screen and (min-width: 769px) {
+            .dynvinput {
+                float: right;
+                font-family: sans-serif;
+                font-weight: 100;
+                color: #8e8e8e;
+                font-size: 50px;
+                line-height: 130%;
 
-		<section class="newEventFormSection" ng-show="currentFormStep == ''">
-			<div class="elementEventi box_proprietaiPhone" ng-repeat="event in events">
-				<li class="eventName">{{event.name}}<div class="infoEvent">Matteo Di Sabatino</div></li>
-				<li class="modify modifica_Evento_id" ng-click="editEvent(event)">&gt;</li>
-				<div class="option_Evento_id_state">
-					<div class="elimina_evento" ng-click="deleteEvent(event)">elimina</div>
-				</div>
-			</div>
-		</section>
-		
-		
-			
-		
+            }
+        }
 
-		<div style="clear: both;"></div>
+        @media only screen and (min-width: 320px) and (max-width: 479px) {
+            .mobileLayoutStateContainer {
+                margin-bottom: 12%;
+                box-shadow: 1px 0px 5px 2px rgba(0, 0, 0, 0.13);
+                overflow: hidden;
+            }
 
-		<section class="newEventFormSection" ng-show="currentFormStep == 'sceltaTipo'">
-			<h1 style="text-align: center;">Scelta Tipo</h1>
-			<div id="byStatus" class="box_proprietaiPhone no_box_proprieta_iPhone box_byStatus" style="opacity: 1;">
-				<div id="byStatusinput" class="byStatus" ng-click="goToFormStep('selezioneStatoScatenante',$event)"><span id="byStatusspan">Stato</span></div>
-			</div>
-			<div id="byDate" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="opacity: 1;">
-				<div id="byDateinput" class="byDate" ng-click="goToFormStep('selezioneData',$event)"><span id="byDatespan">Data</span></div>
-			</div>
-		</section>
+            .openStateRow {
+                height: 40px;
+                margin-bottom: 12%;
+            }
 
-		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatoScatenante'">
-			<h1 style="text-align: center;">Selezione Stato Scatenante</h1>
-			<div id="statusesListInput" >
-				<form id="content_statusesList" style="display: block; opacity: 1;">
-					<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
-						<input type="radio" name="all_statusesstatusesList" ng-model="$parent.newEvent.triggerState" ng-value="state.name" class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone">
-						<li class="statusName statusNameInvited nome_nuovo_scatenante">{{state.name}}</li>
-						<div class="nome_oggetto_nuovo_scatenante nome_oggetto_invitato">{{state.objectName}}</div>
-					</div>
-				</form>
-			</div>
-		</section>
+            .alignIconStateOption {
+                display: table;
+                height: 36px;
+                padding: 0;
+                text-align: center;
+            }
 
-		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatiScatenati'">
-			<h1 style="text-align: center;">Selezione Stati scatenati</h1>
-			<div ng-if="$parent.newEvent.triggerState != state.name" class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
-				<input type="checkbox" name="all_guestslistOfGuests" ng-click="checkedModel(state)" class="elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
-				<li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
-				<li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
-			</div>
-		</section>
+            .layoutIconStateOption {
+                padding-left: 0;
+                padding-right: 0;
+                height: 100%;
+            }
 
-		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneNomeEvento'">
-			<h1 style="text-align: center;">Selezione Nome Evento</h1>
-			<div class="newEventNameproprieta" style="text-align: center;">
-				<form id="newEventNameform">
-					<input id="newEventNameinput" class="newEventNameinput" type="text" ng-model="newEvent.name">
-				</form>
-			</div>
-		</section>
+            .wallSingleRow {
+                padding: 0;
+                height: 100%;
 
-		<section class="newEventFormSection" ng-show="currentFormStep == 'selezioneData'">
-			<h1 style="text-align: center;">Selezione Data</h1>
-			<div id="selezioneDataNuovoEvento" style="text-align: center;"></div>
-		</section>
-	</div>
+            }
 
-	<div id="editEventPanel" class="dynamicPanel">
-		<div class="">
-			<h1 class="eventname">{{currentEvent.name}}</h1>
-			<div id="run_event_modifier" class="box_proprietaiPhone">
-				<div class="testo_proprietaiPhone dynvlabel" ng-show="currentEvent.type == 'stateTriggered'">{{currentEvent.triggerState}}</div>
-				<div class="testo_proprietaiPhone dynvlabel" ng-show="currentEvent.type == 'timeTriggered'">{{convertCron(currentEvent.triggerTimer)}}</div>
-				<a class="dynvinput" ng-model="model" ng-click="goToEditEventFormStep('sceltaTipo')">></a>
-			</div>
-			<div id="myAffix">
-				<div class="create_new create_new_event" ng-class="{'create_new_active': !showGuests}" ng-click="toggleShowGuests()">+</div>
-			</div>
+            .wallSingleRow mobileHeight {
+            / / padding : 0;
+                height: 100%;
+            }
 
-			<section id="content_invitati" class="editEventFormSection" ng-show="showGuests">
-				<div ng-repeat="state in currentEvent.triggeredStates" class="elementGuests elementGuests_invitati option_invitati_state no_box_proprieta_iPhone">
-					<li class="statusName nome_stato_invitato">{{state.name}}</li>
-					<div class="nome_nuovo_oggetto_invitato">{{state.objectName}}</div>
-					<div class="">
-						<div class="delete_element elimina_invitati" ng-click="deleteGuest(state)">elimina</div>
-					</div>
-				</div>
-			</section>
+            .mobileHeight {
+                height: 100%;
+            }
 
-			<section class="editEventFormSection" ng-hide="showGuests">
-				<div id="save_new_guests" class="box_proprietaiPhone" ng-show="statesToAddToEvent.length > 0">
-					<div class="byStatus" ng-click="saveCurrentEvent()">
-						<span>Salva!</span>
-					</div>
-				</div>
+            .nameApplicationState {
+                font-size: 20px;
+            }
 
-				<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states | filter:stateInList" >
-					<input type="checkbox" name="all_guestslistOfGuests" ng-click="toggleNewStateInEvent(state)" class="addNewGuest elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
-					<li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
-					<li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
-				</div>
-			</section>
-		</div>
-	</div>
-		
-	<div Id="editEventRunPanel" class="dynamicPanel">
-		<div class="">
-			<section class="editEventFormSection" ng-show="editEventFormStep == 'sceltaTipo' || editEventFormStep == 'selezioneStatoScatenante' || editEventFormStep == 'selezioneData'">
-				<h1 style="text-align: center;">Scelta Tipo</h1>
-				<div id="byStatus" class="box_byStatus">
-					<div id="byStatusinput" class="byStatus" ng-click="goToEditEventFormStep('selezioneStatoScatenante',$event)"><span id="byStatusspan">Stato</span></div>
-				</div>
-				<div id="byDate" class="box_byDate">
-					<div id="byDateinput" class="byDate" ng-click="goToEditEventFormStep('selezioneData',$event)"><span id="byDatespan">Data</span></div>
-				</div>
-			</section>
+            .layoutIconStateOption .mobile {
+                display: table;
+                transform: translateX(70%);
+                -webkit-transform: translateX(70%);
+                width: 100%;
+                height: 100%;
+            }
 
-			<div id="save_new_run" class="box_proprietaiPhone" ng-show="showSave">
-				<div class="byStatus" ng-click="saveCurrentEvent()">
-					<span>Salva!</span>
-				</div>
-			</div>
+            .layoutStateName {
+                display: table;
+                line-height: 16px;
 
-			<section class="newEventFormSection" ng-show="editEventFormStep == 'selezioneStatoScatenante'">
-				<h1 style="text-align: center;">Selezione Stato Scatenante</h1>
-				<div id="statusesListInput" >
-					<form id="content_statusesList" style="display: block; opacity: 1;">
-						<div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
-							<input type="radio" name="all_statusesstatusesList" ng-click="newRunState()" ng-model="$parent.currentEvent.triggerState" ng-value="state.name" class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone">
-							<li class="statusName statusNameInvited nome_nuovo_scatenante">{{state.name}}</li>
-							<div class="nome_oggetto_nuovo_scatenante nome_oggetto_invitato">{{state.objectName}}</div>
-						</div>
-					</form>
-				</div>
-			</section>
+            }
 
-			<section class="newEventFormSection" ng-show="editEventFormStep == 'selezioneData'">
-				<h1 style="text-align: center;"> Selezione Data</h1>
-				<div id="selezioneDataModificaEvento" style="text-align: center;"></div>
-			</section>
-		</div>
-	</div>
+            .nameApplicationState {
+                font-family: sans-serif;
+                font-weight: 100;
+                padding: 2%;
+                border-bottom: solid 1px #cacaca;
+                margin-bottom: 2%;
+            }
+
+            .wallSingleRow {
+                height: 100%;
+            }
+
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1199px) {
+
+            .active_on {
+                background-color: rgb(34, 201, 34);
+            }
+
+            .activeState {
+                width: 15px;
+                height: 15px !important;
+                margin-right: 5%;
+                border: solid 5px rgb(255, 255, 255);
+                border-radius: 100px;
+                box-shadow: 0 0 1px 1px rgba(3, 3, 3, 0.57);
+            }
+
+            .modify {
+                float: right !important;
+                width: 10px;
+                height: 10px;
+                text-align: right;
+                font-size: 20px !important;
+            }
+
+            .statusName {
+                width: 80%;
+                height: 10px;
+            }
+
+            .elementBacheca {
+                width: 130px !important;
+                height: 130px;
+                overflow-x: auto;
+                padding: 17px;
+                border: none;
+                box-shadow: none;
+                overflow-y: hidden;
+                margin: 2% auto;
+                line-height: 28px !important;
+                -webkit-user-drag: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .elementBacheca li {
+                display: table-caption !important;
+                float: left;
+                position: relative;
+                list-style: none;
+                -webkit-transition: all 0.4s ease 0s;
+                transition: all 0.4s ease 0s;
+            }
+
+            .option_Bacheca_id_state {
+                width: 60%;
+                margin: 20px auto;
+            }
+
+            .option_Bacheca_id_state li {
+                float: left !important;
+            }
+
+            .delete {
+                width: 50%;
+                display: table-cell;
+                height: 50px;
+                margin-top: 20%;
+                text-align: center;
+                line-height: 50px;
+                color: #fff;
+                background-color: #CC2929;
+            }
+
+            .tag {
+                width: 50%;
+                height: 50px;
+                display: table-cell;
+                margin-top: 20%;
+                text-align: center;
+                line-height: 50px;
+                color: #fff;
+                background-color: #29ADCC;
+            }
+
+            #title_state {
+                width: 50%;
+                margin-top: 5%;
+                margin-bottom: 5%;
+                border: none;
+                text-align: center;
+                font-size: 25px;
+                background: none;
+            }
+
+            .desktopLayoutStateContainer {
+                box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.13);
+                padding-left: 2%;
+                padding-right: 2%;
+            }
+
+            .layoutIconStateOption div {
+                font-size: 16px;
+                text-align: center;
+                padding: 0;
+                margin: 0 auto;
+
+            }
+
+            .layoutIconStateOption {
+                padding-top: 22%;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .layoutStateName div {
+                line-height: 12px;
+                text-align: center;
+            }
+
+            .layoutStateName {
+                display: table;
+                vertical-align: middle;
+                width: 100%;
+                height: 40px;
+                padding: 0;
+            }
+
+            .alignIconStateOption {
+                display: table;
+                height: 36px;
+                text-align: center;
+            }
+
+            .nameApplicationState {
+                font-size: 30px;
+            }
+
+            .desktopAlignIcon {
+                width: 10%;
+                margin: 0 auto;
+            }
+
+            .nameApplicationState {
+                font-family: sans-serif;
+                font-weight: 100;
+                padding: 2%;
+                border-bottom: solid 1px #cacaca;
+            }
+
+            .wallSingleRow {
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                width: auto;
+            / / border-radius : 152 px;
+                border: solid 1px #d7d7d7;
+                background-color: rgba(247, 255, 240, 1);
+            }
+
+            #wallContainer {
+                height: 65%;
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
+
+            #ApioEventsContainer {
+                height: 100%;
+            }
+
+            .systemAppContainer {
+                margin-top: 60px;
+                overflow-x: hidden;
+                height: 90%;
+                overflow-y: hidden;
+            }
+
+            .newEventFormSection {
+                overflow-y: scroll;
+                height: 70%;
+                float: left;
+                width: 100%;
+            }
+
+        }
+
+        @media only screen and (min-width: 1200px) {
+            .buttonFunctionLogic {
+                width: 20px;
+                height: 20px;
+                font-size: 12px !important;
+                line-height: 18px;
+                border: solid 1px #000;
+                border-radius: 200px;
+                cursor: pointer;
+            }
+
+            .active_on {
+                background-color: rgb(34, 201, 34);
+            }
+
+            .activeState {
+                width: 15px;
+                height: 15px !important;
+                margin-right: 5%;
+                border: solid 5px rgb(255, 255, 255);
+                border-radius: 100px;
+                box-shadow: 0 0 1px 1px rgba(3, 3, 3, 0.57);
+            }
+
+            .modify {
+                float: right !important;
+                width: 10px;
+                height: 10px;
+                text-align: right;
+                font-size: 20px !important;
+            }
+
+            .statusName {
+                width: 80%;
+                height: 10px;
+            }
+
+            .elementBacheca {
+                width: 130px !important;
+                height: 130px;
+                overflow-x: auto;
+                padding: 17px;
+                border: none;
+                box-shadow: none;
+                overflow-y: hidden;
+                margin: 2% auto;
+                line-height: 28px !important;
+                -webkit-user-drag: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .elementBachecaLogic {
+                width: 130px !important;
+                height: 130px;
+                overflow-x: auto;
+                padding: 0px;
+                border: none;
+                box-shadow: none;
+                overflow-y: hidden;
+                margin: 2% auto;
+                line-height: 28px !important;
+                -webkit-user-drag: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .elementBacheca li {
+                display: table-caption !important;
+                float: left;
+                position: relative;
+                list-style: none;
+                -webkit-transition: all 0.4s ease 0s;
+                transition: all 0.4s ease 0s;
+            }
+
+            .option_Bacheca_id_state {
+                width: 60%;
+                margin: 20px auto;
+            }
+
+            .option_Bacheca_id_state li {
+                float: left !important;
+            }
+
+            .delete {
+                width: 50%;
+                display: table-cell;
+                height: 50px;
+                margin-top: 20%;
+                text-align: center;
+                line-height: 50px;
+                color: #fff;
+                background-color: #CC2929;
+            }
+
+            .tag {
+                width: 50%;
+                height: 50px;
+                display: table-cell;
+                margin-top: 20%;
+                text-align: center;
+                line-height: 50px;
+                color: #fff;
+                background-color: #29ADCC;
+            }
+
+            #title_state {
+                width: 50%;
+                margin-top: 5%;
+                margin-bottom: 5%;
+                border: none;
+                text-align: center;
+                font-size: 25px;
+                background: none;
+            }
+
+            .desktopLayoutStateContainer {
+                box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.13);
+                padding-left: 2%;
+                padding-right: 2%;
+            }
+
+            .layoutIconStateOption div {
+                font-size: 16px;
+                text-align: center;
+                padding: 0;
+                margin: 0 auto;
+
+            }
+
+            .layoutIconStateOption {
+                padding-top: 22%;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .layoutStateName div {
+                line-height: 12px;
+                text-align: center;
+            }
+
+            .layoutStateName {
+                display: table;
+                vertical-align: middle;
+                width: 100%;
+                height: 40px;
+                padding: 0;
+            }
+
+            .alignIconStateOption {
+                display: table;
+                height: 36px;
+                text-align: center;
+            }
+
+            .nameApplicationState {
+                font-size: 30px;
+            }
+
+            .desktopAlignIcon {
+                width: 10%;
+                margin: 0 auto;
+            }
+
+            .nameApplicationState {
+                font-family: sans-serif;
+                font-weight: 100;
+                padding: 2%;
+                border-bottom: solid 1px #cacaca;
+            }
+
+            .wallSingleRow {
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                width: auto;
+            / / border-radius : 152 px;
+                border: solid 1px #d7d7d7;
+                background-color: rgba(247, 255, 240, 1);
+            }
+
+            #wallContainer {
+                height: 65%;
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
+
+            #ApioEventsContainer {
+                height: 100%;
+            }
+
+            .systemAppContainer {
+                margin-top: 60px;
+                overflow-x: hidden;
+                height: 90%;
+                overflow-y: hidden;
+            }
+
+            .newEventFormSection {
+                overflow-y: scroll;
+                height: 70%;
+                float: left;
+                width: 100%;
+            }
+        }
+    </style>
+    <!--INIZIO MENU DA ELIMINARE PER NUOVA SEZIONE LOGICHE -->
+    <div class="container-fluid">
+        <div class="menuGestioneNotifiche">
+            <div class="row">
+                <!--<div class="col-md-4 singolaVoceFirst"><a>Sistema</a></div>-->
+                 <div class="col-md-4 col-xs-4 col-sm-4 singolaVoceFirst"><a href="#/notificationsAll">Sistema</a></div>
+                <div class="col-md-4 col-xs-4 col-sm-4 singolaVoce"><a href="#/wall">Personalizzate</a></div>
+                <div class="col-md-4 col-xs-4 col-sm-4 singolaVoceLast"><a href="#/events">Logiche</a></div>
+            </div>
+        </div>
+    </div>
+    <!--FINE MENU DA ELIMINARE PER NUOVA SEZIONE LOGICHE -->
+
+    <!--INIZIO NUOVO MENU IN VISTA LOGICHE DA SCOMMENTARE -->
+    <!--
+    <div class="container-fluid" ng-show="currentFormStep != 'sceltaTipo'">
+        <div class="menuGestioneNotifiche" >
+        <div class="row">
+            <!--<div class="col-md-4 singolaVoceFirst"><a>Sistema</a></div>--><!--
+		    <div class="col-md-6 col-xs-6 col-sm-6 singolaVoceFirst"><a href="#/wall">Personalizzate</a></div>
+		    <div class="col-md-6 col-xs-6 col-sm-6 singolaVoceLast"><a href="#/events">Logiche</a></div>
+	    </div>
+	    </div>
+    </div>
+	<div class="container-fluid" ng-show="currentFormStep == 'sceltaTipo'">
+	    <div class="menuGestioneNotifiche" >
+	    <div class="row">
+		    <!--<div class="col-md-4 singolaVoceFirst"><a>Sistema</a></div>--><!--
+		    <div class="col-md-6 col-xs-6 col-sm-6 singolaVoceFirst"><a href="#/wall">Personalizzate</a></div>
+		    <div class="col-md-6 col-xs-6 col-sm-6 singolaVoceLast"><a href="#/events">Logiche</a></div>
+	    </div>
+	    </div>
+    </div>
+    -->
+    <!--FINE NUOVO MENU IN VISTA LOGICHE DA SCOMMENTARE -->
+
+    <div id="ApioEventsContainer" class="maxHeight">
+        <section class="nav_event">
+            <div id="goBack" class="box_byDate" style="opacity: 1;"
+                 ng-show="currentFormStep !== 'sceltaTipo' && currentFormStep !== ''" ng-click="goBack()">
+                <div id="goBackinput" class="goBack">
+                    <span id="goBackspan">Indietro</span>
+                </div>
+            </div>
+            <div id="new_event" class="create_new create_new_event"
+                 ng-class="{'create_new_active' : currentFormStep !== ''}" ng-click="reset()">
+                <p>+</p>
+            </div>
+            <div id="goForward" class="box_byDate" style="opacity: 1;" ng-show="showForward()">
+                <div id="goForwardinput" class="goForward" ng-click="goForward()">
+                    <span id="goForwardspan">Avanti</span>
+                </div>
+            </div>
+            <div id="createNewEvent" class="box_byDate" style="opacity: 1;" ng-show="eventNameIsValid()">
+                <div id="createNewEventinput" class="createNewEvent crea" ng-click="saveEvent()">
+                    <span id="createNewEventspan">Crea!</span>
+                </div>
+            </div>
+        </section>
+
+        <!--INIZIO NUOVO ELEMENTO PER RIASSUNTO LOGICA CORRENTE DA SCOMMENTARE-->
+        <!--
+        <div class="container-fluid" ng-show="currentFormStep == 'sceltaTipo'">
+                        <div class="row desktopLayoutStateContainer mobileLayoutStateContainer">
+                    <div class="col-md-12 col-xs-12">
+                        <div class="nameApplicationState" ng-click="explainSingleState($event)">Logica Corrente</div>
+                    </div>
+                    <div class="col-md-2 col-xs-12 wallSingleRow">
+                        Qui vengono caricate gli stati logici mano a mano che vengono selezionati
+                    </div>
+                </div>
+
+            </div>
+            -->
+        <!--FINE NUOVO ELEMENTO PER RIASSUNTO LOGICA CORRENTE DA SCOMMENTARE-->
+
+        <!--INIZIO NUOVA VIEW EVENTI-->
+        <div id="wallContainer" class="app_home openAppIconStyle" ng-click="explaynStates($event)"
+             ng-show="currentFormStep == ''">
+            <!--<div class="row desktopLayoutStateContainer mobileLayoutStateContainer"
+                 ng-repeat="(app, events) in groupedEvents">-->
+            <div class="row desktopLayoutStateContainer mobileLayoutStateContainer"
+                 ng-repeat="app in groupedEventsList">
+                <div class="col-md-12 col-xs-12">
+                    <div class="nameApplicationState" ng-click="explainSingleState($event)" ng-class="{'r-blue': app === 'Eventi temporali'}">{{app}}</div>
+                </div>
+                <!--<div class="col-md-2 col-xs-12 wallSingleRow" ng-repeat="event in events">-->
+                <div class="col-md-2 col-xs-12 wallSingleRow" ng-repeat="event in groupedEventsMap[app]">
+                    <div class="elementBacheca box_proprietaiPhone row">
+                        <div class="col-md-12 col-xs-12 mobileHeight">
+                            <div class="layoutStateName col-xs-6 mobileHeight">
+                                <div class="verticalAlign" style="height:100%;">
+                                    {{event.name}}
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-xs-6 layoutIconStateOption">
+                                <div class="row mobile">
+                                    <div class="verticalAlign mobileHeight desktopAlignIcon">
+                                        <div class="col-xs-4 col-md-4 alignIconStateOption">
+                                            <div class="verticalAlign glyphicon glyphicon-send"></div>
+                                        </div>
+                                        <!--
+                                        <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="launchEvent(state)">
+                                            <div class="verticalAlign glyphicon glyphicon-send"></div>
+                                        </div>
+                                        -->
+                                        <div class="col-xs-4 col-md-4 alignIconStateOption"
+                                             ng-click="deleteEvent(event)">
+                                            <div class="verticalAlign glyphicon glyphicon-trash"></div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-4 alignIconStateOption">
+                                            <div class="verticalAlign glyphicon glyphicon-edit"
+                                                 ng-click="editEvent(event)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xs-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--FINE NUOVA VIEW EVENTI-->
+
+        <div style="clear: both;"></div>
+
+        <!-- INIZIO PARTE DA COMMENTARE PER INSERIMENTO SEZIONE LOGICHE-->
+        <section class="newEventFormSection" ng-show="currentFormStep == 'sceltaTipo'">
+            <h1 style="text-align: center;">Scelta Tipo</h1>
+
+            <div id="byStatus" class="box_proprietaiPhone no_box_proprieta_iPhone box_byStatus" style="opacity: 1;">
+                <div id="byStatusinput" class="byStatus" ng-click="goToFormStep('selezioneStatoScatenante',$event)">
+                    <span id="byStatusspan">Stato</span>
+                </div>
+            </div>
+            <div id="byDate" class="box_proprietaiPhone no_box_proprieta_iPhone box_byDate" style="opacity: 1;">
+                <div id="byDateinput" class="byDate" ng-click="goToFormStep('selezioneData',$event)">
+                    <span id="byDatespan">Data</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatoScatenante'">
+            <h1 style="text-align: center;">Selezione Stato Scatenante</h1>
+
+            <div id="statusesListInput">
+                <form id="content_statusesList" style="display: block; opacity: 1;">
+                    <div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
+                        <input type="radio" name="all_statusesstatusesList" ng-model="$parent.newEvent.triggerState"
+                               ng-value="state.name"
+                               class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone">
+                        <li class="statusName statusNameInvited nome_nuovo_scatenante">{{state.name}}</li>
+                        <div class="nome_oggetto_nuovo_scatenante nome_oggetto_invitato">{{state.objectName}}</div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="newEventFormSection" ng-show="currentFormStep == 'selezioneStatiScatenati'">
+            <h1 style="text-align: center;">Selezione Stati scatenati</h1>
+
+            <div ng-if="$parent.newEvent.triggerState != state.name" class="content_nuovo_scatenante elenco_invitati"
+                 ng-repeat="state in states">
+                <input type="checkbox" name="all_guestslistOfGuests" ng-click="checkedModel(state)"
+                       class="elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
+                <li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
+                <li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
+            </div>
+        </section>
+
+        <section class="newEventFormSection" ng-show="currentFormStep == 'selezioneNomeEvento'">
+            <h1 style="text-align: center;">Selezione Nome Evento</h1>
+
+            <div class="newEventNameproprieta" style="text-align: center;">
+                <form id="newEventNameform">
+                    <input id="newEventNameinput" class="newEventNameinput" type="text" ng-model="newEvent.name">
+                </form>
+            </div>
+        </section>
+
+        <section class="newEventFormSection" ng-show="currentFormStep == 'selezioneData'">
+            <h1 style="text-align: center;">Selezione Data</h1>
+
+            <div id="selezioneDataNuovoEvento" style="text-align: center;"></div>
+        </section>
+        <!--FINE PARTE DA COMMENTARE PER INSERIMENTO SEZIONE LOGICHE-->
+
+        <!--NUOVA PARTE SEZIONE LOGICHE DA SCOMMENTARE-->
+        <!--
+        <div id="wallContainer" class="app_home openAppIconStyle" ng-click="explaynStates($event)" ng-show="currentFormStep == 'sceltaTipo'">
+            <div class="row desktopLayoutStateContainer mobileLayoutStateContainer" ng-repeat="(app, states) in groupedStates">
+                <div class="col-md-12 col-xs-12">
+                    <div class="nameApplicationState" ng-click="explainSingleState($event)">{{app}}</div>
+                </div>
+                <div class="col-md-2 col-xs-12 wallSingleRow" ng-repeat="state in states">
+                    <div class="elementBachecaLogic box_proprietaiPhone row">
+                        <div class="col-md-12 col-xs-12 mobileHeight">
+                            <div class="layoutStateName col-xs-6 mobileHeight" >
+                                <div class="verticalAlign" style="height:100%;">{{state.name}}</div>
+                            </div>
+                                    <div class="col-md-12 col-xs-6 layoutIconStateOption">
+                                        <div class="row mobile">
+                                           <div class="verticalAlign mobileHeight desktopAlignIcon">
+                                            <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="">
+                                                <div class="verticalAlign">
+                                                    <div class="buttonFunctionLogic">
+                                                        if
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="">
+                                                <div class="verticalAlign">
+                                                    <div class="buttonFunctionLogic">
+                                                        Th
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="">
+                                                <div class="verticalAlign">
+                                                    <div class="buttonFunctionLogic glyphicon glyphicon-time">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="">
+                                                <div class="verticalAlign">
+                                                    <div class="buttonFunctionLogic glyphicon glyphicon-chevron-left">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="">
+                                                <div class="verticalAlign">
+                                                    <div class="buttonFunctionLogic">
+                                                        =
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-md-4 alignIconStateOption" ng-click="">
+                                                <div class="verticalAlign">
+                                                    <div class="buttonFunctionLogic glyphicon glyphicon-chevron-right">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <div class="col-md-6 col-xs-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+        <!--FINE NUOVA PARTE SEZIONE LOGICHE DA SCOMMENTARE-->
+    </div>
+
+    <div id="editEventPanel" class="dynamicPanel">
+        <div class="">
+            <h1 class="eventname">{{currentEvent.name}}</h1>
+
+            <div id="run_event_modifier" class="box_proprietaiPhone">
+                <div class="testo_proprietaiPhone dynvlabel" ng-show="currentEvent.type == 'stateTriggered'">
+                    {{currentEvent.triggerState}}
+                </div>
+                <div class="testo_proprietaiPhone dynvlabel" ng-show="currentEvent.type == 'timeTriggered'">
+                    {{convertCron(currentEvent.triggerTimer)}}
+                </div>
+                <a class="dynvinput" ng-model="model" ng-click="goToEditEventFormStep('sceltaTipo')">></a>
+            </div>
+            <div id="myAffix">
+                <div class="create_new create_new_event" ng-class="{'create_new_active': !showGuests}"
+                     ng-click="toggleShowGuests()">+
+                </div>
+            </div>
+
+            <section id="content_invitati" class="editEventFormSection" ng-show="showGuests">
+                <div ng-repeat="state in currentEvent.triggeredStates"
+                     class="elementGuests elementGuests_invitati option_invitati_state no_box_proprieta_iPhone">
+                    <li class="statusName nome_stato_invitato">{{state.name}}</li>
+                    <div class="nome_nuovo_oggetto_invitato">{{state.objectName}}</div>
+                    <div class="">
+                        <div class="delete_element elimina_invitati" ng-click="deleteGuest(state)">elimina</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="editEventFormSection" ng-hide="showGuests">
+                <div id="save_new_guests" class="box_proprietaiPhone" ng-show="statesToAddToEvent.length > 0">
+                    <div class="byStatus" ng-click="saveCurrentEvent()">
+                        <span>Salva!</span>
+                    </div>
+                </div>
+
+                <div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states | filter:stateInList">
+                    <input type="checkbox" name="all_guestslistOfGuests" ng-click="toggleNewStateInEvent(state)"
+                           class="addNewGuest elementNuovi_invitati box_proprietaiPhone elementi_nuovo_scatenante">
+                    <li class="statusNameInvited statusName nome_nuovo_scatenante">{{state.name}}</li>
+                    <li class="nome_oggetto_invitato nome_oggetto_nuovo_scatenante">{{state.objectName}}</li>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div Id="editEventRunPanel" class="dynamicPanel">
+        <div class="">
+            <section class="editEventFormSection"
+                     ng-show="editEventFormStep == 'sceltaTipo' || editEventFormStep == 'selezioneStatoScatenante' || editEventFormStep == 'selezioneData'">
+                <h1 style="text-align: center;">Scelta Tipo</h1>
+
+                <div id="byStatus" class="box_byStatus">
+                    <div id="byStatusinput" class="byStatus"
+                         ng-click="goToEditEventFormStep('selezioneStatoScatenante',$event)"><span id="byStatusspan">Stato</span>
+                    </div>
+                </div>
+                <div id="byDate" class="box_byDate">
+                    <div id="byDateinput" class="byDate" ng-click="goToEditEventFormStep('selezioneData',$event)"><span
+                            id="byDatespan">Data</span></div>
+                </div>
+            </section>
+
+            <div id="save_new_run" class="box_proprietaiPhone" ng-show="showSave">
+                <div class="byStatus" ng-click="saveCurrentEvent()">
+                    <span>Salva!</span>
+                </div>
+            </div>
+
+            <section class="newEventFormSection" ng-show="editEventFormStep == 'selezioneStatoScatenante'">
+                <h1 style="text-align: center;">Selezione Stato Scatenante</h1>
+
+                <div id="statusesListInput">
+                    <form id="content_statusesList" style="display: block; opacity: 1;">
+                        <div class="content_nuovo_scatenante elenco_invitati" ng-repeat="state in states">
+                            <input type="radio" name="all_statusesstatusesList" ng-click="newRunState()"
+                                   ng-model="$parent.currentEvent.triggerState" ng-value="state.name"
+                                   class="elementNuovi_invitati elementGuests elementi_nuovo_scatenante box_proprietaiPhone">
+                            <li class="statusName statusNameInvited nome_nuovo_scatenante">{{state.name}}</li>
+                            <div class="nome_oggetto_nuovo_scatenante nome_oggetto_invitato">{{state.objectName}}</div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="newEventFormSection" ng-show="editEventFormStep == 'selezioneData'">
+                <h1 style="text-align: center;"> Selezione Data</h1>
+
+                <div id="selezioneDataModificaEvento" style="text-align: center;"></div>
+            </section>
+        </div>
+    </div>
 </div>

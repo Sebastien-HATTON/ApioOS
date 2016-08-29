@@ -1,0 +1,255 @@
+<style>
+    .notifications_container {
+        padding-top: 2%;
+    }
+
+    .modal-body .row {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1%;
+    }
+
+    .loader_text {
+        font-weight: 200;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .content_loader {
+        margin: 15px auto;
+    }
+
+    .default_container {
+        padding: 1%;
+    }
+
+    .default_description {
+        font-size: 19px;
+        font-weight: 300;
+        vertical-align: middle;
+    }
+
+    .default_number {
+        border: none;
+        font-size: 17px;
+        color: rgba(214, 39, 21, 0.95);
+        width: 203px;
+        font-weight: 300;
+    }
+
+    .default_button {
+        border: none;
+        margin-left: 2%;
+        padding: 1% 1.5% !important;
+        font-size: 16px;
+        vertical-align: inherit;
+        font-weight: 300;
+        text-decoration: underline;
+    }
+
+    .notification_row {
+        padding: 1.7% 0;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .notifications_background {
+        background: rgba(238, 238, 238, 0.6);
+    }
+
+    .notification_object_name {
+        text-align: center;
+        margin-top: 1.5%;
+    }
+
+    .notification_object_name h4 {
+        font-weight: 300;
+    }
+
+    .notification_name {
+        margin-top: 7px;
+        margin-bottom: 0;
+        font-weight: 400;
+        font-size: 13px;
+    }
+
+    .notification_button {
+        height: 70px;
+        width: 80px;
+        padding: 0;
+        border-radius: 10px;
+        font-size: 42px;
+        color: gray;
+        text-align: center;
+    }
+
+    .modal_span {
+        font-size: 15px;
+        font-weight: 400;
+        vertical-align: middle;
+    }
+
+</style>
+
+<div class="container" id="NotificationsList">
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="notifModal"
+         class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" data-dismiss="modal" class="close">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 id="myModalLabel" class="modal-title">{{currentNotification}}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <span class="modal_span">Send Notification to:</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <table class="table table-striped table-bordered">
+                                <tbody>
+                                <tr ng-repeat="n in numbersData">
+                                    <td class="col-xs-2" style="text-align: center;">
+                                        <input type="checkbox" name="numbers" ng-click="toggleSend(n)"
+                                               ng-checked="n.enabled === true"/>
+                                    </td>
+                                    <td class="col-xs-10" style="padding-left: 3%;">{{n.contact}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <span class="modal_span">Text:</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" style="height: 100%; width: 100%;" ng-model="newTextValue"
+                                      ng-blur="newText()"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div tabindex="-1" role="dialog" aria-labelledby="numbersModal" aria-hidden="true" id="mailsModal"
+         class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" data-dismiss="modal" class="close">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 id="numbersTitle" class="modal-title">Mail settings</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <span class="modal_span">Default:</span>
+                        </div>
+                        <div class="col-xs-9">
+                            <table class="table table-bordered">
+                                <tbody>
+                                <tr ng-repeat="s in sms">
+                                    <td class="col-xs-2">
+                                        <input type="radio" name="defaultNumber" ng-click="changeDefault(s)"
+                                               ng-checked="s.default === true"/>
+                                    </td>
+                                    <td class="col-xs-6">{{s.number}}</td>
+                                    <td class="col-xs-4">
+                                        <button style="width:100%;" type="button" class="btn btn-danger"
+                                                ng-click="removeNumber(s)">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <table class="table table-bordered">
+                            <thead>
+                            <th colspan="2" style="text-align: center;">Add new mail</th>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="col-xs-10">
+                                    <input type="text" ng-model="newNumberModel"/>
+                                </td>
+                                <td class="col-xs-2">
+                                    <button type="button" style="width:100%;" class="btn btn-primary"
+                                            ng-click="addNewNumber()">
+                                        Add
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row default_container">
+        <div class="col-md-7 col-sm-9">
+            <span class="default_description">Your default mail is: <input class="default_number" type="text"
+                                                                           ng-model="defaultNumber" disabled/></span>
+            <button class="btn btn-default default_button" ng-click="showNumberManagement()">manage mails
+            </button>
+        </div>
+    </div>
+
+    <div class="row alert alert-warning" ng-hide="mail_ready">
+        <div class="content_loader"></div>
+        <p class="loader_text">Aggiornamento dati in corso...</p>
+    </div>
+
+    <div class="row notifications_container">
+        <div ng-repeat="name in notificationsNames" class="row notification_row"
+             ng-class="{'notifications_background' : $even}">
+            <div class="col-sm-2 notification_object_name">
+                <h4>{{name}}</h4>
+            </div>
+            <div class="col-sm-10">
+                <div class="row">
+                    <div ng-repeat="n in notifications[$index]" class="col-sm-2 col-xs-4" style="text-align: center;">
+                        <button id="{{n}}" ng-click="showNotification(notificationsIds[name], n)"
+                                class="btn btn-default notification_button fa fa-file-text-o">
+                        </button>
+                        <p class="notification_name">{{n}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

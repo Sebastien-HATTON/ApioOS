@@ -1,0 +1,292 @@
+<div id="appHomeContainer">
+    <style>
+        .black {
+            border: solid 5px #000000 !important;
+        }
+
+        .green {
+            border: solid 5px #00FF80 !important;
+        }
+
+        .orange {
+            border: solid 5px #FF8C00 !important;
+        }
+
+        .red {
+            border: solid 5px #FF0000 !important;
+        }
+
+        .yellow {
+            border: solid 5px #FFEB00 !important;
+        }
+
+        .isSyncing {
+
+        }
+
+        .displayNone {
+            display: none !important;
+        }
+
+        #ApioIconsContainer {
+            padding: 38px 1.1%;
+        }
+
+        #ApioIconsContainer2 {
+            /*padding: 0.8% 0%;*/
+        }
+
+        .ApioIconsContainer2 {
+            width: 14.22%;
+        }
+
+        .ApioIconsContainer3 {
+            width: 20%;
+        }
+
+        .ApioIconsContainer4 {
+            width: 33.25%;
+        }
+
+        .iconDisplay {
+            display: inline-block;
+        }
+
+        .app_icon_style {
+            border-radius: 145px;
+            background-size: 100%;
+            background-position: 50%;
+            -webkit-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9);
+            -moz-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9));
+            box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9);
+            cursor: pointer;
+        }
+
+        .board_icon_style {
+            border-radius: 145px;
+            background-size: 100%;
+            background-position: 50%;
+            -webkit-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.8);
+            -moz-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.8));
+            box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.8);
+            cursor: pointer;
+        }
+
+        .icon_name_container {
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+            height: auto;
+        }
+
+        .homeAppIconName {
+            text-align: center;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #505050;
+        }
+
+        @media only screen and (max-width: 480px) {
+            .ApioIconsContainer2 {
+                width: 25%;
+            }
+
+            .homeAppIconName {
+                font-size: 12px;
+            }
+
+            .iconDisplay {
+                height: 80px;
+                width: 65px;
+            }
+
+            .image-dimensions {
+                height: 55px;
+                width: 55px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 481px) and (max-width: 767px) {
+            .ApioIconsContainer2 {
+                width: 25%;
+            }
+
+            .homeAppIconName {
+                font-size: 15px;
+            }
+
+            .iconDisplay {
+                height: 140px;
+                width: 90px;
+            }
+
+            .image-dimensions {
+                height: 80px;
+                width: 80px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 991px) {
+            .ApioIconsContainer2 {
+                width: 25%;
+            }
+
+            .homeAppIconName {
+                font-size: 17px;
+            }
+
+            .iconDisplay {
+                height: 150px;
+                width: 115px;
+            }
+
+            .image-dimensions {
+                height: 100px;
+                width: 100px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 992px) and (max-width: 1199px) {
+            .iconDisplay {
+                height: 140px;
+                width: 110px;
+            }
+
+            .image-dimensions {
+                height: 90px;
+                width: 90px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 1200px) {
+            .iconDisplay {
+                height: 140px;
+                width: 110px;
+            }
+
+            .image-dimensions {
+                height: 100px;
+                width: 100px;
+                margin: 0 auto;
+            }
+        }
+
+        .suggest {
+            position: absolute;
+            background-color: white;
+            width: 86%;
+            margin-top: 2px;
+        }
+
+        .suggestRowActive {
+            background: rgba(0, 220, 0, 0.48);
+            padding: 4%;
+        }
+
+        .suggestRow {
+        / / background: rgba(0, 220, 0, 0.48);
+            padding: 4%;
+            margin: 0;
+        }
+
+    </style>
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <div id="ApioIconsContainer" layout="row" layout-wrap layout-padding>
+
+        <div id="{{obj.objectId}}" class="ApioIconsContainer2 applicazione"
+             data-objectId="{{obj.objectId}}" ng-repeat="obj in objects"
+             ng-click="launchApplicationSimple(obj.objectId)">
+            <div layout="column" layout-align="center center">
+                <div class="home" flex>
+                    <div ng-if="obj.type=='object' || obj.type=='service'" id="imageId{{obj.objectId}}"
+                         data-objectId="{{obj.objectId}}" class="image-dimensions app_icon_style"
+                         ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2', 'black' : obj.status === '3', 'orange' : obj.status === '4', 'green' : obj.status === '5'}"
+                         style="background-image: url(applications/{{obj.objectId}}/icon.png); background-size: cover;">
+
+                    </div>
+                    <div ng-if="obj.type=='products'" id="imageId{{obj.objectId}}" data-objectId="{{obj.objectId}}"
+                         class="image-dimensions app_icon_style"
+                         ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2', 'black' : obj.status === '3', 'orange' : obj.status === '4', 'green' : obj.status === '5'}"
+                         style="background-image: url(products/{{obj.appId}}/icon.png); background-size: cover;">
+
+                    </div>
+                </div>
+                <div class="icon_name_container">
+                    <div class="homeAppIconName">{{obj.name}}</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--
+    <div id="ApioIconsContainer">
+        <div id="ApioIconsContainer2" ng-if="continueToCloud" class="col-xs-3 col-sm-3 col-md-2"
+             ng-repeat="a in currentUserActive.platform" ng-click="launchBoardSimple(a)" style="text-align: center;">
+            <div class="iconDisplay">
+                <div class="home">
+                    <div class="image-dimensions board_icon_style" ng-class="{'isSyncing' : a.isSyncing === true}"
+                         style="background-image: url(images/gateway.png);">
+                    </div>
+                </div>
+                <div class="icon_name_container">
+                    <div class="homeAppIconName">{{a.name ? a.name : a.apioId}}</div>
+                </div>
+            </div>
+        </div>
+        <div id="{{obj.objectId}}" class="ApioIconsContainer2 col-xs-3 col-sm-3 col-md-2 applicazione"
+             data-objectId="{{obj.objectId}}" ng-repeat="obj in objects"
+             ng-click="launchApplicationSimple(obj.objectId)"
+             oncontextmenu="angular.element(this).scope().openTag(event)" style="text-align: center;">
+            <div class="iconDisplay">
+                <div class="home">
+                    <div ng-if="obj.type=='object' || obj.type=='service'" id="imageId{{obj.objectId}}"
+                         data-objectId="{{obj.objectId}}" class="image-dimensions app_icon_style"
+                         ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2', 'black' : obj.status === '3', 'orange' : obj.status === '4', 'green' : obj.status === '5'}"
+                         style="background-image: url(applications/{{obj.objectId}}/icon.png); background-size: cover;"
+                         data-container="body" data-toggle="popOver{{obj.objectId}}" data-placement="auto right"
+                         data-html="true" data-trigger="manual"
+                         data-content="<div id='content{{obj.objectId}}'><form><input id='tag{{obj.objectId}}' type='text' autocomplete='off' class='form-control' value='{{obj.tag}}' onblur='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().saveThisTags({{obj.objectId}},event)' onkeyup='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().find({{obj.objectId}},event)' onkeydown='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().press({{obj.objectId}},event)'></form><div id='suggest{{obj.objectId}}' class='suggest'></div></div>"></div>
+                    <div ng-if="obj.type=='products'" id="imageId{{obj.objectId}}" data-objectId="{{obj.objectId}}"
+                         class="image-dimensions app_icon_style"
+                         ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2', 'black' : obj.status === '3', 'orange' : obj.status === '4', 'green' : obj.status === '5'}"
+                         style="background-image: url(products/{{obj.appId}}/icon.png); background-size: cover;"
+                         data-container="body" data-toggle="popOver{{obj.objectId}}" data-placement="auto right"
+                         data-html="true" data-trigger="manual"
+                         data-content="<div id='content{{obj.objectId}}'><form><input id='tag{{obj.objectId}}' type='text' autocomplete='off' class='form-control' value='{{obj.tag}}' onblur='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().saveThisTags({{obj.objectId}},event)' onkeyup='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().find({{obj.objectId}},event)' onkeydown='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().press({{obj.objectId}},event)'></form><div id='suggest{{obj.objectId}}' class='suggest'></div></div>"></div>
+
+                </div>
+                <div class="icon_name_container">
+                    <div class="homeAppIconName">{{obj.name}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+</div>

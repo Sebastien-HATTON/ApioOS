@@ -1,0 +1,216 @@
+<div id="appHomeContainer" style="height:100%;">
+    <style>
+        .black {
+            border: solid 5px #000000 !important;
+        }
+
+        .green {
+            border: solid 5px #00FF80 !important;
+        }
+
+        .orange {
+            border: solid 5px #FF8C00 !important;
+        }
+
+        .red {
+            border: solid 5px #FF0000 !important;
+        }
+
+        .yellow {
+            border: solid 5px #FFEB00 !important;
+        }
+
+        .isSyncing {
+
+        }
+
+        .displayNone {
+            display: none !important;
+        }
+
+        #ApioIconsContainer {
+            padding-top: 11px;
+            height: 100%;
+        }
+
+        #ApioIconsContainer2 {
+            padding: 0.8% 0%;
+        }
+
+        .ApioIconsContainer2 {
+            padding: 0.5% 0%;
+        }
+
+        .iconDisplay {
+            display: inline-block;
+        }
+
+        .app_icon_style {
+            border-radius: 145px;
+            background-size: 100%;
+            background-position: 50%;
+            box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 1);
+            cursor: pointer;
+        }
+
+        .board_icon_style {
+            border-radius: 145px;
+            background-size: 100%;
+            background-position: 50%;
+            box-shadow: 0 0 4px 0px rgba(30, 30, 30, 0.8);
+            cursor: pointer;
+        }
+
+        .icon_name_container {
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+            height: auto;
+        }
+
+        .homeAppIconName {
+            text-align: center;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media only screen and (max-width: 480px) {
+            #ApioIconsContainer2 {
+                padding: 1.5% 0%;
+            }
+
+            .ApioIconsContainer2 {
+                padding: 1.5% 0%;
+            }
+
+            .homeAppIconName {
+                font-size: 12px;
+            }
+
+            .iconDisplay {
+                height: 60px;
+                width: 60px;
+            }
+
+            .image-dimensions {
+                height: 60px;
+                width: 60px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 481px) and (max-width: 767px) {
+            .homeAppIconName {
+                font-size: 15px;
+            }
+
+            .iconDisplay {
+                height: 84px;
+                width: 84px;
+            }
+
+            .image-dimensions {
+                height: 84px;
+                width: 84px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 991px) {
+            .homeAppIconName {
+                font-size: 17px;
+            }
+
+            .iconDisplay {
+                height: 100px;
+                width: 100px;
+            }
+
+            .image-dimensions {
+                height: 100px;
+                width: 100px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 992px) and (max-width: 1199px) {
+            .iconDisplay {
+                height: 98px;
+                width: 98px;
+            }
+
+            .image-dimensions {
+                height: 98px;
+                width: 98px;
+                margin: 0 auto;
+            }
+        }
+
+        @media only screen and (min-width: 1200px) {
+            .iconDisplay {
+                height: 103px;
+                width: 103px;
+            }
+
+            .image-dimensions {
+                height: 103px;
+                width: 103px;
+                margin: 0 auto;
+            }
+        }
+
+        .suggest {
+            position: absolute;
+            background-color: white;
+            width: 86%;
+            margin-top: 2px;
+        }
+
+        .suggestRowActive {
+            background: rgba(0, 220, 0, 0.48);
+            padding: 4%;
+        }
+
+        .suggestRow {
+        / / background: rgba(0, 220, 0, 0.48);
+            padding: 4%;
+            margin: 0;
+        }
+
+        #apps {
+            height: 100%;
+            width: 100%;
+        }
+
+        .modifyPosition {
+            border: solid 2px aqua;
+        }
+
+    </style>
+    <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+    <!---------------------------------- LICENSE --------------------------------
+    -                                                                           -
+    - This file is part of ApioOS.                                              -
+    -                                                                           -
+    - ApioOS is free software released under the GPLv2 license: you can         -
+    - redistribute it and/or modify it under the terms of the GNU General       -
+    - Public License version 2 as published by the Free Software Foundation.    -
+    -                                                                           -
+    - ApioOS is distributed in the hope that it will be useful, but             -
+    - WITHOUT ANY WARRANTY; without even the implied warranty of                -
+    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+    - GNU General Public License version 2 for more details.                    -
+    -                                                                           -
+    - To read the license either open the file COPYING.txt or                   -
+    - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+    -                                                                           -
+    ---------------------------------------------------------------------------->
+
+    <div id="ApioIconsContainer">
+        <div style="height:80px; width:100%;"></div>
+        <svg id="apps"></svg>
+    </div>
+</div>
