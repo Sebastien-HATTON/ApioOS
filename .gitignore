@@ -23,8 +23,8 @@ build/Release
 # Commenting this out is preferred by some people, see
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
 Identifier.apio
-!node_modules/serialport
-node_modules
+node_modules/*
+!node_modules/serialport/*
 public/bower_components/*
 public/applications/*
 !public/applications/README.md
