@@ -1,0 +1,17 @@
+<div id="ApioApplication_TMP_" ng-app="ApioApplication_TMP_" style="padding: 10px;">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+            <unlimitedsensor propertyname="temperature" label="Temperature"></unlimitedsensor>
+            <trigger propertyname="actuatorObstructed" labelon="Valvola Otturata" labeloff="Valvola OK" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="energySufficent" labelon="Cambiare Batteria" labeloff="Batteria OK" valueon="1"
+                     valueoff="0"></trigger>
+            <slider propertyname="setPoint" label="Set Point" min="0" max="40" step="1"></slider>
+            <trigger propertyname="setPointSelection" labelon="Room Controll" labeloff="Control Gateway" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="valveOpenClose" labelon="Open" labeloff="Close" valueon="1" valueoff="0"></trigger>
+        </div>
+    </div>
+</div>
+<script src="applications/_TMP_/_TMP_.js"></script>

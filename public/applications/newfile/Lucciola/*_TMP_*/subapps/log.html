@@ -1,0 +1,80 @@
+<style>
+    @media only screen and (min-width: 320px) and (max-width: 479px) {
+        .image-dim {
+            float: right;
+            width: 20%;
+        }
+
+        .table-font {
+            font-size: 11px;
+        }
+    }
+
+    @media only screen and (min-width: 480px) and (max-width: 767px) {
+        .image-dim {
+            float: right;
+            width: 10%;
+        }
+
+        .table-font {
+            font-size: 11px;
+        }
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 991px) {
+        .image-dim {
+            width: 15%;
+            line-height: 0;
+            float: right;
+        }
+
+        .table-font {
+            font-size: 10px !important;
+        }
+    }
+
+    @media only screen and (min-width: 992px) {
+        .image-dim {
+            width: 20%;
+            line-height: 0;
+            float: right;
+        }
+
+        .table-font {
+            font-size: 10px !important;
+        }
+    }
+</style>
+<div id="ApioApplicationLog" ng-app="ApioApplicationLog" style="padding: 10px;">
+    <div ng-controller="defaultController">
+        <div id="app_log" style="display: block;">
+            <div id="export_file" class="box_proprietaiPhone" ng-click="exportToXLSX()" style="cursor: pointer;">
+                <div class="testo_proprietaiPhone">Esporta su file (.xslx)</div>
+                <div class="verticalAlign">
+                    <img src="images/export.png" class="image-dim">
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-font">
+                    <tr class="firstTrTableLog">
+                        <th>Data</th>
+                        <th>Batteria</th>
+                        <th>Laser</th>
+                        <th>Carica</th>
+                        <th>Temperatura</th>
+                        <th>Buzzer</th>
+                    </tr>
+                    <tr ng-repeat="gd in grouppedData" on-finish-render>
+                        <td>{{gd.date}}</td>
+                        <td>{{percentage(gd.x)}}</td>
+                        <td>{{gd.onoff === "0" ? "Spento" : gd.onoff === "1" ? "Acceso" : ""}}</td>
+                        <td>{{gd.onoff1 === "0" ? "Scarico" : gd.onoff1 === "1" ? "Carico" : ""}}</td>
+                        <td>{{gd.y}}</td>
+                        <td>{{gd.buzzer === "0" ? "Spento" : gd.buzzer === "1" ? "Acceso" : ""}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="applications/*_TMP_*/subapps/log.js"></script>

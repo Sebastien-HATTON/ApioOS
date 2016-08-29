@@ -1,0 +1,33 @@
+{
+  "address": "01925593",
+  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
+  "appId": "d2-01-0b",
+  "connected": true,
+  "created": "2015-12-16",
+  "db": {},
+  "log": {},
+  "name": "Smart Plug",
+  "notifications": {},
+  "objectId": "_TMP_",
+  "properties": {
+    "plug1": {
+      "type": "trigger",
+      "labelon": "Plug Attivo",
+      "labeloff": "Plug Disativo",
+      "valueon": "1",
+      "valueoff": "0",
+      "value": "0"
+    },
+    "power1": {
+      "label": "Power [W]",
+      "style": "margin-bottom:0;",
+      "type": "unlimitedsensor",
+      "value": "0.00"
+    }
+  },
+  "protocol": "enocean",
+  "services": [],
+  "sleepTime": 60000,
+  "tag": "#servizi ",
+  "type": "object"
+}

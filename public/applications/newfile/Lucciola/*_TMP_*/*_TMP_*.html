@@ -1,0 +1,230 @@
+<style>
+	.update{
+		-webkit-animation-name: pulse;
+		-webkit-animation-duration: 1s;
+		-webkit-animation-iteration-count: infinite;
+		animation-name: pulse;
+		animation-duration: 1s;
+		animation-iteration-count: infinite;
+	}
+	
+	@-webkit-keyframes 'pulse' {
+		0% {
+		  //background-color: red;
+		  opacity: 0.4;
+		  //-webkit-transform: scale(1.0) rotate(0deg);
+		}
+		100% {
+		  //background-color: red;
+		  opacity: 1.0;
+		  //-webkit-transform: scale(1.0) rotate(0deg);
+		}
+	}
+	
+    .accordion_container {
+        margin-top: 2%;
+        margin-bottom: 2%;
+        -webkit-box-shadow: 0 1px 1px 0 rgba(50, 50, 50, 0.2) !important;
+        -moz-box-shadow: 0 1px 1px 0 rgba(50, 50, 50, 0.2) !important;
+        box-shadow: 0 1px 1px 0 rgba(50, 50, 50, 0.2) !important;
+        border: solid 1px rgba(142, 142, 142, 0.21);
+    }
+
+    .more_info_container {
+        border-radius: 0 !important;
+        border-color: rgba(255, 255, 255, 0) !important;
+    }
+
+    .more_info_button {
+        background-color: white !important;
+        padding: 2.5% 4.2% !important;
+        border-color: rgba(255, 255, 255, 0) !important;
+    }
+
+    .more_info_title {
+        font-family: sans-serif;
+        font-size: 17px;
+        line-height: 28px;
+        color: #585858;
+        font-weight: 300;
+    }
+
+    .data_container {
+        background-color: rgba(174, 173, 173, 1);
+    }
+
+    .data_text {
+        font-family: sans-serif;
+        font-size: 17px;
+        line-height: 25px;
+        color: white;
+        font-weight: 300;
+    }
+
+    .newManutenzione {
+        float: right;
+        top: 1px;
+        margin-top: 5px;
+    }
+    .dimensionAddon{
+	    width: 53%;
+	    text-align: left;
+    }
+</style>
+<div id="ApioApplication*_TMP_*" ng-app="ApioApplication*_TMP_*" style="padding: 10px;">
+        <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+            <p id="prossima"
+               class="panel-title more_info_title more_info_container more_info_button accordion_container">
+                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                Prossima Manutenzione: {{next.dateP}}
+                <a role="button" data-toggle="collapse" data-parent="#prossima" data-target="#newManutenzione"
+                   aria-expanded="false" aria-controls="newManutenzione">
+                    <span class="glyphicon glyphicon-plus newManutenzione" aria-hidden="true"></span>
+                </a>
+            <div id="newManutenzione" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body data_container">
+                    <form>
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input class="form-control" ng-readonly="true" ng-model="next.date">
+                        </div>
+                        <div class="form-group">
+                            <label>Manutentore</label>
+                            <input class="form-control" ng-model="next.manutentore">
+                        </div>
+                        <div class="form-group">
+                            <label>Azienda di Manutenzione</label>
+                            <input class="form-control" ng-model="next.azienda">
+                        </div>
+
+                        <div style="float:right;">
+                            <a role="button" class="btn btn-primary btn-danger " ng-click="abort()">Annulla</a>
+                            <a role="button" class="btn btn-primary btn-success" ng-click="update()">Salva</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            </p>
+            <div class="panel-group accordion_container" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default more_info_container">
+                    <div class="panel-heading more_info_button" role="tab" id="headingOne">
+                        <p class="panel-title more_info_title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" data-target="#collapseOne"
+                               aria-expanded="false" aria-controls="collapseOne">
+                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                Informazioni aggiuntive
+                            </a>
+                        </p>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+	                    <div class="panel panel-default">
+                            <div class="panel-heading">Informazioni di base</div>
+                            <div class="panel-body">
+                                <div  id="formAutoMatricola"  class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon1">Numero di Matricola:</span>
+                                    <input type="text" id="matricola" class="form-control" aria-describedby="basic-addon1" ng-model="matricola" value="{{object.data.matricola}}">
+                                </div>
+                                <div id="formAutoManutentore" class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon2">Azienda di Manutenzione:</span>
+                                    <input type="text" class="form-control" id="manutentore" ng-model="manutentore" aria-describedby="basic-addon1" value="{{object.data.manutentore}}">
+                                </div>
+                                <div id="formAutoSorveglianza" class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon3">Addetto alla sorveglianza:</span>
+                                    <input type="text" class="form-control" id="personaSorveglianza" ng-model="personaSorveglianza" aria-describedby="basic-addon1" value="{{object.data.personaSorveglianza}}">
+                                </div>
+                                <div id="formAutoCompetente" class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon4">Persona competente:</span>
+                                    <input type="text" class="form-control" id="personaCompetente" ng-model="personaCompetente" aria-describedby="basic-addon1" value="{{object.data.personaCompetente}}">
+                                </div>
+                                <div id="formAutoResponsabile" class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon5">Persona responsabile:</span>
+                                    <input type="text" class="form-control" id="responsabile" ng-model="responsabile" aria-describedby="basic-addon1" value="{{object.data.responsabile}}">
+                                </div>
+                                <div id="formAutoProduttore" class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon6">Produttore:</span>
+                                    <input type="text" class="form-control" id="produttore" ng-model="produttore" aria-describedby="basic-addon1" value="{{object.data.produttore}}">
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-addon dimensionAddon" id="basic-addon7">Data Installazione:</span>
+                                    <input type="text" class="form-control" aria-describedby="basic-addon1" value="{{object.created}}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <!--
+                        <div class="panel-body data_container">
+                            <p class="data_text">Numero di Matricola: {{object.data.matricola}}</p>
+                            <p class="data_text">Azienda di Manutenzione: {{object.data.manutentore}}</p>
+                            <p class="data_text">Persona addetta alla sorveglianza: {{object.data.sorvegliante}}</p>
+                            <p class="data_text">Persona competente: {{object.data.competente}}</p>
+                            <p class="data_text">Persona responsabile: {{object.data.responsabile}}</p>
+                            <p class="data_text">Produttore: {{object.data.produttore}}</p>
+                            <p class="data_text">Installata il {{object.created}}</p>
+                        </div>
+                        -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Caratteristiche Fisiche</div>
+                            <div class="panel-body">
+                                <div id="formAutoPeso" class="input-group">
+                                    <span class="input-group-addon" id="basic-addon8">Kg/l</span>
+                                    <input type="text" class="form-control" id="peso" ng-model="peso" aria-describedby="basic-addon1">
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon9">Kg Lordo</span>
+                                    <input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="kgLordo" readonly>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon10">Tipo</span>
+                                    <input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="type" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-group accordion_container" id="accordion1" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default more_info_container">
+                    <div class="panel-heading more_info_button" role="tab" id="headingOne">
+                        <p class="panel-title more_info_title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion1"
+                               data-target="#collapseOne1" aria-expanded="false" aria-controls="collapseOne">
+                                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                                Manutenzioni
+                            </a>
+                        </p>
+                    </div>
+                    <div id="collapseOne1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body data_container">
+                            <div class="table-responsive">
+                                <table class="table table-font">
+                                    <tr class="firstTrTableLog">
+                                        <th>Data</th>
+                                        <th>Manutentore</th>
+                                    </tr>
+                                    <tr ng-repeat="man in object.data.manutenzione" on-finish-render>
+                                        <td>{{man.date}}</td>
+                                        <td>{{man.manutentore}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <battery propertyname="x" max="3.30" min="2.00" label="Battery"></battery>
+            <trigger propertyname="onoff" labelon="Laser Acceso" labeloff="Laser Spento" valueon="1" valueoff="0"
+                     listener="listener('onoff')"></trigger>
+            <trigger propertyname="onoff1" labelon="Estintore Carico" labeloff="Estintore Scarico" valueon="1"
+                     valueoff="0" event="no_click"></trigger>
+            <asyncdisplay propertyname="y" label="Temperatura"></asyncdisplay>
+            <trigger propertyname="buzzer" labelon="Buzzer Acceso" labeloff="Buzzer Spento" valueon="1" valueoff="0"
+                     listener="listener('buzzer')"></trigger>
+            <asyncdisplay propertyname="date" label="Ultimo aggiornamento:"></asyncdisplay>
+            <log label="Log"></log>
+        </div>
+    </div>
+</div>
+<script src="applications/*_TMP_*/*_TMP_*.js"></script>
+

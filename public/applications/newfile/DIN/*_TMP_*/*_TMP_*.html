@@ -1,0 +1,109 @@
+<style>
+	#webcam{
+		background-color:#fff;
+		z-index:1000;
+		position:fixed; 
+		width: 100%; 
+		overflow-x: hidden; 
+		overflow-y: hidden; 
+		height: 45%; 
+		border: none; 
+		padding: 0px; 
+		margin: 0;
+	}
+	#topWebCam{
+		width: 100%; 
+		height: 53%; 
+	}
+
+</style>
+
+<div id="ApioApplication*_TMP_*" ng-app="ApioApplication*_TMP_*" style="padding: 10px;">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+	        
+	       <!--AGGIUNTA WEBCAM HTML -->
+	       
+	       	<!--<div id="webcam"><noscript><img src="http://192.168.1.16:8080/?action=snapshot" /></noscript></div>
+	       	<div id="topWebCam"></div>-->
+	       	
+            <sensor propertyname="adc1" label="adc1" event="false"></sensor>
+            <sensor propertyname="adc2" label="adc2" event="false"></sensor>
+            <sensor propertyname="adc3" label="adc3" event="false"></sensor>
+            <sensor propertyname="adc4" label="adc4" event="false"></sensor>
+            <sensor propertyname="adc5" label="adc5" event="false"></sensor>
+            <sensor propertyname="adc6" label="adc6" event="false"></sensor>
+            <slider propertyname="dac1" label="dac1" min="0" max="65535" step="1"></slider>
+            <slider propertyname="dac2" label="dac2" min="0" max="65535" step="1"></slider>
+            <trigger propertyname="dig1" labelon="do1on" labeloff="do1off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig2" labelon="do2on" labeloff="do2off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig3" labelon="do3on" labeloff="do3off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig4" labelon="do4on" labeloff="do4off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig5" labelon="do5on" labeloff="do5off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig6" labelon="do6on" labeloff="do6off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig7" labelon="do7on" labeloff="do7off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="dig8" labelon="do8on" labeloff="do8off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din1" event="false" labelon="di1on" labeloff="di1off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din2" event="false" labelon="di2on" labeloff="di2off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din3" event="false" labelon="di3on" labeloff="di3off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din4" event="false" labelon="di4on" labeloff="di4off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din5" event="false" labelon="di5on" labeloff="di5off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din6" event="false" labelon="di6on" labeloff="di6off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din7" event="false" labelon="di7on" labeloff="di7off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din8" event="false" labelon="di8on" labeloff="di8off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="rel1" labelon="rel1on" labeloff="rel1off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="rel2" labelon="rel2on" labeloff="rel2off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="rel3" labelon="rel3on" labeloff="rel3off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="rel4" labelon="rel4on" labeloff="rel4off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="rel5" labelon="rel5on" labeloff="rel5off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="rel6" labelon="rel6on" labeloff="rel6off" valueon="1" valueoff="0"></trigger>
+            <log label="Log"></log>
+        </div>
+    </div>
+</div>
+<script src="applications/*_TMP_*/*_TMP_*.js"></script>
+
+<!--SCRIPT JAVASCRIPT PER INTRODUZIONE WEBCAMM -->
+<script type="text/javascript">
+
+/* Copyright (C) 2007 Richard Atterer, richardÂ©atterer.net
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License, version 2. See the file
+   COPYING for details. */
+/*
+var imageNr = 0; // Serial number of current image
+var finished = new Array(); // References to img objects which have finished downloading
+var paused = false;
+
+function createImageLayer() {
+  var img = new Image();
+  img.style.position = "absolute";
+  img.style.zIndex = -1;
+  img.onload = imageOnload;
+  img.onclick = imageOnclick;
+  img.src = "http://192.168.1.16:8080/?action=snapshot&n=" + (++imageNr);
+  var webcam = document.getElementById("webcam");
+  webcam.insertBefore(img, webcam.firstChild);
+}
+
+// Two layers are always present (except at the very beginning), to avoid flicker
+function imageOnload() {
+  this.style.zIndex = imageNr; // Image finished, bring to front!
+  while (1 < finished.length) {
+    var del = finished.shift(); // Delete old image(s) from document
+    del.parentNode.removeChild(del);
+  }
+  finished.push(this);
+  if (!paused) createImageLayer();
+}
+
+function imageOnclick() { // Clicking on the image will pause the stream
+  paused = !paused;
+  if (!paused) createImageLayer();
+}
+while(!document.getElementById('webcam')){
+	
+}
+createImageLayer()*/
+</script>

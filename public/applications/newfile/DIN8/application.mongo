@@ -1,0 +1,297 @@
+{
+  "address": "3082",
+  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
+  "appId": "DIN8",
+  "connected": true,
+  "created": "2016-06-15",
+  "data": {},
+  "db": {
+    "modbus": {
+      "1": "",
+      "2": "Seneca S50280",
+      "3": "Estron SDM220",
+      "4": "Selco200to400"
+    }
+  },
+  "installation": "autoinstalled",
+  "log": {},
+  "marker": {},
+  "name": "DIN 1",
+  "notifications": {
+    "adc1": {
+      "0": {
+        "message": "DIN: adc1 al valore 50",
+        "relation": "eq",
+        "value": "50"
+      }
+    }
+  },
+  "objectId": "_TMP_",
+  "properties": {
+    "adc1": {
+      "hi": false,
+      "label": "adc1",
+      "type": "sensor",
+      "value": "0"
+    },
+    "adc2": {
+      "hi": false,
+      "label": "adc2",
+      "type": "sensor",
+      "value": "0"
+    },
+    "adc3": {
+      "hi": false,
+      "label": "adc3",
+      "type": "sensor",
+      "value": "0"
+    },
+    "adc4": {
+      "hi": false,
+      "label": "adc4",
+      "type": "sensor",
+      "value": "0"
+    },
+    "adc5": {
+      "hi": false,
+      "label": "adc5",
+      "type": "sensor",
+      "value": "0"
+    },
+    "adc6": {
+      "hi": false,
+      "label": "adc6",
+      "type": "sensor",
+      "value": "0"
+    },
+    "dac1": {
+      "graph": "punctual",
+      "label": "dac1",
+      "max": "65535",
+      "min": "0",
+      "step": "1",
+      "type": "slider",
+      "value": "65535"
+    },
+    "dac2": {
+      "graph": "punctual",
+      "label": "dac2",
+      "max": "65535",
+      "min": "0",
+      "step": "1",
+      "type": "slider",
+      "value": "0"
+    },
+    "dig1": {
+      "graph": "punctual",
+      "labeloff": "do1off",
+      "labelon": "do1on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig2": {
+      "graph": "punctual",
+      "labeloff": "do2off",
+      "labelon": "do2on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig3": {
+      "graph": "punctual",
+      "labeloff": "do3off",
+      "labelon": "do3on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig4": {
+      "graph": "punctual",
+      "labeloff": "do4off",
+      "labelon": "do4on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig5": {
+      "graph": "punctual",
+      "labeloff": "do5off",
+      "labelon": "do5on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig6": {
+      "graph": "punctual",
+      "labeloff": "do6off",
+      "labelon": "do6on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig7": {
+      "graph": "punctual",
+      "labeloff": "do7off",
+      "labelon": "do7on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "dig8": {
+      "graph": "punctual",
+      "labeloff": "do8off",
+      "labelon": "do8on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din1": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di1off",
+      "labelon": "di1on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din2": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di2off",
+      "labelon": "di2on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din3": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di3off",
+      "labelon": "di3on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din4": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di4off",
+      "labelon": "di4on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din5": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di5off",
+      "labelon": "di5on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din6": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di6off",
+      "labelon": "di6on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din7": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di7off",
+      "labelon": "di7on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "din8": {
+      "graph": "punctual",
+      "hi": false,
+      "labeloff": "di8off",
+      "labelon": "di8on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "1"
+    },
+    "rel1": {
+      "graph": "punctual",
+      "labeloff": "rel1off",
+      "labelon": "rel1on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "rel2": {
+      "graph": "punctual",
+      "labeloff": "rel2off",
+      "labelon": "rel2on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "rel3": {
+      "graph": "punctual",
+      "labeloff": "rel3off",
+      "labelon": "rel3on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "rel4": {
+      "graph": "punctual",
+      "labeloff": "rel4off",
+      "labelon": "rel4on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "rel5": {
+      "graph": "punctual",
+      "labeloff": "rel5off",
+      "labelon": "rel5on",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "rel6": {
+      "type": "trigger",
+      "labelon": "rel6on",
+      "labeloff": "rel6off",
+      "valueon": "1",
+      "valueoff": "0",
+      "value": "0"
+    }
+  },
+  "protocol": "l",
+  "services": [],
+  "sleepTime": 60000,
+  "tag": "#ufficio #sviluppoUfficio #apioWhite ",
+  "type": "object",
+  "user": []
+}

@@ -1,0 +1,42 @@
+<style>
+	div#rankingLabel.box_proprietaiPhone{
+		margin-bottom:0 !important;
+	}
+	
+	div#registra_statoinput.glyphicon.glyphicon-bell{
+	    color:white;
+	}
+	span.glyphicon.glyphicon-remove.personalizaChevron{
+	    color:white;
+	}
+	div.appName.viewDesktop1.ng-binding{
+		color:white;
+	}
+</style>
+<div id="ApioApplication_TMP_" ng-app="ApioApplication_TMP_" style="padding: 10px; background-color:rgb(0, 116, 188);">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+            <graph graphname="analytics" plot="TotalEnergy" type="avg-15"></graph>
+			<unlimitedsensor  propertyname="TotalEnergy" label="Energia Totale [KW/h]"></unlimitedsensor> 
+            <unlimitedsensor  propertyname="Status" label="Stato Inverter"></unlimitedsensor>
+            <unlimitedsensor  propertyname="Allarm" label="Allarmi"></unlimitedsensor>
+
+            <unlimitedsensor propertyname="ACVoltage1" label="Voltage AC1 [V]" style="margin-bottom:0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="ACVoltage2" label="Voltage AC2 [V]" style="margin-bottom:0;"></unlimitedsensor>
+			<unlimitedsensor  propertyname="ACVoltage3" label="Voltage AC3 [V]"></unlimitedsensor>
+			
+            <unlimitedsensor  propertyname="ACCurrent1" label="Corrente AC1 [A]"></unlimitedsensor>
+            <unlimitedsensor  propertyname="ACCurrent2" label="Corrente AC2 [A]"></unlimitedsensor>
+            <unlimitedsensor  propertyname="ACCurrent3" label="Corrente AC3 [A]" ></unlimitedsensor>
+            
+            <unlimitedsensor  propertyname="DCVoltage1" label="Voltage DC1 [V]"></unlimitedsensor>
+			<unlimitedsensor  propertyname="DCVoltage2" label="Voltage DC2 [V]"></unlimitedsensor>
+			
+            <unlimitedsensor  propertyname="DCCurrent1" label="Corrente DC1 [A]"></unlimitedsensor>
+            <unlimitedsensor  propertyname="DCCurrent2" label="Corrente DC2 [A]"></unlimitedsensor>
+            <log label="Log"></log>
+        </div>
+    </div>
+</div>
+<script src="applications/_TMP_/_TMP_.js"></script>

@@ -1,0 +1,240 @@
+<style>
+    .allOptionGraphic {
+        //padding: 6px 25px;
+    }
+	#analytics_container {
+	    padding: 0 !important;
+    }
+    
+    .basic_button {
+        padding: 0.2%;
+        float: left;
+    }
+    #analytics_container .form-group {
+        margin: 0;
+    }
+    
+    .optionGraphic {
+        line-height: 200%;
+        -webkit-appearance: none;
+    }
+    .optionGraphic option {
+        width: 60%;
+        margin: 0 auto;
+    }
+    .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+	    background-color: whitesmoke;
+	}
+    .text_checkbox {
+	    background: white !important;
+	    cursor: default !important;
+	    box-shadow: 0 0 0 0 !important;
+    }
+    
+    #propertyTab .active a {
+        cursor: default;
+    }
+    #propertyTab li a {
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+	.property_container {
+		padding: 1% 0.2% 0.2% 1%;
+		margin: 0;
+	}
+	
+    .graph_container {
+    }
+    
+
+    @media only screen and (min-width: 320px) and (max-width: 479px) {
+        .paddingAnalyticsOption {
+            padding: 1.2%;
+        }
+        .basic_button {
+	        padding: 1%;
+	    }
+	    .property_container {
+			padding: 2%;
+		}
+    }
+
+    @media only screen and (min-width: 480px) and (max-width: 767px) {
+        .paddingAnalyticsOption {
+            padding: 0.9%;
+        }
+	    .basic_button {
+	        padding: 0.6%;
+	        float: left;
+	    }
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 991px) {
+        .paddingAnalyticsOption {
+            padding: 0.5%;
+        }
+    }
+
+    @media only screen and (min-width: 992px) {
+        .paddingAnalyticsOption {
+            padding: 0.3%;
+        }
+
+        /*.heightFullScreen {
+            height: 110% !important;
+        }*/
+    }
+    
+</style>
+
+<div id="ApioApplication10" ng-app="ApioApplication10" style="padding: 10px;">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <!--<div id="app" class="heightFullScreen" style="display: block;">-->
+        <div id="app" style="display: block;">
+            <div id="analytics_container" class="container-fluid">
+                <!--
+                <div class="row allOptionGraphic">
+                    <div class="col-md-2 col-xs-6 col-sm-8 paddingAnalyticsOption">
+                        <select class="form-control" ng-model="installation" style="-webkit-appearance: none;">
+                            <option value="{{key}}" ng-repeat="(key, value) in installations" label="{{value}}"
+                                    ng-selected="key === $parent.model" installation-render-finished>
+                                {{value}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="!checked">
+                        <div class="input-group date optionGraphic" id="calendar">
+                            <input id="calendar_value" class="form-control" type="text" value=""/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3 col-xs-12 col-sm-6 paddingAnalyticsOption">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <input type="checkbox" ng-model="checked" style="cursor: pointer;">
+                            </span>
+                            <input type="text" class="form-control text_checkbox" value="Confronto tra due periodi" readonly disabled>
+                        </div>
+                    </div>
+					
+                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="checked">
+                        <div class="input-group date optionGraphic" id="first_range">
+                            <input id="first_range_value" class="form-control" type="text" value=""/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-list-alt"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="checked">
+                        <div class="input-group date optionGraphic" id="second_range">
+                            <input id="second_range_value" class="form-control" type="text" value=""/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-list-alt"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                -->
+                <ul id="propertyTab" class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a aria-controls="riferimenti" role="tab" data-toggle="tab" data-idTab="riferimenti">
+                            Riferimento
+                        </a>
+                    </li>
+                    <li role="presentation" ng-show="installationsProperties[installation]" ng-click="setSelectedProperties('variables')">
+                        <a aria-controls="proprieta" role="tab" data-toggle="tab" data-idTab="proprieta">
+	                        Proprietà generali
+	                    </a>
+                    </li>
+                    <li role="presentation" ng-show="installationsPunctualProperties[installation]" ng-click="setSelectedProperties('punctuals')">
+                        <a aria-controls="puntuali" role="tab" data-toggle="tab" data-idTab="puntuali">
+                            Proprietà puntuali
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content row property_container">
+                    <div role="tabpanel" class="tab-pane propertyTab active" id="riferimenti">
+                        
+                        <div class="allOptionGraphic">
+		                    <div class="col-md-2 col-xs-6 col-sm-8 paddingAnalyticsOption">
+		                        <select class="form-control" ng-model="installation" style="-webkit-appearance: none;">
+		                            <option value="{{key}}" ng-repeat="(key, value) in installations" label="{{value}}"
+		                                    ng-selected="key === $parent.model" installation-render-finished>
+		                                {{value}}
+		                            </option>
+		                        </select>
+		                    </div>
+		                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="!checked">
+		                        <div class="input-group date optionGraphic" id="calendar">
+		                            <input id="calendar_value" class="form-control" type="text" value=""/>
+		                            <span class="input-group-addon">
+		                                <span class="glyphicon glyphicon-calendar"></span>
+		                            </span>
+		                        </div>
+		                    </div>
+		                    <div class="form-group col-md-3 col-xs-12 col-sm-6 paddingAnalyticsOption">
+		                        <div class="input-group">
+		                            <span class="input-group-addon">
+		                                <input type="checkbox" ng-model="checked" style="cursor: pointer;">
+		                            </span>
+		                            <input type="text" class="form-control text_checkbox" value="Confronto tra due periodi" readonly disabled>
+		                        </div>
+		                    </div>
+		
+		                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="checked">
+		                        <div class="input-group date optionGraphic" id="first_range">
+		                            <input id="first_range_value" class="form-control" type="text" value=""/>
+		                            <span class="input-group-addon">
+		                                <span class="glyphicon glyphicon-list-alt"></span>
+		                            </span>
+		                        </div>
+		                    </div>
+		
+		                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="checked">
+		                        <div class="input-group date optionGraphic" id="second_range">
+		                            <input id="second_range_value" class="form-control" type="text" value=""/>
+		                            <span class="input-group-addon">
+		                                <span class="glyphicon glyphicon-list-alt"></span>
+		                            </span>
+		                        </div>
+		                    </div>
+		                </div>
+                        
+                    </div>
+                    <div role="tabpanel" class="tab-pane propertyTab" id="proprieta">
+                        <div class="basic_button" ng-click="showElement(key)"
+                             ng-repeat="(key, val) in installationsProperties[installation]">
+                            <button type="button" class="btn"
+                                    ng-class="{'btn-success': isPropertySelected[key], 'btn-default': !isPropertySelected[key]}">
+                                {{getLabel(val)}}
+                            </button>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane propertyTab" id="puntuali">
+                        <div class="basic_button" ng-click="showPunctualElement(key)"
+                             ng-repeat="(key, val) in installationsPunctualProperties[installation]">
+                            <button type="button" class="btn"
+                                    ng-class="{'btn-success': isPropertySelected[key], 'btn-default': !isPropertySelected[key]}">
+                                {{getLabel(val)}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div ng-style="{display: (showPunctual ? 'none' : 'block')}" class="graph_container">
+                    <graph graphname="analytics" date="{{graphDate}}" plot="{{toPlot}}" reduce="false"
+                           target="{{installation}}" type="avg-15"></graph>
+                </div>
+                <div ng-style="{display: (showPunctual ? 'block' : 'none')}" class="graph_container">
+                    <graph graphname="analytics_punctual" date="{{graphDate}}" plot="{{toPlotPunctual}}" reduce="false"
+                           target="{{installation}}"></graph>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="applications/10/10.js"></script>

@@ -1,0 +1,207 @@
+<style>
+    .allOptionGraphic {
+        padding: 1%;
+    }
+
+    .basic_button {
+        padding: 0.2%;
+        float: left;
+    }
+
+    .basic_legend {
+        padding: 0% 1%;
+    }
+
+    .col-xs-0-5 {
+        float: left;
+        min-height: 1px;
+        padding-left: 15px;
+        padding-right: 15px;
+        position: relative;
+        width: 4.16666667%;
+    }
+
+    .optionGraphic {
+        line-height: 200%;
+
+        -webkit-appearance: none;
+    }
+
+    .optionGraphic option {
+        width: 60%;
+        margin: 0 auto;
+    }
+
+    @media only screen and (min-width: 320px) and (max-width: 479px) {
+        .paddingAnalyticsOption {
+            padding: 2%;
+        }
+
+        .basic_legend {
+            padding: 3% 2%;
+        }
+
+        .basic_legend .basic_button {
+            padding-top: 2%;
+            padding-bottom: 2%;
+        }
+
+        .vociOption {
+            text-align: left;
+            line-height: 11px;
+            font-size: 10px;
+            padding: 0;
+        }
+    }
+
+    @media only screen and (min-width: 480px) and (max-width: 767px) {
+        .paddingAnalyticsOption {
+            padding: 2%;
+        }
+
+        .basic_legend {
+            padding: 3% 2%;
+        }
+
+        .basic_legend .basic_button {
+            padding-top: 2%;
+            padding-bottom: 2%;
+        }
+
+        .vociOption {
+            text-align: left;
+            line-height: 11px;
+            font-size: 10px;
+            padding: 0;
+        }
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 991px) {
+        .paddingAnalyticsOption {
+            padding: 1%;
+        }
+
+        .vociOption {
+            text-align: center;
+            line-height: 16px;
+        }
+    }
+
+    @media only screen and (min-width: 992px) {
+        .paddingAnalyticsOption {
+            padding: 1%;
+        }
+
+        .vociOption {
+            text-align: center;
+            line-height: 16px;
+        }
+
+        .heightFullScreen {
+            height: 110% !important;
+        }
+    }
+
+    .form-group {
+        margin: 0;
+    }
+
+    .propertyTab {
+        padding: 1%;
+    }
+</style>
+<div id="ApioApplication10" ng-app="ApioApplication10" style="padding: 10px;">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" class="heightFullScreen" style="display: block;">
+            <div class="container">
+                <div class="row allOptionGraphic">
+                    <div class="col-md-2 col-xs-6 col-sm-8 paddingAnalyticsOption">
+                        <select class="form-control" ng-model="installation" style="-webkit-appearance: none;">
+                            <option value="{{key}}" ng-repeat="(key, value) in installations" label="{{value}}"
+                                    ng-selected="key === $parent.model" installation-render-finished>
+                                {{value}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="!checked">
+                        <div class="input-group date optionGraphic" id="calendar">
+                            <input id="calendar_value" class="form-control" type="text"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3 col-xs-12 col-sm-6 paddingAnalyticsOption">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="border-right: 1px solid #ccc;">
+                                <input type="checkbox" ng-model="checked">
+                            </span>
+                            <input type="text" class="form-control" value="Confronto tra due periodi" readonly
+                                   style="background: none; box-shadow: 0 0 0 0; ">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="checked">
+                        <div id="range1" class="input-group input-daterange">
+                            <input id="range1_lower" type="text" class="form-control">
+                            <span class="input-group-addon">to</span>
+                            <input id="range1_upper" type="text" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 col-xs-6 col-sm-6 paddingAnalyticsOption" ng-show="checked">
+                        <div id="range2" class="input-group input-daterange">
+                            <input id="range2_lower" type="text" class="form-control">
+                            <span class="input-group-addon">to</span>
+                            <input id="range2_upper" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <ul id="propertyTab" class="nav nav-pills nav-justified" role="tablist">
+                    <li role="presentation" class="active">
+                        <a aria-controls="proprieta" role="tab" data-idTab="proprieta" data-toggle="tab"
+                           ng-show="installationsProperties[installation]" style="font-size:15px;">Proprietà</a>
+                    </li>
+                    <li role="presentation">
+                        <a aria-controls="puntuali" role="tab" data-toggle="tab" data-idTab="puntuali"
+                           ng-show="installationsPunctualProperties[installation]" style="font-size:15px;">
+                            Proprietà puntuali
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane propertyTab active" id="proprieta">
+                        <div class="basic_button" ng-click="showElement(key)"
+                             ng-repeat="(key, val) in installationsProperties[installation]"
+                             installations-properties-finished>
+                            <button type="button" class="btn btn-block"
+                                    ng-class="{'btn-success': isPropertySelected[key], 'btn-danger': !isPropertySelected[key]}">
+                                {{getLabel(val)}}
+                            </button>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane propertyTab" id="puntuali">
+                        <div class="basic_button" ng-click="showPunctualElement(key)"
+                             ng-repeat="(key, val) in installationsPunctualProperties[installation]"
+                             installations-punctual-properties-finished>
+                            <button type="button" class="btn btn-block"
+                                    ng-class="{'btn-success': isPropertySelected[key], 'btn-danger': !isPropertySelected[key]}">
+                                {{getLabel(val)}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div ng-style="{display: (showPunctual ? 'none' : 'block')}">
+                    <graph graphname="analytics" date="{{graphDate}}" plot="{{toPlot}}" reduce="false"
+                           target="{{installation}}" type="avg-60"></graph>
+                </div>
+                <div ng-style="{display: (showPunctual ? 'block' : 'none')}">
+                    <graph graphname="analytics_punctual" date="{{graphDate}}" plot="{{toPlotPunctual}}" reduce="false"
+                           target="{{installation}}"></graph>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="applications/10/10.js"></script>

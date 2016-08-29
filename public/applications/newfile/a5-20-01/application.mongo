@@ -1,0 +1,61 @@
+{
+  "address": "01916c91",
+  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
+  "appId": "a5-20-01",
+  "db": {},
+  "name": "Caleffi 1",
+  "notifications": {},
+  "objectId": "_TMP_",
+  "properties": {
+    "actuatorObstructed": {
+      "labeloff": "Valvola OK",
+      "labelon": "Valvola Otturato",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "energySufficent": {
+      "labeloff": "Batteria OK",
+      "labelon": "Cambiare Batteria",
+      "type": "trigger",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "setPoint": {
+      "label": "Set Point",
+      "max": "40",
+      "min": "0",
+      "step": "1",
+      "type": "slider",
+      "value": "36"
+    },
+    "setPointSelection": {
+      "type": "trigger",
+      "labeloff": "Control Gateway",
+      "labelon": "Room Controll",
+      "valueoff": "0",
+      "valueon": "1",
+      "value": "0"
+    },
+    "temperature": {
+      "label": "Temperature",
+      "type": "sensor",
+      "value": "25.73"
+    },
+    "valveOpenClose": {
+      "type": "trigger",
+      "labelon": "Open",
+      "labeloff": "Close",
+      "valueon": "1",
+      "valueoff": "0",
+      "value": "0"
+    }
+  },
+  "protocol": "enocean",
+  "services": [],
+  "sleepTime": 60000,
+  "tag": "",
+  "type": "object"
+}

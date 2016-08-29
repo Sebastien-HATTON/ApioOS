@@ -1,0 +1,1 @@
+{"name":"Lucciola 18","objectId":"*_TMP_*","protocol":"l","address":"1","subapps":{"log":""},"properties":{"onoff":"0","onoff1":"0"},"notifications":{"onoff1":{"0":{"message":"Lucciola 18: Scarico","relation":"eq","value":"0"}}},"db":{},"_id":"55577e3bca1441e90b5e0807"}

@@ -1,0 +1,18 @@
+{
+  "address": "0195957d",
+  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
+  "appId": "a5-02-05",
+  "db": {},
+  "name": "Eno Temp Sensor",
+  "notifications": {},
+  "objectId": "_TMP_",
+  "properties": {
+    "temperature": {
+      "label": "Temperature",
+      "type": "sensor",
+      "value": "26.82"
+    }
+  },
+  "protocol": "enocean",
+  "type": "object"
+}
