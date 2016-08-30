@@ -1046,7 +1046,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 if (isConfirm) {
                     //console.log(configuration.autoinstall.default);
                     socket.emit("git_pull", "");
-                    sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
+                    alert("We will notify you when the update is ready...Enjoy")
+                    
 
                 } else {
                     sweet.show('Annullato', 'Aggiornamento non scaricato, puoi sempre installare dalla dashboard', 'error');
