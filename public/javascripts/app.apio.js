@@ -852,7 +852,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 if (isConfirm) {
                     //console.log(configuration.autoinstall.default);
                     socket.emit("git_pull", "");
-                    sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
+                    alert('Scaricamento in background, verrai avvisato al termine');
                     
 
                 } else {
