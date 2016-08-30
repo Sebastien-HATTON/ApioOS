@@ -1775,10 +1775,10 @@ module.exports = function (config, enableCloudSocket) {
 				    var path = "apio_updater.sh";
 				    request({uri: uri}).pipe(fs.createWriteStream(path)).on('close', function () {
 				        ////console.log("Downloaded Hex file");
-				        exec("sudo +x ./apio_updater.sh", function (error, stdout, stderr) {
+				        exec("sudo +x ./apio_updater.sh | sudo ./apio_updater.sh", function (error, stdout, stderr) {
 				            console.log("Scaricato e aggiornato riavvio necessario");
-				            exec("sudo ./apio_updater.sh", function (error, stdout, stderr) {
-				            	console.log("Scaricato e aggiornato riavvio necessario");
+				            //exec("sudo ./apio_updater.sh", function (error, stdout, stderr) {
+				            	console.log("Scaricato e aggiornato riavvio necessario ", stdout);
 					            fs.unlink("apio_updater.sh", function (err) {
 					                if (err) {
 					                	
@@ -1791,7 +1791,7 @@ module.exports = function (config, enableCloudSocket) {
 			                            
 					                }
 					            });
-					        });
+					        //});
 				        });
 				    });
                     /*var sys = require("sys");
