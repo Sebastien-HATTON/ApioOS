@@ -845,14 +845,14 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showCancelButton: true,
                 confirmButtonColor: '#177537',
                 confirmButtonText: 'Yes!',
-                closeOnConfirm: false,
+                closeOnConfirm: true,
                 closeOnCancel: false,
-                showLoaderOnConfirm: true
+                showLoaderOnConfirm: false
             }, function (isConfirm) {
                 if (isConfirm) {
                     //console.log(configuration.autoinstall.default);
                     socket.emit("git_pull", "");
-                    alert("We will notify you when the update is ready...Enjoy")
+                    sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
                     
 
                 } else {
