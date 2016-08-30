@@ -43,6 +43,7 @@
     "ncp": "~1.0.1",
     "nightmare": "^2.1.6",
     "node-enocean": "^1.0.2",
+    "node-fetch": "^1.6.0",
     "node-slack": "0.0.7",
     "node-uuid": "^1.4.3",
     "node-xlsx": "^0.6.0",

@@ -24,6 +24,7 @@ var fs = require("fs");
 var request = require("request");
 var formidable = require('formidable');
 var validator = require("validator");
+var fetch = require('node-fetch');
 module.exports = function (Apio) {
     return {
         manageDriveFile: function (req, res) {
@@ -931,6 +932,38 @@ module.exports = function (Apio) {
         },
         returnConfig: function (req, res) {
             res.send(Apio.Configuration);
+        },
+        update : function(req,res){
+	        var lastCommit = fs.readFileSync(".git/FETCH_HEAD","utf-8");
+	        console.log("Last Commit: ", lastCommit);
+	        lastCommit = lastCommit.split("\t")[0];
+	        console.log("Last Commit: ", lastCommit);
+	        /*request.get("https://raw.githubusercontent.com/ApioLab/updates/master/version.json", {
+	            json: true
+	        }, function (err, httpResponse) {
+	            if (err) {
+	                console.log("Error: ", err);
+	            } else if (httpResponse.statusCode === 200) {
+	                //execReboot();
+	                console.log("Risposta ",httpResponse)
+	                res.status(200).send(false)
+	            }
+	        });*/
+	        fetch("https://raw.githubusercontent.com/ApioLab/updates/master/version.json")
+		    .then(function(res) {
+		        return res.text();
+		    }).then(function(body) {
+		        //console.log("Body", body);
+		        var remoteCommit = JSON.parse(body)
+		        console.log("1:", remoteCommit.commit);
+		        console.log("2:", lastCommit);
+		        if(remoteCommit.commit.substring(0,7) != lastCommit.substring(0,7)){
+			        res.status(200).send(true);
+		        } else {
+			        res.status(200).send(false);
+		        }
+		    });
+	        
         }
     }
 };

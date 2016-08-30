@@ -1324,6 +1324,7 @@ d.run(function () {
     app.post("/apio/file/delete", routes.core.fileDelete);
     app.post("/apio/log", routes.core.log); //Rotta non più usata
     app.get("/", routes.core.index);
+    app.get("/apio/update",routes.core.update);
     app.get("/admin", routes.core.admin);
     app.get("/app", routes.core.login, routes.core.redirect);
     app.post("/apio/user/setCloudAccess", routes.core.setCloudAccess);

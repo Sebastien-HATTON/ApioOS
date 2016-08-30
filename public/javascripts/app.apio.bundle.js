@@ -735,6 +735,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     $scope.platform = {};
     $scope.continueToCloud = false;
     $scope.cloudShowBoard = false;
+    //$scope.systemUpdated = false;
 
     // setTimeout(function () {
     //     // document.getElementById("apio-os-offline").style.display = "block";
@@ -1027,6 +1028,44 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             });
         }
     });
+    
+    $http.get('/apio/update').success(function (data, status) {
+	    if(data){
+		    //alert("aggiornamento necessario")
+		    sweet.show({
+                title: 'Conferma',
+                text: 'È disponibile un nuovo aggiornamento, vuoi installarlo?',
+                imageUrl: 'images/new-icon.png',
+                showCancelButton: true,
+                confirmButtonColor: '#177537',
+                confirmButtonText: 'Yes!',
+                closeOnConfirm: false,
+                closeOnCancel: false,
+                showLoaderOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    //console.log(configuration.autoinstall.default);
+                    socket.emit("git_pull", "");
+                    sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
+
+                } else {
+                    sweet.show('Annullato', 'Aggiornamento non scaricato, puoi sempre installare dalla dashboard', 'error');
+                }
+            });
+	    } else {
+		    //alert("Il sistema è aggiornato")
+		    $scope.systemUpdated = true;
+		    if (!$scope.$$phase) {
+                $scope.$apply();
+            }
+		    setTimeout(function(){
+		    	$scope.systemUpdated = false;
+		    	if (!$scope.$$phase) {
+                    $scope.$apply();
+                }
+		    }, 5000)
+	    }
+    })
 
     socket.on("update_system", function (data) {
         //var host = $location.host();
@@ -1044,7 +1083,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             }, function (isConfirm) {
                 if (isConfirm) {
                     //console.log(configuration.autoinstall.default);
-                    Apio.io.emit("git_pull", "");
+                    socket.emit("git_pull", "");
                     sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
 
                 } else {
@@ -1074,7 +1113,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                     //   	sweet.show('OK!', 'Il sistema verrà riavviato e sarà disponibile a breve.', 'success');
                     //   });
                     //});
-                    $http.get("/apio/service/githubUpdate/route/" + encodeURIComponent("/restartApp")).success(function () {
+                    $http.post("/apio/rebootBoard").success(function () {
                         sweet.show('OK!', 'Il sistema verrà riavviato e sarà disponibile a breve.', 'success');
                     });
 

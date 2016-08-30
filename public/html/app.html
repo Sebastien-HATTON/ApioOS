@@ -124,6 +124,17 @@
                 <span>ApioOS offline</span>
             </div>
         </div>
+        
+        <!-- Da fare con SnackBar di Angular Material-->
+        <div id="apio-os-update" class="row" ng-show="systemUpdated" style="margin: 0; position: absolute; text-align:center; width: 100%;">
+            <div style="margin-left: auto; margin-right: auto; text-align: center;">
+                <svg height="12" width="12">
+                    <circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="green"/>
+                </svg>
+                <span>ApioOS already up-to-date</span>
+            </div>
+        </div>
+        
 
         <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="incomingNewBoard"
              class="modal fade">

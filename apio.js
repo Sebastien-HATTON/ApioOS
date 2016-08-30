@@ -1771,7 +1771,30 @@ module.exports = function (config, enableCloudSocket) {
                 });
 
                 socket.on("git_pull", function (data) {
-                    var sys = require("sys");
+                	var uri = "https://raw.githubusercontent.com/ApioLab/updates/master/apio_updater.sh";
+				    var path = "apio_updater.sh";
+				    request({uri: uri}).pipe(fs.createWriteStream(path)).on('close', function () {
+				        ////console.log("Downloaded Hex file");
+				        exec("sudo +x ./apio_updater.sh", function (error, stdout, stderr) {
+				            console.log("Scaricato e aggiornato riavvio necessario");
+				            exec("sudo ./apio_updater.sh", function (error, stdout, stderr) {
+				            	console.log("Scaricato e aggiornato riavvio necessario");
+					            fs.unlink("apio_updater.sh", function (err) {
+					                if (err) {
+					                	
+					                } else {
+					                	console.log("delete file")
+					                	var o = {
+			                                type: "done"
+			                            };
+			                            Apio.io.emit("update_system", o)
+			                            
+					                }
+					            });
+					        });
+				        });
+				    });
+                    /*var sys = require("sys");
                     var exec = require("child_process").exec;
                     var child = exec("git pull https://alechelli:\$kateb0ard1@github.com/ApioLab/Apio-VIP-2.3-DEV.git", function (error, stdout, stderr) {
                         if (error !== null) {
@@ -1790,7 +1813,7 @@ module.exports = function (config, enableCloudSocket) {
                             });
                             Apio.io.emit("update_system", o)
                         }
-                    });
+                    });*/
                 });
 
                 //BEGIN:CLOUD
