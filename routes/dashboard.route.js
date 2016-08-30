@@ -601,15 +601,26 @@ module.exports = function (Apio) {
                                     }
                                 }
                             }
-
-                            object.icon = fs.readFileSync(basePath + "/" + id + "/icon.png");
-                            object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
-                            object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
+                            if (fs.existsSync(basePath + "/" + id + "/icon.png")) {
+                            	object.icon = fs.readFileSync(basePath + "/" + id + "/icon.png");
+                            }
+                            if (fs.existsSync(path + ".js")) {
+                            	object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
+                            }
+                            if (fs.existsSync(path + ".html")) {
+                            	object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
+                            }
+                            
                             object.mongo = obj;
                             object.mongo.objectId = dummy;
                             path = basePath + "/" + id + "/_" + id;
-                            object.ino = fs.readFileSync(path + "/_" + id + ".ino", {encoding: "utf8"});
-                            object.makefile = fs.readFileSync(path + "/Makefile", {encoding: "utf8"});
+                            if(fs.existsSync(path)){
+	                            object.ino = fs.readFileSync(path + "/_" + id + ".ino", {encoding: "utf8"});
+	                            object.makefile = fs.readFileSync(path + "/Makefile", {encoding: "utf8"});    
+                            } else {
+	                            console.log("Manca la cartella con il firmware")
+                            }
+                            
 
                             object.js = object.js.replace(new RegExp("ApioApplication" + id, "g"), "ApioApplication" + dummy);
 

@@ -60,6 +60,7 @@ var transporter = nodemailer.createTransport(smtpTransport({
 
 var app = express();
 var configuration = {};
+var integratedCommunication = require("./configuration/integratedCommunication.js");
 
 if (process.argv.indexOf("--config") > -1) {
     configuration = require(process.argv[process.argv.indexOf("--config") + 1]);
@@ -280,6 +281,29 @@ d.run(function () {
                 console.log("Error while check existence of Communication: ", err);
             } else if (names.length) {
                 console.log("Collection Communication Exists");
+                Apio.Database.db.collection("Communication").findAndModify({name: "integratedCommunication"}, [["name", 1]], {$set: integratedCommunication}, function (err, result) {
+                    if (err) {
+                        //Apio.Util.debug("Apio.Database.updateProperty() encountered an error while trying to update the property on the database: ");
+                        console.log(err);
+                        //throw new Apio.Database.Error("Apio.Database.updateProperty() encountered an error while trying to update the property on the database");
+                    } else if (null === result) {
+                        //throw new Apio.Database.Error("Apio.Database.updateProperty() the object with id " + data.objectId + "  does not exist.");	
+                        Apio.Database.db.collection("Communication").insert(integratedCommunication, function (error, result1) {
+		                    if (error) {
+		                        console.log("Error while inserting Communication integratedCommunication: ", error);
+		                    } else if (result1) {
+		                        console.log("Communication integratedCommunication successfully installed");
+		                    }
+		                });
+                        
+                    } else {
+                        //Apio.Util.debug("Apio.Database.updateProperty() Successfully updated the  object " + data.objectId);
+                        //if (callback) {
+                        //    callback();
+                        //}
+                        console.log("Ok")
+                    }
+                });
             } else {
                 console.log("Collection Communication DOESN'T Exists, creating....");
                 Apio.Database.db.createCollection("Communication", function (error, collection) {
@@ -302,12 +326,7 @@ d.run(function () {
                                 }
                             });
 
-                            Apio.Database.db.collection("Communication").insert({
-                                name: "integratedCommunication",
-                                apio: {},
-                                enocean: {},
-                                zwave: {}
-                            }, function (error, result1) {
+                            Apio.Database.db.collection("Communication").insert(integratedCommunication, function (error, result1) {
                                 if (error) {
                                     console.log("Error while inserting Communication integratedCommunication: ", error);
                                 } else if (result1) {

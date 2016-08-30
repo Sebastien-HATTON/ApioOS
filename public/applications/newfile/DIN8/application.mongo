@@ -8,9 +8,10 @@
   "db": {
     "modbus": {
       "1": "",
-      "2": "Seneca S50280",
-      "3": "Estron SDM220",
-      "4": "Selco200to400"
+      "2": "Seneca S500",
+      "3": "Seneca S600",
+      "4": "Estron SDM220",
+      "5": "Selco 200to400"
     }
   },
   "installation": "autoinstalled",

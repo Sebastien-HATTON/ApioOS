@@ -1,1 +1,0 @@
-module.exports = {{"panId":"0x02","dataRate":"3","radioPower":"0","firmwareVersion":"1"}}
