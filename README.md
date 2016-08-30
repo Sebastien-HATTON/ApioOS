@@ -1,8 +1,7 @@
-Apio-VIP
+ApioOS
 ==========
 
-This repository contains the apio server application and the client application.
-This is the new Version of Apio Server.
+This repository contains ApioOS the first WebOS that link together everything in internet: Things, Services, Cloud Platform and People.
 
 # Changes:
 * Improved Serial algorithm
