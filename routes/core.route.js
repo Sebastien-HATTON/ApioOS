@@ -934,9 +934,9 @@ module.exports = function (Apio) {
             res.send(Apio.Configuration);
         },
         update : function(req,res){
-	        var lastCommit = fs.readFileSync(".git/FETCH_HEAD","utf-8");
+	        var lastCommit = fs.readFileSync(".git/refs/heads/master","utf-8");
 	        console.log("Last Commit: ", lastCommit);
-	        lastCommit = lastCommit.split("\t")[0];
+	        //lastCommit = lastCommit.split("\t")[0];
 	        console.log("Last Commit: ", lastCommit);
 	        /*request.get("https://raw.githubusercontent.com/ApioLab/updates/master/version.json", {
 	            json: true
