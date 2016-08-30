@@ -852,7 +852,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 if (isConfirm) {
                     //console.log(configuration.autoinstall.default);
                     socket.emit("git_pull", "");
-                    alert("We will notify you when the update is ready")
+                    alert("We will notify you when the update is ready...Enjoy")
                     
 
                 } else {
