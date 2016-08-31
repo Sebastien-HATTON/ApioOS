@@ -122,6 +122,8 @@ app.use(cookieParser());
 //}));
 
 app.use(sessionMiddleware);
+
+//Questo è una bella merda...l'if cosi lungo fa schifo.
 app.use(function (req, res, next) {
     if (req.headers.host.indexOf("localhost") > -1 || req.headers.host.indexOf("127.0.0.1") > -1) {
         next();
@@ -221,6 +223,8 @@ d.run(function () {
                 console.log("Error while check existence of Objects: ", err);
             } else if (names.length) {
                 console.log("Collection Objects Exists");
+                //Se esiste la collection metto la roba dentro...
+                
             } else {
                 console.log("Collection Objects DOESN'T Exists, creating....");
                 Apio.Database.db.createCollection("Objects", function (error, collection) {
@@ -259,6 +263,7 @@ d.run(function () {
                 });
             }
         });
+        
         Apio.Database.db.collectionNames("Planimetry", function (err, names) {
             if (err) {
                 console.log("Error while check existence of Planimetry: ", err);

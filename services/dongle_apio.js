@@ -279,7 +279,7 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
                 ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
             } else if (doc) {
                 communication = doc;
-                console.log("La collection con name integratedCommunication contiene: ", communication)
+                //console.log("La collection con name integratedCommunication contiene: ", communication)
             }
         });
 
@@ -288,7 +288,7 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
                 ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
             } else if (doc) {
                 addressBindToProperty = doc;
-                console.log("La collection con name addressBindToProperty contiene: ", addressBindToProperty)
+                //console.log("La collection con name addressBindToProperty contiene: ", addressBindToProperty)
             }
         });
 
@@ -911,7 +911,7 @@ Apio.Serial.init = function () {
             Apio.Serial.serialPort.on("data", function (serialString) {
                 setTimeout(function () {
                     if (flagHi) {
-                        console.log("Invio l'hi");
+                        //console.log("Invio l'hi");
                         Apio.Serial.serialPort.write("s0:hi:-");
                         flagHi = false;
 
@@ -920,7 +920,7 @@ Apio.Serial.init = function () {
                 }, 15000)
 
                 //log("XXXX")
-                console.log("--------------------------------serialString: ", serialString);
+                //console.log("--------------------------------serialString: ", serialString);
                 serialString = serialString.toString();
                 //log("Apio.Serial data received " + serialString);
                 //if ((serialString === "COORDINATOR ACTIVE" || (CCounter == 0 && serialString == "c")) && typeof Apio.Serial.sendInstance === 'undefined') {
@@ -946,18 +946,18 @@ Apio.Serial.init = function () {
                     ////console.log("Apio.Serial.verifyQueue (1): ", Apio.Serial.verifyQueue);
                 }
                 if (serialString.split("-")[1] != "") {
-                    console.log("Negativo")
-                    console.log(serialString.split("-")[1]);
+                    //console.log("Negativo")
+                    //console.log(serialString.split("-")[1]);
                     serialString = serialString.split("-")[0] + "-" + serialString.split("-")[1] + "-";
                 } else {
                     serialString = serialString.split("-")[0] + "-";
                 }
                 //serialString = serialString.split("-")[0] + "-";
                 var tokens = serialString.split(":");
-                console.log("#################################tokens: ", tokens);
+                //console.log("#################################tokens: ", tokens);
                 if (tokens[0] == "ok") {
                     lastMessageRead = "l" + tokens[1] + ":" + tokens[2] + ":" + tokens[3];
-                    console.log("OKKKKK "+lastMessageRead);
+                    //console.log("OKKKKK "+lastMessageRead);
 
                     //var index = -1;
                     //for (var i = 0; index === -1 && i < Apio.Serial.verifyQueue.length; i++) {
@@ -999,7 +999,7 @@ Apio.Serial.init = function () {
                         if (Apio.Serial.verifyQueue[i] !== undefined && Apio.Serial.verifyQueue[i] !== null) {
                             var msgComponents = Apio.Serial.verifyQueue[i].message.split(":");
                             if (msgComponents[0] === "l" + tokens[1] && msgComponents[1] === tokens[2] && msgComponents[2] === tokens[3] && Apio.Serial.verifyQueue[i].counter >= 0) {
-                                console.log("Ho ricevuto due volte ACK 1 elimino il mex " + Apio.Serial.verifyQueue[i].message);
+                                //console.log("Ho ricevuto due volte ACK 1 elimino il mex " + Apio.Serial.verifyQueue[i].message);
                                 Apio.Serial.verifyQueue[i] = null;
                                 break;
 
@@ -1037,10 +1037,10 @@ Apio.Serial.init = function () {
                     dataObject.properties = {};
                     var auxi = tokens[3].split("-");
                     dataObject.properties[tokens[2]] = auxi[0];
-                    console.log('dataObject');
+                    //console.log('dataObject');
                     var dataObject2 = Apio.Util.ApioToJSON(serialString);
                     //log("dataObject: ");
-                    console.log("dataObject2: ", dataObject2);
+                    //console.log("dataObject2: ", dataObject2);
                     if (Apio.Util.isSet(dataObject.objectId) && Apio.Util.isSet(dataObject.command)) {
                         Apio.Serial.read(dataObject2);
                     }
@@ -1224,8 +1224,8 @@ Apio.Serial.interval();
 Apio.Serial.verifyQueue = [];
 Apio.Serial.sendInterval = function () {
     Apio.Serial.sendDongleInterval = setInterval(function () {
-        console.log("------------SEND-------------")
-        console.log("Apio.Serial.queue (1): ", Apio.Serial.queue);
+        //console.log("------------SEND-------------")
+        //console.log("Apio.Serial.queue (1): ", Apio.Serial.queue);
         ////////console.log("Apio.Serial.available: ", Apio.Serial.available, "Apio.Serial.queue.length: ", Apio.Serial.queue.length);
         if (Apio.Serial.available && Apio.Serial.queue.length) {
             Apio.Serial.available = false;
@@ -1310,8 +1310,8 @@ Apio.Serial.sendInterval = function () {
                 return b.timestamp - a.timestamp;
             }
         });
-        console.log("------------verify-------------")
-        console.log("Apio.Serial.verifyQueue (1): ", Apio.Serial.verifyQueue);
+        //console.log("------------verify-------------")
+        //console.log("Apio.Serial.verifyQueue (1): ", Apio.Serial.verifyQueue);
         for (var i = 0; i < Apio.Serial.verifyQueue.length; i++) {
             if (Apio.Serial.verifyQueue[i] !== null) {
                 //if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].timestamp >= 1500) {
@@ -1645,16 +1645,16 @@ Apio.io.on("apio_serial_stream", function (data) {
 //};
 
 Apio.Serial.send = function (data, callback) {
-    console.log('---------APIO SERIAL SEND---------');
+    //console.log('---------APIO SERIAL SEND---------');
     if (Apio.Configuration.type == "cloud") {
         ////console.log("Mandooooooo")
         Apio.io.emit("apio.server.serial.send", data);
     } else {
-        console.log('***************DATA IN APIO.SERIAL.SEND***************', data);
+        //console.log('***************DATA IN APIO.SERIAL.SEND***************', data);
 
         var packageMessageAndAddToQueue = function (protocol, address, key, value, callback) {
             var message = protocol + address + ":" + key + ":" + value + "-";
-            console.log("packageMessageAndAddToQueue, message: ", message);
+            //console.log("packageMessageAndAddToQueue, message: ", message);
 
             switch (protocol) {
                 case "l":
@@ -1696,7 +1696,7 @@ Apio.Serial.send = function (data, callback) {
         };
 
         if (typeof data === "object") {
-            console.log("@@@@@@@@@@@@@@@@@APIO.SERIAL.SEND, DATA: ", data);
+            //console.log("@@@@@@@@@@@@@@@@@APIO.SERIAL.SEND, DATA: ", data);
             if (data && Apio.Database.db) {
                 if (data.hasOwnProperty("protocol") && data.protocol.hasOwnProperty("name") && data.protocol.hasOwnProperty("property") && data.protocol.hasOwnProperty("type")) {
                     var fun = data.protocol.fun || "update";
@@ -1731,7 +1731,7 @@ Apio.Serial.send = function (data, callback) {
 
                     if (fn && typeof fn(data, data.allProperties) === "string") {
                         var ret = fn(data, data.allProperties);
-                        console.log("++++++++++++++++++++++++++++++++++++++ret (1): ", ret);
+                        //console.log("++++++++++++++++++++++++++++++++++++++ret (1): ", ret);
                         Apio.Serial.queue.push(ret);
                     }
                 } else if (communication.apio.hasOwnProperty("generic") && communication.apio.generic.hasOwnProperty("send") && communication.apio.generic.send.hasOwnProperty("update")) {
@@ -1766,11 +1766,11 @@ Apio.Serial.send = function (data, callback) {
 
                     if (fn && typeof fn(data, data.allProperties) === "string") {
                         var ret = fn(data, data.allProperties);
-                        console.log("++++++++++++++++++++++++++++++++++++++ret (2): ", ret);
+                        //console.log("++++++++++++++++++++++++++++++++++++++ret (2): ", ret);
                         Apio.Serial.queue.push(ret);
                     }
                 } else {
-                    console.log("quando non ho il protocol, situazione normale prima dell'aggiornamento");
+                    //console.log("quando non ho il protocol, situazione normale prima dell'aggiornamento");
                     var keys = Object.keys(data.properties);
                     Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, doc) {
                         if (err) {
@@ -1822,18 +1822,18 @@ setInterval(function () {
 
 Apio.Serial.read = function (data) {
     data.apioId = Apio.System.getApioIdentifierDongle();
-    console.log("APIO.SERIAL.READ, DATA:", data);
+    //console.log("APIO.SERIAL.READ, DATA:", data);
     var address = ''
     var command = data.command;
     var parentAddress = '';
     if(data.objectId.indexOf('|') > 0){
-	    console.log('FIND PARENT ADDRESS');
+	    //console.log('FIND PARENT ADDRESS');
 	    var tempSplit = data.objectId.split('|');
 	    address = tempSplit[1];
 	    parentAddress = tempSplit[0];
-	    console.log('Address , ParentAddress: ',address,parentAddress);
+	    //console.log('Address , ParentAddress: ',address,parentAddress);
     } else {
-	    console.log('NOT FIND PARENT ADDRESS');
+	    //console.log('NOT FIND PARENT ADDRESS');
     	address = data.objectId;
     }
     var properties = data.properties;
@@ -1844,7 +1844,7 @@ Apio.Serial.read = function (data) {
     if (addressBindToProperty.apio.hasOwnProperty(address) && addressBindToProperty.apio[address].hasOwnProperty("type")) {
 
         type = addressBindToProperty.apio[address].type;
-        console.log("IF: ", type)
+        //console.log("IF: ", type)
     }
     var newApioId = data.apioId;
 
@@ -1868,7 +1868,7 @@ Apio.Serial.read = function (data) {
             data.objectId = addressBindToProperty.apio[address].objectId;
             data.address = address;
             var ret = fn(data, objects[addressBindToProperty.apio[address].objectId].properties);
-            console.log("######################APIO.SERIAL.READ, RET: ", ret);
+            //console.log("######################APIO.SERIAL.READ, RET: ", ret);
             //FAR VEDERE A LORENZO
             //for (var KEY in ret) {
             //    data.properties[KEY] = ret[KEY];
@@ -1894,10 +1894,10 @@ Apio.Serial.read = function (data) {
             data.address = address;
 
 
-            console.log("--------------------data: ", data);
+            //console.log("--------------------data: ", data);
 
             Apio.Database.updateProperty(data, function () {
-                console.log("--------------------data: ", data);
+                //console.log("--------------------data: ", data);
                 Apio.io.emit("serial_update", data);
 
                 if (isNotificationSocketConnected) {
@@ -1909,7 +1909,7 @@ Apio.Serial.read = function (data) {
                 } else {
                     Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
                         if (err) {
-                            console.log("Error while getting object with objectId " + data.objectId + ": ", err);
+                            //console.log("Error while getting object with objectId " + data.objectId + ": ", err);
                         } else if (object) {
                             var logs = {}, timestamp = new Date().getTime();
                             for (var i in object.properties) {
@@ -1938,7 +1938,7 @@ Apio.Serial.read = function (data) {
         }
     }
     else if (!addressBindToProperty.hasOwnProperty(address) && command == "new" && address == "9999") {
-        console.log("*** NEW APIO INSTALLATION ***");
+        //console.log("*** NEW APIO INSTALLATION ***");
         var o = {
             service: 'autoInstall',
             message: 'apio_install_new_object',
@@ -1954,7 +1954,7 @@ Apio.Serial.read = function (data) {
         Apio.io.emit('send_to_service', o);
     }
     else if (!addressBindToProperty.hasOwnProperty(address) && command == "newModbus" && address != "9999") {
-        console.log("*** NEW APIO INSTALLATION BY SUBOBJECT ***");
+        //console.log("*** NEW APIO INSTALLATION BY SUBOBJECT ***");
         var o = {
             service: 'autoInstall',
             message: 'apio_install_new_object_final',
@@ -1968,7 +1968,7 @@ Apio.Serial.read = function (data) {
         }
         o.data.eep = data.properties[Object.keys(data.properties)[0]];
         //console.log("launch apio_install_new_object_final data vale******** ",data);
-        console.log("launch apio_install_new_object_final o vale******** ",o);
+        //console.log("launch apio_install_new_object_final o vale******** ",o);
         //o.data.serialNumber = data.properties[Object.keys(data.properties)[0]];
         Apio.io.emit('send_to_service', o);
     }
@@ -2027,7 +2027,7 @@ Apio.Serial.read = function (data) {
                                 data.address = address;
 
                                 Apio.Database.updateProperty(data, function () {
-                                    console.log("--------------------data: ", data);
+                                    //console.log("--------------------data: ", data);
                                     Apio.io.emit("serial_update", data);
 
                                     if (isNotificationSocketConnected) {
@@ -2392,7 +2392,7 @@ socketServer.on("connection", function (Socket) {
                 ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
             } else if (doc) {
                 communication = doc;
-                console.log("La collection con name integratedCommunication contiene: ", communication)
+                //console.log("La collection con name integratedCommunication contiene: ", communication)
             }
         });
 
@@ -2401,7 +2401,7 @@ socketServer.on("connection", function (Socket) {
                 ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
             } else if (doc) {
                 addressBindToProperty = doc;
-                console.log("La collection con name addressBindToProperty contiene: ", addressBindToProperty)
+                //console.log("La collection con name addressBindToProperty contiene: ", addressBindToProperty)
             }
         });
 
@@ -2449,6 +2449,10 @@ socketServer.on("connection", function (Socket) {
     //    });
     //});
 });
+
+setInterval(function(){
+	console.log(process.memoryUsage());
+}, 3000)
 
 http.listen(port, function () {
     ////console.log("...Start sh...");

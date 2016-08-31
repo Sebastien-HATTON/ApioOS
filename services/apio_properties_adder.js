@@ -1,5 +1,4 @@
 var config = require("../configuration/default.js");
-var Apio = require("../apio.js")(config, false);
 var MongoClient = require("mongodb").MongoClient;
 var configuration = require("../configuration/default.js");
 var database = undefined;
@@ -7,7 +6,6 @@ var fs = require("fs");
 var htmlparser = require("htmlparser");
 var mysql = require("mysql");
 var numberOfObjects = 0;
-var numberOfQueries = 1;
 var apioId = undefined;
 var objectId = undefined;
 
@@ -86,29 +84,82 @@ MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + confi
                     var keys = Object.keys(properties);
                     for (var i in keys) {
                         if (object.properties.hasOwnProperty(keys[i])) {
-                            delete properties[keys[i]];
+                            properties[keys[i]].value = object.properties[keys[i]].value;
+                            for (var k in object.properties[keys[i]]) {
+                                if (!properties[keys[i]].hasOwnProperty(k) || properties[keys[i]][k] !== object.properties[keys[i]][k]) {
+                                    properties[keys[i]][k] = object.properties[keys[i]][k];
+                                }
+                            }
                         }
                     }
 
-                    var p = {};
-                    for (var i in properties) {
-                        p["properties." + i] = properties[i];
-                    }
+                    var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                    sql_db.connect(function (err) {
+                        if (err) {
+                            console.error("error connecting: ", err);
+                        } else {
+                            var numberOfProperties = 0;
+                            var final = function (table, database, field, type) {
+                                sql_db.query("call add_modify_column(\"" + table + "\", \"" + database + "\", \"" + field + "\", \"" + type + "\")", function (e_f, r_f) {
+                                    if (e_f) {
+                                        console.log("Error while creating procedure: ", e_f);
+                                    } else {
+                                        console.log("r_f: ", r_f);
+                                        numberOfProperties--;
+                                        if (numberOfProperties === 0) {
+                                            sql_db.end();
+                                            db.close();
+                                        }
+                                    }
+                                });
+                            };
 
-                    if (Object.keys(properties).length) {
-                        db.collection("Objects").update({objectId: objectId}, {$set: p}, function (err1, result) {
-                            if (err1) {
-                                console.log("Error while updating object with objectId " + objectId + ": ", err1);
-                            } else if (result) {
-                                console.log("Object with objectId " + objectId + " successfully updated, result: ", result);
-                                if (numberOfQueries++ === numberOfObjects) {
-                                    db.close();
-                                }
+                            if (Object.keys(properties).length) {
+                                db.collection("Objects").update({objectId: objectId}, {$set: {properties: properties}}, function (err1, result) {
+                                    if (err1) {
+                                        console.log("Error while updating object with objectId " + objectId + ": ", err1);
+                                    } else if (result) {
+                                        console.log("Object with objectId " + objectId + " successfully updated, result: ", result);
+                                    }
+                                });
+
+                                var props = Object.keys(properties);
+                                props.forEach(function (p) {
+                                    numberOfProperties++;
+                                    var colType = "";
+                                    if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(properties[p].type) > -1) {
+                                        colType = "TEXT";
+                                    } else if (["number", "trigger", "unclickabletrigger"].indexOf(properties[p].type) > -1) {
+                                        colType = "INT";
+                                    } else if (["sensor", "slider", "unlimitedsensor"].indexOf(properties[p].type) > -1) {
+                                        colType = "DOUBLE";
+                                    }
+
+                                    sql_db.query("SELECT * FROM information_schema.routines where ROUTINE_NAME LIKE 'add_modify_column'", function (error, result) {
+                                        if (error) {
+                                            console.log("Error while creating table: ", error);
+                                        } else {
+                                            if (result.length) {
+                                                final(objectId, "Logs", p, colType);
+                                            } else {
+                                                sql_db.query("CREATE PROCEDURE add_modify_column(IN tablename TEXT, IN db_name TEXT, IN columnname TEXT, IN columntype TEXT)\nBEGIN\nIF NOT EXISTS (SELECT NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = tablename AND table_schema = db_name AND column_name = columnname) THEN SET @ddl = CONCAT('alter table `', tablename, '` add column (`', columnname, '` ', columntype, ')'); PREPARE STMT FROM @ddl; EXECUTE STMT; ELSE SET @ddl = CONCAT('alter table `', tablename, '` modify `', columnname, '` ', columntype); PREPARE STMT FROM @ddl; EXECUTE STMT; END IF;\nEND", function (e_p, r_p) {
+                                                    if (e_p) {
+                                                        console.log("Error while creating procedure: ", e_p);
+                                                    } else {
+                                                        console.log("r_p: ", r_p);
+                                                        final(objectId, "Logs", p, colType);
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                });
+                            } else {
+                                db.close();
+                                sql_db.end();
                             }
-                        });
-                    } else {
-                        db.close();
-                    }
+                        }
+                    });
                 } else {
                     console.log("Error while getting object with objectId " + objectId);
                 }
@@ -180,12 +231,13 @@ MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + confi
                         var keys = Object.keys(properties[objects[i].objectId]);
                         for (var j in keys) {
                             if (objects[i].properties.hasOwnProperty(keys[j])) {
-                                delete properties[objects[i].objectId][keys[j]];
+                                properties[objects[i].objectId][keys[j]].value = objects[i].properties[keys[j]].value;
+                                for (var k in objects[i].properties[keys[j]]) {
+                                    if (!properties[objects[i].objectId][keys[j]].hasOwnProperty(k) || properties[objects[i].objectId][keys[j]][k] !== objects[i].properties[keys[j]][k]) {
+                                        properties[objects[i].objectId][keys[j]][k] = objects[i].properties[keys[j]][k];
+                                    }
+                                }
                             }
-                        }
-
-                        if (Object.keys(properties[objects[i].objectId]).length === 0) {
-                            delete properties[objects[i].objectId]
                         }
                     }
 
@@ -213,12 +265,7 @@ MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + confi
                             if (Object.keys(properties).length) {
                                 var objectIds = Object.keys(properties);
                                 objectIds.forEach(function (x) {
-                                    var p = {};
-                                    for (var i in properties[x]) {
-                                        p["properties." + i] = properties[x][i];
-                                    }
-
-                                    db.collection("Objects").update({objectId: x}, {$set: p}, function (err1, result) {
+                                    db.collection("Objects").update({objectId: x}, {$set: {properties: properties[x]}}, function (err1, result) {
                                         if (err1) {
                                             console.log("Error while updating object with objectId " + x + ": ", err1);
                                         } else if (result) {
