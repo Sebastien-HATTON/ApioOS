@@ -6,6 +6,7 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
     $http.get("/apio/user/getSessionComplete").success(function (session) {
         $scope.session = session;
     });
+    
 
     socket.on("dongle_onoff_update", function (data) {
         if ($scope.session.apioId === data.apioId) {
@@ -23,6 +24,19 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
         //$scope.currentFirmwareVersion = data.firmwareVersion;
         //$scope.currentPanId = data.panId;
         //$scope.currentDataRate = data.dataRate;
+    });
+    
+    socket.on("dongle_settings", function (data) {
+    	
+        /*if ($scope.session.apioId === data.apioId) {
+            $scope.currentFirmwareVersion = data.value.firmwareVersion;
+            $scope.currentPanId = data.value.panId;
+            $scope.currentDataRate = data.value.dataRate;
+        }*/
+        //$scope.currentFirmwareVersion = data.firmwareVersion;
+        //$scope.currentPanId = data.panId;
+        //$scope.currentDataRate = data.dataRate;
+        $scope.currentPanId = data.panId;
     });
 
     $scope.selected = 1;
@@ -72,9 +86,9 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
 
     $scope.dongleSettings = function () {
         $http.get("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/getSettings")).success(function (data) {
-            $scope.currentFirmwareVersion = data.firmwareVersion;
+            //$scope.currentFirmwareVersion = data.firmwareVersion;
             $scope.currentPanId = data.panId;
-            $scope.currentDataRate = data.dataRate;
+            //$scope.currentDataRate = data.dataRate;
             //$scope.currentRadioPower = data.radioPower;
         });
     };
