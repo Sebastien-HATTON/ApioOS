@@ -756,7 +756,9 @@ angular.module("ApioApplication").controller("ApioHomeController", ["$scope", "s
     }).error(function (error) {
         console.log("Error while getting integrated communication: ", error);
     });
-
+	
+	
+	/* Function that launch the selected App */
     $scope.launchApplicationSimple = function (id) {
         var head = document.getElementsByTagName("head").item(0);
 
@@ -779,17 +781,22 @@ angular.module("ApioApplication").controller("ApioHomeController", ["$scope", "s
         if (document.getElementsByClassName("popover-content").item(0)) {
             $scope.hideAllPopover();
         }
+        
         if (document.getElementById("subApplication")) {
             Apio.newWidth -= Apio.appWidth;
             $("#ApioApplicationContainer").css("width", Apio.appWidth + "px");
             Apio.removeAngularScope(document.getElementById("subApplication"), true);
             if (document.getElementById("ApioIconsContainer")) {
-                $("#ApioIconsContainer").css("width", "66.4%");
+                $("#ApioIconsContainer").css("width", "69%");
                 var l = document.getElementById("ApioIconsContainer").childNodes;
                 for (var s in l) {
-                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2") && l.item(s).classList.contains("col-md-6")) {
-                        l.item(s).classList.remove("col-md-6");
-                        l.item(s).classList.add("col-md-3");
+                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2")) {
+                        l.item(s).classList.remove("ApioIconsContainer2");
+                        l.item(s).classList.add("ApioIconsContainer3");
+                    }
+                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer4")) {
+                        l.item(s).classList.remove("ApioIconsContainer4");
+                        l.item(s).classList.add("ApioIconsContainer3");
                     }
                 }
             }
@@ -986,17 +993,21 @@ angular.module("ApioApplication").controller("ApioHomeController", ["$scope", "s
                     // La funzione è commentata perché il width ora è dato dalla classe "dynamicPanel"
                     //$("#ApioApplicationContainer").css("width", Apio.appWidth + "px");
                     if ($("#ApioApplicationContainer").css("display") == "none") {
-                        $("#ApioApplicationContainer").show(500, function () {
+                        $("#ApioApplicationContainer").show(1000, "swing", function () {
 
                             if (window.innerWidth > 769) {
                                 // Decomprime contenitore app + corregge col icone
                                 if (document.getElementById("ApioIconsContainer")) {
-                                    $("#ApioIconsContainer").css("width", "66.4%");
+                                    $("#ApioIconsContainer").css("width", "69%");
                                     var l = document.getElementById("ApioIconsContainer").childNodes;
                                     for (var s in l) {
-                                        if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2") && l.item(s).classList.contains("col-md-2")) {
-                                            l.item(s).classList.remove("col-md-2");
-                                            l.item(s).classList.add("col-md-3");
+                                        if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2")) {
+                                            l.item(s).classList.remove("ApioIconsContainer2");
+                                            l.item(s).classList.add("ApioIconsContainer3");
+                                        }
+                                        if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer4")) {
+                                            l.item(s).classList.remove("ApioIconsContainer4");
+                                            l.item(s).classList.add("ApioIconsContainer3");
                                         }
                                     }
                                 }

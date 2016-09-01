@@ -360,7 +360,7 @@
     }
 
     .systemAppContainer {
-        height: 98%;
+        height: 99.3%;
         padding: 0 0 58px 0;
         overflow-x: hidden;
         overflow-y: scroll;
@@ -492,9 +492,9 @@
 
     .testo_proprietaiPhone {
         font-family: sans-serif;
-        font-size: 15px;
-        font-weight: 200;
-        color: #585858;
+        font-size: 22px;
+        font-weight: 300;
+        color: #292929;
         display: table-cell;
         line-height: 21px;
         vertical-align: middle;

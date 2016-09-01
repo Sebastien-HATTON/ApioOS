@@ -29,15 +29,23 @@
         }
 
         #ApioIconsContainer {
-            padding-top: 30px;
+            padding: 38px 1%;
         }
 
         #ApioIconsContainer2 {
-            padding: 0.8% 0%;
+            /*padding: 0.8% 0%;*/
         }
 
         .ApioIconsContainer2 {
-            padding: 0.5% 0%;
+            width: 14.22%;
+        }
+
+        .ApioIconsContainer3 {
+            width: 20%;
+        }
+
+        .ApioIconsContainer4 {
+            width: 33.25%;
         }
 
         .iconDisplay {
@@ -48,7 +56,9 @@
             border-radius: 145px;
             background-size: 100%;
             background-position: 50%;
-            box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 1);
+            -webkit-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9);
+            -moz-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9));
+            box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.9);
             cursor: pointer;
         }
 
@@ -56,7 +66,9 @@
             border-radius: 145px;
             background-size: 100%;
             background-position: 50%;
-            box-shadow: 0 0 4px 0px rgba(30, 30, 30, 0.8);
+            -webkit-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.8);
+            -moz-box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.8));
+            box-shadow: 0px 1px 3px 0px rgba(48, 48, 48, 0.8);
             cursor: pointer;
         }
 
@@ -73,15 +85,15 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: #505050;
         }
 
         @media only screen and (max-width: 480px) {
-            #ApioIconsContainer2 {
-                padding: 1.5% 0%;
-            }
-
+            #ApioIconsContainer > * {
+			    padding: 4px;
+			}
             .ApioIconsContainer2 {
-                padding: 1.5% 0%;
+                width: 25%;
             }
 
             .homeAppIconName {
@@ -89,8 +101,8 @@
             }
 
             .iconDisplay {
-                height: 60px;
-                width: 60px;
+                height: 80px;
+                width: 65px;
             }
 
             .image-dimensions {
@@ -101,30 +113,41 @@
         }
 
         @media only screen and (min-width: 481px) and (max-width: 767px) {
+            #ApioIconsContainer > * {
+			    padding: 6px;
+			}
+            .ApioIconsContainer2 {
+                width: 25%;
+            }
+
             .homeAppIconName {
                 font-size: 15px;
             }
 
             .iconDisplay {
-                height: 84px;
-                width: 84px;
+                height: 140px;
+                width: 90px;
             }
 
             .image-dimensions {
-                height: 84px;
-                width: 84px;
+                height: 85px;
+                width: 85px;
                 margin: 0 auto;
             }
         }
 
         @media only screen and (min-width: 768px) and (max-width: 991px) {
+            .ApioIconsContainer2 {
+                width: 25%;
+            }
+
             .homeAppIconName {
                 font-size: 17px;
             }
 
             .iconDisplay {
-                height: 100px;
-                width: 100px;
+                height: 150px;
+                width: 115px;
             }
 
             .image-dimensions {
@@ -136,26 +159,26 @@
 
         @media only screen and (min-width: 992px) and (max-width: 1199px) {
             .iconDisplay {
-                height: 98px;
-                width: 98px;
+                height: 140px;
+                width: 110px;
             }
 
             .image-dimensions {
-                height: 98px;
-                width: 98px;
+                height: 90px;
+                width: 90px;
                 margin: 0 auto;
             }
         }
 
         @media only screen and (min-width: 1200px) {
             .iconDisplay {
-                height: 103px;
-                width: 103px;
+                height: 140px;
+                width: 110px;
             }
 
             .image-dimensions {
-                height: 103px;
-                width: 103px;
+                height: 100px;
+                width: 100px;
                 margin: 0 auto;
             }
         }
@@ -199,13 +222,17 @@
     -                                                                           -
     ---------------------------------------------------------------------------->
 
-    <div id="ApioIconsContainer">
-        <div id="ApioIconsContainer2" ng-if="continueToCloud" class="col-xs-3 col-sm-3 col-md-2"
-             ng-repeat="a in currentUserActive.platform" ng-click="launchBoardSimple(a)" style="text-align: center;">
-            <div class="iconDisplay">
-                <div class="home">
-                    <div class="image-dimensions board_icon_style" ng-class="{'isSyncing' : a.isSyncing === true}"
-                         style="background-image: url(images/gateway.png);">
+    <div id="ApioIconsContainer" layout="row" layout-wrap layout-padding>
+
+	    <!-- Tools -->
+	    <!--
+	    <div id="continueToCloud" ng-if="continueToCloud" class="ApioIconsContainer2 applicazione"
+             ng-repeat="a in currentUserActive.platform" ng-click="launchBoardSimple(a)">
+            <div layout="column" layout-align="center center">
+                <div class="home" flex>
+                    <div class="image-dimensions app_icon_style" ng-class="{'isSyncing' : a.isSyncing === true}"
+                         style="background-image: url(images/gateway.png); background-size: cover;">
+
                     </div>
                 </div>
                 <div class="icon_name_container">
@@ -213,74 +240,79 @@
                 </div>
             </div>
         </div>
-
-        <div class="ApioIconsContainer2 col-xs-3 col-sm-3 col-md-2 applicazione"
-             ng-show="!categorySelected && category.length !== 0"
-             style="text-align:center;" ng-click="viewAll()">
-            <div class="iconDisplay">
-                <div class="home">
+        <div id="viewAllCategories" ng-show="!categorySelected && category.length !== 0" class="ApioIconsContainer2 applicazione"
+             ng-click="viewAll()">
+            <div layout="column" layout-align="center center">
+                <div class="home" flex>
                     <div id="allCategory" class="image-dimensions app_icon_style"
-                         style="background-image: url(/images/all-category.png); background-size: cover;"></div>
+                         style="background-image: url(/images/all-category.png); background-size: cover;">
+
+                    </div>
                 </div>
                 <div class="icon_name_container">
                     <div class="homeAppIconName">All Objects</div>
                 </div>
             </div>
         </div>
-
-        <div ng-repeat="cat in category" class="ApioIconsContainer2 col-xs-3 col-sm-3 col-md-2 applicazione"
-             ng-show="!categorySelected" style="text-align:center;" ng-click="categoryView(cat.id)">
-            <div class="iconDisplay">
-                <div class="home">
+        <div id="viewCategory" ng-repeat="cat in category" class="ApioIconsContainer2 applicazione"
+             ng-show="!categorySelected" ng-click="categoryView(cat.id)">
+            <div layout="column" layout-align="center center">
+                <div class="home" flex>
                     <div id="{{cat.name}}" class="image-dimensions app_icon_style"
-                         style="background-image: url({{cat.path}}); background-size: cover;"></div>
+                         style="background-image: url({{cat.path}}); background-size: cover;">
+
+                    </div>
                 </div>
                 <div class="icon_name_container">
                     <div class="homeAppIconName">{{cat.name}}</div>
                 </div>
             </div>
         </div>
-
-        <div class="ApioIconsContainer2 col-xs-3 col-sm-3 col-md-2 applicazione" ng-show="categorySelected"
-             style="text-align:center;" ng-click="backToCategory()">
-            <div class="iconDisplay">
-                <div class="home">
+        <div id="backToCategory" class="ApioIconsContainer2 applicazione"
+             ng-show="categorySelected" ng-click="backToCategory()">
+            <div layout="column" layout-align="center center">
+                <div class="home" flex>
                     <div id="backCategory" class="image-dimensions app_icon_style"
-                         style="background-image: url(/images/back-category.png); background-size: cover;"></div>
+                         style="background-image: url(/images/back-category.png); background-size: cover;">
+
+                    </div>
                 </div>
                 <div class="icon_name_container">
                     <div class="homeAppIconName">Back to Category</div>
                 </div>
             </div>
         </div>
-
-        <div id="{{obj.objectId}}"
-             ng-show="!obj.hasOwnProperty('group') || obj.group.id == categorySelect || categorySelect == 'all'"
-             class="ApioIconsContainer2 col-xs-3 col-sm-3 col-md-2 applicazione"
+	    -->
+	    <!-- End Tools -->
+        
+        <!-- Apps -->
+        <div id="{{obj.objectId}}" class="ApioIconsContainer2 applicazione"
              data-objectId="{{obj.objectId}}" ng-repeat="obj in objects"
-             ng-click="launchApplicationSimple(obj.objectId)"
-             oncontextmenu="angular.element(this).scope().openTag(event)" style="text-align: center;">
-            <div class="iconDisplay">
-                <div class="home">
+             ng-click="launchApplicationSimple(obj.objectId)">
+            <div layout="column" layout-align="center center">
+                <div class="home" flex>
                     <div ng-if="obj.type=='object' || obj.type=='service'" id="imageId{{obj.objectId}}"
                          data-objectId="{{obj.objectId}}" class="image-dimensions app_icon_style"
                          ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2', 'black' : obj.status === '3', 'orange' : obj.status === '4', 'green' : obj.status === '5'}"
-                         style="background-image: url(applications/{{obj.objectId}}/icon.png); background-size: cover;"
-                         data-container="body" data-toggle="popOver{{obj.objectId}}" data-placement="auto right"
-                         data-html="true" data-trigger="manual"
-                         data-content="<div id='content{{obj.objectId}}'><form><input id='tag{{obj.objectId}}' type='text' autocomplete='off' class='form-control' value='{{obj.tag}}' onblur='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().saveThisTags({{obj.objectId}},event)' onkeyup='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().find({{obj.objectId}},event)' onkeydown='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().press({{obj.objectId}},event)'></form><div id='suggest{{obj.objectId}}' class='suggest'></div></div>"></div>
+                         style="background-image: url(applications/{{obj.objectId}}/icon.png); background-size: cover;">
+
+                    </div>
                     <div ng-if="obj.type=='products'" id="imageId{{obj.objectId}}" data-objectId="{{obj.objectId}}"
                          class="image-dimensions app_icon_style"
                          ng-class="{'red' : obj.status === '0', 'yellow' : obj.status === '2', 'black' : obj.status === '3', 'orange' : obj.status === '4', 'green' : obj.status === '5'}"
-                         style="background-image: url(products/{{obj.appId}}/icon.png); background-size: cover;"
-                         data-container="body" data-toggle="popOver{{obj.objectId}}" data-placement="auto right"
-                         data-html="true" data-trigger="manual"
-                         data-content="<div id='content{{obj.objectId}}'><form><input id='tag{{obj.objectId}}' type='text' autocomplete='off' class='form-control' value='{{obj.tag}}' onblur='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().saveThisTags({{obj.objectId}},event)' onkeyup='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().find({{obj.objectId}},event)' onkeydown='angular.element(document.getElementById(&quot;appHomeContainer&quot;)).scope().press({{obj.objectId}},event)'></form><div id='suggest{{obj.objectId}}' class='suggest'></div></div>"></div>
+                         style="background-image: url(products/{{obj.appId}}/icon.png); background-size: cover;">
+
+                    </div>
                 </div>
                 <div class="icon_name_container">
                     <div class="homeAppIconName">{{obj.name}}</div>
                 </div>
             </div>
         </div>
+        <!-- End Apps -->
+		
     </div>
+    <!-- End "AppIconsContainer" -->
+
+
 </div>

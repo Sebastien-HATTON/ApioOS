@@ -342,19 +342,25 @@ module.exports = function (Apio) {
                                         var cc = mail.splice(1);
 
                                         if (to) {
-                                            request.post("http://localhost:" + service.port + "/apio/mail/send", {
-                                                body: {
-                                                    to: to,
-                                                    cc: cc.join(),
-                                                    subject: "Board riavviata",
-                                                    text: "La board " + Apio.Configuration.name + " (apioId: " + Apio.System.getApioIdentifier() + ") è stata riavvata il " + (new Date())
-                                                },
-                                                json: true
-                                            }, function (err, httpResponse) {
+                                            require("dns").resolve("www.google.com", function(err) {
                                                 if (err) {
-                                                    console.log("Error while sending mail: ", err);
-                                                } else if (httpResponse.statusCode === 200) {
                                                     execReboot();
+                                                } else {
+                                                    request.post("http://localhost:" + service.port + "/apio/mail/send", {
+                                                        body: {
+                                                            to: to,
+                                                            cc: cc.join(),
+                                                            subject: "Board riavviata",
+                                                            text: "La board " + Apio.Configuration.name + " (apioId: " + Apio.System.getApioIdentifier() + ") è stata riavvata il " + (new Date())
+                                                        },
+                                                        json: true
+                                                    }, function (err, httpResponse) {
+                                                        if (err) {
+                                                            console.log("Error while sending mail: ", err);
+                                                        } else if (httpResponse.statusCode === 200) {
+                                                            execReboot();
+                                                        }
+                                                    });
                                                 }
                                             });
                                         } else {
@@ -444,19 +450,25 @@ module.exports = function (Apio) {
                                         var cc = mail.splice(1);
 
                                         if (to) {
-                                            request.post("http://localhost:" + service.port + "/apio/mail/send", {
-                                                body: {
-                                                    to: to,
-                                                    cc: cc.join(),
-                                                    subject: "Board spenta",
-                                                    text: "La board " + Apio.Configuration.name + " (apioId: " + Apio.System.getApioIdentifier() + ") è stata spenta il " + (new Date())
-                                                },
-                                                json: true
-                                            }, function (err, httpResponse) {
+                                            require("dns").resolve("www.google.com", function(err) {
                                                 if (err) {
-                                                    console.log("Error while sending mail: ", err);
-                                                } else if (httpResponse.statusCode === 200) {
                                                     execShutdown();
+                                                } else {
+                                                    request.post("http://localhost:" + service.port + "/apio/mail/send", {
+                                                        body: {
+                                                            to: to,
+                                                            cc: cc.join(),
+                                                            subject: "Board spenta",
+                                                            text: "La board " + Apio.Configuration.name + " (apioId: " + Apio.System.getApioIdentifier() + ") è stata spenta il " + (new Date())
+                                                        },
+                                                        json: true
+                                                    }, function (err, httpResponse) {
+                                                        if (err) {
+                                                            console.log("Error while sending mail: ", err);
+                                                        } else if (httpResponse.statusCode === 200) {
+                                                            execShutdown();
+                                                        }
+                                                    });
                                                 }
                                             });
                                         } else {

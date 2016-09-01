@@ -7,7 +7,7 @@ app.controller("defaultController", ["$scope", "currentObject", "objectService",
     $scope.viewConfirmList = false;
     $scope.selectedValue = "1";
     $scope.addressModbus = 1;
-
+	$scope.nameModbus;
     $scope.installedShow = function () {
         if ($scope.modbusInstalled.length > 0) {
             return true;
@@ -21,8 +21,33 @@ app.controller("defaultController", ["$scope", "currentObject", "objectService",
         $scope.viewConfirmList = false;
         $scope.addressModbus = 1;
         $scope.selectedValue = "";
+        
         objectService.getById(data).then(function (data) {
             console.log("apio_server_new", data.data);
+            console.log("verifico se è stato specificato un nome: ",$scope.nameModbus);
+            
+            $scope.nameModbus =  document.getElementById('nameModbus').value
+            
+            if(typeof $scope.nameModbus != "undefined" && $scope.nameModbus != ""){
+		    //alert($scope.nameModbus);
+		    
+		    	data.data.name = $scope.nameModbus
+		    
+	            var o = {
+	            address: data.data.address,
+	            id: data.data.objectId,
+	            name: data.data.name,
+	            services: [],
+	            tag: ""
+		        };
+		        console.log("ChangeSettings la richiesta: ", o);
+		
+		        $http.post("/apio/app/changeSettings", o).success(function (data) {
+			        $scope.nameModbus = '';
+		        });
+	        } else {
+			    //alert("Name App campo vuoto!");
+		    }
             if (data.data.parentAddress == $scope.object.address) {
                 $scope.modbusInstalled.push(data.data);
             }

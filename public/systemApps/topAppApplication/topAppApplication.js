@@ -106,6 +106,14 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
                 if (document.getElementById('ApioIconsContainer')) {
                     var l = document.getElementById('ApioIconsContainer').childNodes;
                     for (var s in l) {
+	                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer3")) {
+	                        l.item(s).classList.remove("ApioIconsContainer3");
+	                        l.item(s).classList.add("ApioIconsContainer2");
+	                    }
+	                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer4")) {
+                            l.item(s).classList.remove("ApioIconsContainer4");
+                            l.item(s).classList.add("ApioIconsContainer2");
+                        }
                         if (l.item(s).classList && l.item(s).classList.contains('ApioIconsContainer2') && l.item(s).classList.contains('col-md-3')) {
                             l.item(s).classList.remove('col-md-3');
                             l.item(s).classList.add('col-md-2');
@@ -125,17 +133,21 @@ apioApplication.directive("topappapplication", ["currentObject", "socket", "$htt
                 document.getElementById("ApioApplicationContainer").classList.remove("fullscreen");
 
                 if (document.getElementById("ApioIconsContainer")) {
-                    document.getElementById("ApioIconsContainer").style.display = "block";
+                    //document.getElementById("ApioIconsContainer").style.display = "block";
                     /*if (window.innerWidth < 768) {
-                     document.getElementById("apioMenuMobile").style.display = "block";
-                     } else {
-                     document.getElementById("apioMenu").style.display = "block";
-                     }*/
-                    $location.path("/home");
+                    	document.getElementById("apioMenuMobile").style.display = "block";
+                    } else {
+						document.getElementById("apioMenu").style.display = "block";
+                    }*/
+                    if ($location.url().split("/")[1] === "home"){
+						$location.path("/home");
+					} else if ($location.url().split("/")[1] === "home2") {
+						$location.path("/home2");
+					}
                 }
 
 
-                $("#ApioApplicationContainer").hide("slide", {direction: 'right'}, 500, function () {
+                $("#ApioApplicationContainer").hide("slide", {direction: 'right'}, 850, function () {
                     Apio.removeAngularScope(document.getElementById("subApplication"), true);
                     Apio.removeAngularScope(document.getElementById("ApioApplicationContainer"));
 

@@ -211,9 +211,12 @@ module.exports = function (libraries) {
                                     content = content.split("\n");
                                     for (var i = 0; i < content.length; i++) {
                                         if (content[i][0] === "#" && content[i].indexOf("allow-hotplug wlan0") > -1) {
-                                            content[i] = content[i].substr(1);
-                                            content[i + 1] = content[i + 1].substr(1);
-                                            content[i + 2] = content[i + 2].substr(1);
+                                            // content[i] = content[i].substr(1);
+                                            // content[i + 1] = content[i + 1].substr(1);
+                                            // content[i + 2] = content[i + 2].substr(1);
+                                            content[i] = content[i].substr(content[i].lastIndexOf("#") + 1);
+                                            content[i + 1] = content[i + 1].substr(content[i + 1].lastIndexOf("#") + 1);
+                                            content[i + 2] = content[i + 2].substr(content[i + 2].lastIndexOf("#") + 1);
                                         } else if (content[i].indexOf("iface wlan0 inet static") > -1) {
                                             content[i] = "#" + content[i];
                                             content[i + 1] = "#" + content[i + 1];
@@ -253,10 +256,14 @@ module.exports = function (libraries) {
                             content[i + 1] = "#" + content[i + 1];
                             content[i + 2] = "#" + content[i + 2];
                         } else if (content[i][0] === "#" && content[i].indexOf("iface wlan0 inet static") > -1) {
-                            content[i] = content[i].substr(1);
-                            content[i + 1] = content[i + 1].substr(1);
-                            content[i + 2] = content[i + 2].substr(1);
-                            content[i + 4] = content[i + 4].substr(1);
+                            // content[i] = content[i].substr(1);
+                            // content[i + 1] = content[i + 1].substr(1);
+                            // content[i + 2] = content[i + 2].substr(1);
+                            // content[i + 4] = content[i + 4].substr(1);
+                            content[i] = content[i].substr(content[i].lastIndexOf("#") + 1);
+                            content[i + 1] = content[i + 1].substr(content[i + 1].lastIndexOf("#") + 1);
+                            content[i + 2] = content[i + 2].substr(content[i + 2].lastIndexOf("#") + 1);
+                            content[i + 4] = content[i + 4].substr(content[i + 4].lastIndexOf("#") + 1);
                         }
                     }
 
@@ -476,9 +483,9 @@ module.exports = function (libraries) {
                                         content = content.split("\n");
                                         for (var i = 0; i < content.length; i++) {
                                             if (content[i][0] === "#" && content[i].indexOf("allow-hotplug wlan0") > -1) {
-                                                content[i] = content[i].substr(1);
-                                                content[i + 1] = content[i + 1].substr(1);
-                                                content[i + 2] = content[i + 2].substr(1);
+                                                content[i] = content[i].substr(content[i].lastIndexOf("#") + 1);
+                                                content[i + 1] = content[i + 1].substr(content[i + 1].lastIndexOf("#") + 1);
+                                                content[i + 2] = content[i + 2].substr(content[i + 2].lastIndexOf("#") + 1);
                                             } else if (content[i].indexOf("iface wlan0 inet static") > -1) {
                                                 content[i] = "#" + content[i];
                                                 content[i + 1] = "#" + content[i + 1];
@@ -529,10 +536,10 @@ module.exports = function (libraries) {
                                 content[i + 1] = "#" + content[i + 1];
                                 content[i + 2] = "#" + content[i + 2];
                             } else if (content[i][0] === "#" && content[i].indexOf("iface wlan0 inet static") > -1) {
-                                content[i] = content[i].substr(1);
-                                content[i + 1] = content[i + 1].substr(1);
-                                content[i + 2] = content[i + 2].substr(1);
-                                content[i + 4] = content[i + 4].substr(1);
+                                content[i] = content[i].substr(content[i].lastIndexOf("#") + 1);
+                                content[i + 1] = content[i + 1].substr(content[i + 1].lastIndexOf("#") + 1);
+                                content[i + 2] = content[i + 2].substr(content[i + 2].lastIndexOf("#") + 1);
+                                content[i + 4] = content[i + 4].substr(content[i + 4].lastIndexOf("#") + 1);
                             }
                         }
 

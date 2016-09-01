@@ -6,23 +6,14 @@ var path = require('path')
 
 module.exports = function (Apio) {
 
-    //var transporter = nodemailer.createTransport(smtpTransport({
-    //    host: "smtp.gmail.com",
-    //    port: 465,
-    //    secure : true,
-    //    auth: {
-    //        user: "apioassistance@gmail.com",
-    //        pass: "benfa22232425"
-    //    }
-    //}));
 
     var transporter = nodemailer.createTransport(smtpTransport({
         host: "smtps.aruba.it",
         port: 465,
         secure: true,
         auth: {
-            user: "info@apio.cc",
-            pass: "@Pio22232425."
+            user: "apioos@apio.cc",
+            pass: "Prova1234"
         }
     }));
 
@@ -57,12 +48,20 @@ module.exports = function (Apio) {
                                     from: 'Apio <info@apio.cc>',
                                     subject: 'Nuovo Utente',
                                     text: 'Un nuovo utente si è registrato: ' + email
-                                }
-                                transporter.sendMail(data, function (err, info) {
+                                };
+
+                                require("dns").resolve("www.google.com", function(err) {
                                     if (err) {
-                                        console.log(err);
+                                        console.log("Unable to send mail: no internet connection");
+                                    } else {
+                                        transporter.sendMail(data, function (err, info) {
+                                            if (err) {
+                                                console.log(err);
+                                            } else if (info) {
+                                                console.log(info);
+                                            }
+                                        });
                                     }
-                                    console.log(info);
                                 });
                             }, 3000);
                         }

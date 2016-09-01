@@ -28,18 +28,18 @@
     margin-top: 6%;
 }
 
-@media (min-width: 320px) and (max-width: 480px) {
+@media (min-width: 320px) and (max-width: 480px) { /* Mobile */
     .sensorinput {
         float: none;
         line-height: 16px;
         height: 22px;
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 100 !important;
         margin: auto;
         vertical-align: middle;
         display: table-cell;
         padding-left: 1%;
-        width: 90%;
+        width: 3%;
         text-align: right;
     }
 
@@ -59,26 +59,26 @@
     }
 }
 
-@media (min-width: 481px) and (max-width: 1000px) {
+@media (min-width: 481px) and (max-width: 1000px) { /* Tablet */
     .sensorinput {
         float: none;
         font-weight: 100 !important;
         line-height: 70px;
-        font-size: 25px;
+        font-size: 26px;
         text-align: right;
         display: table-cell;
         vertical-align: middle;
-        width: 6%;
+        width: 2%;
     }
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 1001px) { /* PC */
     .sensorinput {
         float: none;
         display: table-cell;
         font-weight: 100 !important;
         line-height: 25px;
-        font-size: 24px;
+        font-size: 21px;
         font-weight: 400;
         width: 36%;
         text-align: right;
@@ -92,7 +92,7 @@
     }
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
+@media (min-width: 481px) and (max-width: 768px) { /* Tablet */
     .modify-sensor {
         margin: auto;
         float: none;
@@ -109,7 +109,7 @@
     }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 769px) { /* PC */
     .modify-sensor {
         width: 100%;
         height: 50px;

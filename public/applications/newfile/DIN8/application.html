@@ -45,16 +45,18 @@
                       listener="selectDevice()"></list>
                 <md-list>
                     <md-list-item class="viewConfirmList" ng-show="viewConfirmList">
-                        <md-input-container style="width: 70%; margin-right: 10%;">
+                        <md-input-container style="width: 100%; margin-right: 10%;">
                             <label>{{selectedValue}}</label>
                             <input id="addressModbus" type="number" min="1" max="10" step="any" name="address"
                                    ng-model="addressModbus" placeholder="Digita il suo Modbus Address" required
-                                   md-maxlength="3" minlength="1">
-                                   
-                                   <input id="nameModbus" name="address" md-maxlength="10" minlength="4"
-                                   ng-model="nameModbus" placeholder="Digita un nome da Assegnare al Meter">
-                                   
+                                   md-maxlength="3">
                         </md-input-container>
+                        <md-input-container style="width: 100%; margin-right: 10%;">
+                        	<label>Nome App</label>
+							<input id="nameModbus" name="address" md-maxlength="20" minlength="4"
+                                   ng-model="nameModbus" placeholder="Digita un nome da Assegnare al Meter">
+                        </md-input-container>
+
                         <i class="material-icons" ng-click="discardModbus(modbus.objectId)">highlight_off</i>
                         <i class="material-icons" ng-click="addModbus(modbus.objectId)">done</i>
                     </md-list-item>

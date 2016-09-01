@@ -660,9 +660,9 @@
     }*/
     .testo_proprietaiPhone {
         font-family: sans-serif;
-        font-size: 15px;
-        font-weight: 200;
-        color: #585858;
+        font-size: 22px;
+        font-weight: 300;
+        color: #292929;
         display: table-cell;
         line-height: 22px;
         vertical-align: middle;
@@ -751,7 +751,7 @@
     }
 
     .systemAppContainer {
-        height: 98%;
+        height: 99%;
     / / padding: 18 px 70 px 0 px 50 px;
         overflow-x: hidden;
         overflow-y: scroll;

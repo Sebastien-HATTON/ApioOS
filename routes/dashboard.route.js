@@ -749,7 +749,8 @@ module.exports = function (Apio) {
                 o.apioId = req.session.apioId;
             }
 
-            Apio.Database.getObjectById(o, function (result) {
+            var deleteThisObjectToDB = function(o){  
+	            Apio.Database.getObjectById(o, function (result) {
                 console.log("Apio.Database.getObjectById callback");
                 console.log(result);
                 if (result.hasOwnProperty("installation")) {
@@ -774,13 +775,16 @@ module.exports = function (Apio) {
                     }
                 }
 
-                Apio.Database.deleteObject(Apio.Configuration.type === "cloud" ? o : (Apio.Configuration.type === "gateway" ? o.objectId : {}), function (err) {
+                
+	                Apio.Database.deleteObject(Apio.Configuration.type === "cloud" ? o : (Apio.Configuration.type === "gateway" ? o.objectId : {}), function (err)
+                {
                     console.log("Apio.Database.deleteObject callback");
                     // Apio.Database.db.collection("Objects").remove({objectId : id}, function(err){
                     if (err) {
                         console.log("error while deleting the object " + o.objectId + " from the db");
-                        res.status(500).send();
-                    } else {
+                        //res.status(500).send();
+                    } 
+                    else {
                         console.log("Tutto ok, sto per eliminare ricorsivamente la directory");
                         //deleteFolderRecursive(basePath + "/" + o.objectId);
                         if (Apio.Configuration.type === "cloud") {
@@ -810,10 +814,43 @@ module.exports = function (Apio) {
                         });
 
                         console.log("Invio response");
-                        res.send(200);
+                        //res.send(200);
                     }
                 });
-            });
+                 });
+                 }
+                 
+            deleteThisObjectToDB(o);
+                 
+                 var searchParentObject = {
+	                 
+                 }
+                 
+                 if(Apio.Configuration.type === "cloud"){
+	                 searchParentObject.apioId = req.session.apioId
+                 } else if(Apio.Configuration.type == "gateway"){
+	                 searchParentObject.apioId = Apio.System.getApioIdentifier();
+                 }
+                 searchParentObject.parentAddress = req.body.id
+                 
+                 Apio.Database.db.collection("Objects").find(searchParentObject).toArray( function (error, result) {
+	                 console.log("***************** RISULTATO RICERCA PARENT ADDRESS *******************", result)
+	                 if(error){
+		                res.send(500); 
+	                 } else {
+		                 for(var s in result){
+			                 console.log("s vale: ",s);			                 
+			                 var o = {
+			                 		objectId : result[s].objectId,
+			                 		apioId : searchParentObject.apioId
+		                 		}
+			                 console.log("o vale: ",o);	
+			                 deleteThisObjectToDB(o);
+			                
+		                 }
+		                  res.send(200);
+	                 }
+                 });
         },
         //NUOVO
         changeSettingsObject: function (req, res) {

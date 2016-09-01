@@ -1,3 +1,15 @@
+<style>
+	@media (min-width: 551px) and (max-width: 800px) {
+		.panel-heading {
+		    padding: 20px 6%;
+		}
+		.panel-title {
+		    font-size: 22px;
+		}
+	}
+	
+</style>
+
 <div id="{{propertyname}}" style="margin-top:0%; margin-bottom:0%;">
     <!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
 
@@ -21,11 +33,9 @@
     <div class="panel-group {{class}}" role="tablist" aria-multiselectable="true" style="margin-bottom:0%;">
         <div class="panel panel-default" style="margin-bottom:0%;">
             <div class="panel-heading" role="tab" id="headingOne">
-                <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent=".{{class}}"
+                <h4 class="panel-title" role="button" data-toggle="collapse" data-parent=".{{class}}"
                        data-target="#collapseOne{{propertyname}}" aria-expanded="false" aria-controls="collapseOne">
-                        {{label}}
-                    </a>
+                    {{label}}
                 </h4>
             </div>
             <div id="collapseOne{{propertyname}}" class="panel-collapse collapse {{collapse}}" role="tabpanel"

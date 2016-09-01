@@ -18,7 +18,12 @@
  *                                                                          *
  ****************************************************************************/
 
-angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "socket", "boardsService", "objectService", "currentObject", "$routeParams", "$location", "$timeout", "sharedProperties", "$http", "$window", "$rootScope", "sweet", "$mdDialog", function ($scope, socket, boardsService, objectService, currentObject, $routeParams, $location, $timeout, sharedProperties, $http, $window, $rootScope, sweet, $mdDialog) {
+angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "socket", "boardsService", "objectService", "currentObject", "$routeParams", "$location", "$timeout", "sharedProperties", "$http", "$window", "$rootScope", "sweet", "$mdDialog", "$window", function ($scope, socket, boardsService, objectService, currentObject, $routeParams, $location, $timeout, sharedProperties, $http, $window, $rootScope, sweet, $mdDialog, $window) {
+    //If the key-pair clear: "true" is passed the page will be empty
+    if ($location.search().hasOwnProperty("clear") && $location.search().clear === "true") {
+        $window.location = "app#/home";
+        document.body.innerHTML = "";
+    }
 
     socket.on("apio_shutdown", function () {
         var time = 30;
@@ -51,6 +56,28 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
             }
         }, 1000);
     });
+
+    $scope.category = [];
+
+    $scope.backToCategory = function () {
+        $scope.categorySelected = false;
+        $scope.categorySelect = "";
+    };
+
+    $scope.viewAll = function () {
+        $scope.categorySelected = true;
+        $scope.categorySelect = "all";
+    };
+
+    $scope.categorySelected = false;
+    $scope.categorySelect = "";
+
+    $scope.categoryView = function (id) {
+        console.log("categoryView");
+        console.log(id);
+        $scope.categorySelect = String(id);
+        $scope.categorySelected = true;
+    };
 
     $http.get("/apio/user/getSession").success(function (data) {
         $scope.loggedUser = data;
@@ -501,10 +528,81 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
     objectService.list().then(function (d) {
         $rootScope.objectId = d.data;
         //alert()
-        console.log(d.data)
+        console.log(d.data);
         $scope.objects = d.data;
         if ($scope.objects) {
+            var groupExists = function (group) {
+                for (var i = 0, found = false; !found && i < $scope.category.length; i++) {
+                    if (group.name === $scope.category[i].name && group.path === $scope.category[i].path && group.id === $scope.category[i].id) {
+                        found = true;
+                    }
+                }
+
+                return found;
+            };
+
             for (var s in $scope.objects) {
+                //category
+                if ($scope.objects[s].hasOwnProperty("group")) {
+                    if ($scope.objects[s].group.hasOwnProperty("name") && $scope.objects[s].group.hasOwnProperty("path")) {
+                        if ($scope.category.length === 0) {
+                            var o = {
+                                name: $scope.objects[s].group.name,
+                                path: $scope.objects[s].group.path,
+                                id: $scope.objects[s].group.id
+                            };
+
+                            if (!groupExists(o)) {
+                                $scope.category.push(o);
+                            }
+                        } else {
+                            for (var n in $scope.category) {
+                                if ($scope.category[n].name == $scope.objects[s].group) {
+                                    break;
+                                } else if ($scope.category.length - 1 == n) {
+                                    var o = {
+                                        name: $scope.objects[s].group.name,
+                                        path: $scope.objects[s].group.path,
+                                        id: $scope.objects[s].group.id
+                                    };
+
+                                    if (!groupExists(o)) {
+                                        $scope.category.push(o);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if ($scope.category.length === 0) {
+                            var o = {
+                                name: $scope.objects[s].group,
+                                path: "/images/elettricalpanel.png",
+                                id: $scope.objects[s].group
+                            };
+
+                            if (!groupExists(o)) {
+                                $scope.category.push(o);
+                            }
+                        } else {
+                            for (var n in $scope.category) {
+                                if ($scope.category[n].name == $scope.objects[s].group) {
+                                    break;
+                                } else if ($scope.category.length - 1 == n) {
+                                    var o = {
+                                        name: $scope.objects[s].group,
+                                        path: "/images/elettricalpanel.png",
+                                        id: $scope.objects[s].group
+                                    };
+
+                                    if (!groupExists(o)) {
+                                        $scope.category.push(o);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //tag
                 if ($scope.objects[s].tag) {
                     var tagArray = $scope.objects[s].tag.split(" ");
                     for (var l in tagArray) {
@@ -515,6 +613,9 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
                 }
             }
         }
+
+        console.log("$scope.category: ", $scope.category);
+
         $http.get("systemApps/home/order.json").success(function (order) {
             console.log("order: ", order);
             //SALVARE L'ORDINAMENTO IN UNA VARIABILE ACCESSIBILE SOLO NEL CONTROLLER
@@ -683,12 +784,12 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
             $("#ApioApplicationContainer").css("width", Apio.appWidth + "px");
             Apio.removeAngularScope(document.getElementById("subApplication"), true);
             if (document.getElementById("ApioIconsContainer")) {
-                $("#ApioIconsContainer").css("width", "69%");
+                $("#ApioIconsContainer").css("width", "66.4%");
                 var l = document.getElementById("ApioIconsContainer").childNodes;
                 for (var s in l) {
-                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2")) {
-                        l.item(s).classList.remove("ApioIconsContainer2");
-                        l.item(s).classList.add("ApioIconsContainer3");
+                    if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2") && l.item(s).classList.contains("col-md-6")) {
+                        l.item(s).classList.remove("col-md-6");
+                        l.item(s).classList.add("col-md-3");
                     }
                 }
             }
@@ -730,7 +831,7 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
 
                     for (var i in properties) {
                         for (var j in properties[i].attributes) {
-                            if (typeof properties[i].attributes[j] === "object" && properties[i].attributes[j].name !== "event" && properties[i].attributes[j].name !== "listener" && properties[i].attributes[j].name !== "propertyname") {
+                            if (typeof properties[i].attributes[j] === "object" && properties[i].attributes[j].name !== "event" && properties[i].attributes[j].name !== "listener" && properties[i].attributes[j].name !== "propertyname" && properties[i].attributes[j].name !== "writetoserial") {
                                 var propertyname = getPropertyname(properties[i].attributes);
                                 if (!propObj.hasOwnProperty(propertyname)) {
                                     propObj[propertyname] = {
@@ -772,46 +873,47 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
                                 property: propObj[i].protocolproperty
                             };
 
-                            if (!bindToPropertyObj.hasOwnProperty(propObj[i].protocolname)) {
-                                bindToPropertyObj[propObj[i].protocolname] = {};
-                            }
-
-                            if (!bindToPropertyObj[propObj[i].protocolname].hasOwnProperty(propObj[i].protocoladdress)) {
-                                bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress] = {};
-                            }
-
-                            if (!bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress].hasOwnProperty(propObj[i].protocolproperty)) {
-                                bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress][propObj[i].protocolproperty] = {};
-                            }
-
-                            bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress][propObj[i].protocolproperty][$scope.currentObject.objectId] = i;
+                            //if (!bindToPropertyObj.hasOwnProperty(propObj[i].protocolname)) {
+                            //    bindToPropertyObj[propObj[i].protocolname] = {};
+                            //}
+                            //
+                            //if (!bindToPropertyObj[propObj[i].protocolname].hasOwnProperty(propObj[i].protocoladdress)) {
+                            //    bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress] = {};
+                            //}
+                            //
+                            //if (!bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress].hasOwnProperty(propObj[i].protocolproperty)) {
+                            //    bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress][propObj[i].protocolproperty] = {};
+                            //}
+                            //
+                            //bindToPropertyObj[propObj[i].protocolname][propObj[i].protocoladdress][propObj[i].protocolproperty][$scope.currentObject.objectId] = i;
                         } else {
-                            var protocols = Object.keys(bindToPropertyObj);
-                            for (var p in protocols) {
-                                var addresses = Object.keys(bindToPropertyObj[protocols[p]]);
-                                for (var a in addresses) {
-                                    var types = Object.keys(bindToPropertyObj[protocols[p]][addresses[a]]);
-                                    for (var t in types) {
-                                        if (typeof bindToPropertyObj[protocols[p]][addresses[a]][types[t]] === "object") {
-                                            if (bindToPropertyObj[protocols[p]][addresses[a]][types[t]][$scope.currentObject.objectId] === i) {
-                                                delete bindToPropertyObj[protocols[p]][addresses[a]][types[t]][$scope.currentObject.objectId];
-                                            }
-
-                                            //if (Object.keys(bindToPropertyObj[protocols[p]][addresses[a]][types[t]]).length === 0) {
-                                            //    delete bindToPropertyObj[protocols[p]][addresses[a]][types[t]];
-                                            //}
-                                        }
-                                    }
-
-                                    //if (Object.keys(bindToPropertyObj[protocols[p]][addresses[a]]).length === 0) {
-                                    //    delete bindToPropertyObj[protocols[p]][addresses[a]];
-                                    //}
-                                }
-
-                                //if (Object.keys(bindToPropertyObj[protocols[p]]).length === 0) {
-                                //    delete bindToPropertyObj[protocols[p]];
-                                //}
-                            }
+                            delete additionalInfo[i].protocol;
+                            //var protocols = Object.keys(bindToPropertyObj);
+                            //for (var p in protocols) {
+                            //    var addresses = Object.keys(bindToPropertyObj[protocols[p]]);
+                            //    for (var a in addresses) {
+                            //        var types = Object.keys(bindToPropertyObj[protocols[p]][addresses[a]]);
+                            //        for (var t in types) {
+                            //            if (typeof bindToPropertyObj[protocols[p]][addresses[a]][types[t]] === "object") {
+                            //                if (bindToPropertyObj[protocols[p]][addresses[a]][types[t]][$scope.currentObject.objectId] === i) {
+                            //                    delete bindToPropertyObj[protocols[p]][addresses[a]][types[t]][$scope.currentObject.objectId];
+                            //                }
+                            //
+                            //                //if (Object.keys(bindToPropertyObj[protocols[p]][addresses[a]][types[t]]).length === 0) {
+                            //                //    delete bindToPropertyObj[protocols[p]][addresses[a]][types[t]];
+                            //                //}
+                            //            }
+                            //        }
+                            //
+                            //        //if (Object.keys(bindToPropertyObj[protocols[p]][addresses[a]]).length === 0) {
+                            //        //    delete bindToPropertyObj[protocols[p]][addresses[a]];
+                            //        //}
+                            //    }
+                            //
+                            //    //if (Object.keys(bindToPropertyObj[protocols[p]]).length === 0) {
+                            //    //    delete bindToPropertyObj[protocols[p]];
+                            //    //}
+                            //}
                         }
                     }
 
@@ -825,7 +927,7 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
                             isDifferent = true;
                         } else {
                             for (var j in additionalInfo[i]) {
-                                if ((j !== "graph" && j !== "hi" && j !== "protocol" && j !== "value" && !propObj[i].hasOwnProperty(j)) || (j !== "protocol" && j.indexOf("protocol") > -1)) {
+                                if ((j !== "graph" && j !== "hi" && j !== "protocol" && j !== "value" && j !== "additional" && !propObj[i].hasOwnProperty(j)) || (j !== "protocol" && j.indexOf("protocol") > -1)) {
                                     delete additionalInfo[i][j];
                                     isDifferent = true;
                                 }
@@ -833,22 +935,32 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
                         }
                     }
 
-                    if (isDifferent) {
-                        $http.put("/apio/modifyObject/" + d.data.objectId, {
-                            object: {
-                                properties: additionalInfo
-                            }
-                        }).success(function (data) {
-                            console.log("Object with objectId " + d.data.objectId + " successfully modified: ", data);
-                        }).error(function (error) {
-                            console.log("Error while updating object with objectId " + d.data.objectId + ": ", error);
-                        });
-                    }
+                    //if (isDifferent) {
+                    //    $http.put("/apio/modifyObject/" + d.data.objectId, {
+                    //        object: {
+                    //            properties: additionalInfo
+                    //        }
+                    //    }).success(function (data) {
+                    //        console.log("Object with objectId " + d.data.objectId + " successfully modified: ", data);
+                    //    }).error(function (error) {
+                    //        console.log("Error while updating object with objectId " + d.data.objectId + ": ", error);
+                    //    });
+                    //}
+                    //
+                    //$http.post("/apio/communication/bindToProperty", bindToPropertyObj).success(function () {
+                    //    console.log("bindToProperty communication successfully modified");
+                    //}).error(function (error) {
+                    //    console.log("Error while modifying bindToProperty communication: ", error);
+                    //});
 
-                    $http.post("/apio/communication/bindToProperty", bindToPropertyObj).success(function () {
-                        console.log("bindToProperty communication successfully modified");
+                    console.log("additionalInfo: ", additionalInfo);
+
+                    $http.put("/apio/object/updateProperties/" + d.data.objectId, {
+                        properties: additionalInfo
+                    }).success(function (data) {
+                        console.log("Object with objectId " + d.data.objectId + " successfully modified: ", data);
                     }).error(function (error) {
-                        console.log("Error while modifying bindToProperty communication: ", error);
+                        console.log("Error while updating object with objectId " + d.data.objectId + ": ", error);
                     });
 
                     //END: Check is to properties is been added or delete something
@@ -879,12 +991,12 @@ angular.module("ApioApplication").controller("ApioHome2Controller", ["$scope", "
                             if (window.innerWidth > 769) {
                                 // Decomprime contenitore app + corregge col icone
                                 if (document.getElementById("ApioIconsContainer")) {
-                                    $("#ApioIconsContainer").css("width", "69%");
+                                    $("#ApioIconsContainer").css("width", "66.4%");
                                     var l = document.getElementById("ApioIconsContainer").childNodes;
                                     for (var s in l) {
-                                        if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2")) {
-                                            l.item(s).classList.remove("ApioIconsContainer2");
-                                            l.item(s).classList.add("ApioIconsContainer3");
+                                        if (l.item(s).classList && l.item(s).classList.contains("ApioIconsContainer2") && l.item(s).classList.contains("col-md-2")) {
+                                            l.item(s).classList.remove("col-md-2");
+                                            l.item(s).classList.add("col-md-3");
                                         }
                                     }
                                 }

@@ -2842,17 +2842,23 @@ module.exports = function (config, enableCloudSocket) {
 
                                     text += " ha terminato la sincronizzazione del DB alle " + (new Date());
 
-                                    transporter.sendMail({
-                                        to: "info@apio.cc",
-                                        //from: "Apio <apioassistance@gmail.com>",
-                                        from: "Apio <info@apio.cc>",
-                                        subject: "Sincronizzazione del DB terminata",
-                                        text: text
-                                    }, function (err, info) {
+                                    require("dns").resolve("www.google.com", function(err) {
                                         if (err) {
-                                            console.log("Error while sending mail: ", err);
-                                        } else if (info) {
-                                            console.log("Mail successfully sent: ", info);
+                                            console.log("Unable to send mail: no internet connection");
+                                        } else {
+                                            transporter.sendMail({
+                                                to: "info@apio.cc",
+                                                //from: "Apio <apioassistance@gmail.com>",
+                                                from: "Apio <info@apio.cc>",
+                                                subject: "Sincronizzazione del DB terminata",
+                                                text: text
+                                            }, function (err, info) {
+                                                if (err) {
+                                                    console.log("Error while sending mail: ", err);
+                                                } else if (info) {
+                                                    console.log("Mail successfully sent: ", info);
+                                                }
+                                            });
                                         }
                                     });
                                 }
