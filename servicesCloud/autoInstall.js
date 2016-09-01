@@ -197,8 +197,9 @@ module.exports = function (libraries) {
         });
 
         Socket.on("apio_install_new_object", function (data) {
-            socket.emit("send_to_client", {
+        	socket.emit("send_to_client", {
                 message: "auto_install_modal",
+                apioId: data.apioId,
                 data: data
             });
         });
