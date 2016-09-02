@@ -41,6 +41,7 @@ public/applications/*
 public/sketchbook/*
 services/apio_logic/*
 Identifier.apio
+configuration/custom.js
 
 # Users Environment Variables
 .lock-wscript
