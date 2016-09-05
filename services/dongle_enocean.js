@@ -210,9 +210,11 @@ var enoceanLearnAndInstall = function (data) {
 
 var enoceanAppliance = function (data) {
 	if(chipIdWait){
-		enocean.base = data.raw.toString('hex').substring(18, 26)
-		console.log(enocean.base)
-		chipIdWait = 0;
+		if(packetType==2){
+			enocean.base = data.raw.toString('hex').substring(18, 26)
+			console.log(enocean.base)
+			chipIdWait = 0;
+		}
 	}else{
 		enoceanApplianceOnOnce = 1;
 	    i++;
