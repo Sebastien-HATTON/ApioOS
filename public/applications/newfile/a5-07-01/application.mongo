@@ -1,0 +1,22 @@
+{
+  "address": "00015ee8",
+  "appId": "a5-07-01",
+  "db": {},
+  "installation": "autoinstalled",
+  "log": {},
+  "marker": {},
+  "name": "Enocean PIR",
+  "properties": {
+    "presenza": {
+      "label": "Presence",
+      "type": "trigger",
+      "value": "0"
+    }
+  },
+  "protocol": "enocean",
+  "services": [],
+  "sleepTime": 60000,
+  "tag": "",
+  "type": "object",
+  "user": []
+}

@@ -89,6 +89,15 @@ module.exports = {
                 "01" : "(function(data,enocean){ var convertData = []; convertData[0] = data.raw[0] + data.raw[1]; convertData[1] = data.raw[2] + data.raw[3]; convertData[2] = data.raw[4] + data.raw[5]; convertData[3] = data.raw[6] + data.raw[7]; var data = { suplyVoltage : '', lux : '' }; console.log('CONVERTDATA ', convertData); console.log('CONVERTDATA1 ', convertData[1]); console.log('CONVERTDATA2 ', convertData[2]); var rangeSelect = parseInt(convertData[3],16).toString(2); console.log('RANGE SELECTED ',rangeSelect); if(rangeSelect[3] == 1){ data.lux = String((parseInt(convertData[1],16)*(30000/255)+(300-(parseInt(convertData[1],16)*300/255))).toFixed( 2 )); } else if(rangeSelect[3] == 0){ data.lux = String((parseInt(convertData[1],16)*(60000/255)+(600-(parseInt(convertData[1],16)*600/255))).toFixed( 2 )); } data.suplyVoltage = String((parseInt(convertData[0],16)*5.1/255).toFixed( 2 )); console.log('return***** ',data); return data; })"
             }
         },
+        "a5-07-01" : {
+            "send" : {
+                "01" : "",
+                "02" : "function(){console.log('SET LOCAL')}"
+            },
+            "recive" : {
+                "01" : "(function(data, enocean) {console.log('PIR');var convertData = []; convertData[0] = data.raw[0] + data.raw[1]; convertData[1] = data.raw[2] + data.raw[3]; convertData[2] = data.raw[4] + data.raw[5]; convertData[3] = data.raw[6] + data.raw[7]; var data = { presenza: '' }; console.log('CONVERTDATA ', convertData); console.log('CONVERTDATA1 ', convertData[1]); console.log('CONVERTDATA2 ', convertData[2]); var presenza = parseInt(convertData[2], 16); console.log('Presenza ', presenza); if (presenza > 127) { data.presenza = '1'; } else { data.presenza = '0'; } console.log('return***** ', data); return data; })"
+            }
+        },
         "a5-02-05" : {
             "send" : {
                 "01" : "(function(){})"
