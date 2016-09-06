@@ -814,9 +814,39 @@ socket.on("apio_enocean_send", function (data) {
     console.log('++++++++INVIATO++++++++');
 });
 
+var enoceanInit = function(port){
+	clearInterval(search)
+	enocean.listen(port.comName);
+
+    console.log("Enocean Object Istanziato sulla porta ", port.comName);
+    setTimeout(function(){
+    	console.log("Cerco di capire il nuovo chipID:")
+    	enoceanSend('00','05', '03','ffffffff');
+    	chipIdWait = 1;
+
+    }, 5000)
+    
+    enocean.on("data", function (data) {
+    	console.log("Arriva questo: ")
+    	console.log(data)
+        enoceanApplianceOnOnce = 1;
+        //enoceanLearnAndInstall(data);
+        enoceanAppliance(data);
+
+
+    });
+    enocean.on("disconnect", function () {
+        console.log("DISCONNECT ENOCEAN*********")
+        disconnect = 1;
+        openDongle = 0;
+        enoceanSearch()
+    });
+
+    return;
+}
 
 //all'evvio del service controllo se c'è il dongle è in caso affermativo istanzio la seriale e tutto il resto
-com.list(function (err, ports) {
+/*com.list(function (err, ports) {
     if (err) {
         console.log("Unable to get serial ports, error: ", err);
     } else {
@@ -824,261 +854,65 @@ com.list(function (err, ports) {
             //console.log(port);
             if (String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH") {
                 preEnoceanFound = 1;
-
-                enocean.listen(port.comName);
-
-                console.log("Enocean Object Istanziato sulla porta ", port.comName);
-                setTimeout(function(){
-                	console.log("Cerco di capire il nuovo chipID:")
-                	enoceanSend('00','05', '03','ffffffff');
-                	chipIdWait = 1;
-
-                }, 5000)
-                
-                enocean.on("data", function (data) {
-                	console.log("Arriva questo: ")
-                	console.log(data)
-                    enoceanApplianceOnOnce = 1;
-                    //enoceanLearnAndInstall(data);
-                    enoceanAppliance(data);
-
-
-                });
-                enocean.on("disconnect", function () {
-                    console.log("DISCONNECT ENOCEAN*********")
-                    disconnect = 1;
-                });
-
-                return;
+                enoceanInit(port);
             }
         });
-        if (preEnoceanFound !== 1) {
-            disconnect = 1;
-        }
     }
-});
+});*/
 
 
 //permette di instanziare una nuova seriale sul dongle nel caso in cui viene disconnesso il dongle successivamente alla fase di avvio, o di istanziare il necessario nel caso in cui il sistema inizialmente parte senza dongle e viene connesso successivamente
 var portFound;
-var enoceanSearch = setInterval(function () {
-    //console.log("enocean service attivo",enoceanApplianceOnOnce)
-    if (comCallback !== 0 && disconnect === 1) {
-        comCallback = 0;
-        com.list(function (err, ports) {
-            if (err) {
-                console.log("Unable to get serial ports, error: ", err);
-            }
-            else {
-                console.log("Find an Enocean dongle");
-                ports.forEach(function (port) {
-                    //console.log(port);
-                    if ((String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH")) {
-                        enoceanFound = 1;
-                        portFound = port.comName
-                        return;
-                    } else {
-                        enoceanFound = 0;
-                    }
-                });
-                comCallback = 1;
-            }
-        });
-        if (enoceanFound === 1) {
-            //se è la prima volta che viene trovato
-            console.log("*********TROVATO*********");
-            disconnect = 0;
-            enocean.listen(portFound);
-            console.log('istance dongle enocean socket')
-            if (preEnoceanFound === 0) {// questo caso permette di far partire il sistema senza dongle e istanziare la seriale e le socket successivamente all'inserimento del Dongle
-                preEnoceanFound = 1;
-                console.log('istanzio la socket on.data in ascolto seriale dongle');
-                
-                enocean.on("data", function (data) {
-                    console.log("ENOCEAN ON")
-                    //enoceanLearnAndInstall(data);
-                    enoceanAppliance(data);
-                });
-                enocean.on("disconnect", function () {
-                    console.log("DISCONNECT ENOCEAN*********")
-                    disconnect = 1;
-                });
-            } else {
-                console.log(' la socket on.data è già in ascolto sulla seriale dongle');
-            }
-            console.log("Enocean Object Istanziato sulla porta ", portFound);
-            console.log("Cerco di capire il nuovo chipID:")
-		    enoceanSend('00','05', '03','ffffffff');
-        }
-    }
-}, 20000);
+var openDongle = 0;
+var search
+var enoceanSearch = function(){
+	 search = setInterval(function () {
+		com.list(function(err,ports){
+			if(err){
+				console.log("Unable to get serial ports, error: ",err);
+			} else {
+				disconnect = 1;
+				var usb = {}
+				ports.forEach(function(port){
+					if(String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH"){
+						disconnect = 0;
+						if(openDongle==0) openDongle = 1;
+						usb = port;
+					} 
+				})
+				if(disconnect){
+					console.log("Search for a Dongle Enocean")
+					if(usb && usb.hasOwnProperty('comName')){
+						console.log(usb)
+						enoceanInit(usb);
+					} else {
+						openDongle = 0;
+					}
+	
+				}else{
+					if(openDongle==2){
+						console.log("Dongle started!");
+					} else if (openDongle==1){
+						console.log("Dongle Inserted but not started")
+						if(usb && usb.hasOwnProperty('comName')){
+							console.log(usb)
+							enoceanInit(usb);
+							openDongle = 2;
+						}
+					} else if(openDongle==0){
+						console.log("Dongle Not Inserted")
+					}
+					
+				}
+			}
+		})
+	
+	}, 5000);
+}
+
+enoceanSearch();
 
 socketServer.on("connection", function (Socket) {
-    //Socket.on("update_collections", function (data) {
-    //    if (data.command === "add" && data.hasOwnProperty("addData")) {
-    //        var protocol = data.addData.protocol;
-    //        var address = data.addData.address;
-    //        var objectId = data.addData.objectId;
-    //        var type = data.addData.type;
-    //        var originalProperty = data.addData.originalProperty;
-    //        var bindedObjectId = data.addData.bindedObjectId;
-    //        var bindedProperty = data.addData.bindedProperty;
-    //
-    //        //if (protocol != null && address != null && originalProperty != null && bindedObjectId != null && bindedProperty != null) {
-    //        //    if (!bindToProperty.hasOwnProperty(protocol)) {
-    //        //        bindToProperty[protocol] = {};
-    //        //    }
-    //        //
-    //        //    if (!bindToProperty[protocol].hasOwnProperty(address)) {
-    //        //        bindToProperty[protocol][address] = {};
-    //        //
-    //        //        if (objectId != null) {
-    //        //            bindToProperty[protocol][address].objectId = objectId;
-    //        //        }
-    //        //
-    //        //        if (type != null) {
-    //        //            bindToProperty[protocol][address].type = type;
-    //        //        }
-    //        //    }
-    //        //
-    //        //    if (!bindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //        //        bindToProperty[protocol][address][originalProperty] = {};
-    //        //    }
-    //        //
-    //        //    bindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-    //        //}
-    //
-    //        if (protocol != null) {
-    //            if (!bindToProperty.hasOwnProperty(protocol)) {
-    //                bindToProperty[protocol] = {};
-    //            }
-    //
-    //            if (address != null) {
-    //                if (!bindToProperty[protocol].hasOwnProperty(address)) {
-    //                    bindToProperty[protocol][address] = {};
-    //
-    //                    if (objectId != null) {
-    //                        bindToProperty[protocol][address].objectId = objectId;
-    //                    }
-    //
-    //                    if (type != null) {
-    //                        bindToProperty[protocol][address].type = type;
-    //                    }
-    //                }
-    //
-    //                if (originalProperty != null) {
-    //                    if (!bindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //                        bindToProperty[protocol][address][originalProperty] = {};
-    //                    }
-    //
-    //                    if (bindedObjectId != null && bindedProperty != null) {
-    //                        bindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //
-    //        //Update collection objects
-    //        Apio.Database.db.collection("Objects").findOne({objectId: objectId}, function (err_find, obj) {
-    //            if (err_find) {
-    //                console.log("Error while finding object with objectId " + objectId + ": ", err_find);
-    //            } else if (obj) {
-    //               //MATTEO HA SBAGLIATO! CORREGERE NON E' UN PUSH
-    //                objects.push(obj);
-    //            }
-    //        });
-    //    } else if (data.command === "delete" && data.hasOwnProperty("deleteData")) {
-    //        var protocol = data.deleteData.protocol;
-    //        var address = data.deleteData.address;
-    //        var originalProperty = data.deleteData.originalProperty;
-    //        var bindedObjectId = data.deleteData.bindedObjectId;
-    //
-    //        if (bindToProperty.hasOwnProperty(protocol)) {
-    //            if (bindToProperty[protocol].hasOwnProperty(address)) {
-    //                if (bindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //                    if (bindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId)) {
-    //                        delete bindToProperty[protocol][address][originalProperty][bindedObjectId];
-    //                    } else if (originalProperty != null) {
-    //                        delete bindToProperty[protocol][address][originalProperty];
-    //                    }
-    //                } else if (address != null) {
-    //                    delete bindToProperty[protocol][address];
-    //                }
-    //            } else if (protocol != null) {
-    //                delete bindToProperty[protocol];
-    //            }
-    //        }
-    //
-    //        //Update collection objects
-    //        for (var i = 0; i < objects.length; i++) {
-    //            if (objects.objectId === bindedObjectId) {
-    //                objects.splice(i--, 1);
-    //            }
-    //        }
-    //    } else if (data.command === "modify" && data.hasOwnProperty("modifyData")) {
-    //        var protocol = data.modifyData.newProtocol || data.modifyData.protocol;
-    //        var address = data.modifyData.newAddress || data.modifyData.address;
-    //        var objectId = data.modifyData.newObjectId;
-    //        var type = data.modifyData.newType;
-    //        var originalProperty = data.modifyData.newOriginalProperty || data.modifyData.originalProperty;
-    //        var bindedObjectId = data.modifyData.newBindedObjectId || data.modifyData.bindedObjectId;
-    //        var bindedProperty = data.modifyData.newBindedProperty;
-    //
-    //        if (protocol != null && (bindToProperty.hasOwnProperty(protocol) || (data.modifyData.oldProtocol != null && bindToProperty.hasOwnProperty(data.modifyData.oldProtocol)))) {
-    //            if (!bindToProperty.hasOwnProperty(protocol)) {
-    //                bindToProperty[protocol] = JSON.parse(JSON.stringify(bindToProperty[data.modifyData.oldProtocol]));
-    //                delete bindToProperty[data.modifyData.oldProtocol];
-    //            }
-    //
-    //            if (address != null && (bindToProperty[protocol].hasOwnProperty(address) || (data.modifyData.oldAddress != null && bindToProperty[protocol].hasOwnProperty(data.modifyData.oldAddress)))) {
-    //                if (!bindToProperty[protocol].hasOwnProperty(address)) {
-    //                    bindToProperty[protocol][address] = JSON.parse(JSON.stringify(bindToProperty[protocol][data.modifyData.oldAddress]));
-    //                    delete bindToProperty[protocol][data.modifyData.oldAddress];
-    //                }
-    //
-    //                if (objectId != null) {
-    //                    bindToProperty[protocol][address].objectId = objectId;
-    //                }
-    //
-    //                if (type != null) {
-    //                    bindToProperty[protocol][address].type = type;
-    //                }
-    //
-    //                if (originalProperty != null && (bindToProperty[protocol][address].hasOwnProperty(originalProperty) || (data.modifyData.oldOriginalProperty != null && bindToProperty[protocol][address].hasOwnProperty(data.modifyData.oldOriginalProperty)))) {
-    //                    if (!bindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //                        bindToProperty[protocol][address][originalProperty] = JSON.parse(JSON.stringify(bindToProperty[protocol][address][data.modifyData.oldOriginalProperty]));
-    //                        delete bindToProperty[protocol][address][data.modifyData.oldOriginalProperty];
-    //                    }
-    //
-    //                    if (bindedObjectId != null && (bindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId) || (data.modifyData.oldBindedObjectId != null && bindToProperty[protocol][address][originalProperty].hasOwnProperty(data.modifyData.oldBindedObjectId)))) {
-    //                        if (!bindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId)) {
-    //                            bindToProperty[protocol][address][originalProperty][bindedObjectId] = bindToProperty[protocol][address][originalProperty][data.modifyData.oldBindedObjectId];
-    //                            delete bindToProperty[protocol][address][originalProperty][data.modifyData.oldBindedObjectId];
-    //                        }
-    //
-    //                        if (bindedProperty != null) {
-    //                            bindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //
-    //        //Update collection objects
-    //        Apio.Database.db.collection("Objects").findOne({objectId: objectId}, function (err_find, obj) {
-    //            if (err_find) {
-    //                console.log("Error while finding object with objectId " + objectId + ": ", err_find);
-    //            } else if (obj) {
-    //                for (var i = 0; i < objects.length; i++) {
-    //                    if (objects.objectId === objectId) {
-    //                        objects[i] = obj;
-    //                    }
-    //                }
-    //            }
-    //        });
-    //    }
-    //})
-
     Socket.on("update_collections", function () {
         Apio.Object.list("admin", function (err, oBjects) {
             if (err) {

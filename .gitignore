@@ -22,11 +22,13 @@ build/Release
 # Dependency directory
 # Commenting this out is preferred by some people, see
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
-node_modules/*
+# node_modules/*
 backup/*
 services/backup/*
 services/backup/apio/*
 !node_modules/serialport/*
+!node_modules/node-enocean/*
+node_modules/*
 public/bower_components/*
 public/applications/*
 !public/applications/README.md

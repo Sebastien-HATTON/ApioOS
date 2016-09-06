@@ -1,0 +1,64 @@
+{
+  "name": "node-enocean",
+  "version": "1.1.0",
+  "description": "full implementation of the enocean protocol (ESP3 + EEP2.6)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Holger-Will/node-enocean.git"
+  },
+  "keywords": [
+    "enocean",
+    "eep",
+    "iot",
+    "home automation",
+    "internet of things"
+  ],
+  "author": {
+    "name": "Holger Will"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "serialport": "^2.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "node-enocean-button": "^1.0.0",
+    "node-enocean-dimmer": "^1.0.0"
+  },
+  "gitHead": "af2c71d66f4f7b398f4c0fe865ce38366d3326a9",
+  "bugs": {
+    "url": "https://github.com/Holger-Will/node-enocean/issues"
+  },
+  "homepage": "https://github.com/Holger-Will/node-enocean#readme",
+  "_id": "node-enocean@1.1.0",
+  "_shasum": "63089cf6db03c3c9379d9c1c35d2444106cfcf2a",
+  "_from": "node-enocean@>=1.0.2 <2.0.0",
+  "_npmVersion": "3.8.5",
+  "_nodeVersion": "5.9.1",
+  "_npmUser": {
+    "name": "holgerwill",
+    "email": "h.will@klimapartner.de"
+  },
+  "dist": {
+    "shasum": "63089cf6db03c3c9379d9c1c35d2444106cfcf2a",
+    "tarball": "https://registry.npmjs.org/node-enocean/-/node-enocean-1.1.0.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "holgerwill",
+      "email": "h.will@klimapartner.de"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/node-enocean-1.1.0.tgz_1460874863839_0.6549037131480873"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/node-enocean/-/node-enocean-1.1.0.tgz",
+  "readme": "ERROR: No README data found!"
+}
