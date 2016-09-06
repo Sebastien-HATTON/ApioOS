@@ -710,7 +710,6 @@ module.exports = function (config, enableCloudSocket) {
             for (var i in Apio.servicesSocket) {
                 Apio.servicesSocket[i].on("send_to_client", function (data) {
                     //Apio.io.emit(data.message, data.data);
-
                     if (data.hasOwnProperty("who")) {
                         if (Apio.connectedSockets.hasOwnProperty(data.who)) {
                             var socketIds = Apio.connectedSockets[data.who];
@@ -724,7 +723,7 @@ module.exports = function (config, enableCloudSocket) {
                         }
                     } else if (data.hasOwnProperty("apioId")) {
                         for (var e in Apio.connectedSockets) {
-                            if (validator.isEmail(e)) {
+                            if (e === "admin" || validator.isEmail(e)) {
                                 var socketIds = Apio.connectedSockets[e];
                                 for (var i in socketIds) {
                                     if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
@@ -1493,6 +1492,17 @@ module.exports = function (config, enableCloudSocket) {
                                 }
                             }
                         }
+                    } else if (data.hasOwnProperty("apioId")) {
+                        for (var e in Apio.connectedSockets) {
+                            if (e === "admin" || validator.isEmail(e)) {
+                                var socketIds = Apio.connectedSockets[e];
+                                for (var i in socketIds) {
+                                    if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                        Apio.io.sockets.connected[socketIds[i]].emit(data.message, data.data);
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         Apio.io.emit(data.message, data.data);
                     }
@@ -2109,36 +2119,66 @@ module.exports = function (config, enableCloudSocket) {
                                                     }
                                                 }
 
-                                                sql_db.query(final, function (s_e, records) {
-                                                    if (s_e) {
-                                                        console.log("Error while getting timestamp from tables: ", s_e);
-                                                    }
-
-                                                    var result = {};
-                                                    for (var i in records) {
-                                                        result[records[i].objectId] = records[i].timestamp;
-                                                    }
-                                                    sql_db.end();
-
-                                                    var basePath = "public/boards/" + data.apioId;
-                                                    var modMap = {};
-
-                                                    var recursiveRetrieve = function (dir) {
-                                                        var files = fs.readdirSync(dir);
-                                                        for (var i in files) {
-                                                            var stats = fs.statSync(dir + "/" + files[i]);
-                                                            if (stats.isDirectory()) {
-                                                                recursiveRetrieve(dir + "/" + files[i]);
-                                                            } else {
-                                                                modMap[(dir + "/" + files[i]).replace(basePath + "/", "")] = stats.mtime.getTime();
-                                                            }
+                                                if (final) {
+                                                    sql_db.query(final, function (s_e, records) {
+                                                        if (s_e) {
+                                                            console.log("Error while getting timestamp from tables: ", s_e);
                                                         }
-                                                    };
 
-                                                    if (fs.existsSync(basePath)) {
-                                                        recursiveRetrieve(basePath);
-                                                    }
+                                                        var result = {};
+                                                        for (var i in records) {
+                                                            result[records[i].objectId] = records[i].timestamp;
+                                                        }
+                                                        sql_db.end();
 
+                                                        var basePath = "public/boards/" + data.apioId;
+                                                        var modMap = {};
+
+                                                        var recursiveRetrieve = function (dir) {
+                                                            var files = fs.readdirSync(dir);
+                                                            for (var i in files) {
+                                                                var stats = fs.statSync(dir + "/" + files[i]);
+                                                                if (stats.isDirectory()) {
+                                                                    recursiveRetrieve(dir + "/" + files[i]);
+                                                                } else {
+                                                                    modMap[(dir + "/" + files[i]).replace(basePath + "/", "")] = stats.mtime.getTime();
+                                                                }
+                                                            }
+                                                        };
+
+                                                        if (fs.existsSync(basePath)) {
+                                                            recursiveRetrieve(basePath);
+                                                        }
+
+                                                        if (data.test === system.test) {
+                                                            var randomToken = Date.now() + ":" + uuidgen.v4();
+                                                            Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                                            //console.log("Asking " + data.apioId + " for sync data...");
+                                                            //Così ho notificato una sola board che voglio i suoi dati
+                                                            //socket.emit("apio.remote.sync.request");
+                                                            console.log("Asking " + data.apioId + " for sync data...");
+                                                            Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                                                files: modMap,
+                                                                timestampObj: result
+                                                            });
+                                                            //console.log("Waiting for sync data...")
+                                                        } else {
+                                                            Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
+                                                            var randomToken = Date.now() + ":" + uuidgen.v4();
+                                                            Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                                            //console.log("Asking " + data.apioId + " for sync data...");
+                                                            //Così ho notificato una sola board che voglio i suoi dati
+                                                            //socket.emit("apio.remote.sync.request");
+                                                            console.log("Asking " + data.apioId + " for sync data...");
+                                                            Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                                                files: modMap,
+                                                                timestampObj: result
+                                                            });
+                                                        }
+                                                    });
+                                                } else {
                                                     if (data.test === system.test) {
                                                         var randomToken = Date.now() + ":" + uuidgen.v4();
                                                         Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
@@ -2148,8 +2188,8 @@ module.exports = function (config, enableCloudSocket) {
                                                         //socket.emit("apio.remote.sync.request");
                                                         console.log("Asking " + data.apioId + " for sync data...");
                                                         Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
-                                                            files: modMap,
-                                                            timestampObj: result
+                                                            files: {},
+                                                            timestampObj: {}
                                                         });
                                                         //console.log("Waiting for sync data...")
                                                     } else {
@@ -2162,11 +2202,11 @@ module.exports = function (config, enableCloudSocket) {
                                                         //socket.emit("apio.remote.sync.request");
                                                         console.log("Asking " + data.apioId + " for sync data...");
                                                         Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
-                                                            files: modMap,
-                                                            timestampObj: result
+                                                            files: {},
+                                                            timestampObj: {}
                                                         });
                                                     }
-                                                });
+                                                }
                                             }
                                         });
                                     }
