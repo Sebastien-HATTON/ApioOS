@@ -2106,7 +2106,7 @@ Apio.Serial.read = function (data) {
 	                            Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, document) {
 	                                if (err) {
 	                                    //nel caso in cui un oggetto mi comunica ma non c'è nell'db il suo address o l'oggetto viene rimosso interviene il seguente codice per eliminare l'address sull'oggetto
-	                                    Apio.Serial.send("l" + data.objectId + ":setmesh:999901-")
+	                                    Apio.Serial.send("l" + data.objectId + ":setmesh:999801-")
 	                                } else if (document) {
 	                                    if (document.appId !== "DIN8") {
 	                                        for (var i in document.properties) {

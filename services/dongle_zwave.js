@@ -750,6 +750,7 @@ socketServer.on("connection", function (Socket) {
             } else {
                 console.log('OBJECTS IS: ', oBjects);
                 //objects = JSON.parse(JSON.stringify(oBjects));
+                objects = {};
                 for (var i in oBjects) {
                     objects[oBjects[i].objectId] = oBjects[i];
                 }

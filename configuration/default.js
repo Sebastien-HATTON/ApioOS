@@ -48,10 +48,6 @@ module.exports = {
                 startAs: "process",
                 version: "1.0.0"
             },
-            // enocean: {
-            //     startAs: "require",
-            //     version: "1.0.0"
-            // },
             enocean: {
                 startAs: "process",
                 version: "1.0.0"
@@ -68,10 +64,6 @@ module.exports = {
                 startAs: "process",
                 version: "1.0.0"
             },
-            // networking: {
-            //     startAs: "process",
-            //     version: "1.0.0"
-            // },
             networking: {
                 startAs: "require",
                 version: "1.0.0"
@@ -88,7 +80,6 @@ module.exports = {
                 startAs: "process",
                 version: "1.0.0"
             },
-            //"mqtt-enea": {
             mqtt: {
                 startAs: "process",
                 version: "1.0.0"
@@ -104,7 +95,7 @@ module.exports = {
     },
     remote: {
         enabled: true,
-        uri: "http://www.apio.cloud"
+        uri: "http://apio-dev-disa.cloudapp.net"
     },
     serial: {
         baudrate: 115200,
