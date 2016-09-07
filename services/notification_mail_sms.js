@@ -31,9 +31,6 @@ var request = require("request");
 var socket_client = require("socket.io-client")("http://localhost:" + configuration.http.port);
 var socket_server = require("socket.io")(http);
 
-var lastNotificationSend = {};
-var lastMailSend = {};
-var lastSMSSend = {};
 var notificationQueue = [];
 var notificationQueueNext = true;
 var mailQueue = [];
@@ -103,26 +100,6 @@ process.on("SIGINT", function () {
 d.on("error", function (err) {
     console.log("Domain error: ", err);
 });
-
-var mailCheck = function (m) {
-    return (lastMailSend[m.to][m.text].text === m.text && lastMailSend[m.to][m.text].to === m.to);
-};
-
-var notificationCheck = function (n) {
-    var last = lastNotificationSend[n.user];
-    //console.log("notificationCheck, last: ", last);
-    for (var i in last[n.objectId].properties) {
-        if (n.properties.hasOwnProperty(i) && last[n.objectId].properties[i] === n.properties[i]) {
-            return true;
-        }
-    }
-
-    return false;
-};
-
-var SMSCheck = function (s) {
-    return (lastSMSSend[s.To][s.Content].Content === s.Content && lastSMSSend[s.To][s.Content].To === s.To);
-};
 
 setInterval(function () {
     if (notificationQueue[0]) {
@@ -213,189 +190,153 @@ setInterval(function () {
                                                 notificationQueueNext = true;
                                             } else if (serviceSMS) {
                                                 var sendMail = false, sendSMS = false;
-                                                var prop = Object.keys(data.properties)[0];
-                                                for (var i = 0; !sendMail && i < serviceMail.data[data.objectId].properties[prop].length; i++) {
-                                                    //OLD
-                                                    //if (serviceMail.data[data.objectId].properties[prop][i].value === data.properties[prop]) {
-                                                    //    for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                    //        if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                    //            for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                    //                sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                    //            }
-                                                    //        }
-                                                    //    }
-                                                    //}
+                                                for (var prop in data.properties) {
+                                                    if (serviceMail.data[data.objectId].properties.hasOwnProperty(prop)) {
+                                                        for (var i = 0; !sendMail && i < serviceMail.data[data.objectId].properties[prop].length; i++) {
+                                                            if (isNaN(serviceMail.data[data.objectId].properties[prop][i].value[0])) {
+                                                                if (serviceMail.data[data.objectId].properties[prop][i].value[0] === "*") {
+                                                                    if (isNaN(serviceMail.data[data.objectId].properties[prop][i].value[2])) {
+                                                                        var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(1, 2);
+                                                                        var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(3).replace(",", "."));
+                                                                    } else {
+                                                                        var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(1, 1);
+                                                                        var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
+                                                                    }
+                                                                } else {
+                                                                    if (isNaN(serviceMail.data[data.objectId].properties[prop][i].value[1])) {
+                                                                        var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(0, 2);
+                                                                        var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
+                                                                    } else {
+                                                                        var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(0, 1);
+                                                                        var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(1).replace(",", "."));
+                                                                    }
+                                                                }
 
-                                                    if (isNaN(serviceMail.data[data.objectId].properties[prop][i].value[0])) {
-                                                        if (serviceMail.data[data.objectId].properties[prop][i].value[0] === "*") {
-                                                            if (isNaN(serviceMail.data[data.objectId].properties[prop][i].value[2])) {
-                                                                var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(1, 2);
-                                                                var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(3).replace(",", "."));
-                                                            } else {
-                                                                var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(1, 1);
-                                                                var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
-                                                            }
-                                                        } else {
-                                                            if (isNaN(serviceMail.data[data.objectId].properties[prop][i].value[1])) {
-                                                                var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(0, 2);
-                                                                var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
-                                                            } else {
-                                                                var operand = serviceMail.data[data.objectId].properties[prop][i].value.substr(0, 1);
-                                                                var check = Number(serviceMail.data[data.objectId].properties[prop][i].value.substr(1).replace(",", "."));
+                                                                if (operand === ">") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) > check) {
+                                                                        for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else if (operand === ">=") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) >= check) {
+                                                                        for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else if (operand === "<") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) < check) {
+                                                                        for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else if (operand === "<=") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) <= check) {
+                                                                        for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } else if (data.properties[prop] === serviceMail.data[data.objectId].properties[prop][i].value) {
+                                                                for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                    if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                        for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                            sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
                                                         }
 
-                                                        if (operand === ">") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) > check) {
-                                                                for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                        for (var i = 0; !sendSMS && i < serviceSMS.data[data.objectId].properties[prop].length; i++) {
+                                                            if (isNaN(serviceSMS.data[data.objectId].properties[prop][i].value[0])) {
+                                                                if (serviceSMS.data[data.objectId].properties[prop][i].value[0] === "*") {
+                                                                    if (isNaN(serviceSMS.data[data.objectId].properties[prop][i].value[2])) {
+                                                                        var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(1, 2);
+                                                                        var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(3).replace(",", "."));
+                                                                    } else {
+                                                                        var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(1, 1);
+                                                                        var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
+                                                                    }
+                                                                } else {
+                                                                    if (isNaN(serviceSMS.data[data.objectId].properties[prop][i].value[1])) {
+                                                                        var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(0, 2);
+                                                                        var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
+                                                                    } else {
+                                                                        var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(0, 1);
+                                                                        var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(1).replace(",", "."));
+                                                                    }
+                                                                }
+
+                                                                if (operand === ">") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) > check) {
+                                                                        for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else if (operand === ">=") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) >= check) {
+                                                                        for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else if (operand === "<") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) < check) {
+                                                                        for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else if (operand === "<=") {
+                                                                    if (Number(data.properties[prop].replace(",", ".")) <= check) {
+                                                                        for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                            if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                                for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                                    sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
-                                                            }
-                                                        } else if (operand === ">=") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) >= check) {
-                                                                for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
+                                                            } else if (data.properties[prop] === serviceSMS.data[data.objectId].properties[prop][i].value) {
+                                                                for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
+                                                                    if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
+                                                                        for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
+                                                                            sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
                                                                         }
                                                                     }
-                                                                }
-                                                            }
-                                                        } else if (operand === "<") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) < check) {
-                                                                for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        } else if (operand === "<=") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) <= check) {
-                                                                for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (data.properties[prop] === serviceMail.data[data.objectId].properties[prop][i].value) {
-                                                        for (var j = 0; !sendMail && j < serviceMail.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                            if (serviceMail.data[data.objectId].properties[prop][i].users[j].email === user && serviceMail.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                for (var k = 0; !sendMail && k < serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                    sendMail = serviceMail.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
-
-                                                for (var i = 0; !sendSMS && i < serviceSMS.data[data.objectId].properties[prop].length; i++) {
-                                                    //OLD
-                                                    //if (serviceSMS.data[data.objectId].properties[prop][i].value === data.properties[prop]) {
-                                                    //    for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                    //        if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                    //            for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                    //                sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                    //            }
-                                                    //        }
-                                                    //    }
-                                                    //}
-
-                                                    //NEW
-                                                    if (isNaN(serviceSMS.data[data.objectId].properties[prop][i].value[0])) {
-                                                        if (serviceSMS.data[data.objectId].properties[prop][i].value[0] === "*") {
-                                                            if (isNaN(serviceSMS.data[data.objectId].properties[prop][i].value[2])) {
-                                                                var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(1, 2);
-                                                                var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(3).replace(",", "."));
-                                                            } else {
-                                                                var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(1, 1);
-                                                                var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
-                                                            }
-                                                        } else {
-                                                            if (isNaN(serviceSMS.data[data.objectId].properties[prop][i].value[1])) {
-                                                                var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(0, 2);
-                                                                var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(2).replace(",", "."));
-                                                            } else {
-                                                                var operand = serviceSMS.data[data.objectId].properties[prop][i].value.substr(0, 1);
-                                                                var check = Number(serviceSMS.data[data.objectId].properties[prop][i].value.substr(1).replace(",", "."));
-                                                            }
-                                                        }
-
-                                                        if (operand === ">") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) > check) {
-                                                                for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        } else if (operand === ">=") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) >= check) {
-                                                                for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        } else if (operand === "<") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) < check) {
-                                                                for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        } else if (operand === "<=") {
-                                                            if (Number(data.properties[prop].replace(",", ".")) <= check) {
-                                                                for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                                    if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                        for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                            sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (data.properties[prop] === serviceSMS.data[data.objectId].properties[prop][i].value) {
-                                                        for (var j = 0; !sendSMS && j < serviceSMS.data[data.objectId].properties[prop][i].users.length; j++) {
-                                                            if (serviceSMS.data[data.objectId].properties[prop][i].users[j].email === user && serviceSMS.data[data.objectId].properties[prop][i].users[j].message === message) {
-                                                                for (var k = 0; !sendSMS && k < serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo.length; k++) {
-                                                                    sendSMS = serviceSMS.data[data.objectId].properties[prop][i].users[j].sendTo[k].enabled;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                //VECCHIO
-                                                //socket_server.emit("send_to_client", {
-                                                //    message: "apio_notification",
-                                                //    data: {
-                                                //        message: object.name + ": " + message,
-                                                //        objectId: data.objectId,
-                                                //        properties: data.properties,
-                                                //        timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                                //        user: user,
-                                                //        sendMail: sendMail,
-                                                //        sendSMS: sendSMS
-                                                //    },
-                                                //    once: true,
-                                                //    who: user
-                                                //});
 
                                                 var ntf = {
                                                     message: object.name + ": " + message,
@@ -407,32 +348,11 @@ setInterval(function () {
                                                     sendSMS: sendSMS
                                                 };
 
-                                                //console.log("lastNotificationSend.hasOwnProperty(ntf.user): ", lastNotificationSend.hasOwnProperty(ntf.user));
-                                                //if (lastNotificationSend.hasOwnProperty(ntf.user)) {
-                                                //    console.log("lastNotificationSend[ntf.user].hasOwnProperty(data.objectId): ", lastNotificationSend[ntf.user].hasOwnProperty(data.objectId));
-                                                //    console.log("notificationCheck(ntf): ", notificationCheck(ntf));
-                                                //}
-
-                                                if (n.hasOwnProperty("always") && n.always === true) {
-                                                    socket_server.emit("send_to_client", {
-                                                        message: "apio_notification",
-                                                        data: ntf,
-                                                        //once: true,
-                                                        who: user
-                                                    });
-                                                } else if (!lastNotificationSend.hasOwnProperty(ntf.user) || !lastNotificationSend[ntf.user].hasOwnProperty(data.objectId) || !notificationCheck(ntf)) {
-                                                    if (!lastNotificationSend.hasOwnProperty(ntf.user)) {
-                                                        lastNotificationSend[ntf.user] = {};
-                                                    }
-
-                                                    lastNotificationSend[ntf.user][data.objectId] = ntf;
-                                                    socket_server.emit("send_to_client", {
-                                                        message: "apio_notification",
-                                                        data: ntf,
-                                                        //once: true,
-                                                        who: user
-                                                    });
-                                                }
+                                                socket_server.emit("send_to_client", {
+                                                    message: "apio_notification",
+                                                    data: ntf,
+                                                    who: user
+                                                });
                                             } else {
                                                 console.log("No service SMS found");
                                             }
@@ -454,30 +374,21 @@ setInterval(function () {
         if (mailQueueNext) {
             mailQueueNext = false;
             var m = mailQueue.shift();
-            if (!lastMailSend.hasOwnProperty(m.to) || !lastMailSend[m.to].hasOwnProperty(m.text) || !mailCheck(m)) {
-                if (!lastMailSend.hasOwnProperty(m.to)) {
-                    lastMailSend[m.to] = {};
+            transporter.sendMail({
+                to: m.to,
+                //from: "Apio <apioassistance@gmail.com>",
+                from: "Apio <info@apio.cc>",
+                subject: "Notifica da ApioOS",
+                text: m.text
+            }, function (err, info) {
+                if (err) {
+                    console.log("Error while sending mail: ", err);
+                    mailQueueNext = true;
+                } else if (info) {
+                    console.log("Mail successfully sent: ", info);
+                    mailQueueNext = true;
                 }
-
-                lastMailSend[m.to][m.text] = m;
-                transporter.sendMail({
-                    to: m.to,
-                    //from: "Apio <apioassistance@gmail.com>",
-                    from: "Apio <info@apio.cc>",
-                    subject: "Notifica da ApioOS",
-                    text: m.text
-                }, function (err, info) {
-                    if (err) {
-                        console.log("Error while sending mail: ", err);
-                        mailQueueNext = true;
-                    } else if (info) {
-                        console.log("Mail successfully sent: ", info);
-                        mailQueueNext = true;
-                    }
-                });
-            } else {
-                mailQueueNext = true;
-            }
+            });
         }
     }
 
@@ -485,29 +396,19 @@ setInterval(function () {
         if (smsQueueNext) {
             smsQueueNext = false;
             var s = smsQueue.shift();
-
-            if (!lastSMSSend.hasOwnProperty(s.To) || !lastSMSSend[s.To].hasOwnProperty(s.Content) || !SMSCheck(s)) {
-                if (!lastSMSSend.hasOwnProperty(s.To)) {
-                    lastSMSSend[s.To] = {};
+            clockwork.sendSms({
+                From: "Apio OS",
+                Content: s.Content,
+                To: s.To
+            }, function (error, resp) {
+                if (error) {
+                    console.log("Error while sending SMS: ", error);
+                    smsQueueNext = true;
+                } else if (resp) {
+                    console.log("SMS correctly sent: ", resp);
+                    smsQueueNext = true;
                 }
-
-                lastSMSSend[s.To][s.Content] = s;
-                clockwork.sendSms({
-                    From: "Apio OS",
-                    Content: s.Content,
-                    To: s.To
-                }, function (error, resp) {
-                    if (error) {
-                        console.log("Error while sending SMS: ", error);
-                        smsQueueNext = true;
-                    } else if (resp) {
-                        console.log("SMS correctly sent: ", resp);
-                        smsQueueNext = true;
-                    }
-                });
-            } else {
-                smsQueueNext = true;
-            }
+            });
         }
     }
 }, 0);
@@ -528,36 +429,6 @@ socket_server.on("connection", function (socket) {
     });
 
     socket.on("send_notification", function (data) {
-        for (var user in lastNotificationSend) {
-            if (lastNotificationSend[user].hasOwnProperty(data.objectId)) {
-                var key = undefined;
-                for (var i in Object.keys(data.properties)) {
-                    if (Object.keys(data.properties)[i] !== "date") {
-                        key = Object.keys(data.properties)[i];
-                        break;
-                    }
-                }
-                var ntf = lastNotificationSend[user][data.objectId];
-                var text = ntf.message;
-
-                for (var to in lastMailSend) {
-                    if (lastMailSend[to].hasOwnProperty(text)) {
-                        delete lastMailSend[to][text];
-                    }
-                }
-
-                for (var to in lastSMSSend) {
-                    if (lastSMSSend[to].hasOwnProperty(text)) {
-                        delete lastSMSSend[to][text];
-                    }
-                }
-
-                if (ntf.properties.hasOwnProperty(key) && ntf.properties[key] !== data.properties[key]) {
-                    delete lastNotificationSend[user][data.objectId];
-                }
-            }
-        }
-
         if (database) {
             database.collection("Services").findOne({name: "notification"}, function (error, service) {
                 if (error) {
@@ -599,181 +470,147 @@ socket_server.on("connection", function (socket) {
                                 if (error1) {
                                     console.log("Error while getting object with objectId " + data.objectId + ": ", error1);
                                 } else if (object) {
-                                    var key = Object.keys(data.properties)[0];
-                                    for (var j in service.data[data.objectId].properties[key]) {
-                                        //OLD
-                                        //if (data.properties[key] === service.data[data.objectId].properties[key][j].value) {
-                                        //    for (var k in service.data[data.objectId].properties[key][j].users) {
-                                        //        for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                        //            if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                        //                var email = service.data[data.objectId].properties[key][j].users[k].email;
-                                        //                var message = service.data[data.objectId].properties[key][j].users[k].message;
-                                        //                var timestamp = new Date().getTime();
-                                        //                var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
-                                        //
-                                        //                notificationQueue.push({
-                                        //                    data: data,
-                                        //                    email: email,
-                                        //                    message: message,
-                                        //                    object: object,
-                                        //                    timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                        //                    user: user
-                                        //                });
-                                        //            }
-                                        //        }
-                                        //    }
-                                        //}
-
-                                        //NEW
-                                        if (isNaN(service.data[data.objectId].properties[key][j].value[0])) {
-                                            if (service.data[data.objectId].properties[key][j].value[0] === "*") {
-                                                if (isNaN(service.data[data.objectId].properties[key][j].value[2])) {
-                                                    var operand = service.data[data.objectId].properties[key][j].value.substr(1, 2);
-                                                    var check = Number(service.data[data.objectId].properties[key][j].value.substr(3).replace(",", "."));
+                                    for (var key in data.properties) {
+                                        for (var j in service.data[data.objectId].properties[key]) {
+                                            if (isNaN(service.data[data.objectId].properties[key][j].value[0])) {
+                                                if (service.data[data.objectId].properties[key][j].value[0] === "*") {
+                                                    if (isNaN(service.data[data.objectId].properties[key][j].value[2])) {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(1, 2);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(3).replace(",", "."));
+                                                    } else {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(1, 1);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
+                                                    }
                                                 } else {
-                                                    var operand = service.data[data.objectId].properties[key][j].value.substr(1, 1);
-                                                    var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
-                                                }
-                                            } else {
-                                                if (isNaN(service.data[data.objectId].properties[key][j].value[1])) {
-                                                    var operand = service.data[data.objectId].properties[key][j].value.substr(0, 2);
-                                                    var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
-                                                } else {
-                                                    var operand = service.data[data.objectId].properties[key][j].value.substr(0, 1);
-                                                    var check = Number(service.data[data.objectId].properties[key][j].value.substr(1).replace(",", "."));
-                                                }
-                                            }
-
-                                            if (operand === ">") {
-                                                if ((Number(data.properties[key].replace(",", ".")) > check && service.data[data.objectId].properties[key][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) > check && service.data[data.objectId].properties[key][j].value[0] !== "*" && (!prevValue.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValue[data.objectId][key] && Number(prevValue[data.objectId][key].replace(",", "."))) <= check))) {
-                                                    if (!prevValue.hasOwnProperty(data.objectId)) {
-                                                        prevValue[data.objectId] = {};
+                                                    if (isNaN(service.data[data.objectId].properties[key][j].value[1])) {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(0, 2);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
+                                                    } else {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(0, 1);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(1).replace(",", "."));
                                                     }
-                                                    prevValue[data.objectId][key] = data.properties[key];
-                                                    for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                        for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                            if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                var email = service.data[data.objectId].properties[key][j].users[k].email;
-                                                                var message = service.data[data.objectId].properties[key][j].users[k].message;
-                                                                var timestamp = new Date().getTime();
-                                                                var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
+                                                }
 
-                                                                notificationQueue.push({
-                                                                    always: service.data[data.objectId].properties[key][j].value[0] === "*",
-                                                                    data: data,
-                                                                    email: email,
-                                                                    message: message,
-                                                                    object: object,
-                                                                    timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                                                    user: user
-                                                                });
+                                                if (operand === ">") {
+                                                    if (Number(data.properties[key].replace(",", ".")) > check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValue.hasOwnProperty(data.objectId) || !prevValue[data.objectId].hasOwnProperty(key) || (prevValue[data.objectId][key] <= check && Number(data.properties[key].replace(",", ".")) > prevValue[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    var email = service.data[data.objectId].properties[key][j].users[k].email;
+                                                                    var message = service.data[data.objectId].properties[key][j].users[k].message;
+                                                                    var timestamp = new Date().getTime();
+                                                                    var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
+
+                                                                    notificationQueue.push({
+                                                                        always: service.data[data.objectId].properties[key][j].value[0] === "*",
+                                                                        data: data,
+                                                                        email: email,
+                                                                        message: message,
+                                                                        object: object,
+                                                                        timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
+                                                                        user: user
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (operand === ">=") {
+                                                    if (Number(data.properties[key].replace(",", ".")) >= check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValue.hasOwnProperty(data.objectId) || !prevValue[data.objectId].hasOwnProperty(key) || (prevValue[data.objectId][key] < check && Number(data.properties[key].replace(",", ".")) >= prevValue[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    var email = service.data[data.objectId].properties[key][j].users[k].email;
+                                                                    var message = service.data[data.objectId].properties[key][j].users[k].message;
+                                                                    var timestamp = new Date().getTime();
+                                                                    var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
+
+                                                                    notificationQueue.push({
+                                                                        always: service.data[data.objectId].properties[key][j].value[0] === "*",
+                                                                        data: data,
+                                                                        email: email,
+                                                                        message: message,
+                                                                        object: object,
+                                                                        timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
+                                                                        user: user
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (operand === "<") {
+                                                    if (Number(data.properties[key].replace(",", ".")) < check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValue.hasOwnProperty(data.objectId) || !prevValue[data.objectId].hasOwnProperty(key) || (prevValue[data.objectId][key] >= check && Number(data.properties[key].replace(",", ".")) < prevValue[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    var email = service.data[data.objectId].properties[key][j].users[k].email;
+                                                                    var message = service.data[data.objectId].properties[key][j].users[k].message;
+                                                                    var timestamp = new Date().getTime();
+                                                                    var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
+
+                                                                    notificationQueue.push({
+                                                                        always: service.data[data.objectId].properties[key][j].value[0] === "*",
+                                                                        data: data,
+                                                                        email: email,
+                                                                        message: message,
+                                                                        object: object,
+                                                                        timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
+                                                                        user: user
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (operand === "<=") {
+                                                    if (Number(data.properties[key].replace(",", ".")) <= check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValue.hasOwnProperty(data.objectId) || !prevValue[data.objectId].hasOwnProperty(key) || (prevValue[data.objectId][key] > check && Number(data.properties[key].replace(",", ".")) <= prevValue[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    var email = service.data[data.objectId].properties[key][j].users[k].email;
+                                                                    var message = service.data[data.objectId].properties[key][j].users[k].message;
+                                                                    var timestamp = new Date().getTime();
+                                                                    var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
+
+                                                                    notificationQueue.push({
+                                                                        always: service.data[data.objectId].properties[key][j].value[0] === "*",
+                                                                        data: data,
+                                                                        email: email,
+                                                                        message: message,
+                                                                        object: object,
+                                                                        timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
+                                                                        user: user
+                                                                    });
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
-                                            } else if (operand === ">=") {
-                                                if ((Number(data.properties[key].replace(",", ".")) >= check && service.data[data.objectId].properties[key][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) >= check && service.data[data.objectId].properties[key][j].value[0] !== "*" && (!prevValue.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValue[data.objectId][key] && Number(prevValue[data.objectId][key].replace(",", "."))) < check))) {
-                                                    if (!prevValue.hasOwnProperty(data.objectId)) {
-                                                        prevValue[data.objectId] = {};
-                                                    }
-                                                    prevValue[data.objectId][key] = data.properties[key];
-                                                    for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                        for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                            if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                var email = service.data[data.objectId].properties[key][j].users[k].email;
-                                                                var message = service.data[data.objectId].properties[key][j].users[k].message;
-                                                                var timestamp = new Date().getTime();
-                                                                var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
+                                            } else if (data.properties[key] === service.data[data.objectId].properties[key][j].value) {
+                                                for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                    for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                        if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                            var email = service.data[data.objectId].properties[key][j].users[k].email;
+                                                            var message = service.data[data.objectId].properties[key][j].users[k].message;
+                                                            var timestamp = new Date().getTime();
+                                                            var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
 
-                                                                notificationQueue.push({
-                                                                    always: service.data[data.objectId].properties[key][j].value[0] === "*",
-                                                                    data: data,
-                                                                    email: email,
-                                                                    message: message,
-                                                                    object: object,
-                                                                    timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                                                    user: user
-                                                                });
-                                                            }
+                                                            notificationQueue.push({
+                                                                data: data,
+                                                                email: email,
+                                                                message: message,
+                                                                object: object,
+                                                                timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
+                                                                user: user
+                                                            });
                                                         }
-                                                    }
-                                                }
-                                            } else if (operand === "<") {
-                                                if ((Number(data.properties[key].replace(",", ".")) < check && service.data[data.objectId].properties[key][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) < check && service.data[data.objectId].properties[key][j].value[0] !== "*" && (!prevValue.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValue[data.objectId][key] && Number(prevValue[data.objectId][key].replace(",", "."))) >= check))) {
-                                                    if (!prevValue.hasOwnProperty(data.objectId)) {
-                                                        prevValue[data.objectId] = {};
-                                                    }
-                                                    prevValue[data.objectId][key] = data.properties[key];
-                                                    for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                        for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                            if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                var email = service.data[data.objectId].properties[key][j].users[k].email;
-                                                                var message = service.data[data.objectId].properties[key][j].users[k].message;
-                                                                var timestamp = new Date().getTime();
-                                                                var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
-
-                                                                notificationQueue.push({
-                                                                    always: service.data[data.objectId].properties[key][j].value[0] === "*",
-                                                                    data: data,
-                                                                    email: email,
-                                                                    message: message,
-                                                                    object: object,
-                                                                    timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                                                    user: user
-                                                                });
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            } else if (operand === "<=") {
-                                                if ((Number(data.properties[key].replace(",", ".")) <= check && service.data[data.objectId].properties[key][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) <= check && service.data[data.objectId].properties[key][j].value[0] !== "*" && (!prevValue.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValue[data.objectId][key] && Number(prevValue[data.objectId][key].replace(",", "."))) > check))) {
-                                                    if (!prevValue.hasOwnProperty(data.objectId)) {
-                                                        prevValue[data.objectId] = {};
-                                                    }
-                                                    prevValue[data.objectId][key] = data.properties[key];
-                                                    for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                        for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                            if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                var email = service.data[data.objectId].properties[key][j].users[k].email;
-                                                                var message = service.data[data.objectId].properties[key][j].users[k].message;
-                                                                var timestamp = new Date().getTime();
-                                                                var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
-
-                                                                notificationQueue.push({
-                                                                    always: service.data[data.objectId].properties[key][j].value[0] === "*",
-                                                                    data: data,
-                                                                    email: email,
-                                                                    message: message,
-                                                                    object: object,
-                                                                    timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                                                    user: user
-                                                                });
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else if (data.properties[key] === service.data[data.objectId].properties[key][j].value) {
-                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                        var email = service.data[data.objectId].properties[key][j].users[k].email;
-                                                        var message = service.data[data.objectId].properties[key][j].users[k].message;
-                                                        var timestamp = new Date().getTime();
-                                                        var user = service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact;
-
-                                                        notificationQueue.push({
-                                                            data: data,
-                                                            email: email,
-                                                            message: message,
-                                                            object: object,
-                                                            timestamp: data.hasOwnProperty("timestamp") ? data.timestamp : timestamp,
-                                                            user: user
-                                                        });
                                                     }
                                                 }
                                             }
                                         }
+
+                                        if (!prevValue.hasOwnProperty(data.objectId)) {
+                                            prevValue[data.objectId] = {};
+                                        }
+                                        prevValue[data.objectId][key] = Number(data.properties[key].replace(",", "."));
                                     }
                                 }
                             });
@@ -814,127 +651,98 @@ socket_server.on("connection", function (socket) {
                                 if (error1) {
                                     console.log("Error while getting object with objectId " + data.objectId + ": ", error1);
                                 } else if (object) {
-                                    var key = Object.keys(data.properties)[0];
-                                    for (var i in service.data[data.objectId].properties) {
-                                        if (key === i) {
-                                            for (var j in service.data[data.objectId].properties[i]) {
-                                                //OLD
-                                                //if (data.properties[key] === service.data[data.objectId].properties[i][j].value) {
-                                                //    for (var k in service.data[data.objectId].properties[i][j].users) {
-                                                //        for (var l in service.data[data.objectId].properties[i][j].users[k].sendTo) {
-                                                //            if (service.data[data.objectId].properties[i][j].users[k].sendTo[l].enabled) {
-                                                //                mailQueue.push({
-                                                //                    to: service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact,
-                                                //                    text: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message
-                                                //                });
-                                                //            }
-                                                //        }
-                                                //    }
-                                                //}
-
-                                                //NEW
-                                                if (isNaN(service.data[data.objectId].properties[i][j].value[0])) {
-                                                    if (service.data[data.objectId].properties[i][j].value[0] === "*") {
-                                                        if (isNaN(service.data[data.objectId].properties[i][j].value[2])) {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(1, 2);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(3).replace(",", "."));
-                                                        } else {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(1, 1);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(2).replace(",", "."));
-                                                        }
+                                    for (var key in data.properties) {
+                                        for (var j in service.data[data.objectId].properties[key]) {
+                                            if (isNaN(service.data[data.objectId].properties[key][j].value[0])) {
+                                                if (service.data[data.objectId].properties[key][j].value[0] === "*") {
+                                                    if (isNaN(service.data[data.objectId].properties[key][j].value[2])) {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(1, 2);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(3).replace(",", "."));
                                                     } else {
-                                                        if (isNaN(service.data[data.objectId].properties[i][j].value[1])) {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(0, 2);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(2).replace(",", "."));
-                                                        } else {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(0, 1);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(1).replace(",", "."));
-                                                        }
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(1, 1);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
                                                     }
+                                                } else {
+                                                    if (isNaN(service.data[data.objectId].properties[key][j].value[1])) {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(0, 2);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
+                                                    } else {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(0, 1);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(1).replace(",", "."));
+                                                    }
+                                                }
 
-                                                    if (operand === ">") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) > check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) > check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueMail.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueMail[data.objectId][key] && Number(prevValueMail[data.objectId][key].replace(",", "."))) <= check))) {
-                                                            if (!prevValueMail.hasOwnProperty(data.objectId)) {
-                                                                prevValueMail[data.objectId] = {};
-                                                            }
-                                                            prevValueMail[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        mailQueue.push({
-                                                                            to: service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact,
-                                                                            text: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (operand === ">=") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) >= check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) >= check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueMail.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueMail[data.objectId][key] && Number(prevValueMail[data.objectId][key].replace(",", "."))) < check))) {
-                                                            if (!prevValueMail.hasOwnProperty(data.objectId)) {
-                                                                prevValueMail[data.objectId] = {};
-                                                            }
-                                                            prevValueMail[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        mailQueue.push({
-                                                                            to: service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact,
-                                                                            text: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (operand === "<") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) < check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) < check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueMail.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueMail[data.objectId][key] && Number(prevValueMail[data.objectId][key].replace(",", "."))) >= check))) {
-                                                            if (!prevValueMail.hasOwnProperty(data.objectId)) {
-                                                                prevValueMail[data.objectId] = {};
-                                                            }
-                                                            prevValueMail[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        mailQueue.push({
-                                                                            to: service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact,
-                                                                            text: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (operand === "<=") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) <= check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) <= check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueMail.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueMail[data.objectId][key] && Number(prevValueMail[data.objectId][key].replace(",", "."))) > check))) {
-                                                            if (!prevValueMail.hasOwnProperty(data.objectId)) {
-                                                                prevValueMail[data.objectId] = {};
-                                                            }
-                                                            prevValueMail[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        mailQueue.push({
-                                                                            to: service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact,
-                                                                            text: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message
-                                                                        });
-                                                                    }
+                                                if (operand === ">") {
+                                                    if (Number(data.properties[key].replace(",", ".")) > check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueMail.hasOwnProperty(data.objectId) || !prevValueMail[data.objectId].hasOwnProperty(key) || (prevValueMail[data.objectId][key] <= check && Number(data.properties[key].replace(",", ".")) > prevValueMail[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    mailQueue.push({
+                                                                        to: service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact,
+                                                                        text: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message
+                                                                    });
                                                                 }
                                                             }
                                                         }
                                                     }
-                                                } else if (data.properties[key] === service.data[data.objectId].properties[i][j].value) {
-                                                    for (var k in service.data[data.objectId].properties[i][j].users) {
-                                                        for (var l in service.data[data.objectId].properties[i][j].users[k].sendTo) {
-                                                            if (service.data[data.objectId].properties[i][j].users[k].sendTo[l].enabled) {
-                                                                mailQueue.push({
-                                                                    to: service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact,
-                                                                    text: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message
-                                                                });
+                                                } else if (operand === ">=") {
+                                                    if (Number(data.properties[key].replace(",", ".")) >= check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueMail.hasOwnProperty(data.objectId) || !prevValueMail[data.objectId].hasOwnProperty(key) || (prevValueMail[data.objectId][key] < check && Number(data.properties[key].replace(",", ".")) >= prevValueMail[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    mailQueue.push({
+                                                                        to: service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact,
+                                                                        text: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message
+                                                                    });
+                                                                }
                                                             }
+                                                        }
+                                                    }
+                                                } else if (operand === "<") {
+                                                    if (Number(data.properties[key].replace(",", ".")) < check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueMail.hasOwnProperty(data.objectId) || !prevValueMail[data.objectId].hasOwnProperty(key) || (prevValueMail[data.objectId][key] >= check && Number(data.properties[key].replace(",", ".")) < prevValueMail[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    mailQueue.push({
+                                                                        to: service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact,
+                                                                        text: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (operand === "<=") {
+                                                    if (Number(data.properties[key].replace(",", ".")) <= check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueMail.hasOwnProperty(data.objectId) || !prevValueMail[data.objectId].hasOwnProperty(key) || (prevValueMail[data.objectId][key] > check && Number(data.properties[key].replace(",", ".")) <= prevValueMail[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    mailQueue.push({
+                                                                        to: service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact,
+                                                                        text: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else if (data.properties[key] === service.data[data.objectId].properties[key][j].value) {
+                                                for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                    for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                        if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                            mailQueue.push({
+                                                                to: service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact,
+                                                                text: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message
+                                                            });
                                                         }
                                                     }
                                                 }
                                             }
                                         }
+
+                                        if (!prevValueMail.hasOwnProperty(data.objectId)) {
+                                            prevValueMail[data.objectId] = {};
+                                        }
+                                        prevValueMail[data.objectId][key] = data.properties[key];
                                     }
                                 }
                             });
@@ -976,127 +784,98 @@ socket_server.on("connection", function (socket) {
                                 if (error1) {
                                     console.log("Error while getting object with objectId " + data.objectId + ": ", error1);
                                 } else if (object) {
-                                    var key = Object.keys(data.properties)[0];
-                                    for (var i in service.data[data.objectId].properties) {
-                                        if (key === i) {
-                                            for (var j in service.data[data.objectId].properties[i]) {
-                                                //OLD
-                                                //if (data.properties[key] === service.data[data.objectId].properties[i][j].value) {
-                                                //    for (var k in service.data[data.objectId].properties[i][j].users) {
-                                                //        for (var l in service.data[data.objectId].properties[i][j].users[k].sendTo) {
-                                                //            if (service.data[data.objectId].properties[i][j].users[k].sendTo[l].enabled) {
-                                                //                smsQueue.push({
-                                                //                    Content: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message,
-                                                //                    To: "39" + service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact
-                                                //                });
-                                                //            }
-                                                //        }
-                                                //    }
-                                                //}
-
-                                                //NEW
-                                                if (isNaN(service.data[data.objectId].properties[i][j].value[0])) {
-                                                    if (service.data[data.objectId].properties[i][j].value[0] === "*") {
-                                                        if (isNaN(service.data[data.objectId].properties[i][j].value[2])) {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(1, 2);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(3).replace(",", "."));
-                                                        } else {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(1, 1);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(2).replace(",", "."));
-                                                        }
+                                    for (var key in data.properties) {
+                                        for (var j in service.data[data.objectId].properties[key]) {
+                                            if (isNaN(service.data[data.objectId].properties[key][j].value[0])) {
+                                                if (service.data[data.objectId].properties[key][j].value[0] === "*") {
+                                                    if (isNaN(service.data[data.objectId].properties[key][j].value[2])) {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(1, 2);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(3).replace(",", "."));
                                                     } else {
-                                                        if (isNaN(service.data[data.objectId].properties[i][j].value[1])) {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(0, 2);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(2).replace(",", "."));
-                                                        } else {
-                                                            var operand = service.data[data.objectId].properties[i][j].value.substr(0, 1);
-                                                            var check = Number(service.data[data.objectId].properties[i][j].value.substr(1).replace(",", "."));
-                                                        }
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(1, 1);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
                                                     }
+                                                } else {
+                                                    if (isNaN(service.data[data.objectId].properties[key][j].value[1])) {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(0, 2);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(2).replace(",", "."));
+                                                    } else {
+                                                        var operand = service.data[data.objectId].properties[key][j].value.substr(0, 1);
+                                                        var check = Number(service.data[data.objectId].properties[key][j].value.substr(1).replace(",", "."));
+                                                    }
+                                                }
 
-                                                    if (operand === ">") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) > check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) > check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueSMS.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueSMS[data.objectId][key] && Number(prevValueSMS[data.objectId][key].replace(",", "."))) <= check))) {
-                                                            if (!prevValueSMS.hasOwnProperty(data.objectId)) {
-                                                                prevValueSMS[data.objectId] = {};
-                                                            }
-                                                            prevValueSMS[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        smsQueue.push({
-                                                                            Content: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message,
-                                                                            To: "39" + service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (operand === ">=") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) >= check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) >= check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueSMS.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueSMS[data.objectId][key] && Number(prevValueSMS[data.objectId][key].replace(",", "."))) < check))) {
-                                                            if (!prevValueSMS.hasOwnProperty(data.objectId)) {
-                                                                prevValueSMS[data.objectId] = {};
-                                                            }
-                                                            prevValueSMS[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        smsQueue.push({
-                                                                            Content: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message,
-                                                                            To: "39" + service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (operand === "<") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) < check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) < check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueSMS.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueSMS[data.objectId][key] && Number(prevValueSMS[data.objectId][key].replace(",", "."))) >= check))) {
-                                                            if (!prevValueSMS.hasOwnProperty(data.objectId)) {
-                                                                prevValueSMS[data.objectId] = {};
-                                                            }
-                                                            prevValueSMS[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        smsQueue.push({
-                                                                            Content: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message,
-                                                                            To: "39" + service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    } else if (operand === "<=") {
-                                                        if ((Number(data.properties[key].replace(",", ".")) <= check && service.data[data.objectId].properties[i][j].value[0] === "*") || (Number(data.properties[key].replace(",", ".")) <= check && service.data[data.objectId].properties[i][j].value[0] !== "*" && (!prevValueSMS.hasOwnProperty(data.objectId) || (data.properties[key] !== prevValueSMS[data.objectId][key] && Number(prevValueSMS[data.objectId][key].replace(",", "."))) > check))) {
-                                                            if (!prevValueSMS.hasOwnProperty(data.objectId)) {
-                                                                prevValueSMS[data.objectId] = {};
-                                                            }
-                                                            prevValueSMS[data.objectId][key] = data.properties[key];
-                                                            for (var k in service.data[data.objectId].properties[key][j].users) {
-                                                                for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
-                                                                    if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
-                                                                        smsQueue.push({
-                                                                            Content: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message,
-                                                                            To: "39" + service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact
-                                                                        });
-                                                                    }
+                                                if (operand === ">") {
+                                                    if (Number(data.properties[key].replace(",", ".")) > check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueSMS.hasOwnProperty(data.objectId) || !prevValueSMS[data.objectId].hasOwnProperty(key) || (prevValueSMS[data.objectId][key] <= check && Number(data.properties[key].replace(",", ".")) > prevValueSMS[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    smsQueue.push({
+                                                                        Content: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message,
+                                                                        To: "39" + service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact
+                                                                    });
                                                                 }
                                                             }
                                                         }
                                                     }
-                                                } else if (data.properties[key] === service.data[data.objectId].properties[i][j].value) {
-                                                    for (var k in service.data[data.objectId].properties[i][j].users) {
-                                                        for (var l in service.data[data.objectId].properties[i][j].users[k].sendTo) {
-                                                            if (service.data[data.objectId].properties[i][j].users[k].sendTo[l].enabled) {
-                                                                smsQueue.push({
-                                                                    Content: object.name + ": " + service.data[data.objectId].properties[i][j].users[k].message,
-                                                                    To: "39" + service.data[data.objectId].properties[i][j].users[k].sendTo[l].contact
-                                                                });
+                                                } else if (operand === ">=") {
+                                                    if (Number(data.properties[key].replace(",", ".")) >= check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueSMS.hasOwnProperty(data.objectId) || !prevValueSMS[data.objectId].hasOwnProperty(key) || (prevValueSMS[data.objectId][key] < check && Number(data.properties[key].replace(",", ".")) >= prevValueSMS[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    smsQueue.push({
+                                                                        Content: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message,
+                                                                        To: "39" + service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact
+                                                                    });
+                                                                }
                                                             }
+                                                        }
+                                                    }
+                                                } else if (operand === "<") {
+                                                    if (Number(data.properties[key].replace(",", ".")) < check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueSMS.hasOwnProperty(data.objectId) || !prevValueSMS[data.objectId].hasOwnProperty(key) || (prevValueSMS[data.objectId][key] >= check && Number(data.properties[key].replace(",", ".")) < prevValueSMS[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    smsQueue.push({
+                                                                        Content: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message,
+                                                                        To: "39" + service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (operand === "<=") {
+                                                    if (Number(data.properties[key].replace(",", ".")) <= check && (service.data[data.objectId].properties[key][j].value[0] === "*" || !prevValueSMS.hasOwnProperty(data.objectId) || !prevValueSMS[data.objectId].hasOwnProperty(key) || (prevValueSMS[data.objectId][key] > check && Number(data.properties[key].replace(",", ".")) <= prevValueSMS[data.objectId][key]))) {
+                                                        for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                            for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                                if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                                    smsQueue.push({
+                                                                        Content: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message,
+                                                                        To: "39" + service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else if (data.properties[key] === service.data[data.objectId].properties[key][j].value) {
+                                                for (var k in service.data[data.objectId].properties[key][j].users) {
+                                                    for (var l in service.data[data.objectId].properties[key][j].users[k].sendTo) {
+                                                        if (service.data[data.objectId].properties[key][j].users[k].sendTo[l].enabled) {
+                                                            smsQueue.push({
+                                                                Content: object.name + ": " + service.data[data.objectId].properties[key][j].users[k].message,
+                                                                To: "39" + service.data[data.objectId].properties[key][j].users[k].sendTo[l].contact
+                                                            });
                                                         }
                                                     }
                                                 }
                                             }
                                         }
+
+                                        if (!prevValueSMS.hasOwnProperty(data.objectId)) {
+                                            prevValueSMS[data.objectId] = {};
+                                        }
+                                        prevValueSMS[data.objectId][key] = data.properties[key];
                                     }
                                 }
                             });
