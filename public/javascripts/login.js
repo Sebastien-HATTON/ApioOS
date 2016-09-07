@@ -120,7 +120,7 @@ app.controller("LoginController", ["$rootScope", "$scope", "$http", "$location",
     };
 
     $scope.signup = function () {
-        if ($scope.signupEmail == "admin") {
+        // if ($scope.signupEmail == "admin") {
             $http.post("/apio/user", {
                 email: $scope.signupEmail,
                 password: $scope.signupPassword
@@ -134,45 +134,45 @@ app.controller("LoginController", ["$rootScope", "$scope", "$http", "$location",
             }).error(function () {
                 $scope.$signupError = true;
             });
-        } else {
-            $http.post("http://apio.cloudapp.net:8085/apio/user", {
-                email: $scope.signupEmail,
-                password: $scope.signupPassword
-            }).success(function (data) {
-                if (data.error) {
-                    console.log("data.error");
-                    $scope.$signupError = true;
-                } else {
-                    $http.post("/apio/user", {
-                        email: $scope.signupEmail,
-                        password: $scope.signupPassword
-                    }).success(function (data) {
-                        if (data.error) {
-                            console.log("data.error");
-                            $scope.$signupError = true;
-                        } else {
-                            window.location = "/";
-                        }
-                    }).error(function () {
-                        $scope.$signupError = true;
-                    });
-                }
-            }).error(function (data) {
-                $http.post("/apio/user", {
-                    email: $scope.signupEmail,
-                    password: $scope.signupPassword
-                }).success(function (data) {
-                    if (data.error) {
-                        console.log("data.error");
-                        $scope.$signupError = true;
-                    } else {
-                        window.location = "/";
-                    }
-                }).error(function () {
-                    $scope.$signupError = true;
-                });
-            });
-        }
+        // } else {
+        //     $http.post("http://apio.cloudapp.net:8085/apio/user", {
+        //         email: $scope.signupEmail,
+        //         password: $scope.signupPassword
+        //     }).success(function (data) {
+        //         if (data.error) {
+        //             console.log("data.error");
+        //             $scope.$signupError = true;
+        //         } else {
+        //             $http.post("/apio/user", {
+        //                 email: $scope.signupEmail,
+        //                 password: $scope.signupPassword
+        //             }).success(function (data) {
+        //                 if (data.error) {
+        //                     console.log("data.error");
+        //                     $scope.$signupError = true;
+        //                 } else {
+        //                     window.location = "/";
+        //                 }
+        //             }).error(function () {
+        //                 $scope.$signupError = true;
+        //             });
+        //         }
+        //     }).error(function (data) {
+        //         $http.post("/apio/user", {
+        //             email: $scope.signupEmail,
+        //             password: $scope.signupPassword
+        //         }).success(function (data) {
+        //             if (data.error) {
+        //                 console.log("data.error");
+        //                 $scope.$signupError = true;
+        //             } else {
+        //                 window.location = "/";
+        //             }
+        //         }).error(function () {
+        //             $scope.$signupError = true;
+        //         });
+        //     });
+        // }
     };
 
     $scope.switchToSignup = function () {

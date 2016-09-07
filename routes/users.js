@@ -170,7 +170,16 @@ module.exports = function (Apio) {
                 password: hash
             };
 
-            Apio.Database.db.collection("Users").findAndModify(user, [], {$set: {password: newHash}}, function (err, result) {
+            var key = newHash;
+            while (key.length < 32) {
+                key += "0";
+            }
+            key = newHash.substring(0, 32);
+
+            var token = Apio.Token.getFromText(user.email, key);
+            req.session.token = token;
+
+            Apio.Database.db.collection("Users").findAndModify(user, [], {$set: {password: newHash, token: token}}, function (err, result) {
                 if (err) {
                     console.log(err);
                     res.status(500).send({

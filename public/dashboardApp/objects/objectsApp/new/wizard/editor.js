@@ -78,13 +78,120 @@ angular.module('ApioDashboardApplication').controller('EditorPanel', ['$scope', 
             //$('#objectIdTrigger').trigger('click'); //simulate the click to refresh the object list
             $('#static').modal('hide');
             //sweet.show('Done!', 'Your Apio object is now updated in the home!', 'success');
-            $http.post("/apio/launchPropertiesAdder", {
-                objectId: oldId
-            }).success(function (s) {
-                console.log("apio_properties_adder, success: ", s);
-            }).error(function (e) {
-                console.log("apio_properties_adder, error: ", e);
+
+            // $http.post("/apio/launchPropertiesAdder", {
+            //     objectId: oldId
+            // }).success(function (s) {
+            //     console.log("apio_properties_adder, success: ", s);
+            // }).error(function (e) {
+            //     console.log("apio_properties_adder, error: ", e);
+            // });
+
+            objectService.getById(oldId).then(function (d) {
+                var additionalInfo = JSON.parse(JSON.stringify(d.data.propertiesAdditionalInfo));
+                var isDifferent = false;
+                var parser = new DOMParser();
+                var parsed = parser.parseFromString(html, "text/html");
+                var properties = parsed.querySelectorAll("[propertyname]");
+                var propObj = {};
+
+                var existsAddress = function (addr) {
+                    for (var i in $scope.objects) {
+                        if ($scope.objects[i].address instanceof Array && $scope.objects[i].address.indexOf(addr) > -1) {
+                            return true;
+                        } else if (typeof $scope.objects[i].address === "string" && $scope.objects[i].address === addr) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                };
+
+                var getPropertyname = function (elem) {
+                    for (var i in elem) {
+                        if (elem[i].name === "propertyname") {
+                            return elem[i].value;
+                        }
+                    }
+                };
+
+                for (var i in properties) {
+                    for (var j in properties[i].attributes) {
+                        if (typeof properties[i].attributes[j] === "object" && properties[i].attributes[j].name !== "event" && properties[i].attributes[j].name !== "listener" && properties[i].attributes[j].name !== "propertyname" && properties[i].attributes[j].name !== "writetoserial") {
+                            var propertyname = getPropertyname(properties[i].attributes);
+                            if (!propObj.hasOwnProperty(propertyname)) {
+                                propObj[propertyname] = {
+                                    type: properties[i].tagName.toLowerCase()
+                                }
+                            }
+
+                            propObj[propertyname][properties[i].attributes[j].name] = properties[i].attributes[j].value;
+                        }
+                    }
+                }
+
+                for (var i in propObj) {
+                    if (!additionalInfo.hasOwnProperty(i)) {
+                        additionalInfo[i] = propObj[i];
+                        additionalInfo[i].value = "0";
+                        isDifferent = true;
+                    } else {
+                        for (var j in propObj[i]) {
+                            if (!additionalInfo[i].hasOwnProperty(j)) {
+                                if (propObj[i][j] === "false") {
+                                    additionalInfo[i][j] = false;
+                                } else if (propObj[i][j] === "true") {
+                                    additionalInfo[i][j] = true;
+                                } else {
+                                    additionalInfo[i][j] = propObj[i][j];
+                                }
+                                isDifferent = true;
+                            }
+                        }
+                    }
+
+                    if (existsAddress(propObj[i].protocoladdress) && propObj[i].hasOwnProperty("protocolname") && propObj[i].hasOwnProperty("protocolfun") && propObj[i].hasOwnProperty("protocoladdress") && propObj[i].hasOwnProperty("protocoltype") && propObj[i].hasOwnProperty("protocolproperty") && propObj[i].hasOwnProperty("protocolbindtoproperty")) {
+                        additionalInfo[i].protocol = {
+                            name: propObj[i].protocolname,
+                            type: propObj[i].protocoltype,
+                            fun: propObj[i].protocolfun,
+                            address: propObj[i].protocoladdress,
+                            property: propObj[i].protocolproperty
+                        };
+                    } else {
+                        delete additionalInfo[i].protocol;
+                    }
+                }
+
+                for (var i in d.data.properties) {
+                    additionalInfo[i].value = d.data.properties[i];
+                }
+
+                for (var i in additionalInfo) {
+                    if (!propObj.hasOwnProperty(i)) {
+                        delete additionalInfo[i];
+                        isDifferent = true;
+                    } else {
+                        for (var j in additionalInfo[i]) {
+                            if ((j !== "graph" && j !== "hi" && j !== "protocol" && j !== "value" && j !== "additional" && !propObj[i].hasOwnProperty(j)) || (j !== "protocol" && j.indexOf("protocol") > -1)) {
+                                delete additionalInfo[i][j];
+                                isDifferent = true;
+                            }
+                        }
+                    }
+                }
+
+                console.log("additionalInfo: ", additionalInfo);
+
+                $http.put("/apio/object/updateProperties/" + d.data.objectId, {
+                    properties: additionalInfo
+                }).success(function (data) {
+                    console.log("Object with objectId " + d.data.objectId + " successfully modified: ", data);
+                }).error(function (error) {
+                    console.log("Error while updating object with objectId " + d.data.objectId + ": ", error);
+                });
             });
+
             sweet.show({
                 title: "Done!",
                 text: "Your Apio object is now updated in the home!",
@@ -255,4 +362,8 @@ angular.module('ApioDashboardApplication').controller('EditorPanel', ['$scope', 
             alert("An error has occurred while saving the object" + $scope.newObject.objectName);
         });
     };
+
+    objectService.list().then(function (d) {
+        $scope.objects = d.data;
+    });
 }]);

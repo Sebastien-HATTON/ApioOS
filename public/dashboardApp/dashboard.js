@@ -62,7 +62,7 @@ ApioDashboardApplication.factory("objectService", ["$rootScope", "$http", functi
             });
         },
         getById: function (id) {
-            return $http.get("/apio/database/getObjectById/" + id).then(function (response) {
+            return $http.get("/apio/database/getObject/" + id).then(function (response) {
                 return response;
             });
         }

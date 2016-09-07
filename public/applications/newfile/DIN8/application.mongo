@@ -9,9 +9,10 @@
     "modbus": {
       "1": "",
       "2": "Seneca S500",
-      "3": "Seneca S600",
-      "4": "Estron SDM220",
-      "5": "Selco 200to400"
+      "3": "SenecaMon S600",
+      "4": "SenecaTri S600",
+      "5": "Estron SDM220",
+      "6": "Selco 200to400"
     }
   },
   "installation": "autoinstalled",
