@@ -1489,15 +1489,15 @@ d.run(function () {
     server.listen(configuration.http.port, function () {
         Apio.Util.log("APIO server started on port " + configuration.http.port + " using the configuration:");
         console.log(util.inspect(configuration, {colors: true}));
-	/*
-        exec("cd ./services && node apio_properties_adder.js", function (error, stdout, stderr) {
-            if (error || stderr) {
-                console.log("apio_properties_adder, error: ", error || stderr);
-            } else {
-                console.log("apio_properties_adder, success: ", stdout);
-            }
-        });
-	*/
+
+        // exec("cd ./services && node apio_properties_adder.js", function (error, stdout, stderr) {
+        //     if (error || stderr) {
+        //         console.log("apio_properties_adder, error: ", error || stderr);
+        //     } else {
+        //         console.log("apio_properties_adder, success: ", stdout);
+        //     }
+        // });
+
         var gc = require("./services/garbage_collector.js");
         gc();
 

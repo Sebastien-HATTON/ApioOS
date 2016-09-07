@@ -5245,6 +5245,89 @@ module.exports = function (config, enableCloudSocket) {
             } else {
                 console.log("Properties have been updated");
 
+                //Mysql part
+                var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                var numberOfProperties = 0;
+                var final = function (table, database, field, type) {
+                    sql_db.query("call add_modify_column(\"" + table + "\", \"" + database + "\", \"" + field + "\", \"" + type + "\")", function (e_f, r_f) {
+                        if (e_f) {
+                            console.log("Error while calling procedure: ", e_f);
+                        } else {
+                            console.log("r_f: ", r_f);
+                            numberOfProperties--;
+                            if (numberOfProperties === 0) {
+                                sql_db.end();
+                            }
+                        }
+                    });
+                };
+
+                var props = Object.keys(newProperties);
+                var table_name = undefined;
+                if (Apio.Configuration.type === "cloud") {
+                    table_name = searchQuery.objectId + "_" + searchQuery.apioId;
+                } else if (Apio.Configuration.type === "gateway") {
+                    table_name = searchQuery.objectId;
+                }
+
+                //GET ALL COLUMNS AND DELETE IF PROPERTY HAS BEEN DELETED
+                sql_db.query("SHOW COLUMNS FROM `" + table_name + "`", function (error, cols) {
+                    if (error) {
+                        console.log("Error while creating table: ", error);
+                    } else if (cols) {
+                        var columns = [];
+                        for (var x in cols) {
+                            if (cols[x].Field !== "id" && cols[x].Field !== "timestamp") {
+                                columns.push(cols[x].Field);
+                            }
+                        }
+
+                        columns.forEach(function (col) {
+                            if (props.indexOf(col) === -1) {
+                                sql_db.query("ALTER TABLE `" + table_name + "` DROP COLUMN `" + col + "`", function (err, r_a_t) {
+                                    if (err) {
+                                        console.log("Error while altering table " + table_name + ": ", err);
+                                    } else if (r_a_t) {
+                                        console.log("Column " + col + " successfully deleted from table " + table_name + ": ", r_a_t);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+                //ADD COLUMNS THAT ARE NOT IN THE TABLE OR MODIFY TYPE IF HAS CHANGED
+                props.forEach(function (p) {
+                    numberOfProperties++;
+                    var colType = "";
+                    if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(newProperties[p].type) > -1) {
+                        colType = "TEXT";
+                    } else if (["number", "trigger", "unclickabletrigger"].indexOf(newProperties[p].type) > -1) {
+                        colType = "INT";
+                    } else if (["sensor", "slider", "unlimitedsensor"].indexOf(newProperties[p].type) > -1) {
+                        colType = "DOUBLE";
+                    }
+
+                    sql_db.query("SELECT * FROM information_schema.routines where ROUTINE_NAME LIKE 'add_modify_column'", function (error, result) {
+                        if (error) {
+                            console.log("Error while creating table: ", error);
+                        } else {
+                            if (result.length) {
+                                final(table_name, "Logs", p, colType);
+                            } else {
+                                sql_db.query("CREATE PROCEDURE add_modify_column(IN tablename TEXT, IN db_name TEXT, IN columnname TEXT, IN columntype TEXT)\nBEGIN\nIF NOT EXISTS (SELECT NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = tablename AND table_schema = db_name AND column_name = columnname) THEN SET @ddl = CONCAT('alter table `', tablename, '` add column (`', columnname, '` ', columntype, ')'); PREPARE STMT FROM @ddl; EXECUTE STMT; ELSE SET @ddl = CONCAT('alter table `', tablename, '` modify `', columnname, '` ', columntype); PREPARE STMT FROM @ddl; EXECUTE STMT; END IF;\nEND", function (e_p, r_p) {
+                                    if (e_p) {
+                                        console.log("Error while creating procedure: ", e_p);
+                                    } else {
+                                        console.log("r_p: ", r_p);
+                                        final(table_name, "Logs", p, colType);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                });
+
                 if (Apio.Configuration.type === "gateway") {
                     Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: Apio.addressBindToProperty}, function (b_e) {
                         if (b_e) {
