@@ -204,87 +204,87 @@ module.exports = function (Apio) {
         },
         installNgrok: function (req, res) {
             /*var nightmare = Nightmare({show: false});
-            nightmare
-                .goto("https://dashboard.ngrok.com/user/signup")
-                .type("form[action*='/user/signup'] [name=name]", req.session.email)
-                .type("form[action*='/user/signup'] [name=email]", req.session.email)
-                .type("form[action*='/user/signup'] [name=confirm]", req.session.email)
-                .type("form[action*='/user/signup'] [name=password]", req.session.email)
-                .click("form[action*='/user/signup'] [type=submit]")
-                .wait("#dashboard")
-                .evaluate(function () {
-                    return document.querySelector(".get-started .well").firstChild.firstChild.nextSibling.innerHTML;
-                })
-                .end()
-                .then(function (token) {
-                    console.log("NGROK token: ", token);
-                    exec("bash ./ngrok_install.sh " + token);
-                    var send = true;
-                    var interval = setInterval(function () {
-                        console.log("INTERVAL");
-                        if (send) {
-                            send = false;
-                            exec("nmap -p 4040 -Pn localhost | grep 4040 | awk '{print $2}'", function (error, stdout, stderr) {
-                                if (error || stderr) {
-                                    res.status(500).send(error || stderr);
-                                } else if (stdout) {
-                                    stdout = stdout.trim();
-                                    send = true;
-                                    if (stdout === "open") {
-                                        send = false;
-                                        Apio.Configuration.remoteAccess = true;
-                                        var c = JSON.parse(JSON.stringify(Apio.Configuration));
-                                        delete c.dongle;
-                                        fs.writeFile("./configuration/default.js", "module.exports = " + JSON.stringify(c, undefined, 4).replace(/\"([^(\")"]+)\":/g, "$1:") + ";", function (err) {
-                                            if (err) {
-                                                console.log("Error while saving configuration: ", err);
-                                            } else {
-                                                console.log("Configuration successfully saved");
-                                            }
-                                        });
-                                        exec("curl http://localhost:4040/inspect/http | grep window.common", function (error1, stdout1, stderr1) {
-                                            clearInterval(interval);
-                                            if (error1) {
-                                                res.status(500).send(error1);
-                                            } else if (stdout1) {
-                                                var result = stdout1.split(" ");
-                                                var index = -1;
-                                                var obj = "";
-                                                for (var i = 0; index === -1 && i < result.length; i++) {
-                                                    if (result[i] === "window.common") {
-                                                        index = i
-                                                    }
-                                                }
-                                                if (index > -1) {
-                                                    for (var i = index + 2; i < result.length; i++) {
-                                                        if (obj === "") {
-                                                            obj = result[i];
-                                                        } else {
-                                                            obj += " " + result[i];
-                                                        }
-                                                    }
-                                                    obj = eval(obj);
-                                                    var url = obj.Session.Tunnels.command_line.URL;
-                                                    url = url.split("/");
-                                                    url = url[url.length - 1];
-                                                    url = url.split(":");
-                                                    var port = url[1];
-                                                    url = url[0];
-                                                    console.log("url: ", url, "port: ", port);
-                                                    res.status(200).send("ssh pi@" + url + " -p " + port);
-                                                } else {
-                                                    res.status(500).send("No address");
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    }, 0);
-                    //}).catch(function (error) {
-                    //    res.status(500).send(error);
-                });*/
+             nightmare
+             .goto("https://dashboard.ngrok.com/user/signup")
+             .type("form[action*='/user/signup'] [name=name]", req.session.email)
+             .type("form[action*='/user/signup'] [name=email]", req.session.email)
+             .type("form[action*='/user/signup'] [name=confirm]", req.session.email)
+             .type("form[action*='/user/signup'] [name=password]", req.session.email)
+             .click("form[action*='/user/signup'] [type=submit]")
+             .wait("#dashboard")
+             .evaluate(function () {
+             return document.querySelector(".get-started .well").firstChild.firstChild.nextSibling.innerHTML;
+             })
+             .end()
+             .then(function (token) {
+             console.log("NGROK token: ", token);
+             exec("bash ./ngrok_install.sh " + token);
+             var send = true;
+             var interval = setInterval(function () {
+             console.log("INTERVAL");
+             if (send) {
+             send = false;
+             exec("nmap -p 4040 -Pn localhost | grep 4040 | awk '{print $2}'", function (error, stdout, stderr) {
+             if (error || stderr) {
+             res.status(500).send(error || stderr);
+             } else if (stdout) {
+             stdout = stdout.trim();
+             send = true;
+             if (stdout === "open") {
+             send = false;
+             Apio.Configuration.remoteAccess = true;
+             var c = JSON.parse(JSON.stringify(Apio.Configuration));
+             delete c.dongle;
+             fs.writeFile("./configuration/default.js", "module.exports = " + JSON.stringify(c, undefined, 4).replace(/\"([^(\")"]+)\":/g, "$1:") + ";", function (err) {
+             if (err) {
+             console.log("Error while saving configuration: ", err);
+             } else {
+             console.log("Configuration successfully saved");
+             }
+             });
+             exec("curl http://localhost:4040/inspect/http | grep window.common", function (error1, stdout1, stderr1) {
+             clearInterval(interval);
+             if (error1) {
+             res.status(500).send(error1);
+             } else if (stdout1) {
+             var result = stdout1.split(" ");
+             var index = -1;
+             var obj = "";
+             for (var i = 0; index === -1 && i < result.length; i++) {
+             if (result[i] === "window.common") {
+             index = i
+             }
+             }
+             if (index > -1) {
+             for (var i = index + 2; i < result.length; i++) {
+             if (obj === "") {
+             obj = result[i];
+             } else {
+             obj += " " + result[i];
+             }
+             }
+             obj = eval(obj);
+             var url = obj.Session.Tunnels.command_line.URL;
+             url = url.split("/");
+             url = url[url.length - 1];
+             url = url.split(":");
+             var port = url[1];
+             url = url[0];
+             console.log("url: ", url, "port: ", port);
+             res.status(200).send("ssh pi@" + url + " -p " + port);
+             } else {
+             res.status(500).send("No address");
+             }
+             }
+             });
+             }
+             }
+             });
+             }
+             }, 0);
+             //}).catch(function (error) {
+             //    res.status(500).send(error);
+             });*/
         },
         toggleEnableCloud: function (req, res) {
             Apio.Configuration.remote.enabled = !Apio.Configuration.remote.enabled;
@@ -342,7 +342,7 @@ module.exports = function (Apio) {
                                         var cc = mail.splice(1);
 
                                         if (to) {
-                                            require("dns").resolve("www.google.com", function(err) {
+                                            require("dns").resolve("www.google.com", function (err) {
                                                 if (err) {
                                                     execReboot();
                                                 } else {
@@ -450,7 +450,7 @@ module.exports = function (Apio) {
                                         var cc = mail.splice(1);
 
                                         if (to) {
-                                            require("dns").resolve("www.google.com", function(err) {
+                                            require("dns").resolve("www.google.com", function (err) {
                                                 if (err) {
                                                     execShutdown();
                                                 } else {
@@ -945,46 +945,98 @@ module.exports = function (Apio) {
         returnConfig: function (req, res) {
             res.send(Apio.Configuration);
         },
-        update : function(req,res){
-	        var lastCommit = fs.readFileSync(".git/refs/heads/master","utf-8");
-	        var date = fs.statSync(".git/refs/heads/master")
-	        date = date.mtime
-	        console.log(date)
-	        console.log("Last Commit: ", lastCommit);
-	        //lastCommit = lastCommit.split("\t")[0];
-	        console.log("Last Commit: ", lastCommit);
-	        /*request.get("https://raw.githubusercontent.com/ApioLab/updates/master/version.json", {
-	            json: true
-	        }, function (err, httpResponse) {
-	            if (err) {
-	                console.log("Error: ", err);
-	            } else if (httpResponse.statusCode === 200) {
-	                //execReboot();
-	                console.log("Risposta ",httpResponse)
-	                res.status(200).send(false)
-	            }
-	        });*/
-	        fetch("https://raw.githubusercontent.com/ApioLab/updates/master/version.json")
-		    .then(function(res) {
-		        return res.text();
-		    }).then(function(body) {
-		        //console.log("Body", body);
-		        var remoteCommit = JSON.parse(body)
-		        console.log("1:", remoteCommit.commit);
-		        remoteCommit.date = new Date(remoteCommit.apioOs)
-		        console.log("1.date ",remoteCommit.date)
-		        
-		        console.log("2:", lastCommit);
-		        console.log("2.date:", date);
-		        
-		        console.log("Verifico la condizione ",remoteCommit.commit.substring(0,7) != lastCommit.substring(0,7) && date.getFullYear() <= remoteCommit.date.getFullYear() && date.getMonth() <= remoteCommit.date.getMonth() && date.getDate() <= remoteCommit.date.getDate() && date.getHours() <= remoteCommit.date.getHours() && date.getMinutes() < remoteCommit.date.getMinutes())
-		        if(remoteCommit.commit.substring(0,7) != lastCommit.substring(0,7) && date.getFullYear() <= remoteCommit.date.getFullYear() && date.getMonth() <= remoteCommit.date.getMonth() && date.getDate() <= remoteCommit.date.getDate() && date.getHours() <= remoteCommit.date.getHours() && date.getMinutes() < remoteCommit.date.getMinutes()){
-			        res.status(200).send(true);
-		        } else {
-			        res.status(200).send(false);
-		        }
-		    });
-	        
+        update: function (req, res) {
+            fs.readFile(".git/HEAD", "utf8", function (err, head) {
+                if (err) {
+                    res.status(200).send(false);
+                } else if (head) {
+                    var ref_file = head.split("ref:")[1].trim();
+                    var ref_file_components = ref_file.split("/");
+                    var version_file = undefined;
+
+                    if (ref_file_components[ref_file_components.length - 1] === "master") {
+                        version_file = "version.json";
+                    } else {
+                        version_file = "version_" + ref_file_components[ref_file_components.length - 1] + ".json";
+                    }
+
+                    fs.readFile(".git/" + ref_file, "utf8", function (err_c, lastCommit) {
+                        if (err_c) {
+                            res.status(200).send(false);
+                        } else if (lastCommit) {
+                            fs.stat(".git/" + ref_file, function (err_s, stats) {
+                                if (err_s) {
+                                    res.status(200).send(false);
+                                } else if (stats) {
+                                    var date = stats.mtime;
+                                    console.log("date: ", date);
+                                    console.log("lastCommit: ", lastCommit);
+                                    fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
+                                        return res.text();
+                                    }).then(function (body) {
+                                        var remoteCommit = JSON.parse(body);
+                                        console.log("remoteCommit.commit: ", remoteCommit.commit);
+                                        remoteCommit.date = new Date(remoteCommit.apioOs);
+                                        console.log("remoteCommit.date: ", remoteCommit.date);
+
+                                        if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
+                                            res.status(200).send(true);
+                                        } else {
+                                            res.status(200).send(false);
+                                        }
+                                    });
+                                } else {
+                                    res.status(200).send(false);
+                                }
+                            });
+                        } else {
+                            res.status(200).send(false);
+                        }
+                    });
+                } else {
+                    res.status(200).send(false);
+                }
+            });
         }
+        // update: function (req, res) {
+        //     var lastCommit = fs.readFileSync(".git/refs/heads/master", "utf-8");
+        //     var date = fs.statSync(".git/refs/heads/master")
+        //     date = date.mtime
+        //     console.log(date)
+        //     console.log("Last Commit: ", lastCommit);
+        //     //lastCommit = lastCommit.split("\t")[0];
+        //     console.log("Last Commit: ", lastCommit);
+        //     /*request.get("https://raw.githubusercontent.com/ApioLab/updates/master/version.json", {
+        //      json: true
+        //      }, function (err, httpResponse) {
+        //      if (err) {
+        //      console.log("Error: ", err);
+        //      } else if (httpResponse.statusCode === 200) {
+        //      //execReboot();
+        //      console.log("Risposta ",httpResponse)
+        //      res.status(200).send(false)
+        //      }
+        //      });*/
+        //     fetch("https://raw.githubusercontent.com/ApioLab/updates/master/version.json").then(function (res) {
+        //         return res.text();
+        //     }).then(function (body) {
+        //         //console.log("Body", body);
+        //         var remoteCommit = JSON.parse(body);
+        //         console.log("1:", remoteCommit.commit);
+        //         remoteCommit.date = new Date(remoteCommit.apioOs);
+        //         console.log("1.date ", remoteCommit.date);
+        //
+        //         console.log("2:", lastCommit);
+        //         console.log("2.date:", date);
+        //
+        //         console.log("Verifico la condizione ", remoteCommit.commit.substring(0, 7) != lastCommit.substring(0, 7) && date.getFullYear() <= remoteCommit.date.getFullYear() && date.getMonth() <= remoteCommit.date.getMonth() && date.getDate() <= remoteCommit.date.getDate() && date.getHours() <= remoteCommit.date.getHours() && date.getMinutes() < remoteCommit.date.getMinutes())
+        //         if (remoteCommit.commit.substring(0, 7) != lastCommit.substring(0, 7) && date.getFullYear() <= remoteCommit.date.getFullYear() && date.getMonth() <= remoteCommit.date.getMonth() && date.getDate() <= remoteCommit.date.getDate() && date.getHours() <= remoteCommit.date.getHours() && date.getMinutes() < remoteCommit.date.getMinutes()) {
+        //             res.status(200).send(true);
+        //         } else {
+        //             res.status(200).send(false);
+        //         }
+        //     });
+        //
+        // }
     }
 };
