@@ -1,1 +1,91 @@
-{"address":"*_TMP_*","apioId":"69e03242-46ed-4992-8efa-1d872f6b4c16","appId":"Seneca S500","category":"modbus","connected":true,"created":"2015-10-24","db":{},"log":{},"name":"Energy Meter","notifications":{},"objectId":"*_TMP_*","properties":{"appPower":{"label":"Potenza Apparente [VA]","style":"margin-bottom:0;","type":"unlimitedsensor","value":"7.84"},"current":{"label":"Corrente [A]","type":"unlimitedsensor","value":"0.04"},"energy":{"label":"Energia [kWh]","style":"display:none;","type":"unlimitedsensor","value":"11490.80"},"expEnergy":{"label":"Export Energy [Wh]","type":"unlimitedsensor","value":"0.00"},"expLagAppEnergy":{"label":"Export Apparent Energy [VAh]","type":"unlimitedsensor","value":"0.00"},"expLagReaEnergy":{"label":"Export Reactive Energy [varh]","type":"unlimitedsensor","value":"17283.10"},"frequency":{"label":"Frequenza di Rete [Hz]","type":"unlimitedsensor","value":"49,97"},"impEnergy":{"label":"Import Energy [Wh]","type":"unlimitedsensor","value":"11490.80"},"impLagAppEnergy":{"label":"Import Apparent Energy [VAh]","type":"unlimitedsensor","value":"29963.90"},"impLagReaEnergy":{"label":"Import Reactive Energy [varh]","type":"unlimitedsensor","value":"0.00"},"plusInfo":{"type":"collapse","label":"More Info","value":"0"},"power":{"label":"Potenza Attuale [W]","style":"display:none;","type":"unlimitedsensor","value":"2.18"},"reaPower":{"label":"Potenza Reattiva [var]","style":"margin-bottom:0;","type":"unlimitedsensor","value":""},"voltage":{"label":"Tensione [V]","type":"unlimitedsensor","value":"225.31"}},"protocol":"l","services":[],"sleepTime":null,"tag":"","type":"object"}
+{
+  "appId": "SenecaS500",
+  "category": "modbus",
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "name": "Energy Meter",
+  "notifications": {},
+  "properties": {
+    "appPower": {
+      "label": "Potenza Apparente [VA]",
+      "style": "margin-bottom:0;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "current": {
+      "label": "Corrente [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "energy": {
+      "label": "Energia [kWh]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "expEnergy": {
+      "label": "Export Energy [Wh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "expLagAppEnergy": {
+      "label": "Export Apparent Energy [VAh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "expLagReaEnergy": {
+      "label": "Export Reactive Energy [varh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "frequency": {
+      "label": "Frequenza di Rete [Hz]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "impEnergy": {
+      "label": "Import Energy [Wh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "impLagAppEnergy": {
+      "label": "Import Apparent Energy [VAh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "impLagReaEnergy": {
+      "label": "Import Reactive Energy [varh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "plusInfo": {
+      "type": "collapse",
+      "label": "More Info",
+      "value": "0"
+    },
+    "power": {
+      "label": "Potenza Attuale [W]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "reaPower": {
+      "label": "Potenza Reattiva [var]",
+      "style": "margin-bottom:0;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "voltage": {
+      "label": "Tensione [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    }
+  },
+  "protocol": "l",
+  "services": [],
+  "sleepTime": null,
+  "tag": "",
+  "type": "object"
+}

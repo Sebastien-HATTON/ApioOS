@@ -1,1 +1,75 @@
-{"address":"*_TMP_*","apioId":"69e03242-46ed-4992-8efa-1d872f6b4c16","appId":"Seneca S600","category":"modbus","connected":true,"created":"2015-10-24","db":{},"log":{},"name":"Energy Meter","notifications":{},"objectId":"*_TMP_*","properties":{"appPower":{"type":"unlimitedsensor","label":"Potenza Apparente [VA]","style":"margin-bottom:0;","value":"0"},"current":{"label":"Corrente [A]","type":"unlimitedsensor","value":"0.03"},"energy":{"label":"Energia [kWh]","style":"display:none;","type":"unlimitedsensor","value":"512.97"},"expEnergy":{"label":"Export Energy [Wh]","type":"unlimitedsensor","value":"0.00"},"expLagAppEnergy":{"label":"Export Apparent Energy [VAh]","type":"unlimitedsensor","value":"0.00"},"frequency":{"label":"Frequenza di Rete [Hz]","type":"unlimitedsensor","value":"50,00"},"impEnergy":{"label":"Import Energy [Wh]","type":"unlimitedsensor","value":"512.97"},"impLagAppEnergy":{"label":"Import Apparent Energy [VAh]","type":"unlimitedsensor","value":"0.00"},"plusInfo":{"type":"collapse","label":"More Info","value":"0"},"power":{"label":"Potenza Attuale [W]","style":"display:none;","type":"unlimitedsensor","value":"1.67"},"voltage":{"label":"Tensione [V]","type":"unlimitedsensor","value":"225.70"}},"protocol":"l","services":[],"sleepTime":null,"tag":"","type":"object"}
+{
+  "appId": "SenecaTriS600",
+  "category": "modbus",
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "name": "Energy Meter",
+  "notifications": {},
+  "properties": {
+    "appPower": {
+      "type": "unlimitedsensor",
+      "label": "Potenza Apparente [VA]",
+      "style": "margin-bottom:0;",
+      "value": "0"
+    },
+    "current": {
+      "label": "Corrente [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "energy": {
+      "label": "Energia [kWh]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "expEnergy": {
+      "label": "Export Energy [Wh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "expLagAppEnergy": {
+      "label": "Export Apparent Energy [VAh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "frequency": {
+      "label": "Frequenza di Rete [Hz]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "impEnergy": {
+      "label": "Import Energy [Wh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "impLagAppEnergy": {
+      "label": "Import Apparent Energy [VAh]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "plusInfo": {
+      "type": "collapse",
+      "label": "More Info",
+      "value": "0"
+    },
+    "power": {
+      "label": "Potenza Attuale [W]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "voltage": {
+      "label": "Tensione [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    }
+  },
+  "protocol": "l",
+  "services": [],
+  "sleepTime": null,
+  "tag": "",
+  "type": "object"
+}
