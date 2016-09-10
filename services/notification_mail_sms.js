@@ -21,14 +21,14 @@
 "use strict";
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
+var configuration = require("../apio.js")().config.return().file;
 var express = require("express");
 var database = undefined;
 var domain = require("domain");
 var app = express();
 var http = require("http").Server(app);
 var request = require("request");
-var socket_client = require("socket.io-client")("http://localhost:" + configuration.http.port);
 var socket_server = require("socket.io")(http);
 
 var notificationQueue = [];

@@ -19,7 +19,8 @@
  ****************************************************************************/
 
 "use strict";
-var Apio = require("../apio.js")(require("../configuration/default.js"));
+// var Apio = require("../apio.js")(require("../configuration/default.js"));
+var Apio = require("../apio.js")();
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
 var database = undefined;
@@ -41,8 +42,8 @@ var isLogSocketConnected = false;
 var logSocket = undefined;
 var walk = false;
 
-var configuration = require("../configuration/default.js");
-var socket = require("socket.io-client")("http://localhost:" + configuration.http.port, {query: "associate=dongle&token=" + Apio.Token.getFromText("dongle", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
+// var configuration = require("../configuration/default.js");
+var socket = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=dongle&token=" + Apio.Token.getFromText("dongle", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
 
 MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + Apio.Configuration.database.port + "/" + Apio.Configuration.database.database, function (error, db) {
     if (error) {

@@ -29,10 +29,11 @@ module.exports = function (libraries) {
     //var http = require("http").Server(app);
     //var socketServer = require("socket.io")(http)
 
-    var Apio = require("../apio.js")(require("../configuration/default.js"));
+    // var Apio = require("../apio.js")(require("../configuration/default.js"));
+    var Apio = require("../apio.js")();
     var MongoClient = require("mongodb").MongoClient;
     var bodyParser = libraries["body-parser"];
-    var configuration = require("../configuration/default.js");
+    // var configuration = require("../configuration/default.js");
     var express = libraries.express;
     var fs = libraries.fs;
     var mysql = libraries.mysql;
@@ -69,7 +70,7 @@ module.exports = function (libraries) {
         port = Number(process.argv[process.argv.indexOf("--http-port") + 1]);
     }
 
-    MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + configuration.database.port + "/" + configuration.database.database, function (error, db) {
+    MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + Apio.Configuration.database.port + "/" + Apio.Configuration.database.database, function (error, db) {
         if (error) {
             console.log("Unable to get database");
         } else if (db) {

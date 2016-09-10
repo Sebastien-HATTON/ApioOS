@@ -23,7 +23,7 @@ var bodyParser = require("body-parser");
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
 var enocean = require("node-enocean")();
 var chipIdWait = 0;
 var com = require("serialport");
@@ -33,8 +33,9 @@ var preEnoceanFound = 0;
 var comCallback = 1;
 var Port = 8092;
 var enoceanApplianceOnOnce = 0;
-var Apio = require("../apio.js")(configuration);
-var socket = require("socket.io-client")("http://localhost:" + configuration.http.port, {query: "associate=enocean&token=" + Apio.Token.getFromText("enocean", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
+// var Apio = require("../apio.js")(configuration);
+var Apio = require("../apio.js")();
+var socket = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=enocean&token=" + Apio.Token.getFromText("enocean", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
 var socketServer = require("socket.io")(http);
 var objects = [];
 var disconnect = 0;
@@ -58,7 +59,7 @@ app.use(bodyParser.urlencoded({
     limit: "50mb"
 }));
 
-MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + configuration.database.port + "/" + configuration.database.database, function (error, db) {
+MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + Apio.Configuration.database.port + "/" + Apio.Configuration.database.database, function (error, db) {
     if (error) {
         console.log("Unable to get database");
     } else if (db) {
@@ -209,268 +210,268 @@ var enoceanLearnAndInstall = function (data) {
 
 
 var enoceanAppliance = function (data) {
-	if(chipIdWait){
-		if(data.hasOwnProperty('packetType') && data.packetType==2){
-			enocean.base = data.raw.toString('hex').substring(18, 26)
-			console.log(enocean.base)
-			chipIdWait = 0;
-		}
-	}else{
-		enoceanApplianceOnOnce = 1;
-	    i++;
-	    console.log("--------RICEVUTO UN NUOVO MESSAGGIO ENOCEAN--------");
-	    console.log();
-	    console.log('+++++++++++ RSSI', getEnoceanRSSI(data, 'RSSI'));
-	    console.log();
-	    console.log("enocean on data: 	", data);
-	    if (communication.hasOwnProperty('enocean') && bindToProperty.hasOwnProperty('enocean')) {
-	        if (data.learnBit != '0' && data.choice != 'd4') {
-	            //manca di ricavare la fun dal data row
-	            console.log("VERIFICO SE L'OGGETTO é NEL SISTEMA....");
-	            var s = communication['enocean']
-	            var type = '';
-	            if (bindToProperty.hasOwnProperty('enocean') && bindToProperty.enocean.hasOwnProperty(data.senderId)) {
-	                type = bindToProperty.enocean[data.senderId].type
-	                console.log('OGGETTO TROVATO NEL SISTEMA ACCETTO IL MESSAGGIO');
-	                console.log();
-	            }
-	            if (s.hasOwnProperty(type) && s[type].hasOwnProperty('recive')) {
-	
-	                /*function(dataObject,enocean){   var property = {  temperature : '' };  var temperature = parseInt(dataObject.raw.substring(4, 6)); console.log('temperature hex: ', temperature); temperature = ((temperature-255)*(40/-255)).toFixed(2); console.log('temperature converted int: ', temperature); property.temperature = String(temperature);return property; }*/
-	
-	                //var fun = data.rawByte.slice(14, 14+2);
-	                var fun = '01';
-	                console.log('fun ', fun);
-	                s = s[type].recive[fun]
-	                //data.enoceanBase = enocean.base;
-	
-	                //console.log('la funzione da eseguire è: ',s);
-	                //console.log('il dato che gli verrà passato è: ',data);
-	                console.log("Chiamo la receive")
-	                var x = eval.call(null, s);
-	                //la call back deve restituire
-	
-	                console.log();
-	                var receive = {
-	                    RSSI: ''
-	                };
-	
-	                if (x) {
-	
-	                    if (typeof x(data, enocean) === 'object') {
-	                        //Prima di chiamare la funzione butto trigger1 e trigger all'interno della funzione
-	                        //Questi mi servono per il rocker questa cosa è da fare mglio sicuramente...
-	                        data.trigger = trigger;
-	                        data.trigger1 = trigger1;
-	                        console.log("CHIAMO LA RECEIVE")
-	                        receive = x(data, enocean);
-	                    }
-	                    //Dalla fnzone nel caso in cui era un rocker mi torneranno anche i trigger cmabiati quindi devo
-	                    //aggiornare i valori delle variabili globali
-	                    console.log("+++++++++++++++++++ Receive+++", receive)
-	                    if (receive.hasOwnProperty('optionalData')) {
-	
-	                        if (receive.optionalData.hasOwnProperty('trigger')) {
-	                            trigger = receive.optionalData.trigger;
-	                        } else if (receive.optionalData.hasOwnProperty('trigger1')) {
-	                            trigger1 = receive.optionalData.trigger1;
-	                        }
-	                    }
-	                    //
-	                    receive.RSSI = getEnoceanRSSI(data)
-	                    //x(data,enocean);
-	                    var dataForEmit = {
-	                        objectId: bindToProperty.enocean[data.senderId].objectId,
-	                        properties: {},
-	                        writeToDatabase: true,
-	                        writeToSerial: false
-	                    }
-	                    dataForEmit.properties = receive;
-	                    console.log('ricevuto data lancio emit', dataForEmit);
-	                    console.log();
-	                    socket.emit("apio_client_update", dataForEmit);
-	                    //console.log('data ',data);
-	
-	                    //console.log('funzione lanciata: ',receive);
-	
-	                    if (bindToProperty.enocean[data.senderId].hasOwnProperty('sleep')) {
-	                        console.log('QUESTO OGGETTO ERA IN SLEEP: ', data.senderId);
-	                        console.log('CERCO LA SUA FUNZIONE DI SLEEP');
-	                        Apio.Database.db.collection("Objects").findOne({'address': data.senderId}, function (err, doc) {
-	                            if (err) {
-	                                ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
-	                            } else if (doc) {
-	                                var addInfo = doc.properties;
-	                                var needDataToSend = {
-	                                    protocol: {
-	                                        name: 'enocean',
-	                                        type: bindToProperty.enocean[data.senderId].type,
-	                                        fun: '01',
-	                                        address: data.senderId,
-	                                        property: ''
-	                                    },
-	                                    enoceanBase: enocean.base
-	                                }
-	                                console.log('TROVATA! Lancio la funzione di SLEEP: ');
-	                                enoceanSendToDevice(needDataToSend, enocean, addInfo);
-	                            }
-	                        })
-	
-	                    }
-	
-	                }
-	
-	
-	            }
-	
-	        }
-	        else if (data.learnBit == '0') {
-	            if (data.packetTypeString == '4BS') {
-	                //Devo fare teach-in con 4BS
-	                console.log('TEACH IN 4BS');
-	                var eep = [];
-	                var dataToSend = '';
-	                if (data.hasOwnProperty('eep')) {
-	
-	                    dataToSend = data.eep[3] + data.eep[4] + data.eep[6] + data.eep[7]
-	                    console.log('DATA TO SENDO IS COMPONING: ', dataToSend);
-	                    if (data.manufacturer != null) {
-	                        if (data.manufacturer.length == 1) {
-	                            data.manufacturer = '0' + data.manufacturer;
-	                        }
-	                    } else {
-	                        data.manufacturer = "02";
-	                    }
-	                    dataToSend = dataToSend + data.manufacturer + 'f0'
-	                    console.log('LA RISPOSTA è: ', dataToSend);
-	                    console.log('ACCETTO IL NUOVO OGGETTO');
-	                    enoceanSend('4bs', '01', dataToSend, data.senderId);
-	
-	
-	                    // smart ack
-	                    //enoceanSend('','01','01010000000000')
-	                    //enoceanSend('','01','02')
-	                    if (communication.enocean.hasOwnProperty(data.eep) && communication.enocean[data.eep].send.hasOwnProperty('setup')) {
-	                        console.log();
-	                        console.log('il dispositivo prevede una funzione di setup...');
-	                        var dataObject = {
-	                            protocol: {
-	                                address: data.senderId,
-	                                fun: 'setup',
-	                                type: data.eep
-	                            }
-	                        }
-	
-	                        setTimeout(function () {
-	                            console.log('Lancio la funzione di SETUP...');
-	                            enoceanSendToDevice(dataObject, enocean, {});
-	                        }, 3000)
-	                    }
-	                }
-	
-	            }
-	            if (!bindToProperty.enocean.hasOwnProperty(data.senderId)) {
-	                var eepCalculated
-	                if (data.hasOwnProperty('eep')) {
-	                    eepCalculated = data.eep
-	                    console.log('run autoInstall: ', {
-	                        service: 'autoInstall',
-	                        message: 'apio_install_new_object',
-	                        data: {protocol: 'enocean', eep: data.eep, address: data.senderId}
-	                    });
-	                    socket.emit('send_to_service', {
-	                        service: 'autoInstall',
-	                        message: 'apio_install_new_object',
-	                        data: {
-	                            protocol: 'enocean',
-	                            eep: eepCalculated,
-	                            address: data.senderId
-	                        }
-	                    });
-	                } else {
-	                    if (data.hasOwnProperty('packetTypeString')) {
-	                        if (data.packetTypeString == '1BS') {
-	                            //per i tipi 1BS e RPS l'eep deve essere inserito manualmente , così prevede lo standard enocean
-	                            eepCalculated = 'manualInsert'
-	                            console.log('run autoInstall: ', {
-	                                service: 'autoInstall',
-	                                message: 'apio_install_new_object',
-	                                data: {protocol: 'enocean', eep: data.eep, address: data.senderId}
-	                            });
-	                            socket.emit('send_to_service', {
-	                                service: 'autoInstall',
-	                                message: 'apio_install_new_object',
-	                                data: {
-	                                    protocol: 'enocean',
-	                                    eep: eepCalculated,
-	                                    address: data.senderId
-	                                }
-	                            });
-	
-	                        }
-	                    }
-	                }
-	            }
-	
-	        }
-	        else if (data.choice == 'd4') {
-	            //Devo fare l'UTE
-	            //Questo è il comando per la smartplug, si può astrarre bisogna prendere il data
-	            //mettere 91 al posto del primo byte, si può anche fare la dissociazione volendo
-	            console.log("un oggetto ha richiesto l'accoppiamento tramite UTE, OGGETTO: ", data);
-	            enoceanSend('d4', '01', data.rawByte, data.senderId, '91');
-	
-	            var eepCalculated0 = ''
-	            if (data.hasOwnProperty('eep')) {
-	                eepCalculated0 = data.eep
-	            } else {
-	                eepCalculated0 = data.rawByte[26] + data.rawByte[27] + '-' + data.rawByte[24] + data.rawByte[25] + '-' + data.rawByte[22] + data.rawByte[23]
-	            }
-	
-	            if (communication.enocean.hasOwnProperty(eepCalculated0) && communication.enocean[eepCalculated0].send.hasOwnProperty('setup')) {
-	                console.log();
-	                console.log('il dispositivo prevede una funzione di setup...');
-	                var dataObject = {
-	                    protocol: {
-	                        address: data.senderId,
-	                        fun: 'setup',
-	                        type: eepCalculated0
-	                    }
-	                }
-	
-	                setTimeout(function () {
-	                    console.log('Lancio la funzione di SETUP...');
-	                    enoceanSendToDevice(dataObject, enocean, {});
-	                }, 3000)
-	            }
-	
-	            if (!bindToProperty.enocean.hasOwnProperty(data.senderId)) {
-	                var eepCalculated = ''
-	                if (data.hasOwnProperty('eep')) {
-	                    eepCalculated = data.eep
-	                } else {
-	                    eepCalculated = data.rawByte[26] + data.rawByte[27] + '-' + data.rawByte[24] + data.rawByte[25] + '-' + data.rawByte[22] + data.rawByte[23]
-	                }
-	                console.log('run autoInstall: ', {
-	                    service: 'autoInstall',
-	                    message: 'apio_install_new_object',
-	                    data: {protocol: 'enocean', eep: eepCalculated, address: data.senderId}
-	                });
-	                socket.emit('send_to_service', {
-	                    service: 'autoInstall',
-	                    message: 'apio_install_new_object',
-	                    data: {
-	                        protocol: 'enocean',
-	                        eep: eepCalculated,
-	                        address: data.senderId
-	                    }
-	                });
-	
-	            }
-	        }
-	    }
-	
-	}
+    if (chipIdWait) {
+        if (data.hasOwnProperty('packetType') && data.packetType == 2) {
+            enocean.base = data.raw.toString('hex').substring(18, 26)
+            console.log(enocean.base)
+            chipIdWait = 0;
+        }
+    } else {
+        enoceanApplianceOnOnce = 1;
+        i++;
+        console.log("--------RICEVUTO UN NUOVO MESSAGGIO ENOCEAN--------");
+        console.log();
+        console.log('+++++++++++ RSSI', getEnoceanRSSI(data, 'RSSI'));
+        console.log();
+        console.log("enocean on data: 	", data);
+        if (communication.hasOwnProperty('enocean') && bindToProperty.hasOwnProperty('enocean')) {
+            if (data.learnBit != '0' && data.choice != 'd4') {
+                //manca di ricavare la fun dal data row
+                console.log("VERIFICO SE L'OGGETTO é NEL SISTEMA....");
+                var s = communication['enocean']
+                var type = '';
+                if (bindToProperty.hasOwnProperty('enocean') && bindToProperty.enocean.hasOwnProperty(data.senderId)) {
+                    type = bindToProperty.enocean[data.senderId].type
+                    console.log('OGGETTO TROVATO NEL SISTEMA ACCETTO IL MESSAGGIO');
+                    console.log();
+                }
+                if (s.hasOwnProperty(type) && s[type].hasOwnProperty('recive')) {
+
+                    /*function(dataObject,enocean){   var property = {  temperature : '' };  var temperature = parseInt(dataObject.raw.substring(4, 6)); console.log('temperature hex: ', temperature); temperature = ((temperature-255)*(40/-255)).toFixed(2); console.log('temperature converted int: ', temperature); property.temperature = String(temperature);return property; }*/
+
+                    //var fun = data.rawByte.slice(14, 14+2);
+                    var fun = '01';
+                    console.log('fun ', fun);
+                    s = s[type].recive[fun]
+                    //data.enoceanBase = enocean.base;
+
+                    //console.log('la funzione da eseguire è: ',s);
+                    //console.log('il dato che gli verrà passato è: ',data);
+                    console.log("Chiamo la receive")
+                    var x = eval.call(null, s);
+                    //la call back deve restituire
+
+                    console.log();
+                    var receive = {
+                        RSSI: ''
+                    };
+
+                    if (x) {
+
+                        if (typeof x(data, enocean) === 'object') {
+                            //Prima di chiamare la funzione butto trigger1 e trigger all'interno della funzione
+                            //Questi mi servono per il rocker questa cosa è da fare mglio sicuramente...
+                            data.trigger = trigger;
+                            data.trigger1 = trigger1;
+                            console.log("CHIAMO LA RECEIVE")
+                            receive = x(data, enocean);
+                        }
+                        //Dalla fnzone nel caso in cui era un rocker mi torneranno anche i trigger cmabiati quindi devo
+                        //aggiornare i valori delle variabili globali
+                        console.log("+++++++++++++++++++ Receive+++", receive)
+                        if (receive.hasOwnProperty('optionalData')) {
+
+                            if (receive.optionalData.hasOwnProperty('trigger')) {
+                                trigger = receive.optionalData.trigger;
+                            } else if (receive.optionalData.hasOwnProperty('trigger1')) {
+                                trigger1 = receive.optionalData.trigger1;
+                            }
+                        }
+                        //
+                        receive.RSSI = getEnoceanRSSI(data)
+                        //x(data,enocean);
+                        var dataForEmit = {
+                            objectId: bindToProperty.enocean[data.senderId].objectId,
+                            properties: {},
+                            writeToDatabase: true,
+                            writeToSerial: false
+                        }
+                        dataForEmit.properties = receive;
+                        console.log('ricevuto data lancio emit', dataForEmit);
+                        console.log();
+                        socket.emit("apio_client_update", dataForEmit);
+                        //console.log('data ',data);
+
+                        //console.log('funzione lanciata: ',receive);
+
+                        if (bindToProperty.enocean[data.senderId].hasOwnProperty('sleep')) {
+                            console.log('QUESTO OGGETTO ERA IN SLEEP: ', data.senderId);
+                            console.log('CERCO LA SUA FUNZIONE DI SLEEP');
+                            Apio.Database.db.collection("Objects").findOne({'address': data.senderId}, function (err, doc) {
+                                if (err) {
+                                    ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
+                                } else if (doc) {
+                                    var addInfo = doc.properties;
+                                    var needDataToSend = {
+                                        protocol: {
+                                            name: 'enocean',
+                                            type: bindToProperty.enocean[data.senderId].type,
+                                            fun: '01',
+                                            address: data.senderId,
+                                            property: ''
+                                        },
+                                        enoceanBase: enocean.base
+                                    }
+                                    console.log('TROVATA! Lancio la funzione di SLEEP: ');
+                                    enoceanSendToDevice(needDataToSend, enocean, addInfo);
+                                }
+                            })
+
+                        }
+
+                    }
+
+
+                }
+
+            }
+            else if (data.learnBit == '0') {
+                if (data.packetTypeString == '4BS') {
+                    //Devo fare teach-in con 4BS
+                    console.log('TEACH IN 4BS');
+                    var eep = [];
+                    var dataToSend = '';
+                    if (data.hasOwnProperty('eep')) {
+
+                        dataToSend = data.eep[3] + data.eep[4] + data.eep[6] + data.eep[7]
+                        console.log('DATA TO SENDO IS COMPONING: ', dataToSend);
+                        if (data.manufacturer != null) {
+                            if (data.manufacturer.length == 1) {
+                                data.manufacturer = '0' + data.manufacturer;
+                            }
+                        } else {
+                            data.manufacturer = "02";
+                        }
+                        dataToSend = dataToSend + data.manufacturer + 'f0'
+                        console.log('LA RISPOSTA è: ', dataToSend);
+                        console.log('ACCETTO IL NUOVO OGGETTO');
+                        enoceanSend('4bs', '01', dataToSend, data.senderId);
+
+
+                        // smart ack
+                        //enoceanSend('','01','01010000000000')
+                        //enoceanSend('','01','02')
+                        if (communication.enocean.hasOwnProperty(data.eep) && communication.enocean[data.eep].send.hasOwnProperty('setup')) {
+                            console.log();
+                            console.log('il dispositivo prevede una funzione di setup...');
+                            var dataObject = {
+                                protocol: {
+                                    address: data.senderId,
+                                    fun: 'setup',
+                                    type: data.eep
+                                }
+                            }
+
+                            setTimeout(function () {
+                                console.log('Lancio la funzione di SETUP...');
+                                enoceanSendToDevice(dataObject, enocean, {});
+                            }, 3000)
+                        }
+                    }
+
+                }
+                if (!bindToProperty.enocean.hasOwnProperty(data.senderId)) {
+                    var eepCalculated
+                    if (data.hasOwnProperty('eep')) {
+                        eepCalculated = data.eep
+                        console.log('run autoInstall: ', {
+                            service: 'autoInstall',
+                            message: 'apio_install_new_object',
+                            data: {protocol: 'enocean', eep: data.eep, address: data.senderId}
+                        });
+                        socket.emit('send_to_service', {
+                            service: 'autoInstall',
+                            message: 'apio_install_new_object',
+                            data: {
+                                protocol: 'enocean',
+                                eep: eepCalculated,
+                                address: data.senderId
+                            }
+                        });
+                    } else {
+                        if (data.hasOwnProperty('packetTypeString')) {
+                            if (data.packetTypeString == '1BS') {
+                                //per i tipi 1BS e RPS l'eep deve essere inserito manualmente , così prevede lo standard enocean
+                                eepCalculated = 'manualInsert'
+                                console.log('run autoInstall: ', {
+                                    service: 'autoInstall',
+                                    message: 'apio_install_new_object',
+                                    data: {protocol: 'enocean', eep: data.eep, address: data.senderId}
+                                });
+                                socket.emit('send_to_service', {
+                                    service: 'autoInstall',
+                                    message: 'apio_install_new_object',
+                                    data: {
+                                        protocol: 'enocean',
+                                        eep: eepCalculated,
+                                        address: data.senderId
+                                    }
+                                });
+
+                            }
+                        }
+                    }
+                }
+
+            }
+            else if (data.choice == 'd4') {
+                //Devo fare l'UTE
+                //Questo è il comando per la smartplug, si può astrarre bisogna prendere il data
+                //mettere 91 al posto del primo byte, si può anche fare la dissociazione volendo
+                console.log("un oggetto ha richiesto l'accoppiamento tramite UTE, OGGETTO: ", data);
+                enoceanSend('d4', '01', data.rawByte, data.senderId, '91');
+
+                var eepCalculated0 = ''
+                if (data.hasOwnProperty('eep')) {
+                    eepCalculated0 = data.eep
+                } else {
+                    eepCalculated0 = data.rawByte[26] + data.rawByte[27] + '-' + data.rawByte[24] + data.rawByte[25] + '-' + data.rawByte[22] + data.rawByte[23]
+                }
+
+                if (communication.enocean.hasOwnProperty(eepCalculated0) && communication.enocean[eepCalculated0].send.hasOwnProperty('setup')) {
+                    console.log();
+                    console.log('il dispositivo prevede una funzione di setup...');
+                    var dataObject = {
+                        protocol: {
+                            address: data.senderId,
+                            fun: 'setup',
+                            type: eepCalculated0
+                        }
+                    }
+
+                    setTimeout(function () {
+                        console.log('Lancio la funzione di SETUP...');
+                        enoceanSendToDevice(dataObject, enocean, {});
+                    }, 3000)
+                }
+
+                if (!bindToProperty.enocean.hasOwnProperty(data.senderId)) {
+                    var eepCalculated = ''
+                    if (data.hasOwnProperty('eep')) {
+                        eepCalculated = data.eep
+                    } else {
+                        eepCalculated = data.rawByte[26] + data.rawByte[27] + '-' + data.rawByte[24] + data.rawByte[25] + '-' + data.rawByte[22] + data.rawByte[23]
+                    }
+                    console.log('run autoInstall: ', {
+                        service: 'autoInstall',
+                        message: 'apio_install_new_object',
+                        data: {protocol: 'enocean', eep: eepCalculated, address: data.senderId}
+                    });
+                    socket.emit('send_to_service', {
+                        service: 'autoInstall',
+                        message: 'apio_install_new_object',
+                        data: {
+                            protocol: 'enocean',
+                            eep: eepCalculated,
+                            address: data.senderId
+                        }
+                    });
+
+                }
+            }
+        }
+
+    }
 }
 
 var enoceanSend = function (enROR, enPacketType, enData, enDestinationId, enLearn) {
@@ -814,100 +815,104 @@ socket.on("apio_enocean_send", function (data) {
     console.log('++++++++INVIATO++++++++');
 });
 
-var enoceanInit = function(port){
-	clearInterval(search)
-	enocean.listen(port.comName);
+var first = 0;
+var enoceanInit = function (port) {
+    clearInterval(search)
+    enocean.listen(port.comName);
 
     console.log("Enocean Object Istanziato sulla porta ", port.comName);
-    setTimeout(function(){
-    	console.log("Cerco di capire il nuovo chipID:")
-    	enoceanSend('00','05', '03','ffffffff');
-    	chipIdWait = 1;
+    setTimeout(function () {
+        console.log("Cerco di capire il nuovo chipID:")
+        enoceanSend('00', '05', '03', 'ffffffff');
+        chipIdWait = 1;
 
     }, 5000)
-    
-    enocean.on("data", function (data) {
-    	console.log("Arriva questo: ")
-    	console.log(data)
-        enoceanApplianceOnOnce = 1;
-        //enoceanLearnAndInstall(data);
-        enoceanAppliance(data);
+
+    if (first == 0) {
+        first = 1;
+        enocean.on("data", function (data) {
+            console.log("Arriva questo: ")
+            console.log(data)
+            enoceanApplianceOnOnce = 1;
+            //enoceanLearnAndInstall(data);
+            enoceanAppliance(data);
 
 
-    });
-    enocean.on("disconnect", function () {
-        console.log("DISCONNECT ENOCEAN*********")
-        disconnect = 1;
-        openDongle = 0;
-        enoceanSearch()
-    });
+        });
 
+        enocean.on("disconnect", function () {
+            console.log("DISCONNECT ENOCEAN*********")
+            disconnect = 1;
+            openDongle = 0;
+            enoceanSearch()
+        });
+    }
     return;
 }
 
 //all'evvio del service controllo se c'è il dongle è in caso affermativo istanzio la seriale e tutto il resto
 /*com.list(function (err, ports) {
-    if (err) {
-        console.log("Unable to get serial ports, error: ", err);
-    } else {
-        ports.forEach(function (port) {
-            //console.log(port);
-            if (String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH") {
-                preEnoceanFound = 1;
-                enoceanInit(port);
-            }
-        });
-    }
-});*/
+ if (err) {
+ console.log("Unable to get serial ports, error: ", err);
+ } else {
+ ports.forEach(function (port) {
+ //console.log(port);
+ if (String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH") {
+ preEnoceanFound = 1;
+ enoceanInit(port);
+ }
+ });
+ }
+ });*/
 
 
 //permette di instanziare una nuova seriale sul dongle nel caso in cui viene disconnesso il dongle successivamente alla fase di avvio, o di istanziare il necessario nel caso in cui il sistema inizialmente parte senza dongle e viene connesso successivamente
 var portFound;
 var openDongle = 0;
 var search
-var enoceanSearch = function(){
-	 search = setInterval(function () {
-		com.list(function(err,ports){
-			if(err){
-				console.log("Unable to get serial ports, error: ",err);
-			} else {
-				disconnect = 1;
-				var usb = {}
-				ports.forEach(function(port){
-					if(String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH"){
-						disconnect = 0;
-						if(openDongle==0) openDongle = 1;
-						usb = port;
-					} 
-				})
-				if(disconnect){
-					console.log("Search for a Dongle Enocean")
-					if(usb && usb.hasOwnProperty('comName')){
-						console.log(usb)
-						enoceanInit(usb);
-					} else {
-						openDongle = 0;
-					}
-	
-				}else{
-					if(openDongle==2){
-						console.log("Dongle started!");
-					} else if (openDongle==1){
-						console.log("Dongle Inserted but not started")
-						if(usb && usb.hasOwnProperty('comName')){
-							console.log(usb)
-							enoceanInit(usb);
-							openDongle = 2;
-						}
-					} else if(openDongle==0){
-						console.log("Dongle Not Inserted")
-					}
-					
-				}
-			}
-		})
-	
-	}, 5000);
+var enoceanSearch = function () {
+    search = setInterval(function () {
+        com.list(function (err, ports) {
+            if (err) {
+                console.log("Unable to get serial ports, error: ", err);
+            } else {
+                disconnect = 1;
+                var usb = {}
+                ports.forEach(function (port) {
+                    if (String(port.manufacturer) === "EnOcean_GmbH" || String(port.manufacturer) === "EnOcean_GmbH") {
+                        disconnect = 0;
+                        if (openDongle == 0) openDongle = 1;
+                        usb = port;
+                    }
+                })
+                if (disconnect) {
+                    console.log("Search for a Dongle Enocean")
+                    if (usb && usb.hasOwnProperty('comName')) {
+                        console.log(usb)
+                        enoceanInit(usb);
+                    } else {
+                        openDongle = 0;
+                    }
+
+                } else {
+                    if (openDongle == 2) {
+                        console.log("Dongle started!");
+                    } else if (openDongle == 1) {
+                        console.log("Dongle Inserted but not started")
+                        if (usb && usb.hasOwnProperty('comName')) {
+                            console.log(usb)
+                            enoceanInit(usb);
+                            openDongle = 2;
+                        }
+                    } else if (openDongle == 0) {
+                        console.log("Dongle Not Inserted")
+                    }
+
+                }
+            }
+        })
+
+    }, 5000);
 }
 
 enoceanSearch();

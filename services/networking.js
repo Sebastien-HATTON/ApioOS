@@ -25,9 +25,10 @@ module.exports = function (libraries) {
     var fs = libraries.fs;
     var app = express();
     var http = libraries.http.Server(app);
-    var configuration = require("../configuration/default.js");
+    // var configuration = require("../configuration/default.js");
     var exec = libraries.child_process.exec;
-    var Apio = require("../apio.js")(configuration, false);
+    // var Apio = require("../apio.js")(configuration, false);
+    var Apio = require("../apio.js")(false);
     var socketClient = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=networking&token=" + Apio.Token.getFromText("networking", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
     var socketServer = libraries["socket.io"](http);
     var spawn = libraries.child_process.spawn;

@@ -26,8 +26,9 @@ var express = require("express");
 var fs = require("fs");
 var app = express();
 var http = require("http").Server(app);
-var configuration = require("../configuration/default.js");
-var Apio = require("../apio.js")(configuration, false);
+// var configuration = require("../configuration/default.js");
+// var Apio = require("../apio.js")(configuration, false);
+var Apio = require("../apio.js")(false);
 Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=logic&token=" + Apio.Token.getFromText("logic", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
 var request = require("request");
 var socketServer = require("socket.io")(http);
@@ -490,10 +491,22 @@ socketServer.on("connection", function (Socket) {
 
         clearInterval(loop);
         fs.writeFileSync("./apio_logic/" + data.newName, data.file);
-        logics.push({
-            loop: require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer),
-            name: data.newName
-        });
+
+        var found = false;
+        for (var i = 0; !found && i < logics.length; i++) {
+            if (logics[i].name === data.newName) {
+                found = true;
+                require.uncache("./apio_logic/" + data.newName);
+                logics[i].loop = require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer);
+            }
+        }
+
+        if (!found) {
+            logics.push({
+                loop: require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer),
+                name: data.newName
+            });
+        }
 
         if (data.newName !== data.name && fs.existsSync("./apio_logic/" + data.name)) {
             require.uncache("./apio_logic/" + data.name);

@@ -21,7 +21,8 @@
 "use strict";
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
+var configuration = require("../apio.js")().config.return().file;
 var express = require("express");
 var database = undefined;
 var domain = require("domain");

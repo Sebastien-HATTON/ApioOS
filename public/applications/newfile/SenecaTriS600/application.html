@@ -1,63 +1,77 @@
 <style>
-	div#rankingLabel.box_proprietaiPhone{
-		margin-bottom:0 !important;
-	}
-	
-	div#registra_statoinput.glyphicon.glyphicon-bell{
-	    color:white;
-	}
-	span.glyphicon.glyphicon-remove.personalizaChevron{
-	    color:white;
-	}
-	div.appName.viewDesktop1.ng-binding{
-		color:white;
-	}
+    div#rankingLabel.box_proprietaiPhone {
+        margin-bottom: 0 !important;
+    }
+
+    div#registra_statoinput.glyphicon.glyphicon-bell {
+        color: white;
+    }
+
+    span.glyphicon.glyphicon-remove.personalizaChevron {
+        color: white;
+    }
+
+    div.appName.viewDesktop1.ng-binding {
+        color: white;
+    }
 </style>
-<div id="ApioApplication_TMP_" ng-app="ApioApplication_TMP_" style="padding: 10px; background-color:rgb(73,161,71);">
+<div id="ApioApplication_TMP_" ng-app="ApioApplication_TMP_" style="padding: 10px; background-color: rgb(73,161,71);">
     <div ng-controller="defaultController">
         <topappapplication></topappapplication>
         <div id="app" style="display: block;">
-            
-			<graph graphname="analytics" plot="power,energy" type="avg-15"></graph>
-            
-            <unlimitedsensor propertyname="impEnergy" label="Energia [Wh]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="expEnergy" label="Exp Energy [Wh]" style="margin-bottom:0;"></unlimitedsensor>
-            
-            <unlimitedsensor  propertyname="voltage1" label="Voltage 1 [V]"></unlimitedsensor>
-            <unlimitedsensor  propertyname="voltage2" label="Voltage 2 [V]"></unlimitedsensor>
-            <unlimitedsensor  propertyname="voltage3" label="Voltage 3 [V]"></unlimitedsensor>
-            <unlimitedsensor  propertyname="voltage" label="Voltage [V]"></unlimitedsensor>
-            
-            
-            <unlimitedsensor  propertyname="current1" label="Corrente 1 [A]"></unlimitedsensor>
-            <unlimitedsensor  propertyname="current2" label="Corrente 2 [A]"></unlimitedsensor>
-            <unlimitedsensor  propertyname="current3" label="Corrente 3 [A]"></unlimitedsensor>
-            <unlimitedsensor  propertyname="current" label="Corrente [A]"></unlimitedsensor>
-            
-            <unlimitedsensor  propertyname="frequency" label="Frequency [Hz]"></unlimitedsensor>
-            
-            <unlimitedsensor propertyname="power1" label="Potenza Attuale 1 [W]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="power2" label="Potenza Attuale 2 [W]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="power3" label="Potenza Attuale 3 [W]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="power" label="Potenza Attuale Totale [W]" style="margin-bottom:0;"></unlimitedsensor>
-            
-            <unlimitedsensor propertyname="reactivePower1" label="Potenza Reattiva 1 [var]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="reactivePower2" label="Potenza Reattiva 2 [var]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="reactivePower3" label="Potenza Reattiva 3 [var]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="reactivePower" label="Potenza Reattiva Totale [var]" style="margin-bottom:0;"></unlimitedsensor>
-            
-            <unlimitedsensor propertyname="apparentPower1" label="Potenza Apparente 1 [VA]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="apparentPower2" label="Potenza Apparente 2 [VA]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="apparentPower3" label="Potenza Apparente 3 [VA]" style="margin-bottom:0;"></unlimitedsensor>
-            <unlimitedsensor propertyname="apparentPower" label="Potenza Apparente Totale [VA]" style="margin-bottom:0;"></unlimitedsensor>
-            
-			
 
-			<collapse label="More Info" propertyName="plusInfo">
-            	<unlimitedsensor propertyname="impEnergy" label="Import Energy [Wh]"></unlimitedsensor>
-            	<unlimitedsensor propertyname="expEnergy" label="Export Energy [Wh]"></unlimitedsensor>
-            	<unlimitedsensor propertyname="impLagAppEnergy" label="Import Apparent Energy [VAh]"></unlimitedsensor>
-            	<unlimitedsensor propertyname="expLagAppEnergy" label="Export Apparent Energy [VAh]"></unlimitedsensor>
+            <graph graphname="analytics" plot="power,impEnergy" type="avg-15"></graph>
+
+            <unlimitedsensor propertyname="impEnergy" label="Energia [Wh]" style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="expEnergy" label="Exp Energy [Wh]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+
+            <unlimitedsensor propertyname="voltage1" label="Voltage 1 [V]"></unlimitedsensor>
+            <unlimitedsensor propertyname="voltage2" label="Voltage 2 [V]"></unlimitedsensor>
+            <unlimitedsensor propertyname="voltage3" label="Voltage 3 [V]"></unlimitedsensor>
+            <unlimitedsensor propertyname="voltage" label="Voltage [V]"></unlimitedsensor>
+
+
+            <unlimitedsensor propertyname="current1" label="Corrente 1 [A]"></unlimitedsensor>
+            <unlimitedsensor propertyname="current2" label="Corrente 2 [A]"></unlimitedsensor>
+            <unlimitedsensor propertyname="current3" label="Corrente 3 [A]"></unlimitedsensor>
+            <unlimitedsensor propertyname="current" label="Corrente [A]"></unlimitedsensor>
+
+            <unlimitedsensor propertyname="frequency" label="Frequency [Hz]"></unlimitedsensor>
+
+            <unlimitedsensor propertyname="power1" label="Potenza Attuale 1 [W]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="power2" label="Potenza Attuale 2 [W]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="power3" label="Potenza Attuale 3 [W]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="power" label="Potenza Attuale Totale [W]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+
+            <unlimitedsensor propertyname="reactivePower1" label="Potenza Reattiva 1 [var]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="reactivePower2" label="Potenza Reattiva 2 [var]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="reactivePower3" label="Potenza Reattiva 3 [var]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="reactivePower" label="Potenza Reattiva Totale [var]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+
+            <unlimitedsensor propertyname="apparentPower1" label="Potenza Apparente 1 [VA]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="apparentPower2" label="Potenza Apparente 2 [VA]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="apparentPower3" label="Potenza Apparente 3 [VA]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+            <unlimitedsensor propertyname="apparentPower" label="Potenza Apparente Totale [VA]"
+                             style="margin-bottom: 0;"></unlimitedsensor>
+
+
+            <collapse label="More Info" propertyName="plusInfo">
+                <unlimitedsensor propertyname="impEnergy" label="Import Energy [Wh]"></unlimitedsensor>
+                <unlimitedsensor propertyname="expEnergy" label="Export Energy [Wh]"></unlimitedsensor>
+                <unlimitedsensor propertyname="impLagAppEnergy" label="Import Apparent Energy [VAh]"></unlimitedsensor>
+                <unlimitedsensor propertyname="expLagAppEnergy" label="Export Apparent Energy [VAh]"></unlimitedsensor>
             </collapse>
 
             <log label="Log"></log>

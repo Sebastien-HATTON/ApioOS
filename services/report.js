@@ -21,7 +21,8 @@
 "use strict";
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
+var configuration = require("../apio.js")().config.return().file;
 var database = undefined;
 var domain = require("domain");
 var express = require("express");
@@ -65,7 +66,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-process.on("SIGINT", function() {
+process.on("SIGINT", function () {
     console.log("About to exit");
     database.close();
     process.exit();

@@ -39,7 +39,8 @@ module.exports = function (libraries) {
     var validator = libraries.validator;
     var app = express();
     var http = libraries.http.Server(app);
-    var configuration = require("../configuration/default.js");
+    var Apio = require("../apio.js")();
+    // var configuration = require("../configuration/default.js");
 
     var Socket = undefined;
     var mailSocketConnected = false;
@@ -84,7 +85,7 @@ module.exports = function (libraries) {
         });
     });
 
-    var Apio = require("../apio.js")(configuration);
+    // var Apio = require("../apio.js")(configuration);
 
     Apio.System.getApioIdentifierCloud = function () {
         if (null !== Apio.System.ApioIdentifier && 'undefined' !== typeof Apio.System.ApioIdentifier) {
@@ -102,9 +103,9 @@ module.exports = function (libraries) {
             return Apio.System.ApioIdentifier;
         }
     };
-    //var socket = libraries["socket.io-client"]("http://localhost:" + configuration.http.port, {query: "apioId=" + Apio.System.getApioIdentifierCloud()});
-    //var socket = libraries["socket.io-client"]("http://localhost:" + configuration.http.port, {query: "associate=cloud"});
-    var socket = libraries["socket.io-client"]("http://localhost:" + configuration.http.port, {query: "associate=cloud&token=" + Apio.Token.getFromText("cloud", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
+    //var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "apioId=" + Apio.System.getApioIdentifierCloud()});
+    //var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=cloud"});
+    var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=cloud&token=" + Apio.Token.getFromText("cloud", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
     var enableCloudUpdateInterval = undefined;
 
     //var launchInterval = function () {
@@ -556,7 +557,7 @@ module.exports = function (libraries) {
                                 var cc = mail.splice(1);
 
                                 if (to) {
-                                    require("dns").resolve("www.google.com", function(err) {
+                                    require("dns").resolve("www.google.com", function (err) {
                                         if (err) {
                                             execReboot();
                                         } else {
@@ -664,7 +665,7 @@ module.exports = function (libraries) {
                                 var cc = mail.splice(1);
 
                                 if (to) {
-                                    require("dns").resolve("www.google.com", function(err) {
+                                    require("dns").resolve("www.google.com", function (err) {
                                         if (err) {
                                             execShutdown();
                                         } else {
@@ -1875,7 +1876,7 @@ module.exports = function (libraries) {
         });
     });
 
-    MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + configuration.database.port + "/" + configuration.database.database, function (error, db) {
+    MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + Apio.Configuration.database.port + "/" + Apio.Configuration.database.database, function (error, db) {
         if (error) {
             console.log("Unable to get database");
         } else if (db) {
@@ -1928,9 +1929,9 @@ module.exports = function (libraries) {
     });
 
     /***************************************CLOUD SOCKET ************************************/
-        //Apio.Remote = {
-        //    connectionRetryCounter: 0
-        //};
+    //Apio.Remote = {
+    //    connectionRetryCounter: 0
+    //};
 
 //SERVER
     http.listen(port, function () {

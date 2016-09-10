@@ -20,7 +20,8 @@
 
 "use strict";
 //module.exports = function (libraries) {
-var Apio = require("../apio.js")(require("../configuration/default.js"));
+// var Apio = require("../apio.js")(require("../configuration/default.js"));
+var Apio = require("../apio.js")();
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
 
@@ -58,19 +59,19 @@ var isLogSocketConnected = false;
 var logSocket = undefined;
 
 //AGGIUNTE PER LOGIC INIZIO
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
 var obj = {};
 var prevObj = {};
-Apio.io = require("socket.io-client")("http://localhost:" + configuration.http.port);
+Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port);
 var walk = false;
 
 Apio.io.on("apio_server_update", function (data) {
     if (walk) {
         for (var i in data.properties) {
             if (obj[data.objectId].properties.hasOwnProperty(i)) {
-	            console.log("interviene la socket");
-	            prevObj[data.objectId].properties[i].value = obj[data.objectId].properties[i].value;
-	            console.log(prevObj[data.objectId].properties[i].value);
+                console.log("interviene la socket");
+                prevObj[data.objectId].properties[i].value = obj[data.objectId].properties[i].value;
+                console.log(prevObj[data.objectId].properties[i].value);
                 obj[data.objectId].properties[i].value = data.properties[i];
                 console.log(obj[data.objectId].properties[i].value);
             }
@@ -88,7 +89,7 @@ process.on("SIGINT", function () {
 });
 
 
-//Apio.io = require("socket.io-client")("http://localhost:" + configuration.http.port);
+//Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port);
 //Apio.io = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port);
 var log = function (data) {
     console.log(data);
@@ -299,19 +300,19 @@ Apio.logic = {
         }
     },
     watchProperty: function (id, p, a) {
-	    //console.log('+++++++watch+++++++');
-	    //console.log(Number(prevObj[id].properties[p].value.replace(",", ".")));
-	    //console.log(Number(obj[id].properties[p].value.replace(",", ".")));
-	    var valore;
-	    if(Number(prevObj[id].properties[p].value.replace(",", ".")) != Number(obj[id].properties[p].value.replace(",", "."))){
-		    console.log("dentro*******");
-		    prevObj[id].properties[p].value = obj[id].properties[p].value;
-		    valore = Number(String(obj[id].properties[p].value).replace(",", "."));
-		    a(valore);
+        //console.log('+++++++watch+++++++');
+        //console.log(Number(prevObj[id].properties[p].value.replace(",", ".")));
+        //console.log(Number(obj[id].properties[p].value.replace(",", ".")));
+        var valore;
+        if (Number(prevObj[id].properties[p].value.replace(",", ".")) != Number(obj[id].properties[p].value.replace(",", "."))) {
+            console.log("dentro*******");
+            prevObj[id].properties[p].value = obj[id].properties[p].value;
+            valore = Number(String(obj[id].properties[p].value).replace(",", "."));
+            a(valore);
         }
     },
     getProperty: function (id, p) {
-		//console.log("dentro*******");
+        //console.log("dentro*******");
         return Number(String(obj[id].properties[p].value).replace(",", "."));
     },
     interval: function () {
@@ -371,7 +372,7 @@ var interval = setInterval(function () {
 
 //var files = fs.readdirSync("./services/apio_logic");
 if (!fs.existsSync("./apio_logic")) {
-	fs.mkdirSync("./apio_logic");
+    fs.mkdirSync("./apio_logic");
 }
 var files = fs.readdirSync("./apio_logic");
 var logics = [];
@@ -379,10 +380,10 @@ var logics = [];
 var initialSetup = function () {
     log("Setup")
     for (var i in files) {
-    	console.log("in da for")
-    	
+        console.log("in da for")
+
         var o = {};
-		
+
         o.loop = require("./apio_logic/" + files[i])(Apio.logic, request)
         o.name = files[i];
         log(o);
@@ -409,10 +410,9 @@ Apio.System.getApioIdentifier = function () {
 }
 
 
-
 process.on("uncaughtException", function (err) {
     log("Caught exception: " + err);
-    
+
 
 });
 
@@ -438,22 +438,22 @@ Apio.ws.read = function (data) {
             }
             switch (command) {
                 /*case "send":
-                    Apio.Database.getObjectById(data.objectId, function (object) {
-                        data.objectId = object.objectId;
-                        data.protocol = object.protocol;
+                 Apio.Database.getObjectById(data.objectId, function (object) {
+                 data.objectId = object.objectId;
+                 data.protocol = object.protocol;
 
-                        Apio.Serial.send(data);
+                 Apio.Serial.send(data);
 
-                        Apio.Database.updateProperty(data, function () {
-                            Apio.io.to("apio_client").emit("apio_client_update", data);
-                        });
-                    });
-                    break;
-                case "time":
-                    log("SONO DENTRO TIME, DATA VALE: ", data);
-                    var t = new Date().getTime();
-                    Apio.Serial.send("l" + data.objectId + ":time:" + t + "-");
-                    break;
+                 Apio.Database.updateProperty(data, function () {
+                 Apio.io.to("apio_client").emit("apio_client_update", data);
+                 });
+                 });
+                 break;
+                 case "time":
+                 log("SONO DENTRO TIME, DATA VALE: ", data);
+                 var t = new Date().getTime();
+                 Apio.Serial.send("l" + data.objectId + ":time:" + t + "-");
+                 break;
                  */
                 case "update":
                     var areJSONsEqual = function (a, b) {
@@ -487,11 +487,14 @@ Apio.ws.read = function (data) {
 
                     if (Apio.Database.db) {
                         console.log("Secondo IF");
-                        Apio.Database.db.collection("Objects").findOne({objectId: data.objectId, protocol: "w"}, function (err, res) {
+                        Apio.Database.db.collection("Objects").findOne({
+                            objectId: data.objectId,
+                            protocol: "w"
+                        }, function (err, res) {
                             if (err) {
                                 log("Error while getting object with objectId " + data.objectId + ": ", err);
                             } else if (res) {
-	                            data.protocol = res.protocol
+                                data.protocol = res.protocol
                                 var timestamp = new Date().getTime(), updt = {};
                                 for (var i in res.properties) {
                                     console.log("FOR")
@@ -577,44 +580,44 @@ Apio.ws.read = function (data) {
                     }
                     break;
                 /*case "hi":
-                    log("Ho riconosciuto la parola chiave hi");
-                    if (data.objectId == "9999") {
-                        //console.log(data)
-                        var o = {}
-                        o.name = "apio_autoinstall_service"
-                        o.data = data.properties.appId;
-                        Apio.io.emit("socket_service", o)
-                    } else {
-                        log("L'indirizzo fisico dell'oggetto che si è appena connesso è " + data.address);
-                        Apio.Database.db.collection("Objects").findOne({
-                            objectId: data.objectId
-                        }, function (err, document) {
-                            if (err) {
-                                log("non esiste un oggetto con address " + data.objectId);
-                                Apio.Serial.send("l" + data.objectId + ":setmesh:999801-")
-                            } else if (document) {
-                                for (var i in document.properties) {
-                                    if (!document.properties[i].hasOwnProperty("hi") || document.properties[i].hi === true) {
-                                        Apio.Serial.send(document.protocol + document.address + ":" + i + ":" + document.properties[i].value + "-");
-                                    }
-                                }
-                                Apio.Serial.send(document.protocol + document.address + ":finish:-");
-                                Apio.Database.db.collection("Objects").update({objectId: document.objectId}, {$set: {connected: true}}, function (err, res) {
-                                    if (err) {
-                                        log("Error while updating field 'connected'");
-                                    } else {
-                                        log("Field 'connected' successfully updated");
-                                    }
-                                });
-                                log("l'oggetto con address " + document.address + " è " + document.objectId);
-                                if (isNotificationSocketConnected) {
-                                    notificationSocket.emit("send_notification", data);
-                                }
-                            }
+                 log("Ho riconosciuto la parola chiave hi");
+                 if (data.objectId == "9999") {
+                 //console.log(data)
+                 var o = {}
+                 o.name = "apio_autoinstall_service"
+                 o.data = data.properties.appId;
+                 Apio.io.emit("socket_service", o)
+                 } else {
+                 log("L'indirizzo fisico dell'oggetto che si è appena connesso è " + data.address);
+                 Apio.Database.db.collection("Objects").findOne({
+                 objectId: data.objectId
+                 }, function (err, document) {
+                 if (err) {
+                 log("non esiste un oggetto con address " + data.objectId);
+                 Apio.Serial.send("l" + data.objectId + ":setmesh:999801-")
+                 } else if (document) {
+                 for (var i in document.properties) {
+                 if (!document.properties[i].hasOwnProperty("hi") || document.properties[i].hi === true) {
+                 Apio.Serial.send(document.protocol + document.address + ":" + i + ":" + document.properties[i].value + "-");
+                 }
+                 }
+                 Apio.Serial.send(document.protocol + document.address + ":finish:-");
+                 Apio.Database.db.collection("Objects").update({objectId: document.objectId}, {$set: {connected: true}}, function (err, res) {
+                 if (err) {
+                 log("Error while updating field 'connected'");
+                 } else {
+                 log("Field 'connected' successfully updated");
+                 }
+                 });
+                 log("l'oggetto con address " + document.address + " è " + document.objectId);
+                 if (isNotificationSocketConnected) {
+                 notificationSocket.emit("send_notification", data);
+                 }
+                 }
 
-                        });
-                    }
-                    break;*/
+                 });
+                 }
+                 break;*/
                 default:
                     break;
             }
@@ -622,97 +625,97 @@ Apio.ws.read = function (data) {
     }
 };
 var webSocket = {}
-Apio.ws.listen = function(){
-	//console.log(server)
+Apio.ws.listen = function () {
+    //console.log(server)
     wss.on('connection', function connection(ws) {
-      
-      var location = url.parse(ws.upgradeReq.url, true);
-      // you might use location.query.access_token to authenticate or share sessions
-      // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
-      //Apio.ws = ws;
-      webSocket = ws;
-      ws.on('message', function incoming(message) {
-        //console.log("CIAOOOOOOOOOOOOOOOOOO MIIIIIIIIIIO", message)
-        var m = message.split(':')
-        if(m.length>3){
-        	var dataObject2 = Apio.Util.ApioToJSON(message);
-        	Apio.ws.read(dataObject2);
-        }
-        /*if(m[0]=="hi"){
-            console.log("Case Hi")
-            var address = m[1];
-            ws.address = m[1];
-            console.log(address)
-            connectedObjects[address]={};
-            connectedObjects[address] = ws;
-            connectedObjects[address].send("Ciao, benvenuta in Apio, BUDDY",function(err){
-            });
-        }
-        if(m[0]=="update"){
-            console.log("Case Update")
-            var address = m[1];
-            ws.address = m[1];
-            var eventTime = m[2];
-            console.log(address)
-            connectedObjects[address]={};
-            connectedObjects[address] = ws;
-            /*connectedObjects[address].send("Ciao, benvenuta in Apio, BUDDY",function(err){
-            });*/
-            /*buddy.update(connectedObjects[address], address, eventTime, bot ,function(){
-            });
-            console.log("Buddy richiede un aggiornamento"); 
-        }*/
 
-        
-        console.log('received: %s', message);
-        //console.log(connectedObjects[address]);
-        //ws.send(message)
-      });
-      ws.on('close', function() {
-        console.log("CLOSEEEE")
-        console.log(ws.address);
-
-       /* connectedObjects.forEach(function(element,index,array){
-            console.log(element.addess);
-            if(element.address==ws.address){
-                console.log("Dentro");
-                connectedObjects.splice(index,1);
+        var location = url.parse(ws.upgradeReq.url, true);
+        // you might use location.query.access_token to authenticate or share sessions
+        // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+        //Apio.ws = ws;
+        webSocket = ws;
+        ws.on('message', function incoming(message) {
+            //console.log("CIAOOOOOOOOOOOOOOOOOO MIIIIIIIIIIO", message)
+            var m = message.split(':')
+            if (m.length > 3) {
+                var dataObject2 = Apio.Util.ApioToJSON(message);
+                Apio.ws.read(dataObject2);
             }
-        })*/
-      });
-      if(Apio.io){
-      	Apio.io.on("apio_serial_send", function (data) {
-		    log("SONO DENTRO ALL'EVENTO SULLA SOCKET APIO_SERIAL_SEND");
-		    var keys = Object.keys(data.properties);
-		    keys.forEach(function (key) {
-		    	ws.send("data.protocol+data.address:"+key+":"+data.properties[key]+"-",function(error){
-                    if(error)
-                        console.log("La socket da questo errore ", error)
-                });
-            })
-		});
-		Apio.io.on("apio_serial_stream", function (data) {
-		    log("SONO DENTRO ALL'EVENTO SULLA SOCKET APIO_SERIAL_STREAM");
-		    if(data){
-			    console.log(data)
-				ws.send(JSON.stringify(data))
-		    }
-		});
-      }
-      
+            /*if(m[0]=="hi"){
+             console.log("Case Hi")
+             var address = m[1];
+             ws.address = m[1];
+             console.log(address)
+             connectedObjects[address]={};
+             connectedObjects[address] = ws;
+             connectedObjects[address].send("Ciao, benvenuta in Apio, BUDDY",function(err){
+             });
+             }
+             if(m[0]=="update"){
+             console.log("Case Update")
+             var address = m[1];
+             ws.address = m[1];
+             var eventTime = m[2];
+             console.log(address)
+             connectedObjects[address]={};
+             connectedObjects[address] = ws;
+             /*connectedObjects[address].send("Ciao, benvenuta in Apio, BUDDY",function(err){
+             });*/
+            /*buddy.update(connectedObjects[address], address, eventTime, bot ,function(){
+             });
+             console.log("Buddy richiede un aggiornamento");
+             }*/
 
-      /*if(Apio.ws.queue.length>0){
-          var messageToSend = Apio.ws.queue.shift();
-          console.log("+++++++++Invio+++++++",messageToSend)
-          ws.send(messageToSend);
-      }*/
-      
-      });
-      
+
+            console.log('received: %s', message);
+            //console.log(connectedObjects[address]);
+            //ws.send(message)
+        });
+        ws.on('close', function () {
+            console.log("CLOSEEEE")
+            console.log(ws.address);
+
+            /* connectedObjects.forEach(function(element,index,array){
+             console.log(element.addess);
+             if(element.address==ws.address){
+             console.log("Dentro");
+             connectedObjects.splice(index,1);
+             }
+             })*/
+        });
+        if (Apio.io) {
+            Apio.io.on("apio_serial_send", function (data) {
+                log("SONO DENTRO ALL'EVENTO SULLA SOCKET APIO_SERIAL_SEND");
+                var keys = Object.keys(data.properties);
+                keys.forEach(function (key) {
+                    ws.send("data.protocol+data.address:" + key + ":" + data.properties[key] + "-", function (error) {
+                        if (error)
+                            console.log("La socket da questo errore ", error)
+                    });
+                })
+            });
+            Apio.io.on("apio_serial_stream", function (data) {
+                log("SONO DENTRO ALL'EVENTO SULLA SOCKET APIO_SERIAL_STREAM");
+                if (data) {
+                    console.log(data)
+                    ws.send(JSON.stringify(data))
+                }
+            });
+        }
+
+
+        /*if(Apio.ws.queue.length>0){
+         var messageToSend = Apio.ws.queue.shift();
+         console.log("+++++++++Invio+++++++",messageToSend)
+         ws.send(messageToSend);
+         }*/
+
+    });
+
 }
 
 var server = http.createServer(app);
-var wss = new WebSocketServer({ server: server })
+var wss = new WebSocketServer({server: server})
 
 server.listen(port, function () {
     log("APIO ObjectWs Service correctly started on port ");
@@ -721,12 +724,7 @@ server.listen(port, function () {
     });
     Apio.ws.listen();
     console.log(webSocket)
-    
-    
-    
-    
-        
-          
+
 
     //AGGIUNTE PER LOGIC INIZIO
     initialSetup();

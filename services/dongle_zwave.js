@@ -18,7 +18,8 @@
  *                                                                          *
  ****************************************************************************/
 
-var Apio = require("../apio.js")(require("../configuration/default.js"), false);
+// var Apio = require("../apio.js")(require("../configuration/default.js"), false);
+var Apio = require("../apio.js")(false);
 var fs = require("fs");
 var com = require("serialport");
 var request = require("request")
@@ -55,13 +56,13 @@ Apio.Database.connect(function () {
             if (err) {
 
             } else {
-                console.log('OBJECTS IS: ', oBjects);
+                // console.log('OBJECTS IS: ', oBjects);
                 //objects = JSON.parse(JSON.stringify(oBjects));
                 for (var i in oBjects) {
                     objects[oBjects[i].objectId] = oBjects[i];
                 }
 
-                console.log("°°°°°°°°°°°°°°°°objects°°°°°°°°°°°°°°°", objects);
+                // console.log("°°°°°°°°°°°°°°°°objects°°°°°°°°°°°°°°°", objects);
             }
         }
     )
@@ -71,7 +72,7 @@ Apio.Database.connect(function () {
         } else if (doc) {
 
             communication = doc;
-            console.log('la collection communication contiene: ', communication)
+            // console.log('la collection communication contiene: ', communication)
         }
     })
     Apio.Database.db.collection("Communication").findOne({'name': 'addressBindToProperty'}, function (err, doc) {
@@ -80,7 +81,7 @@ Apio.Database.connect(function () {
         } else if (doc) {
 
             bindToProperty = doc;
-            console.log('la collection communication contiene: ', communication)
+            // console.log('la collection communication contiene: ', communication)
         }
     })
 
@@ -107,7 +108,12 @@ var zwaveSendToDevice = function (data, addInfo) {
     var index = 0;
     //console.log("value: ",req.params.value)
     var value = Number(data.message.value);
-    zwave.setValue(nodeId, classZ, instance, index, value);
+
+    try {
+        zwave.setValue(nodeId, classZ, instance, index, value);
+    } catch (ex) {
+        console.log("Expection while send info to node: ", ex);
+    }
 
     /*var s = communication["enocean"]
      console.log("******S1********", s);
@@ -146,8 +152,8 @@ var zwaveSendToDevice = function (data, addInfo) {
 }
 
 Apio.io.on("apio_server_update", function (data) {
-    console.log("apio_server_update")
-    console.log(data)
+    // console.log("apio_server_update")
+    // console.log(data)
     if (Apio.Database.hasOwnProperty('db')) {
         Apio.Database.db.collection("Objects").findOne({'objectId': data.objectId}, function (err, doc) {
             if (err) {
@@ -155,29 +161,29 @@ Apio.io.on("apio_server_update", function (data) {
             } else if (doc) {
 
                 //bindToProperty = doc;
-                console.log(doc)
+                // console.log(doc)
                 var proprieta = Object.keys(data.properties);
                 for (var a in proprieta) {
-                    console.log("Dentro al for")
-                    console.log(proprieta[a])
+                    // console.log("Dentro al for")
+                    // console.log(proprieta[a])
                     //console.log(doc.properties.hasOwnProperty(proprieta[a]))
                     //console.log(doc.properties[proprieta[a]].hasOwnProperty('additional'))
                     //console.log(doc.properties[proprieta[a]].additional.hasOwnProperty('enea'));
                     if (doc.properties.hasOwnProperty(proprieta[a]) && doc.properties[proprieta[a]].hasOwnProperty('additional') && doc.properties[proprieta[a]].additional[0].hasOwnProperty('enea')) {
-                        console.log("Pre");
-                        console.log(doc.properties[proprieta[a]].additional[0].enea)
+                        // console.log("Pre");
+                        // console.log(doc.properties[proprieta[a]].additional[0].enea)
                         //delete doc.properties[proprieta[a]].additional[0].enea.Value;
                         //console.log(data.properties[proprieta[a]])
                         //doc.properties[proprieta[a]].additional[0].enea.EnergyBoxID = Apio.System.getApioIdentifier()
                         doc.properties[proprieta[a]].additional[0].enea.Value = data.properties[proprieta[a]];
                         var timeStamp = new Date().getTime();
                         doc.properties[proprieta[a]].additional[0].enea.CurrentDateTimeUnix = timeStamp;
-                        console.log("Post")
-                        console.log(doc.properties[proprieta[a]].additional[0].enea)
+                        // console.log("Post")
+                        // console.log(doc.properties[proprieta[a]].additional[0].enea)
 
                         //Pubblico sull MQTT
                         //client.publish('enea/ricezioneMisure', doc.properties[proprieta[a]].additional[0].enea);
-                        socketServer.emit("mqtt_service",doc.properties[proprieta[a]].additional[0].enea)
+                        socketServer.emit("mqtt_service", doc.properties[proprieta[a]].additional[0].enea)
                         //client.publish('enea/ricezioneMisure', JSON.stringify(doc.properties[proprieta[a]].additional[0].enea));
                     }
 
@@ -211,7 +217,11 @@ Apio.io.on("apio_zwave_send", function (data) {
         objects[data.objectId].properties[data.message.property].value = data.message.value;
         console.log('objects[data.objectId].properties[data.message.property] ', objects[data.objectId].properties[data.message.property]);
         //PRIMA ERA FUORI DALL'IF
-        zwaveSendToDevice(data, data.allProperties);
+        if (flagInit) {
+            zwaveSendToDevice(data, data.allProperties);
+        } else {
+            console.log("Initialization not ended at the moment");
+        }
     }
 
     //ORA DENTRO L'IF
@@ -748,7 +758,7 @@ socketServer.on("connection", function (Socket) {
             if (err) {
 
             } else {
-                console.log('OBJECTS IS: ', oBjects);
+                // console.log('OBJECTS IS: ', oBjects);
                 //objects = JSON.parse(JSON.stringify(oBjects));
                 objects = {};
                 for (var i in oBjects) {
@@ -763,7 +773,7 @@ socketServer.on("connection", function (Socket) {
             } else if (doc) {
 
                 communication = doc;
-                console.log('la collection communication contiene: ', communication)
+                // console.log('la collection communication contiene: ', communication)
             }
         });
 
@@ -773,7 +783,7 @@ socketServer.on("connection", function (Socket) {
             } else if (doc) {
 
                 bindToProperty = doc;
-                console.log('la collection communication contiene: ', communication)
+                // console.log('la collection communication contiene: ', communication)
             }
         });
     });

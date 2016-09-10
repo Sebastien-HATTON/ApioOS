@@ -26,12 +26,15 @@ angular.module("ApioApplication").controller("modala5-02-05", ["$scope", "$http"
     $scope.cancel = function () {
         $http.get("/apio/user/getSessionComplete").success(function (session) {
             socket.emit("close_autoInstall_modal", session.apioId);
-            $mdDialog.hide();
         });
+        console.log("hai cliccato su close");
+        $mdDialog.hide();
     };
 
     $scope.confirm = function () {
+        console.log("hai cliccato su confirm");
         $http.get("/apio/user/getSessionComplete").success(function (session) {
+            console.log("SUCCESS lancio socket");
             $scope.modalData.apioId = session.apioId;
             socket.emit("close_autoInstall_modal", session.apioId);
             socket.emit("send_to_service", {

@@ -1,5 +1,6 @@
-var configuration = require("../configuration/default.js");
-var Apio = require("../apio.js")(configuration);
+// var configuration = require("../configuration/default.js");
+// var Apio = require("../apio.js")(configuration);
+var Apio = require("../apio.js")();
 var bodyParser = require("body-parser");
 var compression = require("compression");
 var domain = require("domain");
@@ -8,7 +9,7 @@ var express = require("express");
 var app = express();
 var http = require("http").Server(app);
 var socketServer = require("socket.io")(http);
-var socketClient = require("socket.io-client")("http://localhost:" + configuration.http.port);
+var socketClient = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port);
 
 require.uncache = function (moduleName) {
     require.searchCache(moduleName, function (mod) {

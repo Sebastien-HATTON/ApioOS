@@ -26,7 +26,6 @@ var exec = require("child_process").exec;
 var express = require("express");
 var fs = require("fs");
 var http = require("http");
-//var logger = require("morgan");
 var path = require("path");
 var request = require("request");
 var session = require("express-session");
@@ -38,15 +37,6 @@ var slack = new Slack(webhook_url);
 
 var nodemailer = require("nodemailer");
 var smtpTransport = require("nodemailer-smtp-transport");
-//var transporter = nodemailer.createTransport(smtpTransport({
-//    host: "smtp.gmail.com",
-//    port: 465,
-//    secure: true,
-//    auth: {
-//        user: "apioassistance@gmail.com",
-//        pass: "Apio22232425."
-//    }
-//}));
 
 var transporter = nodemailer.createTransport(smtpTransport({
     host: "smtps.aruba.it",
@@ -59,34 +49,10 @@ var transporter = nodemailer.createTransport(smtpTransport({
 }));
 
 var app = express();
-var configuration = {};
 var integratedCommunication = require("./configuration/integratedCommunication.js");
 
-if (process.argv.indexOf("--config") > -1) {
-    configuration = require(process.argv[process.argv.indexOf("--config") + 1]);
-} else {
-    configuration = require("./configuration/default.js");
-}
-
-configuration.dongle = require("./configuration/dongle.js");
-
-if (process.argv.indexOf("--use-remote") > -1) {
-    configuration.remote.enabled = true;
-    configuration.remote.uri = process.argv[process.argv.indexOf("--use-remote") + 1]
-}
-if (process.argv.indexOf("--no-serial") > -1) {
-    configuration.serial.enabled = false;
-}
-
-if (process.argv.indexOf("--http-port") > -1) {
-    configuration.http.port = process.argv[process.argv.indexOf("--http-port") + 1];
-}
-
-if (process.argv.indexOf("--serial-port") > -1) {
-    configuration.serial.port = process.argv[process.argv.indexOf("--serial-port") + 1];
-}
-
-var Apio = require("./apio.js")(configuration);
+// var Apio = require("./apio.js")(configuration);
+var Apio = require("./apio.js")();
 
 var sessionMiddleware = session({
     cookie: {
@@ -100,7 +66,6 @@ var sessionMiddleware = session({
 });
 
 app.use(express.static(path.join(__dirname, "public")));
-//app.use(logger("dev"));
 app.use(bodyParser.json({
     limit: "50mb"
 }));
@@ -110,20 +75,8 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 
-//app.use(session({
-//    cookie: {
-//        expires: false,
-//        maxAge: 0,
-//        name: "apioCookie"
-//    },
-//    resave: true,
-//    saveUninitialized: true,
-//    secret: "e8cb0757-f5de-4c109-9774-7Bf45e79f285"
-//}));
-
 app.use(sessionMiddleware);
 
-//Questo è una bella merda...l'if cosi lungo fa schifo.
 app.use(function (req, res, next) {
     if (req.headers.host.indexOf("localhost") > -1 || req.headers.host.indexOf("127.0.0.1") > -1) {
         next();
@@ -224,7 +177,7 @@ d.run(function () {
             } else if (names.length) {
                 console.log("Collection Objects Exists");
                 //Se esiste la collection metto la roba dentro...
-                
+
             } else {
                 console.log("Collection Objects DOESN'T Exists, creating....");
                 Apio.Database.db.createCollection("Objects", function (error, collection) {
@@ -263,7 +216,7 @@ d.run(function () {
                 });
             }
         });
-        
+
         Apio.Database.db.collectionNames("Planimetry", function (err, names) {
             if (err) {
                 console.log("Error while check existence of Planimetry: ", err);
@@ -292,15 +245,15 @@ d.run(function () {
                         console.log(err);
                         //throw new Apio.Database.Error("Apio.Database.updateProperty() encountered an error while trying to update the property on the database");
                     } else if (null === result) {
-                        //throw new Apio.Database.Error("Apio.Database.updateProperty() the object with id " + data.objectId + "  does not exist.");	
+                        //throw new Apio.Database.Error("Apio.Database.updateProperty() the object with id " + data.objectId + "  does not exist.");
                         Apio.Database.db.collection("Communication").insert(integratedCommunication, function (error, result1) {
-		                    if (error) {
-		                        console.log("Error while inserting Communication integratedCommunication: ", error);
-		                    } else if (result1) {
-		                        console.log("Communication integratedCommunication successfully installed");
-		                    }
-		                });
-                        
+                            if (error) {
+                                console.log("Error while inserting Communication integratedCommunication: ", error);
+                            } else if (result1) {
+                                console.log("Communication integratedCommunication successfully installed");
+                            }
+                        });
+
                     } else {
                         //Apio.Util.debug("Apio.Database.updateProperty() Successfully updated the  object " + data.objectId);
                         //if (callback) {
@@ -344,9 +297,9 @@ d.run(function () {
             }
         });
 
-        if (configuration.type === "gateway") {
+        if (Apio.Configuration.type === "gateway") {
             var startGatewayService = function (service) {
-                if (configuration.dependencies.gateway[service].hasOwnProperty("startAs") && configuration.dependencies.gateway[service].hasOwnProperty("version")) {
+                if (Apio.Configuration.dependencies.gateway[service].hasOwnProperty("startAs") && Apio.Configuration.dependencies.gateway[service].hasOwnProperty("version")) {
                     if (service === "dongle") {
                         exec("ps aux | grep dongle_apio | awk '{print $2}'", function (error, stdout, stderr) {
                             if (error) {
@@ -468,7 +421,7 @@ d.run(function () {
                                 });
                             }
                         });
-                    } else if (configuration.dependencies.gateway[service].startAs === "process") {
+                    } else if (Apio.Configuration.dependencies.gateway[service].startAs === "process") {
                         exec("ps aux | grep " + service + " | awk '{print $2}'", function (error, stdout, stderr) {
                             if (error) {
                                 console.log("exec error: " + error);
@@ -496,7 +449,7 @@ d.run(function () {
                                 });
                             }
                         });
-                    } else if (configuration.dependencies.gateway[service].startAs === "require") {
+                    } else if (Apio.Configuration.dependencies.gateway[service].startAs === "require") {
                         require("./services/" + service + ".js")(require("./apioLibraries.js"));
                     }
                 }
@@ -507,133 +460,8 @@ d.run(function () {
                     console.log("Error while check existence of Services: ", err);
                 } else if (names.length) {
                     console.log("Collection Services Exists");
-                    for (var i in configuration.dependencies.gateway) {
+                    for (var i in Apio.Configuration.dependencies.gateway) {
                         startGatewayService(i);
-                        //if (i !== "logic" && i !== "mail" && i !== "sms") {
-                        //    if (i === "dongle") {
-                        //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                if (fs.existsSync("./dongle_flag.txt")) {
-                        //                    var hiFlag = Number(String(fs.readFileSync("./dongle_flag.txt")).trim());
-                        //                    if (hiFlag === 0) {
-                        //                        fs.writeFileSync("./dongle_flag.txt", "1");
-                        //                    }
-                        //                } else {
-                        //                    fs.writeFileSync("./dongle_flag.txt", "1");
-                        //                }
-                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "log") {
-                        //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "zwave") {
-                        //        exec("ps aux | grep zwave | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' zwave.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "notification") {
-                        //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else {
-                        //        require("./services/" + i + ".js")(require("./apioLibraries.js"));
-                        //    }
-                        //}
                     }
                 } else {
                     console.log("Collection Services DOESN'T Exists, creating....");
@@ -642,141 +470,16 @@ d.run(function () {
                             console.log("Error while creating collection Services");
                         } else if (collection) {
                             console.log("Collection Services successfully created");
-                            for (var i in configuration.dependencies.gateway) {
+                            for (var i in Apio.Configuration.dependencies.gateway) {
                                 startGatewayService(i);
-                                //if (i !== "logic" && i !== "mail" && i !== "sms") {
-                                //    if (i === "dongle") {
-                                //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                if (fs.existsSync("./dongle_flag.txt")) {
-                                //                    var hiFlag = Number(String(fs.readFileSync("./dongle_flag.txt")).trim());
-                                //                    if (hiFlag === 0) {
-                                //                        fs.writeFileSync("./dongle_flag.txt", "1");
-                                //                    }
-                                //                } else {
-                                //                    fs.writeFileSync("./dongle_flag.txt", "1");
-                                //                }
-                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else if (i === "log") {
-                                //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else if (i === "zwave") {
-                                //        exec("ps aux | grep zwave | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' zwave.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else if (i === "notification") {
-                                //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./services && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else {
-                                //        require("./services/" + i + ".js")(require("./apioLibraries.js"));
-                                //    }
-                                //}
                             }
                         }
                     });
                 }
             });
-        } else if (configuration.type === "cloud") {
+        } else if (Apio.Configuration.type === "cloud") {
             var startCloudService = function (service) {
-                if (configuration.dependencies.cloud[service].hasOwnProperty("startAs") && configuration.dependencies.cloud[service].hasOwnProperty("version")) {
+                if (Apio.Configuration.dependencies.cloud[service].hasOwnProperty("startAs") && Apio.Configuration.dependencies.cloud[service].hasOwnProperty("version")) {
                     if (service === "dongle") {
                         exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
                             if (error) {
@@ -833,7 +536,7 @@ d.run(function () {
                                 });
                             }
                         });
-                    } else if (configuration.dependencies.cloud[service].startAs === "process") {
+                    } else if (Apio.Configuration.dependencies.cloud[service].startAs === "process") {
                         exec("ps aux | grep " + service + " | awk '{print $2}'", function (error, stdout, stderr) {
                             if (error) {
                                 console.log("exec error: " + error);
@@ -861,7 +564,7 @@ d.run(function () {
                                 });
                             }
                         });
-                    } else if (configuration.dependencies.cloud[service].startAs === "require") {
+                    } else if (Apio.Configuration.dependencies.cloud[service].startAs === "require") {
                         require("./servicesCloud/" + service + ".js")(require("./apioLibraries.js"));
                     }
                 }
@@ -872,152 +575,8 @@ d.run(function () {
                     console.log("Error while check existence of Services: ", err);
                 } else if (names.length) {
                     console.log("Collection Services Exists");
-                    for (var i in configuration.dependencies.cloud) {
+                    for (var i in Apio.Configuration.dependencies.cloud) {
                         startCloudService(i);
-                        //if (i !== "logic" && i !== "mail" && i !== "sms") {
-                        //    if (i === "dongle") {
-                        //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "log") {
-                        //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "notification") {
-                        //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "objectWs") {
-                        //        exec("ps aux | grep objectWS | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //
-                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' objectWS.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else if (i === "boardSync") {
-                        //        exec("ps aux | grep boardSync | awk '{print $2}'", function (error, stdout, stderr) {
-                        //            if (error) {
-                        //                console.log("exec error: " + error);
-                        //            } else if (stdout) {
-                        //                stdout = stdout.split("\n");
-                        //                stdout.pop();
-                        //                if (stdout.length > 2) {
-                        //                    for (var i in stdout) {
-                        //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                        //                            if (error) {
-                        //                                console.log("exec error: " + error);
-                        //                            } else {
-                        //                                console.log("Process with PID " + stdout[i] + " killed");
-                        //                            }
-                        //                        });
-                        //                    }
-                        //                }
-                        //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' boardSync.js", function (error, stdout, stderr) {
-                        //                    if (error) {
-                        //                        console.log("exec error: " + error);
-                        //                    } else {
-                        //                        console.log(i + " server corretly start");
-                        //                    }
-                        //                });
-                        //            }
-                        //        });
-                        //    } else {
-                        //        require("./servicesCloud/" + i + ".js")(require("./apioLibraries.js"));
-                        //    }
-                        //}
                     }
                 } else {
                     console.log("Collection Services DOESN'T Exists, creating....");
@@ -1026,125 +585,8 @@ d.run(function () {
                             console.log("Error while creating collection Services");
                         } else if (collection) {
                             console.log("Collection Services successfully created");
-                            for (var i in configuration.dependencies.cloud) {
+                            for (var i in Apio.Configuration.dependencies.cloud) {
                                 startCloudService(i);
-                                //if (i !== "logic" && i !== "mail" && i !== "sms") {
-                                //    if (i === "dongle") {
-                                //        exec("ps aux | grep dongle | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' dongle_logic.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else if (i === "log") {
-                                //        exec("ps aux | grep log | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' log.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else if (i === "notification") {
-                                //        exec("ps aux | grep notification | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' notification_mail_sms.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else if (i === "objectWs") {
-                                //        exec("ps aux | grep objectWS | awk '{print $2}'", function (error, stdout, stderr) {
-                                //            if (error) {
-                                //                console.log("exec error: " + error);
-                                //            } else if (stdout) {
-                                //                stdout = stdout.split("\n");
-                                //                stdout.pop();
-                                //                if (stdout.length > 2) {
-                                //                    for (var i in stdout) {
-                                //                        exec("sudo kill -9 " + stdout[i], function (error, stdout, stderr) {
-                                //                            if (error) {
-                                //                                console.log("exec error: " + error);
-                                //                            } else {
-                                //                                console.log("Process with PID " + stdout[i] + " killed");
-                                //                            }
-                                //                        });
-                                //                    }
-                                //                }
-                                //
-                                //                exec("cd ./servicesCloud && sudo forever start -s -c 'node --expose_gc' objectWS.js", function (error, stdout, stderr) {
-                                //                    if (error) {
-                                //                        console.log("exec error: " + error);
-                                //                    } else {
-                                //                        console.log(i + " server corretly start");
-                                //                    }
-                                //                });
-                                //            }
-                                //        });
-                                //    } else {
-                                //        require("./servicesCloud/" + i + ".js")(require("./apioLibraries.js"));
-                                //    }
-                                //}
                             }
                         }
                     });
@@ -1214,7 +656,7 @@ d.run(function () {
         });
         Apio.io.emit("started");
 
-        if (configuration.type === "gateway") {
+        if (Apio.Configuration.type === "gateway") {
             Apio.Database.db.collection("Users").find().toArray(function (err, users) {
                 if (err) {
                     console.log("Error while getting Users: ", err);
@@ -1226,8 +668,8 @@ d.run(function () {
                         }
                     }
                     var name = "";
-                    if (configuration.hasOwnProperty('name')) {
-                        name = configuration.name;
+                    if (Apio.Configuration.hasOwnProperty('name')) {
+                        name = Apio.Configuration.name;
 
                     } else {
                         name = Apio.System.getApioIdentifier();
@@ -1322,8 +764,8 @@ d.run(function () {
                                             }
 
                                             slack.send({
-                                                text: "Il sistema " + configuration.name + " è connesso.Gli utenti abilitati sono:\n\r " + u.join("\n\r") + "\n\r" + IPtext,
-                                                username: configuration.name
+                                                text: "Il sistema " + Apio.Configuration.name + " è connesso.Gli utenti abilitati sono:\n\r " + u.join("\n\r") + "\n\r" + IPtext,
+                                                username: Apio.Configuration.name
                                             });
                                         });
                                     });
@@ -1334,13 +776,6 @@ d.run(function () {
                 }
             });
         }
-
-        //Apio.System.resumeCronEvents();
-        /*
-
-         if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
-         Apio.Remote.setupRemoteConnection();
-         }*/
     });
 
     //Core Routes
@@ -1348,7 +783,7 @@ d.run(function () {
     app.post("/apio/file/delete", routes.core.fileDelete);
     app.post("/apio/log", routes.core.log); //Rotta non più usata
     app.get("/", routes.core.index);
-    app.get("/apio/update",routes.core.update);
+    app.get("/apio/update", routes.core.update);
     app.get("/admin", routes.core.admin);
     app.get("/app", routes.core.login, routes.core.redirect);
     app.post("/apio/user/setCloudAccess", routes.core.setCloudAccess);
@@ -1479,16 +914,11 @@ d.run(function () {
     app.post("/apio/service/:service/route/:route/data/:data", routes.services.postRequest);
     app.get("/apio/service/:service/route/:route", routes.services.getRequest);
 
-    //Custom Routes
-    //routes.custom = require("./public/applications/routes/customRoutes.js")(Apio, app);
-
-    //http.globalAgent.maxSockets = Infinity;
     var server = http.createServer(app);
-
     Apio.io.listen(server);
-    server.listen(configuration.http.port, function () {
-        Apio.Util.log("APIO server started on port " + configuration.http.port + " using the configuration:");
-        console.log(util.inspect(configuration, {colors: true}));
+    server.listen(Apio.Configuration.http.port, function () {
+        Apio.Util.log("APIO server started on port " + Apio.Configuration.http.port + " using the configuration:");
+        console.log(util.inspect(Apio.Configuration, {colors: true}));
 
         // exec("cd ./services && node apio_properties_adder.js", function (error, stdout, stderr) {
         //     if (error || stderr) {
@@ -1500,98 +930,5 @@ d.run(function () {
 
         var gc = require("./services/garbage_collector.js");
         gc();
-
-        /*setInterval(function(){
-         Apio.Database.db.stats(function(err, stats){
-         if(err){
-         console.log("Error while getting stats: ", err);
-         } else if(Number(stats.storageSize)/1024/1024 >= 35) {
-         console.log("DB reached to maximum size, appending data to file");
-         Apio.Database.db.collection("Objects").find().toArray(function(error, objs){
-         if(error){
-         console.log("Error while getting objects: ", error);
-         } else if(objs){
-         for(var i in objs){
-         var date = new Date(), day = date.getDate(), month = date.getMonth() + 1, year = date.getFullYear();
-         if(fs.existsSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json")){
-         var read = String(fs.readFileSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json"));
-         var data = JSON.parse(read === "" ? "{}" : read);
-         } else {
-         var data = {};
-         }
-
-         for(var j in objs[i].log){
-         if(typeof data[j] === "undefined"){
-         data[j] = {};
-         }
-
-         for(var k in objs[i].log[j]) {
-         data[j][k] = objs[i].log[j][k];
-         }
-         }
-         fs.writeFileSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json", JSON.stringify(data));
-         }
-         Apio.Database.db.collection("Objects").update({}, { $set : { log : {} } }, { multi: true }, function(e, r){
-         if(e){
-         console.log("Error while updating logs", e);
-         } else if(r){
-         Apio.Database.db.command({ compact: "Objects", paddingFactor: 1 }, function(er, re){
-         if(er){
-         console.log("Unable to compact collection Objects");
-         } else if(re){
-         console.log("Return of compact is: ", re);
-         }
-         });
-         }
-         });
-         }
-         });
-         }
-         });
-         }, 60000);*/
-
-        //BOT PER MODIFICA FILES, POTREBBE TORNARE UTILE DI NUOVO
-        /*setTimeout(function(){
-         Apio.Database.db.collection("Objects").find().toArray(function(error, objs){
-         if(error){
-         console.log("Error while getting objects: ", error);
-         } else if(objs){
-         for(var i in objs){
-         var files = fs.readdirSync("public/applications/"+objs[i].objectId);
-         var toWrite = {};
-         for(var j in files){
-         if(files[j].indexOf("_") === -1 && files[j].indexOf("logs ") > -1 && files[j].indexOf(".json") > -1){
-         var read = String(fs.readFileSync("public/applications/"+objs[i].objectId+"/"+files[j]));
-         var data = JSON.parse(read === "" ? "{}" : read);
-
-         for(var k in data){
-         for(var l in data[k]){
-         var date = new Date(Number(l));
-         var day = date.getDate();
-         var month = date.getMonth() + 1;
-         var year = date.getFullYear();
-
-         if(typeof toWrite[year+"-"+month+"-"+day] === "undefined"){
-         toWrite[year+"-"+month+"-"+day] = {};
-         }
-
-         if(typeof toWrite[year+"-"+month+"-"+day][k] === "undefined"){
-         toWrite[year+"-"+month+"-"+day][k] = {};
-         }
-
-         toWrite[year+"-"+month+"-"+day][k][l] = data[k][l];
-         }
-         }
-         }
-         }
-
-         for(var j in toWrite) {
-         fs.writeFileSync("public/applications/" + objs[i].objectId + "/logs " + j + ".json", JSON.stringify(toWrite[j]));
-         console.log("File public/applications/" + objs[i].objectId + "/logs " + j + ".json successfully overwrited");
-         }
-         }
-         }
-         });
-         }, 1000);*/
     });
 });

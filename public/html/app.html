@@ -58,7 +58,7 @@
         / / background-size: contain;
             color: rgba(0, 0, 0, 0.67);
         }
-        
+
         .mdl-navigation__link {
             cursor: pointer;
         }
@@ -108,7 +108,8 @@
 
 <div id="targetBody" ng-app="ApioApplication">
     <div ng-controller="ApioMainController">
-        <div id="apio-os-offline" class="row" ng-show="systemOffline" style="margin: 0; position: absolute; text-align:center; width: 100%;">
+        <div id="apio-os-offline" class="row" ng-show="systemOffline"
+             style="margin: 0; position: absolute; text-align:center; width: 100%;">
             <div style="margin-left: auto; margin-right: auto; text-align: center;">
                 <svg height="12" width="12">
                     <circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="red"/>
@@ -117,7 +118,8 @@
             </div>
         </div>
         <!-- Da fare con SnackBar di Angular Material-->
-        <div id="apio-os-update" class="row" ng-show="systemUpdated" style="margin: 0; position: absolute; text-align:center; width: 100%;">
+        <div id="apio-os-update" class="row" ng-show="systemUpdated"
+             style="margin: 0; position: absolute; text-align:center; width: 100%;">
             <div style="margin-left: auto; margin-right: auto; text-align: center;">
                 <svg height="12" width="12">
                     <circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="green"/>
@@ -233,16 +235,16 @@
             </button>
             <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect viewDesktop"
                 for="demo-menu-lower-right">
-	            <li id="notificationTrigger" class="mdl-menu__item">Notification</li>
+                <li id="notificationTrigger" class="mdl-menu__item">Notification</li>
                 <li class="mdl-menu__item" ng-click="openUserProfile()">Profile</li>
                 <!--<li class="mdl-menu__item">Invite new users</li>-->
                 <li class="mdl-menu__item" ng-click="userDetails()">Logout</li>
-                
-                
+
+
             </ul>
             <ul class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect viewMobile"
                 for="demo-menu-lower-right">
-	            <li id="notificationTrigger" class="mdl-menu__item">Notification</li>
+                <li id="notificationTrigger" class="mdl-menu__item">Notification</li>
                 <li class="mdl-menu__item" ng-click="openUserProfile()">Profile</li>
                 <!--<li class="mdl-menu__item">Invite new users</li>-->
                 <li class="mdl-menu__item" ng-click="userDetails()">Logout</li>
@@ -417,6 +419,7 @@
 <script src="dialog/appModifyUserProfile/index.js"></script>
 <script src="/systemApps/maps/loadingNewPlanimetry/index.js"></script>
 <script src="/applications/newfile/DIN8/template_modal.js"></script>
+<script src="/applications/newfile/a5-07-01/template_modal.js"></script>
 <script src="/applications/newfile/a5-06-01/template_modal.js"></script>
 <script src="/applications/newfile/a5-02-05/template_modal.js"></script>
 <script src="/applications/newfile/a5-20-01/template_modal.js"></script>

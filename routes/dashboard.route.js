@@ -602,25 +602,25 @@ module.exports = function (Apio) {
                                 }
                             }
                             if (fs.existsSync(basePath + "/" + id + "/icon.png")) {
-                            	object.icon = fs.readFileSync(basePath + "/" + id + "/icon.png");
+                                object.icon = fs.readFileSync(basePath + "/" + id + "/icon.png");
                             }
                             if (fs.existsSync(path + ".js")) {
-                            	object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
+                                object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
                             }
                             if (fs.existsSync(path + ".html")) {
-                            	object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
+                                object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
                             }
-                            
+
                             object.mongo = obj;
                             object.mongo.objectId = dummy;
                             path = basePath + "/" + id + "/_" + id;
-                            if(fs.existsSync(path)){
-	                            object.ino = fs.readFileSync(path + "/_" + id + ".ino", {encoding: "utf8"});
-	                            object.makefile = fs.readFileSync(path + "/Makefile", {encoding: "utf8"});    
+                            if (fs.existsSync(path)) {
+                                object.ino = fs.readFileSync(path + "/_" + id + ".ino", {encoding: "utf8"});
+                                object.makefile = fs.readFileSync(path + "/Makefile", {encoding: "utf8"});
                             } else {
-	                            console.log("Manca la cartella con il firmware")
+                                console.log("Manca la cartella con il firmware")
                             }
-                            
+
 
                             object.js = object.js.replace(new RegExp("ApioApplication" + id, "g"), "ApioApplication" + dummy);
 
@@ -749,108 +749,104 @@ module.exports = function (Apio) {
                 o.apioId = req.session.apioId;
             }
 
-            var deleteThisObjectToDB = function(o){  
-	            Apio.Database.getObjectById(o, function (result) {
-                console.log("Apio.Database.getObjectById callback");
-                console.log(result);
-                if (result.hasOwnProperty("installation")) {
-                    console.log("C'è property installation");
-                    if (result.installation == "autoinstalled") {
-                        console.log("Installation vale autoinstalled");
-                        //FIX questo se siamo sul cloud va inviato al gateway
-                        if (Apio.Configuration.type == "gateway") {
-                            console.log("Sono gateway, invio in seriale");
-                            console.log("l" + result.address + ":setmesh:999801-")
-                            Apio.Serial.send("l" + result.address + ":setmesh:999801-");
+            var deleteThisObjectToDB = function (o) {
+                Apio.Database.getObjectById(o, function (result) {
+                    console.log("Apio.Database.getObjectById callback");
+                    console.log(result);
+                    if (result.hasOwnProperty("installation")) {
+                        console.log("C'è property installation");
+                        if (result.installation == "autoinstalled") {
+                            console.log("Installation vale autoinstalled");
+                            //FIX questo se siamo sul cloud va inviato al gateway
+                            if (Apio.Configuration.type == "gateway") {
+                                console.log("Sono gateway, invio in seriale");
+                                console.log("l" + result.address + ":setmesh:999801-")
+                                Apio.Serial.send("l" + result.address + ":setmesh:999801-");
 
-                        } else {
-                            console.log("Sono cloud, invio in seriale");
-                            var elem = {
-                                apioId: req.session.apioId,
-                                message: "l" + result.address + ":setmesh:999801-"
-                            };
-
-                            Apio.Serial.send(elem);
-                        }
-                    }
-                }
-
-                
-	                Apio.Database.deleteObject(Apio.Configuration.type === "cloud" ? o : (Apio.Configuration.type === "gateway" ? o.objectId : {}), function (err)
-                {
-                    console.log("Apio.Database.deleteObject callback");
-                    // Apio.Database.db.collection("Objects").remove({objectId : id}, function(err){
-                    if (err) {
-                        console.log("error while deleting the object " + o.objectId + " from the db");
-                        //res.status(500).send();
-                    } 
-                    else {
-                        console.log("Tutto ok, sto per eliminare ricorsivamente la directory");
-                        //deleteFolderRecursive(basePath + "/" + o.objectId);
-                        if (Apio.Configuration.type === "cloud") {
-                            deleteFolderRecursive("public/boards/" + req.session.apioId + "/" + o.objectId);
-                        } else if (Apio.Configuration.type === "gateway") {
-                            deleteFolderRecursive("public/applications/" + o.objectId);
-                        }
-                        console.log("Faccio emit");
-                        //Apio.io.emit("apio_server_delete", o.objectId);
-                        var socketIds = Apio.connectedSockets[req.session.email];
-                        for (var i in socketIds) {
-                            if (req.session.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
-                                Apio.io.sockets.connected[socketIds[i]].emit("apio_server_delete", o.objectId);
+                            } else {
+                                console.log("Sono cloud, invio in seriale");
+                                var socketId = Apio.connectedSockets[req.session.apioId][0];
+                                Apio.io.sockets.connected[socketId].emit("send_to_client_service", {
+                                    data: "l" + result.address + ":setmesh:999801-",
+                                    message: "apio_serial_send",
+                                    service: "dongle"
+                                });
                             }
                         }
-                        if (Apio.Configuration.type === "cloud") {
-                            //Apio.io.emit("apio.remote.object.delete", o.objectId);
-                            var socketId = Apio.connectedSockets[o.apioId][0];
-                            Apio.io.sockets.connected[socketId].emit("apio.remote.object.delete", o.objectId);
-                        } else if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
-                            Apio.Remote.socket.emit("apio.delete.app", o);
-                        }
-
-                        var servicesKeys = Object.keys(Apio.servicesSocket);
-                        servicesKeys.forEach(function (service) {
-                            Apio.servicesSocket[service].emit("update_collections");
-                        });
-
-                        console.log("Invio response");
-                        //res.send(200);
                     }
+
+
+                    Apio.Database.deleteObject(Apio.Configuration.type === "cloud" ? o : (Apio.Configuration.type === "gateway" ? o.objectId : {}), function (err) {
+                        console.log("Apio.Database.deleteObject callback");
+                        // Apio.Database.db.collection("Objects").remove({objectId : id}, function(err){
+                        if (err) {
+                            console.log("error while deleting the object " + o.objectId + " from the db");
+                            //res.status(500).send();
+                        } else {
+                            console.log("Tutto ok, sto per eliminare ricorsivamente la directory");
+                            //deleteFolderRecursive(basePath + "/" + o.objectId);
+                            if (Apio.Configuration.type === "cloud") {
+                                deleteFolderRecursive("public/boards/" + req.session.apioId + "/" + o.objectId);
+                            } else if (Apio.Configuration.type === "gateway") {
+                                deleteFolderRecursive("public/applications/" + o.objectId);
+                            }
+                            console.log("Faccio emit");
+                            //Apio.io.emit("apio_server_delete", o.objectId);
+                            var socketIds = Apio.connectedSockets[req.session.email];
+                            for (var i in socketIds) {
+                                if (req.session.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_delete", o.objectId);
+                                }
+                            }
+                            if (Apio.Configuration.type === "cloud") {
+                                //Apio.io.emit("apio.remote.object.delete", o.objectId);
+                                var socketId = Apio.connectedSockets[o.apioId][0];
+                                Apio.io.sockets.connected[socketId].emit("apio.remote.object.delete", o.objectId);
+                            } else if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
+                                Apio.Remote.socket.emit("apio.delete.app", o);
+                            }
+
+                            var servicesKeys = Object.keys(Apio.servicesSocket);
+                            servicesKeys.forEach(function (service) {
+                                Apio.servicesSocket[service].emit("update_collections");
+                            });
+
+                            console.log("Invio response");
+                            //res.send(200);
+                        }
+                    });
                 });
-                 });
-                 }
-                 
+            };
+
             deleteThisObjectToDB(o);
-                 
-                 var searchParentObject = {
-	                 
-                 }
-                 
-                 if(Apio.Configuration.type === "cloud"){
-	                 searchParentObject.apioId = req.session.apioId
-                 } else if(Apio.Configuration.type == "gateway"){
-	                 searchParentObject.apioId = Apio.System.getApioIdentifier();
-                 }
-                 searchParentObject.parentAddress = req.body.id
-                 
-                 Apio.Database.db.collection("Objects").find(searchParentObject).toArray( function (error, result) {
-	                 console.log("***************** RISULTATO RICERCA PARENT ADDRESS *******************", result)
-	                 if(error){
-		                res.send(500); 
-	                 } else {
-		                 for(var s in result){
-			                 console.log("s vale: ",s);			                 
-			                 var o = {
-			                 		objectId : result[s].objectId,
-			                 		apioId : searchParentObject.apioId
-		                 		}
-			                 console.log("o vale: ",o);	
-			                 deleteThisObjectToDB(o);
-			                
-		                 }
-		                  res.send(200);
-	                 }
-                 });
+
+            var searchParentObject = {};
+
+            if (Apio.Configuration.type === "cloud") {
+                searchParentObject.apioId = req.session.apioId
+            } else if (Apio.Configuration.type == "gateway") {
+                searchParentObject.apioId = Apio.System.getApioIdentifier();
+            }
+            searchParentObject.parentAddress = req.body.id;
+
+            Apio.Database.db.collection("Objects").find(searchParentObject).toArray(function (error, result) {
+                console.log("***************** RISULTATO RICERCA PARENT ADDRESS *******************", result)
+                if (error) {
+                    res.send(500);
+                } else {
+                    for (var s in result) {
+                        console.log("s vale: ", s);
+                        var o = {
+                            objectId: result[s].objectId,
+                            apioId: searchParentObject.apioId
+                        };
+                        console.log("o vale: ", o);
+                        deleteThisObjectToDB(o);
+
+                    }
+                    res.send(200);
+                }
+            });
         },
         //NUOVO
         changeSettingsObject: function (req, res) {

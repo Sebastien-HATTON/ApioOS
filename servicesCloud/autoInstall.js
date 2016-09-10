@@ -19,15 +19,15 @@
  ****************************************************************************/
 
 module.exports = function (libraries) {
-    var configuration = require("../configuration/default.js");
+    // var configuration = require("../configuration/default.js");
     var bodyParser = libraries["body-parser"];
     var express = libraries.express;
     var fs = libraries.fs;
     var app = express();
     var http = libraries.http.Server(app);
     var mysql = libraries.mysql;
-    var Apio = require("../apio.js")(configuration);
-    var socket = libraries["socket.io-client"]("http://localhost:" + configuration.http.port, {query: "associate=autoInstall&token=" + Apio.Token.getFromText("autoInstall", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
+    var Apio = require("../apio.js")();
+    var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=autoInstall&token=" + Apio.Token.getFromText("autoInstall", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
     var socketServer = libraries["socket.io"](http);
     var port = 8101;
 
@@ -197,7 +197,7 @@ module.exports = function (libraries) {
         });
 
         Socket.on("apio_install_new_object", function (data) {
-        	socket.emit("send_to_client", {
+            socket.emit("send_to_client", {
                 message: "auto_install_modal",
                 apioId: data.apioId,
                 data: data

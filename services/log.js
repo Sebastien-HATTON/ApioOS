@@ -22,7 +22,8 @@
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
 var compression = require("compression");
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
+var configuration = require("../apio.js")().config.return().file;
 var database = undefined;
 var domain = require("domain");
 var express = require("express");
@@ -167,16 +168,15 @@ socket_server.on("connection", function (socket) {
                             for (var i in object.properties) {
                                 if (fields.indexOf(i) > -1) {
                                     if (query_string) {
-                                        query_string += ", " + i + " = '";
                                         if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                                            query_string += String(data.properties[i]).replace(",", ".") + "'";
+                                            query_string += ", " + i + " = '" + String(data.properties[i]).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
 
                                             log[i][timestamp] = String(data.properties[i]).replace(",", ".");
                                         } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                                            query_string += String(object.properties[i].value).replace(",", ".") + "'";
+                                            query_string += ", " + i + " = '" + String(object.properties[i].value).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
@@ -184,16 +184,16 @@ socket_server.on("connection", function (socket) {
                                             log[i][timestamp] = String(object.properties[i].value).replace(",", ".");
                                         }
                                     } else {
-                                        query_string = "INSERT INTO `" + data.objectId + "` SET timestamp = '" + timestamp + "', " + i + " = '";
+                                        query_string = "INSERT INTO `" + data.objectId + "` SET timestamp = '" + timestamp + "'";
                                         if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                                            query_string += String(data.properties[i]).replace(",", ".") + "'";
+                                            query_string += ", " + i + " = '" + String(data.properties[i]).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
 
                                             log[i][timestamp] = String(data.properties[i]).replace(",", ".");
                                         } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                                            query_string += String(object.properties[i].value).replace(",", ".") + "'";
+                                            query_string += ", " + i + " = '" + String(object.properties[i].value).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }

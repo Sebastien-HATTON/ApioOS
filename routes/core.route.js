@@ -290,7 +290,8 @@ module.exports = function (Apio) {
             Apio.Configuration.remote.enabled = !Apio.Configuration.remote.enabled;
             var c = JSON.parse(JSON.stringify(Apio.Configuration));
             delete c.dongle;
-            fs.writeFile("./configuration/default.js", "module.exports = " + JSON.stringify(c, undefined, 4).replace(/\"([^(\")"]+)\":/g, "$1:") + ";", function (err) {
+            // fs.writeFile("./configuration/default.js", "module.exports = " + JSON.stringify(c, undefined, 4).replace(/\"([^(\")"]+)\":/g, "$1:") + ";", function (err) {
+            fs.writeFile(Apio.config.return().name, "module.exports = " + JSON.stringify(c, undefined, 4) + ";", function (err) {
                 if (err) {
                     console.log("Error while saving configuration: ", err);
                     res.status(500).send(err);

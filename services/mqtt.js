@@ -1,4 +1,5 @@
-var Apio = require("../apio.js")(require("../configuration/default.js"), false);
+// var Apio = require("../apio.js")(require("../configuration/default.js"), false);
+var Apio = require("../apio.js")(false);
 var fs = require("fs");
 //MongoClient
 var MongoClient = require("mongodb").MongoClient;
@@ -31,26 +32,26 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
 });
 
 ///192.168.116.26:1883
-var mqtt    = require('mqtt');
-var client  = mqtt.connect('mqtt://192.168.116.26:1883');
- 
+var mqtt = require('mqtt');
+var client = mqtt.connect('mqtt://192.168.116.26:1883');
+
 client.on('connect', function () {
-	console.log("MQTT CONNECTED")
-  //client.subscribe('presence');
-  //client.publish('presence', 'Hello mqtt');
+    console.log("MQTT CONNECTED")
+    //client.subscribe('presence');
+    //client.publish('presence', 'Hello mqtt');
 });
- 
+
 client.on('message', function (topic, message) {
-  // message is Buffer 
-  console.log(message.toString());
-  client.end();
+    // message is Buffer
+    console.log(message.toString());
+    client.end();
 });
 
 //Mettere qui l'evento sulla socket.
-Apio.io.on("mqtt_service", function(data){
-	console.log("mqtt_service")
-	console.log(data)
-  client.publish('enea/ricezioneMisure', JSON.stringify(data));
+Apio.io.on("mqtt_service", function (data) {
+    console.log("mqtt_service")
+    console.log(data)
+    client.publish('enea/ricezioneMisure', JSON.stringify(data));
 
 })
 

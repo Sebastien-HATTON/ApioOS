@@ -554,33 +554,43 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     socket.on("auto_install_modal", function (data) {
         console.log("RICEVUTA RICHIESTA DI AUTO-INSTALLAZIONE!", data);
         var s = $scope.$new();
-        s.modalData = data;
         if (data.protocol === "enocean" && data.hasOwnProperty("eep")) {
-            $mdDialog.show({
-                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
-                controller: "modal" + data.eep,
-                clickOutsideToClose: false,
-                bindToController: true,
-                scope: s
-            });
+	        if(!dialogInstall){
+	            $mdDialog.show({
+	                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
+	                controller: "modal" + data.eep,
+	                clickOutsideToClose: false,
+	                bindToController: true,
+	                scope: s
+	            });
+				setTimeout(function(){dialogInstall = false;}, 5000);
+            }
         } else if (data.protocol === "apio" && data.hasOwnProperty("eep")) {
             console.log("OGGETTO APIO");
-            $mdDialog.show({
-                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
-                controller: "modal" + data.eep,
-                clickOutsideToClose: false,
-                bindToController: true,
-                scope: s
-            });
+            if(!dialogInstall){
+	            dialogInstall = true;
+	            $mdDialog.show({
+	                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
+	                controller: "modal" + data.eep,
+	                clickOutsideToClose: false,
+	                bindToController: true,
+	                scope: s
+	            });
+	            setTimeout(function(){dialogInstall = false;}, 5000);
+            }
         } else if (data.protocol === "z" && data.hasOwnProperty("eep")) {
             console.log("OGGETTO ZWAVE");
-            $mdDialog.show({
-                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
-                controller: "modal" + data.eep,
-                clickOutsideToClose: false,
-                bindToController: true,
-                scope: s
-            });
+            if(!dialogInstall){
+	            $mdDialog.show({
+	                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
+	                controller: "modal" + data.eep,
+	                clickOutsideToClose: false,
+	                bindToController: true,
+	                scope: s
+	            });
+            	setTimeout(function(){dialogInstall = false;}, 5000);
+            }
+            
         }
     });
 

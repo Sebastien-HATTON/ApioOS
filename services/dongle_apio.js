@@ -20,7 +20,8 @@
 
 "use strict";
 //module.exports = function (libraries) {
-var Apio = require("../apio.js")(require("../configuration/default.js"), false);
+// var Apio = require("../apio.js")(require("../configuration/default.js"), false);
+var Apio = require("../apio.js")(false);
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
 var com = require("serialport");
@@ -89,7 +90,7 @@ var isLogSocketConnected = false;
 var logSocket = undefined;
 
 //AGGIUNTE PER LOGIC INIZIO
-var configuration = require("../configuration/default.js");
+// var configuration = require("../configuration/default.js");
 var obj = {};
 var prevObj = {};
 //var socket = require("socket.io-client")("http://localhost:" + configuration.http.port);
@@ -153,8 +154,8 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
         //CONTROLLO ESISTENZA DEI DOCUMENTI DI DONGLE E LOGIC - INIZIO
         db.collection("Services").findOne({name: "dongle"}, function (error, service) {
             if (error) {
-                ////console.log("Error while getting service Dongle: ", error);
-                ////console.log("Unable to find service Dongle");
+                console.log("Error while getting service Dongle: ", error);
+                console.log("Unable to find service Dongle");
                 db.collection("Services").insert({
                     name: "dongle",
                     show: "DONGLE",
@@ -164,15 +165,15 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
                     port: String(port)
                 }, function (err) {
                     if (err) {
-                        ////console.log("Error while creating service Dongle on DB: ", err);
+                        console.log("Error while creating service Dongle on DB: ", err);
                     } else {
-                        ////console.log("Service Dongle successfully created");
+                        console.log("Service Dongle successfully created");
                     }
                 });
             } else if (service) {
-                ////console.log("Service Dongle exists");
+                console.log("Service Dongle exists");
             } else {
-                ////console.log("Unable to find service Dongle");
+                console.log("Unable to find service Dongle");
                 db.collection("Services").insert({
                     name: "dongle",
                     show: "DONGLE",
@@ -182,9 +183,9 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
                     port: String(port)
                 }, function (err) {
                     if (err) {
-                        ////console.log("Error while creating service Dongle on DB: ", err);
+                        console.log("Error while creating service Dongle on DB: ", err);
                     } else {
-                        ////console.log("Service Dongle successfully created");
+                        console.log("Service Dongle successfully created");
                     }
                 });
             }
@@ -349,21 +350,26 @@ var log = function (data) {
 //};
 
 app.get("/apio/dongle/getSettings", function (req, res) {
-/*    if (Apio.hasOwnProperty("Configuration")) {
-        if (Apio.Configuration.hasOwnProperty("dongle")) {
-            res.status(200).send(Apio.Configuration.dongle);
-        } else {
-            try {
-                Apio.Configuration.dongle = require("../configuration/dongle.js");
-                res.status(200).send(Apio.Configuration.dongle);
-            } catch (e) {
-                res.status(500).send("Errore");
-            }
+    /*    if (Apio.hasOwnProperty("Configuration")) {
+     if (Apio.Configuration.hasOwnProperty("dongle")) {
+     res.status(200).send(Apio.Configuration.dongle);
+     } else {
+     try {
+     Apio.Configuration.dongle = require("../configuration/dongle.js");
+     res.status(200).send(Apio.Configuration.dongle);
+     } catch (e) {
+     res.status(500).send("Errore");
+     }
+     }
+     }*/
+
+    var interval = setInterval(function () {
+        if (Apio && Apio.Serial && Apio.Serial.serialPort) {
+            clearInterval(interval);
+            Apio.Serial.serialPort.write("s0:panId:-");
+            res.sendStatus(200);
         }
-    }*/
-    Apio.Serial.serialPort.write("s0:panId:-");
-    res.status(200)
-    
+    }, 0);
 });
 
 app.post("/apio/dongle/changeSettings", function (req, res) {
@@ -1227,6 +1233,8 @@ Apio.Serial.interval();
 Apio.Serial.verifyQueue = [];
 Apio.Serial.sendInterval = function () {
     Apio.Serial.sendDongleInterval = setInterval(function () {
+        console.log("Apio.Serial.queue prima di inviare: ", Apio.Serial.queue);
+        console.log("Apio.Serial.verifyQueue prima di inviare: ", Apio.Serial.verifyQueue);
         //console.log("------------SEND-------------")
         //console.log("Apio.Serial.queue (1): ", Apio.Serial.queue);
         ////////console.log("Apio.Serial.available: ", Apio.Serial.available, "Apio.Serial.queue.length: ", Apio.Serial.queue.length);
@@ -1283,8 +1291,6 @@ Apio.Serial.sendInterval = function () {
                     }
                 });
 
-                //console.log("Apio.Serial.queue: ", Apio.Serial.queue);
-                //console.log("Apio.Serial.verifyQueue: ", Apio.Serial.verifyQueue);
                 ////console.log(".................................Al Dongle Mando: ", messageToSend);
                 Apio.Serial.serialPort.write(messageToSend, function (error) {
                     if (error) {
@@ -1298,7 +1304,9 @@ Apio.Serial.sendInterval = function () {
                 Apio.Serial.available = true;
             }
         }
-    }, 20);
+        console.log("Apio.Serial.queue dopo aver inviato: ", Apio.Serial.queue);
+        console.log("Apio.Serial.verifyQueue dopo aver inviato: ", Apio.Serial.verifyQueue);
+    }, 100);
 
     Apio.Serial.verifyQueueVerification = setInterval(function () {
         var ts = new Date().getTime();
@@ -1318,7 +1326,7 @@ Apio.Serial.sendInterval = function () {
         for (var i = 0; i < Apio.Serial.verifyQueue.length; i++) {
             if (Apio.Serial.verifyQueue[i] !== null) {
                 //if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].timestamp >= 1500) {
-                if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].processTime >= 700 && ts - Apio.Serial.verifyQueue[i].timestamp < 60 * 1000) {
+                if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].processTime >= 800 && ts - Apio.Serial.verifyQueue[i].timestamp < 60 * 1000) {
                     //Apio.Serial.queue.push(Apio.Serial.verifyQueue.splice(i--, 1)[0].message);
                     //////////console.log("Apio.Serial.verifyQueue[i]: ", Apio.Serial.verifyQueue[i]);
                     var message = Apio.Serial.verifyQueue[i].message.split(":");
@@ -1824,589 +1832,435 @@ setInterval(function () {
 }, 50);
 
 Apio.Serial.read = function (data) {
-	//console.log("Sono dentro al Read e devo mettere l'eccezione ", data);
+    //console.log("Sono dentro al Read e devo mettere l'eccezione ", data);
 
     //Qui vengono gestiti tutti gli aggiornamenti relativi al Coordinatore {Ricordarsi di mettere cloud qui}
-    if(data.objectId == "0"){
-	    if(data.command == "update"){
-		  var propertyName = Object.keys(data.properties)[0];  
-		  if(propertyName=="panId"){
-			  //Eri qui
-			  var o = {}
-			  o.panId = data.properties[propertyName];
-			  socketServer.emit("send_to_client", {
-			        data: o,
-			        message: "dongle_settings"
-			    });
-		  }
-	    }
+    if (data.objectId == "0") {
+        if (data.command == "update") {
+            var propertyName = Object.keys(data.properties)[0];
+            if (propertyName == "panId") {
+                //Eri qui
+                var o = {}
+                o.panId = data.properties[propertyName];
+                socketServer.emit("send_to_client", {
+                    data: o,
+                    message: "dongle_settings"
+                });
+            }
+        }
     } else {
-	    data.apioId = Apio.System.getApioIdentifierDongle();
-	    //console.log("APIO.SERIAL.READ, DATA:", data);
-	    var address = ''
-	    var command = data.command;
-	    var parentAddress = '';
-	    if(data.objectId.indexOf('|') > 0){
-		    //console.log('FIND PARENT ADDRESS');
-		    var tempSplit = data.objectId.split('|');
-		    address = tempSplit[1];
-		    parentAddress = tempSplit[0];
-		    //console.log('Address , ParentAddress: ',address,parentAddress);
-	    } else {
-		    //console.log('NOT FIND PARENT ADDRESS');
-	    	address = data.objectId;
-	    }
-	    var properties = data.properties;
-	    var propertyName = Object.keys(data.properties)[0];
-	    var propertyValue = properties[propertyName];
-	    var protocol = undefined;
-	    var type = undefined;
-	    if (addressBindToProperty.apio.hasOwnProperty(address) && addressBindToProperty.apio[address].hasOwnProperty("type")) {
-	
-	        type = addressBindToProperty.apio[address].type;
-	        //console.log("IF: ", type)
-	    }
-	    var newApioId = data.apioId;
-	
-	    if (!Apio.Serial.hasOwnProperty("serialPort")) {
-	        throw new Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
-	    }
-	
-	    if (communication.hasOwnProperty("apio") && communication.apio.hasOwnProperty(type) && communication.apio[type].hasOwnProperty("recive") && communication.apio[type].recive.hasOwnProperty(command)) {
-	        var stringFn = communication.apio[type].recive[command];
-	        if (stringFn[0] !== "(") {
-	            stringFn = "(" + stringFn;
-	        }
-	
-	        if (stringFn[stringFn.length - 1] !== ")") {
-	            stringFn += ")";
-	        }
-	
-	        var fn = eval.call(null, stringFn);
-	
-	        if (fn && addressBindToProperty.apio[address].objectId != null && typeof fn(data) === "object") {
-	            data.objectId = addressBindToProperty.apio[address].objectId;
-	            data.address = address;
-	            var ret = fn(data, objects[addressBindToProperty.apio[address].objectId].properties);
-	            //console.log("######################APIO.SERIAL.READ, RET: ", ret);
-	            //FAR VEDERE A LORENZO
-	            //for (var KEY in ret) {
-	            //    data.properties[KEY] = ret[KEY];
-	            //}
-	
-	            //se nel return della callback dell'oggetto in integratedCommunication c'è la proprietà di tipo send allora invio il suo valore in seriale
-	            //questa procedura permette di inviare un messaggio in risposta ad un oggetto che ha appena invocato il recive e di procedere poi 
-	            //normalmente all'aggiornamento delle proprietà. La prorietà send viene eliminata subito dopo che il messaggio è stato inviato
-	            if (ret.hasOwnProperty('send') && ret.send !== '') {
-	                Apio.Serial.send('l' + ret.send)
-	                //delete ret.send;
-	            }
-	            data.properties = ret;
-	            var d = new Date();
-	            var day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
-	            var month = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
-	            var year = d.getFullYear();
-	            var hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
-	            var minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
-	            var second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
-	
-	            data.properties.date = day + "/" + month + "/" + year + " - " + hour + ":" + minute + ":" + second;
-	            data.address = address;
-	
-	
-	            //console.log("--------------------data: ", data);
-	
-	            Apio.Database.updateProperty(data, function () {
-	                //console.log("--------------------data: ", data);
-	                Apio.io.emit("serial_update", data);
-	
-	                if (isNotificationSocketConnected) {
-	                    notificationSocket.emit("send_notification", data);
-	                }
-	
-	                if (isLogSocketConnected) {
-	                    logSocket.emit("log_update", data);
-	                } else {
-	                    Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
-	                        if (err) {
-	                            //console.log("Error while getting object with objectId " + data.objectId + ": ", err);
-	                        } else if (object) {
-	                            var logs = {}, timestamp = new Date().getTime();
-	                            for (var i in object.properties) {
-	                                if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-	                                    logs["data." + data.objectId + "." + i + "." + timestamp] = String(data.properties[i]);
-	                                } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-	                                    logs["data." + data.objectId + "." + i + "." + timestamp] = String(object.properties[i].value);
-	                                }
-	                            }
-	
-	                            Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
-	                                if (error) {
-	                                    //log("Error while updating service log: ", error);
-	                                } else if (result) {
-	                                    //log("Service log successfully updated, result: ", result);
-	                                }
-	                            });
-	                        }
-	                    });
-	                }
-	
-	                if (Apio.Configuration.type === "cloud") {
-	                    Apio.io.emit("apio.remote.object.update", data);
-	                }
-	            });
-	        }
-	    }
-	    else if (!addressBindToProperty.hasOwnProperty(address) && command == "new" && address == "9999") {
-	        //console.log("*** NEW APIO INSTALLATION ***");
-	        var o = {
-	            service: 'autoInstall',
-	            message: 'apio_install_new_object',
-	            data: {
-	                protocol: 'apio',
-	                address: '',
-	                eep: '',
-	                serialNumber: ''
-	            }
-	        }
-	        o.data.eep = Object.keys(data.properties)[0];
-	        o.data.serialNumber = data.properties[Object.keys(data.properties)[0]];
-	        Apio.io.emit('send_to_service', o);
-	    }
-	    else if (!addressBindToProperty.hasOwnProperty(address) && command == "newModbus" && address != "9999") {
-	        //console.log("*** NEW APIO INSTALLATION BY SUBOBJECT ***");
-	        var o = {
-	            service: 'autoInstall',
-	            message: 'apio_install_new_object_final',
-	            data: {
-	                protocol: 'apio',
-	                address: address,
-	                eep: '',
-	                serialNumber: '',
-	                parentAddress: parentAddress
-	            }
-	        }
-	        o.data.eep = data.properties[Object.keys(data.properties)[0]];
-	        //console.log("launch apio_install_new_object_final data vale******** ",data);
-	        //console.log("launch apio_install_new_object_final o vale******** ",o);
-	        //o.data.serialNumber = data.properties[Object.keys(data.properties)[0]];
-	        Apio.io.emit('send_to_service', o);
-	    }
-	    else {
-	        var oIds = Object.keys(objects);
-	        for (var i = 0, found = false; !found && i < oIds.length; i++) {
-	            //Although it's called objectId the parameter in data referrers to the address
-	            if (data.objectId === objects[oIds[i]].address) {
-	                found = true;
-	                data.objectId = objects[oIds[i]].objectId;
-	                switch (command) {
-	                    case "send":
-	                        Apio.Database.getObjectById(data.objectId, function (object) {
-	                            data.objectId = object.objectId;
-	                            data.protocol = object.protocol;
-	
-	                            Apio.Serial.send(data);
-	
-	                            Apio.Database.updateProperty(data, function () {
-	                                Apio.io.to("apio_client").emit("apio_client_update", data);
-	                            });
-	                        });
-	                        break;
-	                    case "time":
-	                        ////console.log("SONO DENTRO TIME, DATA VALE: ", data);
-	                        var t = new Date().getTime();
-	                        Apio.Serial.send("l" + data.objectId + ":time:" + t + "-");
-	                        break;
-	
-	                    case "update":
-	                        Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, res) {
-	                            if (err) {
-	                                ////console.log("Error while getting object with objectId " + data.objectId + ": ", err);
-	                            } else if (res) {
-	                                var timestamp = new Date().getTime(), updt = {};
-	                                for (var i in res.properties) {
-	                                    if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "") {
-	                                        if (!isNaN(String(data.properties[i]).replace(",", "."))) {
-	                                            updt["log." + i + "." + timestamp] = data.properties[i];
-	                                        }
-	                                    } else if (res.properties[i].value !== undefined && typeof res.properties[i].value !== "object" && res.properties[i].value !== null && res.properties[i].value !== "" /*&&*/) {
-	                                        if (!isNaN(String(res.properties[i].value).replace(",", "."))) {
-	                                            updt["log." + i + "." + timestamp] = res.properties[i].value;
-	                                        }
-	                                    }
-	                                }
-	                                var d = new Date();
-	                                var day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
-	                                var month = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
-	                                var year = d.getFullYear();
-	                                var hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
-	                                var minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
-	                                var second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
-	
-	                                data.properties.date = day + "/" + month + "/" + year + " - " + hour + ":" + minute + ":" + second;
-	                                data.address = address;
-	
-	                                Apio.Database.updateProperty(data, function () {
-	                                    //console.log("--------------------data: ", data);
-	                                    Apio.io.emit("serial_update", data);
-	
-	                                    if (isNotificationSocketConnected) {
-	                                        notificationSocket.emit("send_notification", data);
-	                                    }
-	
-	                                    if (isLogSocketConnected) {
-	                                        logSocket.emit("log_update", data);
-	                                    }
-	                                    //da capire cosa fà MATTEO in questo else, sembra sia un backup nel caso in cui il servizio log non è sù
-	                                    else {
-	                                        Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
-	                                            if (err) {
-	                                                ////console.log("Error while getting object with objectId " + data.objectId + ": ", err);
-	                                            } else if (object) {
-	                                                var logs = {}, timestamp = new Date().getTime();
-	                                                for (var i in object.properties) {
-	                                                    if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-	                                                        logs["data." + data.objectId + "." + i + "." + timestamp] = String(data.properties[i]);
-	                                                    } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-	                                                        logs["data." + data.objectId + "." + i + "." + timestamp] = String(object.properties[i].value);
-	                                                    }
-	                                                }
-	
-	                                                Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
-	                                                    if (error) {
-	                                                        //log("Error while updating service log: ", error);
-	                                                    } else if (result) {
-	                                                        //log("Service log successfully updated, result: ", result);
-	                                                    }
-	                                                });
-	                                            }
-	                                        });
-	                                    }
-	
-	                                    if (Apio.Configuration.type === "cloud") {
-	                                        Apio.io.emit("apio.remote.object.update", data);
-	                                    }
-	                                });
-	                            }
-	                        });
-	                        break;
-	                    case "hi":
-	                        ////console.log("Ho riconosciuto la parola chiave hi");
-	                        if (data.objectId == "9999") {
-	                            //log(data)
-	                            var o = {}
-	                            o.name = "apio_autoinstall_service"
-	                            o.data = data.properties.appId;
-	                            Apio.io.emit("socket_service", o)
-	                        } else {
-	                            //console.log("Hi dell' oggetto ",data.objectId)
-	                            //log("L'indirizzo fisico dell'oggetto che si è appena connesso è " + data.address);
-	
-	
-	                            Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, document) {
-	                                if (err) {
-	                                    //nel caso in cui un oggetto mi comunica ma non c'è nell'db il suo address o l'oggetto viene rimosso interviene il seguente codice per eliminare l'address sull'oggetto
-	                                    Apio.Serial.send("l" + data.objectId + ":setmesh:999801-")
-	                                } else if (document) {
-	                                    if (document.appId !== "DIN8") {
-	                                        for (var i in document.properties) {
-	                                            if (!document.properties[i].hasOwnProperty("hi") || document.properties[i].hi === true) {
-	                                                Apio.Serial.send(document.protocol + document.address + ":" + i + ":" + document.properties[i].value + "-");
-	                                            }
-	                                        }
-	                                        Apio.Serial.send(document.protocol + document.address + ":finish:-");
-	                                    }
-	                                    else if (document.appId === "DIN8") {
-	                                        var codifyHiDIN = [[], [], []];
-	                                        var codifedHiDIN = [];
-	                                        for (var i in document.properties) {
-	                                            if (!document.properties[i].hasOwnProperty("hi") || document.properties[i].hi === true) {
-	                                                //Apio.Serial.send(document.protocol + document.address + ":" + i + ":" + document.properties[i].value + "-");
-	                                                if (i.indexOf('rel') > -1) {
-	                                                    codifyHiDIN[0][Number(i[3]) - 1] = document.properties[i].value;
-	                                                } else if (i.indexOf('dig') > -1) {
-	                                                    codifyHiDIN[1][Number(i[3]) - 1] = document.properties[i].value;
-	                                                } else if (i.indexOf('dac') > -1) {
-	                                                    codifyHiDIN[2][Number(i[3]) - 1] = document.properties[i].value;
-	                                                }
-	                                            }
-	                                        }
-	                                        //console.log("IL PACCHETTO DA CODIFICARE E' ",codifyHiDIN);
-	
-	                                        for (var a in codifyHiDIN) {
-	                                            for (var b in codifyHiDIN[a]) {
-	                                                if (a != 2) {
-	                                                    if (b == 0) {
-	                                                        codifedHiDIN[a] = String(codifyHiDIN[a][b])
-	                                                    } else {
-	                                                        codifedHiDIN[a] = codifedHiDIN[a] + String(codifyHiDIN[a][b])
-	                                                    }
-	                                                } else {
-	                                                    if (String(codifyHiDIN[a][b]) !== '-') {
-	
-	                                                        if (b == 0) {
-	
-	                                                            if (String(Number(codifyHiDIN[a][b]).toString(16)).length < 4) {
-	                                                                ////console.log("Primo if ", codifedHiDin[a]);
-	                                                                if (String(Number(codifyHiDIN[a][b]).toString(16)).length == 1) {
-	                                                                    codifedHiDIN[a] = '0';
-	                                                                }
-	
-	                                                                for (var i = 1; i < (4 - (String(Number(codifyHiDIN[a][b]).toString(16)))); i++) {
-	
-	                                                                    codifedHiDIN[a] += '0';
-	
-	                                                                }
-	
-	                                                                if (String(Number(codifyHiDIN[a][b]).toString(16)).length != 1) {
-	                                                                    codifedHiDIN[a] += String(Number(codifyHiDIN[a][b]).toString(16))
-	                                                                }
-	
-	
-	                                                            } else {
-	                                                                codifedHiDIN[a] = String(Number(codifyHiDIN[a][b]).toString(16))
-	                                                            }
-	                                                        } else {
-	                                                            //console.log('DAC2',Number(codifyHiDIN[a][b]).toString(16));
-	                                                            if (String(Number(codifyHiDIN[a][b]).toString(16)).length < 4) {
-	
-	                                                                for (var i = 0; i < (4 - (String(Number(codifyHiDIN[a][b]).toString(16)))); i++) {
-	                                                                    codifedHiDIN[a] += '0';
-	
-	                                                                }
-	
-	                                                                if (String(Number(codifyHiDIN[a][b]).toString(16)).length != 1) {
-	                                                                    codifedHiDIN[a] += String(Number(codifyHiDIN[a][b]).toString(16))
-	                                                                }
-	
-	                                                            } else {
-	                                                                codifedHiDIN[a] += String(Number(codifyHiDIN[a][b]).toString(16))
-	                                                            }
-	                                                        }
-	                                                    } else {
-	                                                        //console.log('ci sono i trattini',codifyHiDIN[a][b]);
-	                                                        if (b == 0) {
-	                                                            codifedHiDIN[a] = '0000'
-	                                                        } else {
-	                                                            codifedHiDIN[a] = codifedHiDIN[a] + '0000'
-	                                                        }
-	                                                    }
-	                                                }
-	                                            }
-	                                            if (a == 0) {
-	                                                codifedHiDIN[a] = codifedHiDIN[a] + '00';
-	                                            }
-	                                        }
-	                                        for (var s in codifedHiDIN) {
-	                                            if (s != 2) {
-	                                                codifedHiDIN[s] = parseInt(codifedHiDIN[s], 2).toString(16)
-	                                                if (String(codifedHiDIN[s]).length == 1) {
-	                                                    codifedHiDIN[s] = '0' + String(codifedHiDIN[s]);
-	                                                }
-	
-	                                            }
-	                                        }
-	                                        //console.log("IL PACCHETTO CODIFICATO E' ",codifedHiDIN);
-	                                        //console.log("invio il Pacchetto! ", codifedHiDIN[0]+codifedHiDIN[1]+codifedHiDIN[2]);
-	                                        Apio.Serial.send(document.protocol + document.address + ":s:" + codifedHiDIN[0] + codifedHiDIN[1] + codifedHiDIN[2] + "-");
-	                                    }
-	                                    //commentato perchè sembr essere un rimasulio di qualcosa che ora non usiamo più, in pratica dopo l'hi e lo scambio di ifnormazioni con l'oggetto, il sistema inseriva la property connected a TRUE sull'oggetto stesso, il problema è che non c'è qualcosa che mai la mette a false, quindi vedremo in seguito come operare
-	                                    /*Apio.Database.db.collection("Objects").update({objectId: document.objectId}, {$set: {connected: true}},
-	                                     function (err, res) {
-	                                     if (err) {
-	                                     //log("Error while updating field 'connected'");
-	                                     } else {
-	                                     //log("Field 'connected' successfully updated");
-	                                     }
-	                                     });*/
-	                                    //log("l'oggetto con address " + document.address + " è " + document.objectId);
-	                                    if (isNotificationSocketConnected) {
-	                                        notificationSocket.emit("send_notification", data);
-	                                    }
-	                                }
-	
-	                            });
-	                        }
-	                        break;
-	                    default:
-	                        break;
-	                }
-	            }
-	        }
-	    }
-	    
+        data.apioId = Apio.System.getApioIdentifierDongle();
+        //console.log("APIO.SERIAL.READ, DATA:", data);
+        var address = ''
+        var command = data.command;
+        var parentAddress = '';
+        if (data.objectId.indexOf('|') > 0) {
+            //console.log('FIND PARENT ADDRESS');
+            var tempSplit = data.objectId.split('|');
+            address = tempSplit[1];
+            parentAddress = tempSplit[0];
+            //console.log('Address , ParentAddress: ',address,parentAddress);
+        } else {
+            //console.log('NOT FIND PARENT ADDRESS');
+            address = data.objectId;
+        }
+        var properties = data.properties;
+        var propertyName = Object.keys(data.properties)[0];
+        var propertyValue = properties[propertyName];
+        var protocol = undefined;
+        var type = undefined;
+        if (addressBindToProperty.apio.hasOwnProperty(address) && addressBindToProperty.apio[address].hasOwnProperty("type")) {
+
+            type = addressBindToProperty.apio[address].type;
+            //console.log("IF: ", type)
+        }
+        var newApioId = data.apioId;
+
+        if (!Apio.Serial.hasOwnProperty("serialPort")) {
+            throw new Error("The Apio.Serial service has not been initialized. Please, call Apio.Serial.init() before using it.");
+        }
+
+        if (communication.hasOwnProperty("apio") && communication.apio.hasOwnProperty(type) && communication.apio[type].hasOwnProperty("recive") && communication.apio[type].recive.hasOwnProperty(command)) {
+            //console.log("sto per chiamare la callback");
+            var stringFn = communication.apio[type].recive[command];
+            if (stringFn[0] !== "(") {
+                stringFn = "(" + stringFn;
+            }
+
+            if (stringFn[stringFn.length - 1] !== ")") {
+                stringFn += ")";
+            }
+
+            var fn = eval.call(null, stringFn);
+            //console.log("la callback da chimaare è: ", fn);
+            if (fn && addressBindToProperty.apio[address].objectId != null && typeof fn(data) === "object") {
+                data.objectId = addressBindToProperty.apio[address].objectId;
+                data.address = address;
+                var ret = fn(data, objects[addressBindToProperty.apio[address].objectId].properties);
+                //console.log("######################APIO.SERIAL.READ, RET: ", ret);
+                //FAR VEDERE A LORENZO
+                //for (var KEY in ret) {
+                //    data.properties[KEY] = ret[KEY];
+                //}
+
+                //se nel return della callback dell'oggetto in integratedCommunication c'è la proprietà di tipo send allora invio il suo valore in seriale
+                //questa procedura permette di inviare un messaggio in risposta ad un oggetto che ha appena invocato il recive e di procedere poi
+                //normalmente all'aggiornamento delle proprietà. La prorietà send viene eliminata subito dopo che il messaggio è stato inviato
+                if (ret.hasOwnProperty('send') && ret.send !== '') {
+                    Apio.Serial.send('l' + ret.send)
+                    //delete ret.send;
+                }
+                data.properties = ret;
+                var d = new Date();
+                var day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
+                var month = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
+                var year = d.getFullYear();
+                var hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+                var minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
+                var second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
+
+                data.properties.date = day + "/" + month + "/" + year + " - " + hour + ":" + minute + ":" + second;
+                data.address = address;
+
+
+                //console.log("--------------------data: ", data);
+
+                Apio.Database.updateProperty(data, function () {
+                    //console.log("--------------------data: ", data);
+                    Apio.io.emit("serial_update", data);
+
+                    if (isNotificationSocketConnected) {
+                        notificationSocket.emit("send_notification", data);
+                    }
+
+                    if (isLogSocketConnected) {
+                        logSocket.emit("log_update", data);
+                    } else {
+                        Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
+                            if (err) {
+                                //console.log("Error while getting object with objectId " + data.objectId + ": ", err);
+                            } else if (object) {
+                                var logs = {}, timestamp = new Date().getTime();
+                                for (var i in object.properties) {
+                                    if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+                                        logs["data." + data.objectId + "." + i + "." + timestamp] = String(data.properties[i]);
+                                    } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+                                        logs["data." + data.objectId + "." + i + "." + timestamp] = String(object.properties[i].value);
+                                    }
+                                }
+
+                                Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
+                                    if (error) {
+                                        //log("Error while updating service log: ", error);
+                                    } else if (result) {
+                                        //log("Service log successfully updated, result: ", result);
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    if (Apio.Configuration.type === "cloud") {
+                        Apio.io.emit("apio.remote.object.update", data);
+                    }
+                });
+            }
+        }
+        else if (!addressBindToProperty.hasOwnProperty(address) && command == "new" && address == "9999") {
+            //console.log("*** NEW APIO INSTALLATION ***");
+            var o = {
+                service: 'autoInstall',
+                message: 'apio_install_new_object',
+                data: {
+                    protocol: 'apio',
+                    address: '',
+                    eep: '',
+                    serialNumber: ''
+                }
+            }
+            o.data.eep = Object.keys(data.properties)[0];
+            o.data.serialNumber = data.properties[Object.keys(data.properties)[0]];
+            Apio.io.emit('send_to_service', o);
+        }
+        else if (!addressBindToProperty.hasOwnProperty(address) && command == "newModbus" && address != "9999") {
+            //console.log("*** NEW APIO INSTALLATION BY SUBOBJECT ***");
+            var o = {
+                service: 'autoInstall',
+                message: 'apio_install_new_object_final',
+                data: {
+                    protocol: 'apio',
+                    address: address,
+                    eep: '',
+                    serialNumber: '',
+                    parentAddress: parentAddress
+                }
+            }
+            o.data.eep = data.properties[Object.keys(data.properties)[0]];
+            //console.log("launch apio_install_new_object_final data vale******** ",data);
+            //console.log("launch apio_install_new_object_final o vale******** ",o);
+            //o.data.serialNumber = data.properties[Object.keys(data.properties)[0]];
+            Apio.io.emit('send_to_service', o);
+        }
+        else {
+            var oIds = Object.keys(objects);
+            for (var i = 0, found = false; !found && i < oIds.length; i++) {
+                //Although it's called objectId the parameter in data referrers to the address
+                if (data.objectId === objects[oIds[i]].address) {
+                    found = true;
+                    data.objectId = objects[oIds[i]].objectId;
+                    switch (command) {
+                        case "send":
+                            Apio.Database.getObjectById(data.objectId, function (object) {
+                                data.objectId = object.objectId;
+                                data.protocol = object.protocol;
+
+                                Apio.Serial.send(data);
+
+                                Apio.Database.updateProperty(data, function () {
+                                    Apio.io.to("apio_client").emit("apio_client_update", data);
+                                });
+                            });
+                            break;
+                        case "time":
+                            ////console.log("SONO DENTRO TIME, DATA VALE: ", data);
+                            var t = new Date().getTime();
+                            Apio.Serial.send("l" + data.objectId + ":time:" + t + "-");
+                            break;
+
+                        case "update":
+                            Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, res) {
+                                if (err) {
+                                    ////console.log("Error while getting object with objectId " + data.objectId + ": ", err);
+                                } else if (res) {
+                                    var timestamp = new Date().getTime(), updt = {};
+                                    for (var i in res.properties) {
+                                        if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "") {
+                                            if (!isNaN(String(data.properties[i]).replace(",", "."))) {
+                                                updt["log." + i + "." + timestamp] = data.properties[i];
+                                            }
+                                        } else if (res.properties[i].value !== undefined && typeof res.properties[i].value !== "object" && res.properties[i].value !== null && res.properties[i].value !== "" /*&&*/) {
+                                            if (!isNaN(String(res.properties[i].value).replace(",", "."))) {
+                                                updt["log." + i + "." + timestamp] = res.properties[i].value;
+                                            }
+                                        }
+                                    }
+                                    var d = new Date();
+                                    var day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
+                                    var month = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
+                                    var year = d.getFullYear();
+                                    var hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+                                    var minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
+                                    var second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
+
+                                    data.properties.date = day + "/" + month + "/" + year + " - " + hour + ":" + minute + ":" + second;
+                                    data.address = address;
+
+                                    Apio.Database.updateProperty(data, function () {
+                                        //console.log("--------------------data: ", data);
+                                        Apio.io.emit("serial_update", data);
+
+                                        if (isNotificationSocketConnected) {
+                                            notificationSocket.emit("send_notification", data);
+                                        }
+
+                                        if (isLogSocketConnected) {
+                                            logSocket.emit("log_update", data);
+                                        }
+                                        //da capire cosa fà MATTEO in questo else, sembra sia un backup nel caso in cui il servizio log non è sù
+                                        else {
+                                            Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
+                                                if (err) {
+                                                    ////console.log("Error while getting object with objectId " + data.objectId + ": ", err);
+                                                } else if (object) {
+                                                    var logs = {}, timestamp = new Date().getTime();
+                                                    for (var i in object.properties) {
+                                                        if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+                                                            logs["data." + data.objectId + "." + i + "." + timestamp] = String(data.properties[i]);
+                                                        } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+                                                            logs["data." + data.objectId + "." + i + "." + timestamp] = String(object.properties[i].value);
+                                                        }
+                                                    }
+
+                                                    Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
+                                                        if (error) {
+                                                            //log("Error while updating service log: ", error);
+                                                        } else if (result) {
+                                                            //log("Service log successfully updated, result: ", result);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+
+                                        if (Apio.Configuration.type === "cloud") {
+                                            Apio.io.emit("apio.remote.object.update", data);
+                                        }
+                                    });
+                                }
+                            });
+                            break;
+                        case "hi":
+                            ////console.log("Ho riconosciuto la parola chiave hi");
+                            if (data.objectId == "9999") {
+                                //log(data)
+                                var o = {}
+                                o.name = "apio_autoinstall_service"
+                                o.data = data.properties.appId;
+                                Apio.io.emit("socket_service", o)
+                            } else {
+                                //console.log("Hi dell' oggetto ",data.objectId)
+                                //log("L'indirizzo fisico dell'oggetto che si è appena connesso è " + data.address);
+
+
+                                Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, document) {
+                                    if (err) {
+                                        //nel caso in cui un oggetto mi comunica ma non c'è nell'db il suo address o l'oggetto viene rimosso interviene il seguente codice per eliminare l'address sull'oggetto
+                                        Apio.Serial.send("l" + data.objectId + ":setmesh:999801-")
+                                    } else if (document) {
+                                        if (document.appId !== "DIN8") {
+                                            for (var i in document.properties) {
+                                                if (!document.properties[i].hasOwnProperty("hi") || document.properties[i].hi === true) {
+                                                    Apio.Serial.send(document.protocol + document.address + ":" + i + ":" + document.properties[i].value + "-");
+                                                }
+                                            }
+                                            Apio.Serial.send(document.protocol + document.address + ":finish:-");
+                                        }
+                                        else if (document.appId === "DIN8") {
+                                            var codifyHiDIN = [[], [], []];
+                                            var codifedHiDIN = [];
+                                            for (var i in document.properties) {
+                                                if (!document.properties[i].hasOwnProperty("hi") || document.properties[i].hi === true) {
+                                                    //Apio.Serial.send(document.protocol + document.address + ":" + i + ":" + document.properties[i].value + "-");
+                                                    if (i.indexOf('rel') > -1) {
+                                                        codifyHiDIN[0][Number(i[3]) - 1] = document.properties[i].value;
+                                                    } else if (i.indexOf('dig') > -1) {
+                                                        codifyHiDIN[1][Number(i[3]) - 1] = document.properties[i].value;
+                                                    } else if (i.indexOf('dac') > -1) {
+                                                        codifyHiDIN[2][Number(i[3]) - 1] = document.properties[i].value;
+                                                    }
+                                                }
+                                            }
+                                            //console.log("IL PACCHETTO DA CODIFICARE E' ",codifyHiDIN);
+
+                                            for (var a in codifyHiDIN) {
+                                                for (var b in codifyHiDIN[a]) {
+                                                    if (a != 2) {
+                                                        if (b == 0) {
+                                                            codifedHiDIN[a] = String(codifyHiDIN[a][b])
+                                                        } else {
+                                                            codifedHiDIN[a] = codifedHiDIN[a] + String(codifyHiDIN[a][b])
+                                                        }
+                                                    } else {
+                                                        if (String(codifyHiDIN[a][b]) !== '-') {
+
+                                                            if (b == 0) {
+
+                                                                if (String(Number(codifyHiDIN[a][b]).toString(16)).length < 4) {
+                                                                    ////console.log("Primo if ", codifedHiDin[a]);
+                                                                    if (String(Number(codifyHiDIN[a][b]).toString(16)).length == 1) {
+                                                                        codifedHiDIN[a] = '0';
+                                                                    }
+
+                                                                    for (var i = 1; i < (4 - (String(Number(codifyHiDIN[a][b]).toString(16)))); i++) {
+
+                                                                        codifedHiDIN[a] += '0';
+
+                                                                    }
+
+                                                                    if (String(Number(codifyHiDIN[a][b]).toString(16)).length != 1) {
+                                                                        codifedHiDIN[a] += String(Number(codifyHiDIN[a][b]).toString(16))
+                                                                    }
+
+
+                                                                } else {
+                                                                    codifedHiDIN[a] = String(Number(codifyHiDIN[a][b]).toString(16))
+                                                                }
+                                                            } else {
+                                                                //console.log('DAC2',Number(codifyHiDIN[a][b]).toString(16));
+                                                                if (String(Number(codifyHiDIN[a][b]).toString(16)).length < 4) {
+
+                                                                    for (var i = 0; i < (4 - (String(Number(codifyHiDIN[a][b]).toString(16)))); i++) {
+                                                                        codifedHiDIN[a] += '0';
+
+                                                                    }
+
+                                                                    if (String(Number(codifyHiDIN[a][b]).toString(16)).length != 1) {
+                                                                        codifedHiDIN[a] += String(Number(codifyHiDIN[a][b]).toString(16))
+                                                                    }
+
+                                                                } else {
+                                                                    codifedHiDIN[a] += String(Number(codifyHiDIN[a][b]).toString(16))
+                                                                }
+                                                            }
+                                                        } else {
+                                                            //console.log('ci sono i trattini',codifyHiDIN[a][b]);
+                                                            if (b == 0) {
+                                                                codifedHiDIN[a] = '0000'
+                                                            } else {
+                                                                codifedHiDIN[a] = codifedHiDIN[a] + '0000'
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                if (a == 0) {
+                                                    codifedHiDIN[a] = codifedHiDIN[a] + '00';
+                                                }
+                                            }
+                                            for (var s in codifedHiDIN) {
+                                                if (s != 2) {
+                                                    codifedHiDIN[s] = parseInt(codifedHiDIN[s], 2).toString(16)
+                                                    if (String(codifedHiDIN[s]).length == 1) {
+                                                        codifedHiDIN[s] = '0' + String(codifedHiDIN[s]);
+                                                    }
+
+                                                }
+                                            }
+                                            //console.log("IL PACCHETTO CODIFICATO E' ",codifedHiDIN);
+                                            //console.log("invio il Pacchetto! ", codifedHiDIN[0]+codifedHiDIN[1]+codifedHiDIN[2]);
+                                            Apio.Serial.send(document.protocol + document.address + ":s:" + codifedHiDIN[0] + codifedHiDIN[1] + codifedHiDIN[2] + "-");
+                                        }
+                                        //commentato perchè sembr essere un rimasulio di qualcosa che ora non usiamo più, in pratica dopo l'hi e lo scambio di ifnormazioni con l'oggetto, il sistema inseriva la property connected a TRUE sull'oggetto stesso, il problema è che non c'è qualcosa che mai la mette a false, quindi vedremo in seguito come operare
+                                        /*Apio.Database.db.collection("Objects").update({objectId: document.objectId}, {$set: {connected: true}},
+                                         function (err, res) {
+                                         if (err) {
+                                         //log("Error while updating field 'connected'");
+                                         } else {
+                                         //log("Field 'connected' successfully updated");
+                                         }
+                                         });*/
+                                        //log("l'oggetto con address " + document.address + " è " + document.objectId);
+                                        if (isNotificationSocketConnected) {
+                                            notificationSocket.emit("send_notification", data);
+                                        }
+                                    }
+
+                                });
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
     }
 };
 
 socketServer.on("connection", function (Socket) {
-    //Socket.on("update_collections", function (data) {
-    //    if (data.command === "add" && data.hasOwnProperty("addData")) {
-    //        var protocol = data.addData.protocol;
-    //        var address = data.addData.address;
-    //        var objectId = data.addData.objectId;
-    //        var type = data.addData.type;
-    //        var originalProperty = data.addData.originalProperty;
-    //        var bindedObjectId = data.addData.bindedObjectId;
-    //        var bindedProperty = data.addData.bindedProperty;
-    //
-    //        //if (protocol != null && address != null && originalProperty != null && bindedObjectId != null && bindedProperty != null) {
-    //        //    if (!addressBindToProperty.hasOwnProperty(protocol)) {
-    //        //        addressBindToProperty[protocol] = {};
-    //        //    }
-    //        //
-    //        //    if (!addressBindToProperty[protocol].hasOwnProperty(address)) {
-    //        //        addressBindToProperty[protocol][address] = {};
-    //        //
-    //        //        if (objectId != null) {
-    //        //            addressBindToProperty[protocol][address].objectId = objectId;
-    //        //        }
-    //        //
-    //        //        if (type != null) {
-    //        //            addressBindToProperty[protocol][address].type = type;
-    //        //        }
-    //        //    }
-    //        //
-    //        //    if (!addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //        //        addressBindToProperty[protocol][address][originalProperty] = {};
-    //        //    }
-    //        //
-    //        //    addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-    //        //}
-    //
-    //        if (protocol != null) {
-    //            if (!addressBindToProperty.hasOwnProperty(protocol)) {
-    //                addressBindToProperty[protocol] = {};
-    //            }
-    //
-    //            if (address != null) {
-    //                if (!addressBindToProperty[protocol].hasOwnProperty(address)) {
-    //                    addressBindToProperty[protocol][address] = {};
-    //
-    //                    if (objectId != null) {
-    //                        addressBindToProperty[protocol][address].objectId = objectId;
-    //                    }
-    //
-    //                    if (type != null) {
-    //                        addressBindToProperty[protocol][address].type = type;
-    //                    }
-    //                }
-    //
-    //                if (originalProperty != null) {
-    //                    if (!addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //                        addressBindToProperty[protocol][address][originalProperty] = {};
-    //                    }
-    //
-    //                    if (bindedObjectId != null && bindedProperty != null) {
-    //                        addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //
-    //        //Update collection objects
-    //        Apio.Database.db.collection("Objects").findOne({objectId: objectId}, function (err_find, obj) {
-    //            if (err_find) {
-    //                console.log("Error while finding object with objectId " + objectId + ": ", err_find);
-    //            } else if (obj) {
-    //                //objects.push(obj);
-    //                objects[obj.objectId] = obj;
-    //
-    //                console.log("AGGIUNTO OGGETTO ", obj, "ORA objects VALE: ", objects);
-    //            }
-    //        });
-    //    } else if (data.command === "delete" && data.hasOwnProperty("deleteData")) {
-    //        var protocol = data.deleteData.protocol;
-    //        var address = data.deleteData.address;
-    //        var originalProperty = data.deleteData.originalProperty;
-    //        var bindedObjectId = data.deleteData.bindedObjectId;
-    //
-    //        if (addressBindToProperty.hasOwnProperty(protocol)) {
-    //            if (addressBindToProperty[protocol].hasOwnProperty(address)) {
-    //                if (addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //                    if (addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId)) {
-    //                        delete addressBindToProperty[protocol][address][originalProperty][bindedObjectId];
-    //                    } else if (originalProperty != null) {
-    //                        delete addressBindToProperty[protocol][address][originalProperty];
-    //                    }
-    //                } else if (address != null) {
-    //                    delete addressBindToProperty[protocol][address];
-    //                }
-    //            } else if (protocol != null) {
-    //                delete addressBindToProperty[protocol];
-    //            }
-    //        }
-    //
-    //        //Update collection objects
-    //        for (var i = 0; i < objects.length; i++) {
-    //            if (objects[i].objectId === bindedObjectId) {
-    //                console.log("ELIMINO OGGETTO ", objects[i], "ORA objects VALE: ", objects);
-    //                objects.splice(i--, 1);
-    //            }
-    //        }
-    //    } else if (data.command === "modify" && data.hasOwnProperty("modifyData")) {
-    //        var protocol = data.modifyData.newProtocol || data.modifyData.protocol;
-    //        var address = data.modifyData.newAddress || data.modifyData.address;
-    //        var objectId = data.modifyData.newObjectId;
-    //        var type = data.modifyData.newType;
-    //        var originalProperty = data.modifyData.newOriginalProperty || data.modifyData.originalProperty;
-    //        var bindedObjectId = data.modifyData.newBindedObjectId || data.modifyData.bindedObjectId;
-    //        var bindedProperty = data.modifyData.newBindedProperty;
-    //
-    //        if (protocol != null && (addressBindToProperty.hasOwnProperty(protocol) || (data.modifyData.oldProtocol != null && addressBindToProperty.hasOwnProperty(data.modifyData.oldProtocol)))) {
-    //            if (!addressBindToProperty.hasOwnProperty(protocol)) {
-    //                addressBindToProperty[protocol] = JSON.parse(JSON.stringify(addressBindToProperty[data.modifyData.oldProtocol]));
-    //                delete addressBindToProperty[data.modifyData.oldProtocol];
-    //            }
-    //
-    //            if (address != null && (addressBindToProperty[protocol].hasOwnProperty(address) || (data.modifyData.oldAddress != null && addressBindToProperty[protocol].hasOwnProperty(data.modifyData.oldAddress)))) {
-    //                if (!addressBindToProperty[protocol].hasOwnProperty(address)) {
-    //                    addressBindToProperty[protocol][address] = JSON.parse(JSON.stringify(addressBindToProperty[protocol][data.modifyData.oldAddress]));
-    //                    delete addressBindToProperty[protocol][data.modifyData.oldAddress];
-    //                }
-    //
-    //                if (objectId != null) {
-    //                    addressBindToProperty[protocol][address].objectId = objectId;
-    //                }
-    //
-    //                if (type != null) {
-    //                    addressBindToProperty[protocol][address].type = type;
-    //                }
-    //
-    //                if (originalProperty != null && (addressBindToProperty[protocol][address].hasOwnProperty(originalProperty) || (data.modifyData.oldOriginalProperty != null && addressBindToProperty[protocol][address].hasOwnProperty(data.modifyData.oldOriginalProperty)))) {
-    //                    if (!addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-    //                        addressBindToProperty[protocol][address][originalProperty] = JSON.parse(JSON.stringify(addressBindToProperty[protocol][address][data.modifyData.oldOriginalProperty]));
-    //                        delete addressBindToProperty[protocol][address][data.modifyData.oldOriginalProperty];
-    //                    }
-    //
-    //                    if (bindedObjectId != null && (addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId) || (data.modifyData.oldBindedObjectId != null && addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(data.modifyData.oldBindedObjectId)))) {
-    //                        if (!addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId)) {
-    //                            addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = addressBindToProperty[protocol][address][originalProperty][data.modifyData.oldBindedObjectId];
-    //                            delete addressBindToProperty[protocol][address][originalProperty][data.modifyData.oldBindedObjectId];
-    //                        }
-    //
-    //                        if (bindedProperty != null) {
-    //                            addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //
-    //        //Update collection objects
-    //        Apio.Database.db.collection("Objects").findOne({objectId: objectId}, function (err_find, obj) {
-    //            if (err_find) {
-    //                console.log("Error while finding object with objectId " + objectId + ": ", err_find);
-    //            } else if (obj) {
-    //                for (var i = 0; i < objects.length; i++) {
-    //                    if (objects[i].objectId === objectId) {
-    //                        console.log("MODIFICO OGGETTO ", objects[i], "ORA objects VALE: ", objects);
-    //                        objects[i] = obj;
-    //                    }
-    //                }
-    //            }
-    //        });
-    //    }
-    //})
+    Socket.on("apio_serial_send", function (data) {
+        if (data) {
+            if (typeof data === "object") {
+                for (var p in data.properties) {
+                    if (objects[data.objectId].properties.hasOwnProperty(p)) {
+                        objects[data.objectId].properties[p].value = data.properties[p];
+                    }
+                }
+            }
+
+            Apio.Serial.send(data);
+        }
+    });
 
     Socket.on("update_collections", function () {
         Apio.Database.db.collection("Communication").findOne({name: "integratedCommunication"}, function (err, doc) {
@@ -2439,42 +2293,7 @@ socketServer.on("connection", function (Socket) {
             }
         });
     });
-
-    //Socket.on("apio_logic_delete", function (data) {
-    //    data.apioId = Apio.System.getApioIdentifier();
-    //    fs.unlinkSync("./apio_logic/" + data.name);
-    //    socketServer.emit("send_to_client", {
-    //        message: "apio_logic_delete",
-    //        data: data
-    //    });
-    //});
-    //
-    //Socket.on("apio_logic_modify", function (data) {
-    //    data.apioId = Apio.System.getApioIdentifier();
-    //    fs.writeFileSync("./apio_logic/" + data.newName, data.file);
-    //    if (data.newName !== data.name && fs.existsSync("./apio_logic/" + data.name)) {
-    //        fs.unlinkSync("./apio_logic/" + data.name);
-    //    }
-    //
-    //    socketServer.emit("send_to_client", {
-    //        message: "apio_logic_modify",
-    //        data: data
-    //    });
-    //});
-    //
-    //Socket.on("apio_logic_new", function (data) {
-    //    data.apioId = Apio.System.getApioIdentifier();
-    //    fs.writeFileSync("./apio_logic/" + data.newName, data.file);
-    //    socketServer.emit("send_to_client", {
-    //        message: "apio_logic_new",
-    //        data: data
-    //    });
-    //});
 });
-
-setInterval(function(){
-	console.log(process.memoryUsage());
-}, 3000)
 
 http.listen(port, function () {
     ////console.log("...Start sh...");
