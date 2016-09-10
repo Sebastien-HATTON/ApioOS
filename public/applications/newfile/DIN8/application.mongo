@@ -9,25 +9,18 @@
     "modbus": {
       "1": "",
       "2": "Seneca S500",
-      "3": "SenecaMon S600",
-      "4": "SenecaTri S600",
-      "5": "Estron SDM220",
-      "6": "Selco 200to400"
+      "3": "SenecaMon S604",
+      "4": "SenecaTri S604",
+      "5": "Seneca S504C",
+      "6": "Estron SDM220",
+      "7": "Selco 200to400"
     }
   },
   "installation": "autoinstalled",
   "log": {},
   "marker": {},
   "name": "DIN 1",
-  "notifications": {
-    "adc1": {
-      "0": {
-        "message": "DIN: adc1 al valore 50",
-        "relation": "eq",
-        "value": "50"
-      }
-    }
-  },
+  "notifications": {},
   "objectId": "_TMP_",
   "properties": {
     "adc1": {
@@ -73,7 +66,7 @@
       "min": "0",
       "step": "1",
       "type": "slider",
-      "value": "65535"
+      "value": "0"
     },
     "dac2": {
       "graph": "punctual",

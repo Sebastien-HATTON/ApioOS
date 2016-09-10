@@ -40,42 +40,20 @@ module.exports = function (libraries) {
     var app = express();
     var http = libraries.http.Server(app);
     var Apio = require("../apio.js")();
-    // var configuration = require("../configuration/default.js");
 
     var Socket = undefined;
     var mailSocketConnected = false;
     var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
 
-    var socketServer = libraries["socket.io"](http); //CLoud socket
+    var socketServer = libraries["socket.io"](http);
 
     socketServer.on("connection", function (socket) {
         socket.on("apio_cloud_reconnect", function () {
-            //Apio = require("../apio.js")(configuration);
-            //Apio.System.getApioIdentifierCloud = function () {
-            //    if (null !== Apio.System.ApioIdentifier && 'undefined' !== typeof Apio.System.ApioIdentifier) {
-            //        return Apio.System.ApioIdentifier
-            //    } else {
-            //        if (fs.existsSync('Identifier.apio')) {
-            //            Apio.System.ApioIdentifier = fs.readFileSync('Identifier.apio', {
-            //                encoding: 'utf-8'
-            //            }).trim();
-            //        } else {
-            //            Apio.System.ApioIdentifier = uuidgen.v4();
-            //            console.log("............................CLOUDJS CREO IDENTIFIER............")
-            //            fs.writeFileSync('Identifier.apio', Apio.System.ApioIdentifier);
-            //        }
-            //        return Apio.System.ApioIdentifier;
-            //    }
-            //};
-            //Apio.Database.connect(function () {
-            //});
-            //activate();
             request({
                 json: true,
                 method: "POST",
                 uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/restartSystem"
             });
-            //console.log("Apio.Remote.socket.io.opts: ", Apio.Remote.socket.io.opts);
         });
 
         socket.on("enableCloudUpdate.comfirm", function () {
@@ -84,8 +62,6 @@ module.exports = function (libraries) {
             clearInterval(enableCloudUpdateInterval);
         });
     });
-
-    // var Apio = require("../apio.js")(configuration);
 
     Apio.System.getApioIdentifierCloud = function () {
         if (null !== Apio.System.ApioIdentifier && 'undefined' !== typeof Apio.System.ApioIdentifier) {
@@ -103,31 +79,12 @@ module.exports = function (libraries) {
             return Apio.System.ApioIdentifier;
         }
     };
-    //var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "apioId=" + Apio.System.getApioIdentifierCloud()});
-    //var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=cloud"});
+
     var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=cloud&token=" + Apio.Token.getFromText("cloud", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
     var enableCloudUpdateInterval = undefined;
 
-    //var launchInterval = function () {
-    //    var pingInterval = setInterval(function () {
-    //        exec("nmap -p 8086 apio.cloudapp.net | grep 8086 | awk '{print $2}'", function (error, stdout, stderr) {
-    //            if (error || stderr) {
-    //                console.log("Error while ping to cloud: ", error || stderr);
-    //            } else if (stdout) {
-    //                if (stdout === "open") {
-    //
-    //                } else if (stdout === "closed") {
-    //
-    //                }
-    //            }
-    //        });
-    //    }, 10000);
-    //};
-
     if (Apio.Configuration.remote.enabled) {
         Apio.Util.log("Setting up remote connection to " + Apio.Configuration.remote.uri);
-        //Core Socket
-        //var socket_cloud = libraries["socket.io-client"](Apio.Configuration.remote.uri);
         Apio.Remote.socket.on('error', function () {
             console.log("This apio instance cloudnt connect to remote host: " + Apio.Configuration.remote.uri)
         });
@@ -136,7 +93,6 @@ module.exports = function (libraries) {
             //Devo notificare il cloud che sono online
             console.log("Sending the handshake to the cloud (" + Apio.Configuration.remote.uri + "). My id is " + Apio.System.getApioIdentifierCloud());
             if (Apio.Configuration.type === "gateway") {
-                //Apio.isBoardSynced = false;
                 socket.emit("enableCloudUpdate", false);
             }
 
@@ -154,6 +110,9 @@ module.exports = function (libraries) {
 
         Apio.Remote.socket.on("close_autoInstall_modal", function () {
             socketServer.emit("send_to_client", {
+                data: {
+                    apioId: Apio.System.getApioIdentifierCloud()
+                },
                 message: "close_autoInstall_modal",
                 sendToCloud: false
             });
@@ -209,9 +168,6 @@ module.exports = function (libraries) {
                 } else {
                     console.log("Token registered successfully");
                     console.log("--------------------------------RICONNESSIONE");
-                    //Apio.Remote.socket.disconnect();
-                    //Apio.Remote.socket.connect();
-                    //console.log("Apio.Remote.socket.io.opts: ", Apio.Remote.socket.io.opts);
                     request({
                         json: true,
                         method: "POST",
@@ -517,15 +473,7 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("apio_reboot_board", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data) {
             socket.emit("send_to_client", {message: "apio_board_reboot", data: data});
-            // exec("sudo reboot", function (error, stdout, stderr) {
-            //     if (error || stderr) {
-            //         console.log("exec error: " + error || stderr);
-            //     } else if (stdout) {
-            //         console.log("Board is rebooting in a while, please wait");
-            //     }
-            // });
 
             var execReboot = function () {
                 exec("sudo reboot", function (error, stdout, stderr) {
@@ -588,11 +536,9 @@ module.exports = function (libraries) {
             } else {
                 execReboot();
             }
-            //}
         });
 
         Apio.Remote.socket.on("apio_restart_system", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data) {
             socket.emit("send_to_client", {message: "apio_system_restart", data: data});
             exec("ps aux | grep app.js | awk '{print $2}'", function (error, appjsPID, stderr) {
                 if (error) {
@@ -619,19 +565,10 @@ module.exports = function (libraries) {
                     });
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("apio_shutdown_board", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data) {
             socket.emit("send_to_client", {message: "apio_board_shutdown", data: data});
-            // exec("sudo shutdown -h now", function (error, stdout, stderr) {
-            //     if (error || stderr) {
-            //         console.log("exec error: " + error || stderr);
-            //     } else if (stdout) {
-            //         console.log("Board is shutting down in a while, please wait");
-            //     }
-            // });
 
             var execShutdown = function () {
                 exec("sudo shutdown -h now", function (error, stdout, stderr) {
@@ -696,7 +633,6 @@ module.exports = function (libraries) {
             } else {
                 execShutdown();
             }
-            //}
         });
 
         Apio.Remote.socket.on("ask_wifi_status", function () {
@@ -849,7 +785,6 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("ask_dongle_settings", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data) {
             if (Apio.hasOwnProperty("Configuration") && Apio.Configuration.hasOwnProperty("dongle")) {
                 socketServer.emit("send_to_client", {
                     data: Apio.Configuration.dongle,
@@ -865,7 +800,6 @@ module.exports = function (libraries) {
                     socketServer.emit("send_to_client", {data: {}, message: "get_dongle_setting"});
                 }
             }
-            //}
         });
 
         Apio.Remote.socket.on("ask_logics", function () {
@@ -913,8 +847,6 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("change_dongle_settings", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data.apioId) {
-            //delete data.apioId;
             request({
                 json: true,
                 method: "POST",
@@ -927,12 +859,9 @@ module.exports = function (libraries) {
                     console.log("Setting changed");
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("change_set_onoff", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data.apioId) {
-            //delete data.apioId;
             request({
                 json: true,
                 method: "POST",
@@ -944,11 +873,9 @@ module.exports = function (libraries) {
                     console.log("Setting changed");
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("update_dongle", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data) {
             request({
                 json: true,
                 method: "GET",
@@ -960,14 +887,11 @@ module.exports = function (libraries) {
                     console.log("New firmware");
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("send_to_client_service", function (data) {
-            //if (Apio.System.getApioIdentifierCloud() === data.apioId) {
             console.log("send_to_client_service", data);
             socket.emit("send_to_service", data);
-            //}
         });
 
         Apio.Remote.socket.on("apio_board_enabled", function (data) {
@@ -984,9 +908,6 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("apio_client_stream", function (data) {
-            //console.log("apio_client_stream");
-            //console.log(data);
-            //Apio.Serial.stream(data);
             socket.emit("apio_client_stream", data);
         });
 
@@ -1002,7 +923,6 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("apio.create.new.app", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             var decodeBase64Image = function (dataString) {
                 var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/), response = {};
 
@@ -1084,7 +1004,6 @@ module.exports = function (libraries) {
                         }
                     }
 
-                    //Injection of the libraries file in the sketch folder
                     var source = "public/arduino/";
                     console.log("obj.protocol: " + obj.protocol);
                     if (obj.protocol === "z") {
@@ -1112,7 +1031,6 @@ module.exports = function (libraries) {
                         console.log("done!");
                     });
 
-                    //if there is a sensor in properties inject the sensor.h from libraries
                     if (SensorInProperties === 1) {
                         source = "public/arduino/libraries";
                         ncp(source, destination, function (err) {
@@ -1123,15 +1041,12 @@ module.exports = function (libraries) {
                         });
                     }
 
-                    //socket.emit("apio_server_new", {apioId: data.apioId, objectId: obj.objectId});
                     socket.emit("apio_server_new", obj.objectId);
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("ask_board_ip", function (data) {
-            //if (data === Apio.System.getApioIdentifierCloud()) {
             exec("ifconfig -a | grep 'Link encap' | awk '{print $1}'", function (error, stdout) {
                 if (error) {
                     console.log("exec error (1): " + error);
@@ -1165,19 +1080,8 @@ module.exports = function (libraries) {
                                 var publicIP = "";
                                 if (error) {
                                     console.log("exec error (3): " + error);
-                                    //socket.emit("get_board_ip", {
-                                    //    apioId: Apio.System.getApioIdentifierCloud(),
-                                    //    local: peripheralsIP,
-                                    //    public: ""
-                                    //});
                                 } else if (stdout) {
                                     publicIP = stdout.trim();
-                                    //socket.emit("get_board_ip", {local: peripheralsIP, public: stdout.trim()});
-                                    //socket.emit("get_board_ip", {
-                                    //    apioId: Apio.System.getApioIdentifierCloud(),
-                                    //    local: peripheralsIP,
-                                    //    public: stdout.trim()
-                                    //});
                                 }
 
                                 exec("curl http://localhost:4040/inspect/http | grep window.common", function (error1, stdout1, stderr1) {
@@ -1228,31 +1132,22 @@ module.exports = function (libraries) {
                     }, 0);
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("apio_notification_disabled.fromcloud", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             socket.emit("apio_notification_disabled", {notif: data.notif, user: data.user});
-            //}
         });
 
         Apio.Remote.socket.on("apio_notification_enabled.fromcloud", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             socket.emit("apio_notification_enabled", {notif: data.notif, user: data.user});
-            //}
         });
 
         Apio.Remote.socket.on("apio_notification_read.fromcloud", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             socket.emit("apio_notification_read", {notif: data.notif, user: data.user});
-            //}
         });
 
         Apio.Remote.socket.on("apio_notification_read_all.fromcloud", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             socket.emit("apio_notification_read_all", {user: data.user});
-            //}
         });
 
         Apio.Remote.socket.on('apio.remote.handshake.test.success', function (data) {
@@ -1276,7 +1171,6 @@ module.exports = function (libraries) {
         //CHIARIRE, L'emit deve esistere ma non ha senso metterlo qui perché non viene intercettato
         Apio.Remote.socket.on("apio_shutdown", function (data) {
             if (data == Apio.System.getApioIdentifierCloud()) {
-                //socket.emit("apio_shutdown")
                 var child = exec("sudo shutdown -h now", function (error, stdout, stderr) {
                     if (error !== null) {
                         console.log("exec error: " + error);
@@ -1303,13 +1197,10 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("apio.add.planimetry", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             fs.writeFileSync("public/images/planimetry/" + data.filename, data.filedata);
-            //}
         });
 
         Apio.Remote.socket.on("apio.add.db.planimetry.fromcloud", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             delete data.planimetry.apioId;
             Apio.Database.db.collection("Planimetry").insert(data.planimetry, function (err) {
                 if (err) {
@@ -1322,7 +1213,6 @@ module.exports = function (libraries) {
                     console.log("Planimetry succefully inserted");
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on("apio.modify.db.planimetry.fromcloud", function (data) {
@@ -1343,13 +1233,10 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("apio.remove.planimetry", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             fs.unlinkSync("public/images/planimetry/" + data.filename);
-            //}
         });
 
         Apio.Remote.socket.on("apio.remove.db.planimetry.fromcloud", function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             Apio.Database.db.collection("Planimetry").remove({planimetryId: data.planimetryId}, function (err) {
                 if (err) {
                     console.log("Error while removing planimetry with planimetryId " + data.planimetryId + ": ", err);
@@ -1358,7 +1245,6 @@ module.exports = function (libraries) {
                     console.log("Planimetry with planimetryId " + data.planimetryId + " succefully removed");
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on('apio.remote.sync.request', function (data) {
@@ -1646,15 +1532,11 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on('apio.remote.object.delete', function (data) {
             Apio.Util.log("Deleting object from the cloud.");
             Apio.Database.deleteObject(data, function (err) {
-                // Apio.Database.db.collection('Objects').remove({objectId : id}, function(err){
                 if (err) {
                     console.log('error while deleting the object ' + data + ' from the db');
-                    //res.status(500).send();
                 } else {
-                    //Apio.System.deleteFolderRecursive('../public/applications/' + data);
                     Apio.System.deleteFolderRecursive('public/applications/' + data);
                     socket.emit("apio_server_delete", data);
-                    //res.send(200);
                 }
             });
         });
@@ -1663,15 +1545,9 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on('apio_remote_autoinstall', function (data) {
             if (Apio.Configuration.autoinstall.default == false) {
                 var req_data = {
-                    //json: true,
                     uri: "http://localhost:8083/" + Apio.Configuration.autoinstall.company + "/installNew/" + data,
                     method: "GET"
-                    /*body: {
-                     mail: data.properties.mail,
-                     text: data.properties.text
-                     }*/
                 };
-                //console.log("\n\n /apio/service/" + data.protocol + "/send");
                 console.log(req_data);
                 console.log("\n\n");
                 request(req_data, function (error, response, body) {
@@ -1679,7 +1555,6 @@ module.exports = function (libraries) {
                         if (Number(response.statusCode) === 200) {
                             console.log("xxxxxxHo installato dal cloud rinvio l'oggetto");
                             console.log(body);
-                            //QUIIIIIIII
                             var o = {};
                             o.objectId = body.id;
                             Apio.Database.getObjectById(o, function (data) {
@@ -1703,30 +1578,10 @@ module.exports = function (libraries) {
                         address: data.address
                     }
                 };
-                //console.log("\n\n /apio/service/" + data.protocol + "/send");
                 console.log(req_data);
                 console.log("\n\n");
                 request(req_data, function (error, response, body) {
-                    /*if (response) {
-                     if (Number(response.statusCode) === 200) {
-                     console.log("Email inviata");
-                     } else {
-                     console.log("Apio Service: Something went wrong");
-                     }
-                     } else {
-                     console.log("Errore di sistema: ", error);
-                     }*/
                 });
-                /*var url = "http://localhost:8083/marketplace/applications/autoinstall"
-                 $http.post(url, {
-                 appId: data.appId,
-                 address: data.address
-
-                 }).success(function(as, status){
-                 sweet.show('Installata!', data.appId+' installed', 'success');
-
-
-                 })*/
             }
         });
 
@@ -1755,20 +1610,13 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on('apio.remote.user.delete', function (data) {
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             Apio.Users.delete(data, function () {
                 console.log("User in cloud successfully deleted");
                 socket.emit("apio_user_delete", data);
             });
-            //}
         });
 
         Apio.Remote.socket.on('apio.remote.user.updateUser', function (data) {
-            //Apio.Util.log("Socket user : apio.remote.user.delete");
-            //Apio.Users.updateUser(data, function () {
-            //    console.log("");
-            //});
-            //if (data.apioId === Apio.System.getApioIdentifierCloud()) {
             console.log("apio.remote.user.updateUser", data);
             Apio.Users.shareApp(data, function (err, result) {
                 if (err) {
@@ -1782,7 +1630,6 @@ module.exports = function (libraries) {
                     }
                 }
             });
-            //}
         });
 
         Apio.Remote.socket.on('apio.remote.user.assignUser', function (data) {
@@ -1800,32 +1647,23 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on('apio.cloud.update', function (data) {
-            //if (data.apioId == Apio.System.getApioIdentifierCloud()) {
             data.sendToCloud = false;
             socket.emit("apio_client_update", data);
-            //}
         });
 
         Apio.Remote.socket.on("apio.cloud.sync.end", function (apioId) {
-            //if (Apio.Configuration.type === "gateway" && apioId == Apio.System.getApioIdentifierCloud()) {
-            //Apio.isBoardSynced = true;
             console.log("----------apio.cloud.sync.end-------- invio true");
             enableCloudUpdateInterval = setInterval(function () {
                 socket.emit("enableCloudUpdate", true);
             }, 0);
-            // socket.emit("enableCloudUpdate", true);
-            //}
-            //console.log("apio.cloud.sync.end, Apio.isBoardSynced: ", Apio.isBoardSynced);
         });
 
         Apio.Remote.socket.on('disconnect', function () {
         });
     }
 
-//socketServer.listen(server);
     var log = function (data) {
         console.log(data);
-        //socketServer.emit("logic_update", data);
         socketServer.emit("send_to_client", {
             message: "logic_update",
             data: data
@@ -1928,19 +1766,9 @@ module.exports = function (libraries) {
         }
     });
 
-    /***************************************CLOUD SOCKET ************************************/
-    //Apio.Remote = {
-    //    connectionRetryCounter: 0
-    //};
-
-//SERVER
     http.listen(port, function () {
         log("APIO Cloud Service correctly started on port " + port);
         Apio.Database.connect(function () {
-            //if (Apio.Configuration.remote.enabled) {
-            //    if (Apio.Configuration.type == "gateway") {
-            //    }
-            //}
         });
 
         var gc = require("./garbage_collector.js");

@@ -43,22 +43,38 @@
                 </md-toolbar>
                 <list propertyName="modbus" label="Select Modbus Device" style="margin: 0;"
                       listener="selectDevice()"></list>
+                <div ng-show="!viewConfirmList && !callbackInstallModbus">
+	                <div style="width:40px; margin-left:auto; margin-right:auto;">
+	                	<md-progress-circular md-mode="indeterminate"></md-progress-circular>
+	                </div>
+                </div>
                 <md-list>
                     <md-list-item class="viewConfirmList" ng-show="viewConfirmList">
-                        <md-input-container style="width: 100%; margin-right: 10%;">
+                        <md-input-container style="width: 100%;">
                             <label>{{selectedValue}}</label>
                             <input id="addressModbus" type="number" min="1" max="10" step="any" name="address"
                                    ng-model="addressModbus" placeholder="Digita il suo Modbus Address" required
                                    md-maxlength="3">
                         </md-input-container>
-                        <md-input-container style="width: 100%; margin-right: 10%;">
+                        <md-input-container style="width: 100%; margin-left:10%;">
                         	<label>Nome App</label>
 							<input id="nameModbus" name="address" md-maxlength="20" minlength="4"
                                    ng-model="nameModbus" placeholder="Digita un nome da Assegnare al Meter">
                         </md-input-container>
 
-                        <i class="material-icons" ng-click="discardModbus(modbus.objectId)">highlight_off</i>
-                        <i class="material-icons" ng-click="addModbus(modbus.objectId)">done</i>
+                        
+                    </md-list-item>
+                    <md-list-item class="viewConfirmList" ng-show="viewConfirmList">
+                    <div class="col-xs-6">
+                    	<div style="width:30px; margin-left:auto; margin-right:auto;">
+                    		<i class="material-icons" style="font-size:30px;" ng-click="discardModbus(modbus.objectId)">highlight_off</i>
+                    	</div>
+                    </div>
+                    <div class="col-xs-6">
+	                    <div style="width:30px; margin-left:auto; margin-right:auto;">
+                        	<i class="material-icons" style="font-size:30px;" ng-click="addModbus(modbus.objectId)">done</i>
+	                    </div>
+                    </div>
                     </md-list-item>
                     <md-toolbar style="background-color: #009688;" ng-show="installedShow()">
                         <div class="md-toolbar-tools">
@@ -104,6 +120,16 @@
             <trigger propertyname="rel5" labelon="rel5on" labeloff="rel5off" valueon="1" valueoff="0"></trigger>
             <trigger propertyname="rel6" labelon="rel6on" labeloff="rel6off" valueon="1" valueoff="0"></trigger>
             <log label="Log"></log>
+            <div>
+	            <div ng-show="!reset" style="width:74px; margin-left:auto; margin-right:auto;">
+		            <md-button ng-click="resetDIN()" class="md-fab md-warn" aria-label="FAB">
+					  RESET
+					</md-button>
+	            </div>
+	            <div ng-show="reset" style="width:40px; margin-left:auto; margin-right:auto;">
+	            	<md-progress-circular  md-mode="indeterminate"></md-progress-circular>
+	            </div>	
+            </div>
         </div>
     </div>
 </div>

@@ -18,7 +18,6 @@
  *                                                                          *
  ****************************************************************************/
 
-//var Apio = require("../apio.js");
 var clone = require("git-clone");
 var easyimg = require("easyimage");
 var exec = require("child_process").exec;
@@ -35,9 +34,9 @@ var deleteFolderRecursive = function (path) {
     if (fs.existsSync(path)) {
         fs.readdirSync(path).forEach(function (file, index) {
             var curPath = path + "/" + file;
-            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+            if (fs.lstatSync(curPath).isDirectory()) {
                 deleteFolderRecursive(curPath);
-            } else { // delete file
+            } else {
                 if (fs.existsSync(curPath)) {
                     fs.unlinkSync(curPath);
                 }
@@ -67,10 +66,7 @@ module.exports = function (Apio) {
             res.sendfile("public/dashboardApp/dashboard.html");
         },
         updateApioApp: function (req, res) {
-            //var icon = req.body.icon;
             var objectId = req.body.objectId;
-            //var newId = req.body.newId;
-            //var ino = req.body.ino;
             var html = req.body.html;
             var js = req.body.js;
             var basePath = "";
@@ -79,17 +75,9 @@ module.exports = function (Apio) {
             } else if (Apio.Configuration.type === "gateway") {
                 basePath = "public/applications";
             }
-            //var mongo = req.body.mongo;
-            //var makefile = req.body.makefile;
-            //console.log("updating the object: " + objectId + " with the new id " + newId);
-            //console.log("ino: " + ino);
-            //console.log(makefile)
-            //fs.writeFileSync(basePath + "/" + newId + "/_" + newId + "/_" + newId + ".ino", ino);
-            //fs.writeFileSync(basePath + "/" + newId + "/_" + newId + "/Makefile", makefile);
-            //fs.writeFileSync(basePath + "/" + newId + "/icon.png", icon);
+
             fs.writeFileSync(basePath + "/" + objectId + "/" + objectId + ".html", html);
             fs.writeFileSync(basePath + "/" + objectId + "/" + objectId + ".js", js);
-            //fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".mongo", mongo);
             res.sendStatus(200);
 
             if (Apio.Configuration.type === "cloud") {
@@ -107,50 +95,6 @@ module.exports = function (Apio) {
                     objectId: objectId
                 });
             }
-
-            //si potrebbero usare writeFile (asincrono) annidati ed eliminare il try catch
-            //if (objectId === newId) {
-            /*    Apio.Database.db.collection("Objects").update({objectId: objectId}, JSON.parse(mongo), function (error) {
-             if (error) {
-             console.log(error);
-             console.log(e);
-             res.status(500).send();
-             } else {
-             fs.writeFileSync(basePath + "/" + newId + "/_" + newId + "/_" + newId + ".ino", ino);
-             fs.writeFileSync(basePath + "/" + newId + "/_" + newId + "/Makefile", makefile);
-             //fs.writeFileSync(basePath + "/" + newId + "/icon.png", icon);
-             fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".html", html);
-             fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".js", js);
-             fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".mongo", mongo);
-             //fs.writeFileSync(basePath + "/" + objectId + "/" + objectId + ".json", JSON.stringify(objectToSave));
-             res.send(200);
-             }
-             })
-             } else {
-             Apio.Database.db.collection("Objects").insert(JSON.parse(mongo), function (error, count) {
-             if (error) {
-             console.log(error);
-             console.log(e);
-             res.status(500).send();
-             }
-             else {
-
-             if (req.body.hasOwnProperty("adapter")) {
-             fs.writeFileSync(path + "/" + dummy + "/adapter.js", req.body.adapter);
-             }
-
-             fs.writeFileSync(basePath + "/" + newId + "/_" + newId + "/_" + newId + ".ino", ino);
-             fs.writeFileSync(basePath + "/" + newId + "/_" + newId + "/Makefile", makefile);
-             fs.writeFileSync(basePath + "/" + newId + "/icon.png", icon, {encoding: "base64"});
-             fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".html", html);
-             fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".js", js);
-             fs.writeFileSync(basePath + "/" + newId + "/" + newId + ".mongo", mongo);
-             //fs.writeFileSync(basePath + "/" + objectId + "/" + objectId + ".json", JSON.stringify(objectToSave));
-             res.send(200);
-             }
-             })
-             }*/
-
         },
         folderApioApp: function (req, res) {
             var id = req.body.id;
@@ -198,29 +142,10 @@ module.exports = function (Apio) {
             console.log(path);
             var object = {};
 
-            /*if (fs.existsSync(basePath + "/" + id + "/adapter.js")) {
-             object.adapter = fs.readFileSync(basePath + "/" + id + "/adapter.js")
-             }
-             */
             object.icon = fs.readFileSync(basePath + "/" + id + "/icon.png", {encoding: "base64"});
             object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
             object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
-            //object.json = fs.readFileSync(path+".json", {encoding: "utf8"});
-            //object.mongo = fs.readFileSync(path + ".mongo", {encoding: "utf8"});
-            //path = basePath + "/" + id + "/_" + id;
-            //object.ino = fs.readFileSync(path + "/_" + id + ".ino", {encoding: "utf8"});
-            //object.makefile = fs.readFileSync(path + "/Makefile", {encoding: "utf8"});
-            console.log("GUARDA QUAAAAAA")
-            //console.log(object.makefile)
-
-            /*console.log("js:\n"+object.js);
-             console.log("html:\n"+object.html);
-             console.log("json:\n"+object.json);
-             console.log("mongo:\n"+object.mongo);
-             console.log("ino:\n"+object.ino);*/
-
             res.send(object);
-
         },
         createNewApioAppFromEditor: function (req, res) {
             var obj = req.body.object;
@@ -255,50 +180,7 @@ module.exports = function (Apio) {
                     console.log("/apio/Database/createNewApioAppFromEditor Error while saving");
                     res.send(500);
                 } else {
-                    res.send();
-
-                    //var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
-                    //sql_db.connect(function (err) {
-                    //    if (err) {
-                    //        console.log("Error while connecting to MySQL: ", err);
-                    //    } else {
-                    //        console.log("Successfully connected to MySQL");
-                    //        var condition_array = [];
-                    //        for (var p in obj.properties) {
-                    //            if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(obj.properties[p].type.toLowerCase()) > -1) {
-                    //                condition_array.push(p + " TEXT");
-                    //            } else if (["number", "trigger", "unclickabletrigger"].indexOf(obj.properties[p].type.toLowerCase()) > -1) {
-                    //                condition_array.push(p + " INT");
-                    //            } else if (["sensor", "slider", "unlimitedsensor"].indexOf(obj.properties[p].type.toLowerCase()) > -1) {
-                    //                condition_array.push(p + " DOUBLE");
-                    //            }
-                    //        }
-                    //
-                    //        var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
-                    //        var table = "";
-                    //        if (Apio.Configuration.type === "cloud") {
-                    //            table = obj.objectId + "_" + req.session.apioId;
-                    //        } else if (Apio.Configuration.type === "gateway") {
-                    //            table = obj.objectId;
-                    //        }
-                    //
-                    //        sql_db.query("CREATE TABLE `" + table + "` (" + condition_string + ")", function (error, result) {
-                    //            if (error) {
-                    //                console.log("Error while creating table: ", error);
-                    //            } else {
-                    //                console.log("Created table " + table + ", result: ", result);
-                    //                sql_db.query("CREATE INDEX timestamp ON `" + table + "` (timestamp)", function (error1, result1) {
-                    //                    if (error1) {
-                    //                        console.log("Error while creating table: ", error1);
-                    //                    } else {
-                    //                        console.log("Created index on table " + table + ", result1: ", result1);
-                    //                        sql_db.end();
-                    //                    }
-                    //                });
-                    //            }
-                    //        });
-                    //    }
-                    //});
+                    res.send(200);
 
                     if (Apio.Configuration.type === "cloud") {
                         var socketId = Apio.connectedSockets[req.session.apioId][0];
@@ -443,62 +325,6 @@ module.exports = function (Apio) {
 
                     res.send();
 
-                    //var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
-                    //sql_db.connect(function (err) {
-                    //    if (err) {
-                    //        console.log("Error while connecting to MySQL: ", err);
-                    //    } else {
-                    //        console.log("Successfully connected to MySQL");
-                    //        var condition_array = [];
-                    //        for (var p in obj.properties) {
-                    //            if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(obj.properties[p].type.toLowerCase()) > -1) {
-                    //                condition_array.push(p + " TEXT");
-                    //            } else if (["number", "trigger", "unclickabletrigger"].indexOf(obj.properties[p].type.toLowerCase()) > -1) {
-                    //                condition_array.push(p + " INT");
-                    //            } else if (["sensor", "slider", "unlimitedsensor"].indexOf(obj.properties[p].type.toLowerCase()) > -1) {
-                    //                condition_array.push(p + " DOUBLE");
-                    //            }
-                    //        }
-                    //
-                    //        var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
-                    //        var table = "";
-                    //        if (Apio.Configuration.type === "cloud") {
-                    //            table = obj.objectId + "_" + req.session.apioId;
-                    //        } else if (Apio.Configuration.type === "gateway") {
-                    //            table = obj.objectId;
-                    //        }
-                    //
-                    //        sql_db.query("CREATE TABLE `" + table + "` (" + condition_string + ")", function (error, result) {
-                    //            if (error) {
-                    //                console.log("Error while creating table: ", error);
-                    //            } else {
-                    //                console.log("Created table " + table + ", result: ", result);
-                    //                sql_db.query("CREATE INDEX timestamp ON `" + table + "` (timestamp)", function (error1, result1) {
-                    //                    if (error1) {
-                    //                        console.log("Error while creating index: ", error1);
-                    //                    } else {
-                    //                        console.log("Created index on table " + table + ", result1: ", result1);
-                    //                    }
-                    //
-                    //                    if (Apio.Configuration.type === "cloud") {
-                    //                        sql_db.end();
-                    //                    } else if (Apio.Configuration.type === "gateway") {
-                    //                        sql_db.query("CREATE EVENT IF NOT EXISTS log_deleter_" + table + " ON SCHEDULE EVERY 3 DAY ON COMPLETION PRESERVE COMMENT 'Deletes all logs on table " + table + " older than 3 days starting from now' DO DELETE FROM `" + table + "` WHERE DATEDIFF(NOW(), FROM_UNIXTIME(timestamp / 1000)) > 3", function (error2, result2) {
-                    //                            if (error2) {
-                    //                                console.log("Error while creating event: ", error2);
-                    //                            } else {
-                    //                                console.log("Created event on table " + table + ", result1: ", result2);
-                    //                            }
-                    //
-                    //                            sql_db.end();
-                    //                        });
-                    //                    }
-                    //                });
-                    //            }
-                    //        });
-                    //    }
-                    //});
-
                     Apio.io.emit("apio_server_new", obj.objectId);
 
                     if (Apio.Configuration.type === "gateway") {
@@ -550,7 +376,6 @@ module.exports = function (Apio) {
                             }
                         }
 
-                        //Apio.io.emit("apio.create.new.app", cloudNewData);
                         var socketId = Apio.connectedSockets[req.session.apioId][0];
                         Apio.io.sockets.connected[socketId].emit("apio.create.new.app", cloudNewData);
                     }
@@ -757,10 +582,8 @@ module.exports = function (Apio) {
                         console.log("C'è property installation");
                         if (result.installation == "autoinstalled") {
                             console.log("Installation vale autoinstalled");
-                            //FIX questo se siamo sul cloud va inviato al gateway
                             if (Apio.Configuration.type == "gateway") {
-                                console.log("Sono gateway, invio in seriale");
-                                console.log("l" + result.address + ":setmesh:999801-")
+                                console.log("Sono gateway, invio in seriale l" + result.address + ":setmesh:999801-");
                                 Apio.Serial.send("l" + result.address + ":setmesh:999801-");
 
                             } else {
@@ -778,28 +601,28 @@ module.exports = function (Apio) {
 
                     Apio.Database.deleteObject(Apio.Configuration.type === "cloud" ? o : (Apio.Configuration.type === "gateway" ? o.objectId : {}), function (err) {
                         console.log("Apio.Database.deleteObject callback");
-                        // Apio.Database.db.collection("Objects").remove({objectId : id}, function(err){
                         if (err) {
                             console.log("error while deleting the object " + o.objectId + " from the db");
-                            //res.status(500).send();
                         } else {
                             console.log("Tutto ok, sto per eliminare ricorsivamente la directory");
-                            //deleteFolderRecursive(basePath + "/" + o.objectId);
                             if (Apio.Configuration.type === "cloud") {
                                 deleteFolderRecursive("public/boards/" + req.session.apioId + "/" + o.objectId);
                             } else if (Apio.Configuration.type === "gateway") {
                                 deleteFolderRecursive("public/applications/" + o.objectId);
                             }
                             console.log("Faccio emit");
-                            //Apio.io.emit("apio_server_delete", o.objectId);
-                            var socketIds = Apio.connectedSockets[req.session.email];
-                            for (var i in socketIds) {
-                                if (req.session.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
-                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_delete", o.objectId);
+                            for (var x in Apio.connectedSockets) {
+                                if (x === "admin" || validator.isEmail(x)) {
+                                    var socketIds = Apio.connectedSockets[x];
+                                    for (var i in socketIds) {
+                                        if (req.session.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                            Apio.io.sockets.connected[socketIds[i]].emit("apio_server_delete", o.objectId);
+                                        }
+                                    }
                                 }
                             }
+
                             if (Apio.Configuration.type === "cloud") {
-                                //Apio.io.emit("apio.remote.object.delete", o.objectId);
                                 var socketId = Apio.connectedSockets[o.apioId][0];
                                 Apio.io.sockets.connected[socketId].emit("apio.remote.object.delete", o.objectId);
                             } else if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
@@ -810,9 +633,6 @@ module.exports = function (Apio) {
                             servicesKeys.forEach(function (service) {
                                 Apio.servicesSocket[service].emit("update_collections");
                             });
-
-                            console.log("Invio response");
-                            //res.send(200);
                         }
                     });
                 });
@@ -848,7 +668,6 @@ module.exports = function (Apio) {
                 }
             });
         },
-        //NUOVO
         changeSettingsObject: function (req, res) {
             var panId = "01";
             var o = {
@@ -887,118 +706,6 @@ module.exports = function (Apio) {
                 res.sendStatus(200);
             });
         },
-        //VECCHIO
-        //changeSettingsObject: function (req, res) {
-        //    var panId = "01";
-        //    var o = {
-        //        address: req.body.address,
-        //        name: req.body.name,
-        //        services: req.body.services,
-        //        tag: req.body.tag,
-        //        sleepTime: req.body.sleepTime
-        //    };
-        //
-        //    //Apio.Database.db.collection("Objects").findAndModify({objectId: req.body.id}, {}, {$set: o}, function (error, result) {
-        //    //    if (error) {
-        //    //        console.log(error);
-        //    //        res.status(500).send(error);
-        //    //    } else if (result) {
-        //    //        var c = {};
-        //    //        c.name = "apio_serial_send";
-        //    //        c.data = "l" + result.address + ":setmesh:" + o.address + panId + "-";
-        //    //        Apio.io.emit("socket_service", c);
-        //    //        res.sendStatus(200);
-        //    //    } else {
-        //    //        res.sendStatus(404);
-        //    //    }
-        //    //});
-        //
-        //    var searchQuery = {
-        //        objectId: req.body.id
-        //    };
-        //
-        //    if (Apio.Configuration.type === "cloud") {
-        //        searchQuery.apioId = req.session.apioId;
-        //    }
-        //
-        //    Apio.Database.db.collection("Objects").findAndModify(searchQuery, {}, {$set: o}, function (error, result) {
-        //        if (error) {
-        //            res.status(500).send(error);
-        //        } else if (result) {
-        //            //MODIFYING COMMUNICATION
-        //            if (req.body.address !== result.address) {
-        //                Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (err_bind, bind) {
-        //                    if (err_bind) {
-        //                        console.log("Error while getting addressBindToProperty communication: ", err_bind);
-        //                    } else if (bind) {
-        //                        delete bind._id;
-        //                        for (var protocol in bind) {
-        //                            if (protocol !== "name") {
-        //                                var addresses = Object.keys(bind[protocol]);
-        //                                for (var a in addresses) {
-        //                                    if (addresses[a] === result.address) {
-        //                                        bind[protocol][req.body.address] = JSON.parse(JSON.stringify(bind[protocol][addresses[a]]));
-        //                                        delete bind[protocol][addresses[a]];
-        //                                    }
-        //                                }
-        //                            }
-        //                        }
-        //
-        //                        Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: bind}, function (err_updt) {
-        //                            if (err_updt) {
-        //                                console.log("Error while updating communication addressBindToProperty: ", err_updt);
-        //                            } else {
-        //                                console.log("Communication addressBindToProperty successfully updated");
-        //                                Apio.addressBindToProperty = JSON.parse(JSON.stringify(bind));
-        //                            }
-        //                        });
-        //                    }
-        //                });
-        //            }
-        //
-        //            Apio.io.emit("socket_service", {
-        //                data: "l" + result.address + ":setmesh:" + o.address + panId + "-",
-        //                name: "apio_serial_send"
-        //            });
-        //
-        //            o.apioId = req.session.apioId;
-        //            o.objectId = req.body.id;
-        //            var event = {
-        //                server: "apio_object_change_settings.fromgateway",
-        //                remote: "apio_object_change_settings.fromcloud"
-        //            };
-        //            Apio.System.sync(event, o);
-        //
-        //            for (var x in Apio.connectedSockets) {
-        //                if (x === "admin" || validator.isEmail(x)) {
-        //                    var socketIds = Apio.connectedSockets[x];
-        //                    for (var i in socketIds) {
-        //                        if (o.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
-        //                            Apio.io.sockets.connected[socketIds[i]].emit("apio_object_change_settings", o);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //
-        //            //for (var x in Apio.connectedSockets) {
-        //            //    if (x === "admin" || validator.isEmail(x)) {
-        //            //        var socketIds = Apio.connectedSockets[x];
-        //            //        for (var i in socketIds) {
-        //            //            if (Apio.Configuration.type === "cloud") {
-        //            //                if (o.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
-        //            //                    Apio.io.sockets.connected[socketIds[i]].emit("apio_object_change_settings", o);
-        //            //                }
-        //            //            } else if (Apio.Configuration.type === "gateway") {
-        //            //                Apio.io.sockets.connected[socketIds[i]].emit("apio_object_change_settings", o);
-        //            //            }
-        //            //        }
-        //            //    }
-        //            //}
-        //
-        //            res.sendStatus(200);
-        //        }
-        //    });
-        //},
         uploadApioApp: function (req, res) {
             console.log("/apio/app/upload");
 
@@ -1020,14 +727,11 @@ module.exports = function (Apio) {
                         console.log(err);
 
                     console.log("The extraction has ended!");
-                    //recupero max actual id
                     Apio.Database.getMaximumObjectId(function (error, data) {
                         if (error) {
                             console.log("error: " + error);
                         } else if (data) {
                             console.log("data is: " + data);
-                            //qui rinomino i cazzetti nell"id attuale
-
                             var id = "*_TMP_*";
                             var path = "upload/temp/" + id + "/" + id;
                             var object = {};
@@ -1198,7 +902,6 @@ module.exports = function (Apio) {
                             object.icon = fs.readFileSync("upload/temp/" + id + "/icon.png");
                             object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
                             object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
-                            //object.json = fs.readFileSync(path+".json", {encoding: "utf8"});
                             object.mongo = fs.readFileSync(path + ".mongo", {encoding: "utf8"});
                             path = "upload/temp/" + id + "/_" + id;
                             object.ino = fs.readFileSync(path + "/_" + id + ".ino", {encoding: "utf8"});
@@ -1219,13 +922,10 @@ module.exports = function (Apio) {
                             object.mongo.apioId = req.session.apioId;
                             console.log('"objectId after":"' + object.mongo.objectId + '"')
 
-                            //Apio.Database.db.collection("Objects").insert(JSON.parse(object.json),function(err,data){
-                            //Apio.Database.db.collection("Objects").insert(object.mongo, function (err, data) {
                             Apio.Database.registerObject(object.mongo, function (err) {
                                 if (err) {
                                     console.log(err);
                                 } else {
-                                    //var path = "public/applications/";
                                     var path = "";
                                     if (Apio.Configuration.type === "cloud") {
                                         path = "public/boards/" + req.session.apioId;
@@ -1253,7 +953,6 @@ module.exports = function (Apio) {
 
                                     fs.writeFileSync(path + "/" + dummy + "/_" + dummy + "/_" + dummy + ".ino", object.ino);
                                     fs.writeFileSync(path + "/" + dummy + "/_" + dummy + "/Makefile", object.makefile);
-                                    //fs.writeFileSync(path+"/"+dummy+"/" + dummy + ".json",object.json);
                                     deleteFolderRecursive("upload");
                                     res.send({id: dummy});
 
@@ -1291,49 +990,6 @@ module.exports = function (Apio) {
                                             Apio.Remote.socket.emit("apio.upload.app", obj);
                                         }
                                     }
-
-                                    //var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
-                                    //sql_db.connect(function (err) {
-                                    //    if (err) {
-                                    //        console.log("Error while connecting to MySQL: ", err);
-                                    //    } else {
-                                    //        console.log("Successfully connected to MySQL");
-                                    //        var condition_array = [];
-                                    //        for (var p in object.mongo.properties) {
-                                    //            if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(object.mongo.properties[p].type.toLowerCase()) > -1) {
-                                    //                condition_array.push(p + " TEXT");
-                                    //            } else if (["number", "trigger", "unclickabletrigger"].indexOf(object.mongo.properties[p].type.toLowerCase()) > -1) {
-                                    //                condition_array.push(p + " INT");
-                                    //            } else if (["sensor", "slider", "unlimitedsensor"].indexOf(object.mongo.properties[p].type.toLowerCase()) > -1) {
-                                    //                condition_array.push(p + " DOUBLE");
-                                    //            }
-                                    //        }
-                                    //
-                                    //        var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
-                                    //        var table = "";
-                                    //        if (Apio.Configuration.type === "cloud") {
-                                    //            table = object.mongo.objectId + "_" + req.session.apioId;
-                                    //        } else if (Apio.Configuration.type === "gateway") {
-                                    //            table = object.mongo.objectId;
-                                    //        }
-                                    //
-                                    //        sql_db.query("CREATE TABLE `" + table + "` (" + condition_string + ")", function (error, result) {
-                                    //            if (error) {
-                                    //                console.log("Error while creating table: ", error);
-                                    //            } else {
-                                    //                console.log("Created table " + table + ", result: ", result);
-                                    //                sql_db.query("CREATE INDEX timestamp ON `" + table + "` (timestamp)", function (error1, result1) {
-                                    //                    if (error1) {
-                                    //                        console.log("Error while creating table: ", error1);
-                                    //                    } else {
-                                    //                        console.log("Created index on table " + table + ", result1: ", result1);
-                                    //                        sql_db.end();
-                                    //                    }
-                                    //                });
-                                    //            }
-                                    //        });
-                                    //    }
-                                    //});
                                 }
                             });
                         }
@@ -1360,11 +1016,10 @@ module.exports = function (Apio) {
         },
         gitCloneApp: function (req, res) {
             console.log("/apio/app/gitCloneApp");
-            //clone(repo, targetPath, [options], cb)
             var repo = req.body.gitPath;
             var targetPath = "./temp";
-            deleteFolderRecursive("./temp"); // be sure temp folder does not exist. If exist it automatically delete it
-            fs.mkdirSync("./temp"); //create a new temp folder
+            deleteFolderRecursive("./temp");
+            fs.mkdirSync("./temp");
             clone(repo, targetPath, function () {
                 console.log("cloned repo " + repo + " in target " + targetPath);
                 console.log("uploading the app in the Apio Application folder");
@@ -1375,8 +1030,6 @@ module.exports = function (Apio) {
                     }
                     else if (data) {
                         console.log("data is: " + data);
-                        //qui rinomino i *_TMP_* nell"id attuale
-
                         var id = "*_TMP_*";
                         var path = "./temp/" + id + "/" + id;
                         var object = {};
@@ -1388,7 +1041,6 @@ module.exports = function (Apio) {
                         object.icon = fs.readFileSync("./temp/" + id + "/icon.png", {encoding: "base64"});
                         object.js = fs.readFileSync(path + ".js", {encoding: "utf8"});
                         object.html = fs.readFileSync(path + ".html", {encoding: "utf8"});
-                        //object.json = fs.readFileSync(path+".json", {encoding: "utf8"});
                         object.mongo = fs.readFileSync(path + ".mongo", {encoding: "utf8"});
 
                         console.log(object.mongo)
@@ -1405,8 +1057,6 @@ module.exports = function (Apio) {
                         object.html = object.html.replace("applications/" + id + "/" + id + ".js", "applications/" + dummy + "/" + dummy + ".js");
                         object.html = object.html.replace(/applications\/\*_TMP_\*\//g, "applications/" + dummy + "/");
 
-                        //object.json=object.json.replace(""objectId":""+id+""",""objectId":""+dummy+""");
-                        //object.mongo=object.mongo.replace(""objectId":""+id+""",""objectId":""+dummy+""")
                         object.mongo = JSON.parse(object.mongo);
                         delete object.mongo._id;
                         console.log(object.mongo)
@@ -1419,13 +1069,10 @@ module.exports = function (Apio) {
 
                         console.log('"objectId after":"' + object.mongo.objectId + '"')
 
-                        //Apio.Database.db.collection("Objects").insert(JSON.parse(object.json),function(err,data){
-                        //Apio.Database.db.collection("Objects").insert(object.mongo, function (err, data) {
                         Apio.Database.registerObject(object.mongo, function (err) {
                             if (err) {
                                 console.log(err);
                             } else {
-                                //var path = "public/applications/";
                                 var path = "";
                                 if (Apio.Configuration.type === "cloud") {
                                     path = "public/boards/" + req.session.apioId;
@@ -1487,9 +1134,7 @@ module.exports = function (Apio) {
                             }
                         });
                     }
-
                 });
-                //res.send({data:"gitCloneApp has been executed"});
             });
         }
     }

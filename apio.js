@@ -37,29 +37,6 @@ var getApioIdentifier = function () {
     }
 };
 
-// var returnConfigFile = function () {
-//     var configuration = undefined;
-//     try {
-//         configuration = require("./configuration/custom.js");
-//         configuration.dongle = require("./configuration/dongle.js");
-//
-//         console.log("Loading custom.js");
-//         return {
-//             file: configuration,
-//             name: "configuration/custom.js"
-//         };
-//     } catch (ex) {
-//         configuration = require("./configuration/default.js");
-//         configuration.dongle = require("./configuration/dongle.js");
-//
-//         console.log("Unable to find custom.js, loading default.js");
-//         return {
-//             file: configuration,
-//             name: "configuration/default.js"
-//         };
-//     }
-// };
-
 var returnConfigFile = function () {
     var configuration = undefined, name = undefined;
     try {
@@ -123,7 +100,6 @@ var singleton_socket = function () {
     };
 }();
 
-// module.exports = function (config, enableCloudSocket) {
 module.exports = function (enableCloudSocket) {
     "use strict";
     var Apio = {};
@@ -162,7 +138,6 @@ module.exports = function (enableCloudSocket) {
 
     Apio.config = {};
     Apio.config.return = returnConfigFile;
-    // Apio.Configuration = config;
     Apio.Configuration = Apio.config.return().file;
 
     if (Apio.Configuration.type === "gateway") {
@@ -203,7 +178,6 @@ module.exports = function (enableCloudSocket) {
         }
     };
 
-    //
     Apio.servicesSocket = {
         autoInstall: require("socket.io-client")("http://localhost:8101"),
         boardSync: require("socket.io-client")("http://localhost:8087"),
@@ -218,7 +192,6 @@ module.exports = function (enableCloudSocket) {
         shutdown: require("socket.io-client")("http://localhost:8096"),
         zwave: require("socket.io-client")("http://localhost:5000")
     };
-    //
 
     Apio.Communication = {};
     Apio.Communication.sendAddressBindToProperty = function (data) {
@@ -324,57 +297,6 @@ module.exports = function (enableCloudSocket) {
                         }
                     }
                 }
-
-
-                //for (var x in propertiesKeys) {
-                //    if (propertiesKeys[x] !== "date") {
-                //        var propertyValue = data.properties[propertiesKeys[x]];
-                //        var bindProtocols = Object.keys(Apio.addressBindToProperty);
-                //        for (var bindProtocolIndex = 0; bindProtocolIndex < bindProtocols.length; bindProtocolIndex++) {
-                //            if (typeof Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]] === "object") {
-                //                var addresses = Object.keys(Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]]);
-                //                for (var addressIndex = 0; addressIndex < addresses.length; addressIndex++) {
-                //                    if (typeof Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]][addresses[addressIndex]] === "object") {
-                //                        var properties = Object.keys(Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]][addresses[addressIndex]]);
-                //                        for (var propertiesIndex = 0; propertiesIndex < properties.length; propertiesIndex++) {
-                //                            if (typeof Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]][addresses[addressIndex]][properties[propertiesIndex]] === "object") {
-                //                                for (var oId in Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]][addresses[addressIndex]][properties[propertiesIndex]]) {
-                //                                    if (data.objectId === oId && propertiesKeys[x] === Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]][addresses[addressIndex]][properties[propertiesIndex]][oId]) {
-                //                                        var d = new Date();
-                //                                        var day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
-                //                                        var month = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
-                //                                        var year = d.getFullYear();
-                //                                        var hour = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
-                //                                        var minute = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
-                //                                        var second = d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds();
-                //
-                //                                        var newDate = day + "/" + month + "/" + year + " - " + hour + ":" + minute + ":" + second;
-                //
-                //                                        var o = {
-                //                                            objectId: Apio.addressBindToProperty[bindProtocols[bindProtocolIndex]][addresses[addressIndex]].objectId,
-                //                                            command: data.command,
-                //                                            properties: {
-                //                                                date: newDate
-                //                                            },
-                //                                            apioId: data.apioId,
-                //                                            writeToDatabase: true,
-                //                                            writeToSerial: false
-                //                                        };
-                //                                        o.properties[properties[propertiesIndex]] = propertyValue;
-                //                                        Apio.Object.update(o, function () {
-                //                                            Apio.servicesSocket.notification.emit("send_notification", o);
-                //                                            Apio.servicesSocket.log.emit("log_update", o);
-                //                                        });
-                //                                    }
-                //                                }
-                //                            }
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
             }
         }
     };
@@ -456,7 +378,6 @@ module.exports = function (enableCloudSocket) {
     };
 
     Apio.Util.ApioToJSON = function (str) {
-        //var regex = /([lz])?(\w+)\:(send|update|energy|hi|register|request+)?\:?([\w+\:(\w|\w\.\w)+\-]+)/;
         console.log('str: ', str);
         var regex = /([lz])?(\w+\|\w+|\w+)\:(\w+)?\:?([\w+\:(\w|\w\.\w)+\-]+)/;
         var match = regex.exec(str);
@@ -531,7 +452,6 @@ module.exports = function (enableCloudSocket) {
 
             for (var i in Apio.servicesSocket) {
                 Apio.servicesSocket[i].on("send_to_client", function (data) {
-                    //Apio.io.emit(data.message, data.data);
                     if (data.hasOwnProperty("who")) {
                         if (Apio.connectedSockets.hasOwnProperty(data.who)) {
                             var socketIds = Apio.connectedSockets[data.who];
@@ -806,15 +726,29 @@ module.exports = function (enableCloudSocket) {
                     }
                 });
 
+                socket.on("close_autoInstall_modal.fromgateway", function (apioId) {
+                    for (var user in Apio.connectedSockets) {
+                        if (user === "admin" || validator.isEmail(user)) {
+                            for (var i in Apio.connectedSockets[user]) {
+                                if (Apio.connectedSockets[user][i] !== socket.id && apioId === Apio.io.sockets.connected[Apio.connectedSockets[user][i]].client.request.session.apioId) {
+                                    Apio.io.sockets.connected[Apio.connectedSockets[user][i]].emit("close_autoInstall_modal");
+                                }
+                            }
+                        }
+                    }
+                });
+
                 socket.on("close_autoInstall_modal", function (apioId) {
                     if (Apio.Configuration.type === "cloud" && Apio.connectedSockets.hasOwnProperty(apioId) && Apio.connectedSockets[apioId][0]) {
                         Apio.io.sockets.connected[Apio.connectedSockets[apioId][0]].emit("close_autoInstall_modal");
+                    } else if (Apio.Configuration.type === "gateway") {
+                        Apio.Remote.socket.emit("close_autoInstall_modal.fromgateway", apioId);
                     }
 
                     for (var user in Apio.connectedSockets) {
                         if (user === "admin" || validator.isEmail(user)) {
                             for (var i in Apio.connectedSockets[user]) {
-                                if (Apio.connectedSockets[user][i] !== socket.id) {
+                                if (Apio.connectedSockets[user][i] !== socket.id && apioId === Apio.io.sockets.connected[Apio.connectedSockets[user][i]].client.request.session.apioId) {
                                     Apio.io.sockets.connected[Apio.connectedSockets[user][i]].emit("close_autoInstall_modal");
                                 }
                             }
@@ -845,19 +779,9 @@ module.exports = function (enableCloudSocket) {
                         if (err) {
                             console.log("Error while getting objects: ", err);
                         } else if (doc) {
-                            //OBJECTS RETEIVE VECCHIO
                             for (var i in doc) {
                                 objects[doc[i].objectId] = doc[i];
                             }
-
-                            //OBJECTS RETEIVE NUOVO
-                            //for (var i in doc) {
-                            //    if (!objects.hasOwnProperty(doc[i].apioId)) {
-                            //        objects[doc[i].apioId] = {};
-                            //    }
-                            //
-                            //    objects[doc[i].apioId][doc[i].objectId] = doc[i];
-                            //}
                         }
                     });
 
@@ -866,237 +790,6 @@ module.exports = function (enableCloudSocket) {
                         Apio.servicesSocket[service].emit("update_collections");
                     });
                 });
-
-                //socket.on("apio_change_bind_to_property", function (data) {
-                //    //var data = {
-                //    //    command: "add",
-                //    //    addData: {
-                //    //        protocol: "The protocol in which something have to be added. If it does not exist it will created. If specified it also address, originalProperty, bindedObjectId and bindedProperty are expected.",
-                //    //        address: "The address in which a something have to be added. If it does not exist it will created. If specified it also protocol, originalProperty, bindedObjectId and bindedProperty are expected.",
-                //    //        objectId: "The objectId have to be added. If specified it also protocol, address are expected.",
-                //    //        type: "The type have to be added. If specified it also protocol, address are expected.",
-                //    //        originalProperty: "The originalProperty in which a something have to be added. If it does not exist it will created. If specified it also protocol, address, bindedObjectId and bindedProperty are expected.",
-                //    //        bindedObjectId: "The bindedObjectId have to be added. If specified it also protocol, address, originalProperty and bindedProperty are expected.",
-                //    //        bindedProperty: "The bindedProperty have to be added. If specified it also protocol, address, originalProperty and bindedObjectId are expected."
-                //    //    }
-                //    //}
-                //
-                //    //var data = {
-                //    //    command: "delete",
-                //    //    deleteData: {
-                //    //        protocol: "The protocol have to be deleted. No protocol will be deleted if address is specified.",
-                //    //        address: "The address have to be deleted. If specified also protocol is expected. No address will be deleted if originalProperty is specified.",
-                //    //        originalProperty: "The originalProperty have to be deleted. If specified also protocol and address are expected. No originalProperty will be deleted if bindedObjectId is specified.",
-                //    //        bindedObjectId: "The bindedObjectId have to be deleted. If specified also protocol, address and originalProperty are expected."
-                //    //    }
-                //    //}
-                //
-                //    //var data = {
-                //    //    command: "modify",
-                //    //    modifyData: {
-                //    //        protocol: "The protocol in which a modify is required. If specified it automatically exclude both oldProtocol and newProtocol.",
-                //    //        oldProtocol: "The protocol has been changed. If specified also newProtocol is expected and protocol is automatically excluded.",
-                //    //        newProtocol: "The protocol have to be set in substitution of oldProtocol. If specified also oldProtocol is expected and protocol is automatically excluded.",
-                //    //        address: "The address in which a modify is required. If specified also protocol (or oldProtocol and newProtocol) is required. It automatically exclude both oldAddress and newAddress.",
-                //    //        oldAddress: "The address has been changed. If specified also newAddress and protocol (or oldProtocol and newProtocol) are expected and address is automatically excluded.",
-                //    //        newAddress: "The address have to be set in substitution of oldAddress. If specified also oldAddress and protocol (or oldProtocol and newProtocol) are expected and address is automatically excluded.",
-                //    //        newObjectId: "The objectId to set. If specified also protocol (or oldProtocol and newProtocol) and address (or oldAddress and newAddress).",
-                //    //        newType: "The type to set. If specified also protocol (or oldProtocol and newProtocol) and address (or oldAddress and newAddress).",
-                //    //        originalProperty: "The originalProperty in which a modify is required. If specified also protocol (or oldProtocol and newProtocol) and address (or oldAddress and newAddress) are expected. It automatically exclude both oldOriginalProperty and newOriginalProperty.",
-                //    //        oldOriginalProperty: "The originalProperty has been changed. If specified also newOriginalProperty, protocol (or oldProtocol and newProtocol) and address (or oldAddress and newAddress) are expected and originalProperty is automatically excluded.",
-                //    //        newOriginalProperty: "The originalProperty have to be set in substitution of oldOriginalProperty. If specified also oldOriginalProperty, protocol (or oldProtocol and newProtocol) and address (or oldAddress and newAddress) are expected and originalProperty is automatically excluded.",
-                //    //        bindedObjectId: "The bindedObjectId in which a modify is required. If specified also protocol (or oldProtocol and newProtocol), address (or oldAddress and newAddress) and originalProperty (or oldOriginalProperty and newOriginalProperty). It automatically exclude both oldBindedObjectId and newBindedObjectId.",
-                //    //        oldBindedObjectId: "The bindedObjectId has been changed. If specified also newBindedObjectId, protocol (or oldProtocol and newProtocol), address (or oldAddress and newAddress) and originalProperty (or oldOriginalProperty and newOriginalProperty) are expected and bindedObjectId is automatically excluded.",
-                //    //        newBindedObjectId: "The bindedObjectId have to be set in substitution of oldBindedObjectId. If specified also oldBindedObjectId, protocol (or oldProtocol and newProtocol), address (or oldAddress and newAddress) and originalProperty (or oldOriginalProperty and newOriginalProperty) are expected and bindedObjectId is automatically excluded.",
-                //    //        newBindedProperty: "The bindedProperty have to be set in substitution of the previous."
-                //    //    }
-                //    //}
-                //
-                //    if (data.command === "add" && data.hasOwnProperty("addData")) {
-                //        var protocol = data.addData.protocol;
-                //        var address = data.addData.address;
-                //        var objectId = data.addData.objectId;
-                //        var type = data.addData.type;
-                //        var originalProperty = data.addData.originalProperty;
-                //        var bindedObjectId = data.addData.bindedObjectId;
-                //        var bindedProperty = data.addData.bindedProperty;
-                //
-                //        //if (protocol != null && address != null && originalProperty != null && bindedObjectId != null && bindedProperty != null) {
-                //        //    if (!Apio.addressBindToProperty.hasOwnProperty(protocol)) {
-                //        //        Apio.addressBindToProperty[protocol] = {};
-                //        //    }
-                //        //
-                //        //    if (!Apio.addressBindToProperty[protocol].hasOwnProperty(address)) {
-                //        //        Apio.addressBindToProperty[protocol][address] = {};
-                //        //
-                //        //        if (objectId != null) {
-                //        //            Apio.addressBindToProperty[protocol][address].objectId = objectId;
-                //        //        }
-                //        //
-                //        //        if (type != null) {
-                //        //            Apio.addressBindToProperty[protocol][address].type = type;
-                //        //        }
-                //        //    }
-                //        //
-                //        //    if (!Apio.addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-                //        //        Apio.addressBindToProperty[protocol][address][originalProperty] = {};
-                //        //    }
-                //        //
-                //        //    Apio.addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-                //        //}
-                //
-                //        if (protocol != null) {
-                //            if (!Apio.addressBindToProperty.hasOwnProperty(protocol)) {
-                //                Apio.addressBindToProperty[protocol] = {};
-                //            }
-                //
-                //            if (address != null) {
-                //                if (!Apio.addressBindToProperty[protocol].hasOwnProperty(address)) {
-                //                    Apio.addressBindToProperty[protocol][address] = {};
-                //
-                //                    if (objectId != null) {
-                //                        Apio.addressBindToProperty[protocol][address].objectId = objectId;
-                //                    }
-                //
-                //                    if (type != null) {
-                //                        Apio.addressBindToProperty[protocol][address].type = type;
-                //                    }
-                //                }
-                //
-                //                if (originalProperty != null) {
-                //                    if (!Apio.addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-                //                        Apio.addressBindToProperty[protocol][address][originalProperty] = {};
-                //                    }
-                //
-                //                    if (bindedObjectId != null && bindedProperty != null) {
-                //                        Apio.addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-                //                    }
-                //                }
-                //            }
-                //        }
-                //
-                //        //Update collection objects
-                //        Apio.Database.db.collection("Objects").findOne({objectId: objectId}, function (err_find, obj) {
-                //            if (err_find) {
-                //                console.log("Error while finding object with objectId " + objectId + ": ", err_find);
-                //            } else if (obj) {
-                //                objects[objectId] = obj;
-                //            }
-                //        });
-                //
-                //        //Update services
-                //        if (Apio.servicesSocket.hasOwnProperty(protocol)) {
-                //            Apio.servicesSocket[protocol].emit("update_collections", data);
-                //        } else if (protocol === "apio") {
-                //            Apio.servicesSocket.dongle.emit("update_collections", data);
-                //        }
-                //    } else if (data.command === "delete" && data.hasOwnProperty("deleteData")) {
-                //        var protocol = data.deleteData.protocol;
-                //        var address = data.deleteData.address;
-                //        var originalProperty = data.deleteData.originalProperty;
-                //        var bindedObjectId = data.deleteData.bindedObjectId;
-                //
-                //        if (Apio.addressBindToProperty.hasOwnProperty(protocol)) {
-                //            if (Apio.addressBindToProperty[protocol].hasOwnProperty(address)) {
-                //                if (Apio.addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-                //                    if (Apio.addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId)) {
-                //                        delete Apio.addressBindToProperty[protocol][address][originalProperty][bindedObjectId];
-                //                    } else if (originalProperty != null) {
-                //                        delete Apio.addressBindToProperty[protocol][address][originalProperty];
-                //                    }
-                //                } else if (address != null) {
-                //                    delete Apio.addressBindToProperty[protocol][address];
-                //                }
-                //            } else if (protocol != null) {
-                //                delete Apio.addressBindToProperty[protocol];
-                //            }
-                //        }
-                //
-                //        //Update collection objects
-                //        delete objects[bindedObjectId];
-                //
-                //        //Update services
-                //        if (Apio.servicesSocket.hasOwnProperty(protocol)) {
-                //            Apio.servicesSocket[protocol].emit("update_collections", data);
-                //        } else if (protocol === "apio") {
-                //            Apio.servicesSocket.dongle.emit("update_collections", data);
-                //        }
-                //    } else if (data.command === "modify" && data.hasOwnProperty("modifyData")) {
-                //        var protocol = data.modifyData.newProtocol || data.modifyData.protocol;
-                //        var address = data.modifyData.newAddress || data.modifyData.address;
-                //        var objectId = data.modifyData.newObjectId;
-                //        var type = data.modifyData.newType;
-                //        var originalProperty = data.modifyData.newOriginalProperty || data.modifyData.originalProperty;
-                //        var bindedObjectId = data.modifyData.newBindedObjectId || data.modifyData.bindedObjectId;
-                //        var bindedProperty = data.modifyData.newBindedProperty;
-                //
-                //        if (protocol != null && (Apio.addressBindToProperty.hasOwnProperty(protocol) || (data.modifyData.oldProtocol != null && Apio.addressBindToProperty.hasOwnProperty(data.modifyData.oldProtocol)))) {
-                //            if (!Apio.addressBindToProperty.hasOwnProperty(protocol)) {
-                //                Apio.addressBindToProperty[protocol] = JSON.parse(JSON.stringify(Apio.addressBindToProperty[data.modifyData.oldProtocol]));
-                //                delete Apio.addressBindToProperty[data.modifyData.oldProtocol];
-                //            }
-                //
-                //            if (address != null && (Apio.addressBindToProperty[protocol].hasOwnProperty(address) || (data.modifyData.oldAddress != null && Apio.addressBindToProperty[protocol].hasOwnProperty(data.modifyData.oldAddress)))) {
-                //                if (!Apio.addressBindToProperty[protocol].hasOwnProperty(address)) {
-                //                    Apio.addressBindToProperty[protocol][address] = JSON.parse(JSON.stringify(Apio.addressBindToProperty[protocol][data.modifyData.oldAddress]));
-                //                    delete Apio.addressBindToProperty[protocol][data.modifyData.oldAddress];
-                //                }
-                //
-                //                if (objectId != null) {
-                //                    Apio.addressBindToProperty[protocol][address].objectId = objectId;
-                //                }
-                //
-                //                if (type != null) {
-                //                    Apio.addressBindToProperty[protocol][address].type = type;
-                //                }
-                //
-                //                if (originalProperty != null && (Apio.addressBindToProperty[protocol][address].hasOwnProperty(originalProperty) || (data.modifyData.oldOriginalProperty != null && Apio.addressBindToProperty[protocol][address].hasOwnProperty(data.modifyData.oldOriginalProperty)))) {
-                //                    if (!Apio.addressBindToProperty[protocol][address].hasOwnProperty(originalProperty)) {
-                //                        Apio.addressBindToProperty[protocol][address][originalProperty] = JSON.parse(JSON.stringify(Apio.addressBindToProperty[protocol][address][data.modifyData.oldOriginalProperty]));
-                //                        delete Apio.addressBindToProperty[protocol][address][data.modifyData.oldOriginalProperty];
-                //                    }
-                //
-                //                    if (bindedObjectId != null && (Apio.addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId) || (data.modifyData.oldBindedObjectId != null && Apio.addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(data.modifyData.oldBindedObjectId)))) {
-                //                        if (!Apio.addressBindToProperty[protocol][address][originalProperty].hasOwnProperty(bindedObjectId)) {
-                //                            Apio.addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = Apio.addressBindToProperty[protocol][address][originalProperty][data.modifyData.oldBindedObjectId];
-                //                            delete Apio.addressBindToProperty[protocol][address][originalProperty][data.modifyData.oldBindedObjectId];
-                //                        }
-                //
-                //                        if (bindedProperty != null) {
-                //                            Apio.addressBindToProperty[protocol][address][originalProperty][bindedObjectId] = bindedProperty;
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
-                //
-                //        //Update collection objects
-                //        Apio.Database.db.collection("Objects").findOne({objectId: objectId}, function (err_find, obj) {
-                //            if (err_find) {
-                //                console.log("Error while finding object with objectId " + objectId + ": ", err_find);
-                //            } else if (obj) {
-                //                objects[objectId] = obj;
-                //            }
-                //        });
-                //
-                //        //Update services
-                //        if (Apio.servicesSocket.hasOwnProperty(protocol)) {
-                //            Apio.servicesSocket[protocol].emit("update_collections", data);
-                //        } else if (protocol === "apio") {
-                //            Apio.servicesSocket.dongle.emit("update_collections", data);
-                //        }
-                //    }
-                //
-                //    delete Apio.addressBindToProperty._id;
-                //
-                //    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: Apio.addressBindToProperty}, function (err_updt) {
-                //        if (err_updt) {
-                //            console.log("Error while updating communication addressBindToProperty: ", err_updt);
-                //        } else {
-                //            console.log("Communication addressBindToProperty successfully updated");
-                //        }
-                //    });
-                //});
 
                 socket.on("apio.update.apio.app", function (data) {
                     fs.writeFileSync("public/boards/" + data.apioId + "/" + data.objectId + "/" + data.objectId + ".html", data.html);
@@ -1302,7 +995,6 @@ module.exports = function (enableCloudSocket) {
                 });
 
                 socket.on("send_to_client", function (data) {
-                    //Apio.io.emit(data.message, data.data);
                     if (data.hasOwnProperty("who")) {
                         if (Apio.connectedSockets.hasOwnProperty(data.who)) {
                             var socketIds = Apio.connectedSockets[data.who];
@@ -1344,19 +1036,12 @@ module.exports = function (enableCloudSocket) {
                 });
 
                 socket.on("ask_board_ip", function (data) {
-                    //Apio.io.emit("ask_board_ip", data);
                     if (Apio.connectedSockets.hasOwnProperty(data.who)) {
-                        //Apio.io.sockets.connected[Apio.connectedSockets[data.who][0]].emit("ask_board_ip", data.who);
                         Apio.io.sockets.connected[Apio.connectedSockets[data.who][0]].emit("ask_board_ip");
                     }
                 });
 
                 socket.on("get_board_ip", function (data) {
-                    //Apio.io.emit("get_board_ip", data);
-                    //if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
-                    //    Apio.Remote.socket.emit("get_board_ip", data);
-                    //}
-
                     if (Apio.Configuration.type === "cloud") {
                         Apio.io.emit("get_board_ip", data);
                         //MIGLIORARE (TROVARE TUTTE LE E-MAIL E MANDARE SOLO Lì)
@@ -1465,7 +1150,6 @@ module.exports = function (enableCloudSocket) {
                 });
 
                 socket.on("apio.add.db.planimetry.fromgateway", function (data) {
-                    //console.log("apio.add.db.planimetry.fromgateway, data: ", data);
                     delete data.planimetry._id;
                     data.planimetry.apioId = data.apioId;
 
@@ -1477,18 +1161,6 @@ module.exports = function (enableCloudSocket) {
                             console.log("Error while inserting Planimetry with planimetryId " + data.planimetry.planimetryId);
                         } else if (result) {
                             console.log("Planimetry with planimetryId " + data.planimetry.planimetryId + " successfully inserted");
-
-                            //Apio.io.emit("apio.add.db.planimetry", data.planimetry);
-
-                            //for (var u in data.planimetry.user) {
-                            //    var socketIds = Apio.connectedSockets[data.planimetry.user[u].email];
-                            //    for (var i in socketIds) {
-                            //        if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
-                            //            Apio.io.sockets.connected[socketIds[i]].emit("apio.add.db.planimetry", data.planimetry);
-                            //        }
-                            //    }
-                            //}
-
                             for (var sid in Apio.io.sockets.connected) {
                                 if (Apio.io.sockets.connected[sid].hasOwnProperty("client") && Apio.io.sockets.connected[sid].client.hasOwnProperty("request") && Apio.io.sockets.connected[sid].client.request.hasOwnProperty("session") && Apio.io.sockets.connected[sid].client.request.session.hasOwnProperty("apioId") && Apio.io.sockets.connected[sid].client.request.session.hasOwnProperty("priviligies") && data.apioId === Apio.io.sockets.connected[sid].client.request.session.apioId) {
                                     if (Apio.io.sockets.connected[sid].client.request.session.priviligies === "superAdmin") {
@@ -1510,7 +1182,6 @@ module.exports = function (enableCloudSocket) {
 
                 socket.on("apio.remove.db.planimetry.fromgateway", function (data) {
                     Apio.Database.db.collection("Planimetry").remove(data, function (result) {
-                        //Apio.io.emit("apio.remove.db.planimetry", data.planimetryId);
                         for (var x in Apio.connectedSockets) {
                             if (x === "admin" || validator.isEmail(x)) {
                                 var socketIds = Apio.connectedSockets[x];
@@ -1563,7 +1234,6 @@ module.exports = function (enableCloudSocket) {
                         if (error) {
                             console.log("Error while inserting new User: ", error);
                         } else if (user) {
-                            //Apio.io.emit("apio_user_new", user);
                             for (var x in Apio.connectedSockets) {
                                 if (x === "admin" || validator.isEmail(x)) {
                                     var socketIds = Apio.connectedSockets[x];
@@ -1606,10 +1276,8 @@ module.exports = function (enableCloudSocket) {
                     var uri = "https://raw.githubusercontent.com/ApioLab/updates/master/apio_updater.sh";
                     var path = "apio_updater.sh";
                     request({uri: uri}).pipe(fs.createWriteStream(path)).on('close', function () {
-                        ////console.log("Downloaded Hex file");
                         exec("sudo chmod +x apio_updater.sh && sudo ./apio_updater.sh", function (error, stdout, stderr) {
                             console.log("Scaricato e aggiornato riavvio necessario");
-                            //exec("sudo ./apio_updater.sh", function (error, stdout, stderr) {
                             console.log("Scaricato e aggiornato riavvio necessario ", stdout);
                             fs.unlink("apio_updater.sh", function (err) {
                                 if (err) {
@@ -1623,29 +1291,8 @@ module.exports = function (enableCloudSocket) {
 
                                 }
                             });
-                            //});
                         });
                     });
-                    /*var sys = require("sys");
-                     var exec = require("child_process").exec;
-                     var child = exec("git pull https://alechelli:\$kateb0ard1@github.com/ApioLab/Apio-VIP-2.3-DEV.git", function (error, stdout, stderr) {
-                     if (error !== null) {
-                     console.log("exec error: " + error);
-                     var o = {
-                     type: "done"
-                     };
-
-                     sys.print("Github ha aggiornato i file: " + stdout);
-                     Apio.Database.db.collection("Services").update({name: "githubUpdate"}, {$set: {lastUpdate: true}}, function (err) {
-                     if (err) {
-                     callback(err, null);
-                     } else {
-                     callback(null, true);
-                     }
-                     });
-                     Apio.io.emit("update_system", o)
-                     }
-                     });*/
                 });
 
                 //BEGIN:CLOUD
@@ -1707,13 +1354,11 @@ module.exports = function (enableCloudSocket) {
                                 }
                             }
                         }
-                        //Apio.io.emit("apio_server_update", {apioId: data.apioId, objectId: data.objectId});
                     });
                 });
 
                 socket.on("new_apio_system", function (data) {
                     Apio.Database.db.collection("systems").insert(data, function (err, result) {
-                        //Apio.io.emit("apio.remote.sync.request", data);
                         var socketId = Apio.connectedSockets[data.apioId][0];
                         Apio.io.sockets.connected[socketId].emit("apio.remote.sync.request", data);
                     });
@@ -1819,7 +1464,6 @@ module.exports = function (enableCloudSocket) {
                                 });
                             }
 
-                            //Apio.io.emit("apio_server_new", {apioId: data.apioId, objectId: data.obj.objectId});
                             Apio.io.emit("apio_server_new", data.obj.objectId);
                         }
                     });
@@ -1850,7 +1494,6 @@ module.exports = function (enableCloudSocket) {
                             deleteFolderRecursive("public/boards/" + data.apioId + "/" + data.objectId);
                             console.log("Object with objectId " + data.objectId + " and apioId " + data.apioId + " successfully removed");
 
-                            //Apio.io.emit("apio_server_delete", data.objectId);
                             for (var x in Apio.connectedSockets) {
                                 if (x === "admin" || validator.isEmail(x)) {
                                     var socketIds = Apio.connectedSockets[x];
@@ -2136,10 +1779,6 @@ module.exports = function (enableCloudSocket) {
 
                 socket.on("apio.server.user.setPermission", function (data) {
                     Apio.Util.log("Socket user : apio.server.user.setPermission");
-                    //Apio.Users.delete(data, function () {
-                    //    console.log("User from the cloud successfully setted role");
-                    //});
-
                     Apio.Users.setPermission(data, function () {
                         console.log("User from the cloud successfully setted role");
                     });
@@ -2163,7 +1802,6 @@ module.exports = function (enableCloudSocket) {
 
                                 transporter.sendMail({
                                     to: "info@apio.cc",
-                                    //from: "Apio <apioassistance@gmail.com>",
                                     from: "Apio <info@apio.cc>",
                                     subject: "Sincronizzazione iniziata",
                                     text: text
@@ -2388,110 +2026,6 @@ module.exports = function (enableCloudSocket) {
                     }, function (callback) {
                         var temp_users = JSON.parse(JSON.stringify(data.apio.users));
                         var next = true;
-                        //var interval = setInterval(function () {
-                        //    if (temp_users[0]) {
-                        //        if (next) {
-                        //            next = false;
-                        //            Apio.Database.db.collection("Users").findOne({email: temp_users[0].email}, function (err, usr) {
-                        //                if (err) {
-                        //                    console.log("Unable to find user with email " + temp_users[0].email + ": ", err);
-                        //                    temp_users.shift();
-                        //                    next = true;
-                        //                } else if (usr) {
-                        //                    if (temp_users[0].hasOwnProperty("additional_info")) {
-                        //                        if (usr.hasOwnProperty("additional_info")) {
-                        //                            for (var i in temp_users[0].additional_info) {
-                        //                                if (usr.additional_info.hasOwnProperty(i)) {
-                        //                                    var isInAdditionalInfo = function (arr, toFind) {
-                        //                                        for (var i in arr) {
-                        //                                            if (arr[i].number === toFind) {
-                        //                                                return true;
-                        //                                            }
-                        //                                        }
-                        //
-                        //                                        return false;
-                        //                                    };
-                        //
-                        //                                    for (var j = 0; j < temp_users[0].additional_info[i].length; j++) {
-                        //                                        if (!isInAdditionalInfo(usr.additional_info[i], temp_users[0].additional_info[i][j].number)) {
-                        //                                            usr.additional_info[i].push(temp_users[0].additional_info[i][j]);
-                        //                                        }
-                        //                                    }
-                        //                                } else {
-                        //                                    usr.additional_info[i] = temp_users[0].additional_info[i];
-                        //                                }
-                        //                            }
-                        //                        } else {
-                        //                            usr.additional_info = temp_users[0].additional_info;
-                        //                        }
-                        //                    } else if (!usr.hasOwnProperty("additional_info")) {
-                        //                        usr.additional_info = [];
-                        //                    }
-                        //
-                        //                    if (!usr.hasOwnProperty("apioId")) {
-                        //                        usr.apioId = [];
-                        //                    }
-                        //
-                        //                    var isIn = false;
-                        //                    for (var a = 0; !isIn && a < usr.apioId.length; a++) {
-                        //                        if (usr.apioId[a].code === data.apio.system.apioId) {
-                        //                            isIn = true;
-                        //                        }
-                        //                    }
-                        //
-                        //                    if (!isIn) {
-                        //                        usr.apioId.push({
-                        //                            code: data.apio.system.apioId,
-                        //                            role: temp_users[0].role
-                        //                        });
-                        //
-                        //                        delete temp_users[0].role;
-                        //                    }
-                        //
-                        //                    Apio.Database.db.collection("Users").update({email: temp_users[0].email}, {
-                        //                        $set: {
-                        //                            additional_info: usr.additional_info,
-                        //                            apioId: usr.apioId
-                        //                        }
-                        //                    }, function (err) {
-                        //                        if (err) {
-                        //                            temp_users.shift();
-                        //                            next = true;
-                        //                            callback(err, null);
-                        //                        } else {
-                        //                            temp_users.shift();
-                        //                            next = true;
-                        //                            callback(null, true);
-                        //                        }
-                        //                    });
-                        //                } else {
-                        //                    temp_users[0].apioId = [];
-                        //                    temp_users[0].apioId.push({
-                        //                        code: data.apio.system.apioId,
-                        //                        role: temp_users[0].role
-                        //                    });
-                        //                    delete temp_users[0].role;
-                        //                    Apio.Database.db.collection("Users").insert(temp_users[0], function (err) {
-                        //                        if (err) {
-                        //                            temp_users.shift();
-                        //                            next = true;
-                        //                            console.log("ApioCloud>> Error while updating Users Data");
-                        //                            callback(err, null);
-                        //                        } else {
-                        //                            temp_users.shift();
-                        //                            next = true;
-                        //                            console.log("ApioCloud>>> Added new users data ");
-                        //                            callback(null, true);
-                        //                        }
-                        //                    });
-                        //                }
-                        //            });
-                        //        }
-                        //    } else {
-                        //        clearInterval(interval);
-                        //    }
-                        //}, 0);
-
                         var interval = setInterval(function () {
                             if (temp_users[0]) {
                                 if (next) {
@@ -2627,20 +2161,14 @@ module.exports = function (enableCloudSocket) {
                                             }
 
                                             Apio.Database.db.collection("Users").update({email: temp_users[0].email}, {
-                                                //$set: {
-                                                //    additional_info: usr.additional_info,
-                                                //    apioId: usr.apioId
-                                                //}
                                                 $set: usr
                                             }, function (err) {
                                                 if (err) {
                                                     temp_users.shift();
                                                     next = true;
-                                                    //callback(err, null);
                                                 } else {
                                                     temp_users.shift();
                                                     next = true;
-                                                    //callback(null, true);
                                                 }
                                             });
                                         } else {
@@ -2655,12 +2183,10 @@ module.exports = function (enableCloudSocket) {
                                                     temp_users.shift();
                                                     next = true;
                                                     console.log("ApioCloud>> Error while updating Users Data");
-                                                    //callback(err, null);
                                                 } else {
                                                     temp_users.shift();
                                                     next = true;
                                                     console.log("ApioCloud>>> Added new users data ");
-                                                    //callback(null, true);
                                                 }
                                             });
                                         }
@@ -2678,12 +2204,6 @@ module.exports = function (enableCloudSocket) {
                         }
                         console.log("Handshake result is ");
                         console.log(results);
-
-                        //Apio.io.emit("apio.cloud.sync.end", data.apio.system.apioId);
-
-                        //var socketId = Apio.connectedSockets[data.apio.system.apioId][0];
-                        //console.log("Alla board con apioId " + data.apio.system.apioId + " invio sync end");
-                        //Apio.io.sockets.connected[socketId].emit("apio.cloud.sync.end");
 
                         var apioIdSockets = Apio.connectedSockets[data.apio.system.apioId];
                         var socketId = apioIdSockets[apioIdSockets.length - 1];
@@ -2710,7 +2230,6 @@ module.exports = function (enableCloudSocket) {
                                         } else {
                                             transporter.sendMail({
                                                 to: "info@apio.cc",
-                                                //from: "Apio <apioassistance@gmail.com>",
                                                 from: "Apio <info@apio.cc>",
                                                 subject: "Sincronizzazione del DB terminata",
                                                 text: text
@@ -2782,50 +2301,6 @@ module.exports = function (enableCloudSocket) {
                 socket.on("serial_update", function (data) {
                     //cambio il nome della variabile data nella function(data) in newData, questa conterrà cioò che permette a data di essere quello ch e è ora e che attualmente si trova in dongle_logic Apio.Serial.Read nell'oggetto JSON o
                     if (Apio.Configuration.type === "gateway") {
-                        //VECCHIO
-                        //console.log("---------------------serial_update-------------", data);
-                        //Apio.io.emit("apio_server_update", data);
-                        //if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
-                        //    data.apioId = Apio.System.getApioIdentifier();
-                        //    Apio.Remote.socket.emit('apio.server.object.update', data);
-                        //}
-                        //
-                        ////LOG IN TEMPO REALE - DA TESTARE
-                        //Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (error, object) {
-                        //    if (error) {
-                        //        console.log("Error while getting object with objectId " + data.objectId + ": ", error);
-                        //    } else if (object) {
-                        //        var logs = {}, timestamp = new Date().getTime();
-                        //
-                        //        for (var i in object.properties) {
-                        //            if (!logs.hasOwnProperty(i)) {
-                        //                logs[i] = {};
-                        //            }
-                        //
-                        //            if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                        //                logs[i][timestamp] = String(data.properties[i]);
-                        //            } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                        //                logs[i][timestamp] = String(object.properties[i].value);
-                        //            }
-                        //        }
-                        //
-                        //        Apio.io.emit("log_update", {
-                        //            log: logs,
-                        //            objectId: data.objectId
-                        //        });
-                        //
-                        //        if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
-                        //            Apio.Remote.socket.emit("log_update.fromgateway", {
-                        //                apioId: Apio.System.getApioIdentifier(),
-                        //                log: logs,
-                        //                objectId: data.objectId
-                        //            });
-                        //        }
-                        //    }
-                        //});
-                        //
-
-                        //NUOVO
                         console.log("---------------------serial_update-------------", data);
                         Apio.io.emit("apio_server_update", data);
                         if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
@@ -2855,19 +2330,6 @@ module.exports = function (enableCloudSocket) {
                                         logs[i][timestamp] = String(object.properties[i].value);
                                     }
                                 }
-
-                                // Apio.io.emit("log_update", {
-                                //     log: logs,
-                                //     objectId: data.objectId
-                                // });
-
-                                // if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
-                                //     Apio.Remote.socket.emit("log_update.fromgateway", {
-                                //         apioId: Apio.System.getApioIdentifier(),
-                                //         log: logs,
-                                //         objectId: data.objectId
-                                //     });
-                                // }
                             }
                         });
                     } else if (data.hasOwnProperty("protocol") && data.protocol == "w" && Apio.Configuration.type === "cloud") {
@@ -2884,98 +2346,13 @@ module.exports = function (enableCloudSocket) {
                         data.apioId = Apio.System.getApioIdentifier();
                         Apio.Serial.stream(data);
                     } else {
-                        //socket.broadcast.emit("apio_client_stream", data);
                         var socketId = Apio.connectedSockets[socket.request.session.apioId][0];
                         Apio.io.sockets.connected[socketId].emit("apio_client_stream", data);
                     }
                 });
 
-                //APIO_CLIENT_UPDATE VECCHIO
-
-                //socket.on("apio_client_update", function (data) {
-                //    var x = data, id = this.id;
-                //    //var x = data;
-                //    try {
-                //        data = eval("(" + data + ")");
-                //        var check = function (d) {
-                //            for (var i in d) {
-                //                if (d[i] == "true") {
-                //                    d[i] = true;
-                //                } else if (d[i] == "false") {
-                //                    d[i] = false;
-                //                } else if (typeof d[i] === "number") {
-                //                    d[i] = d[i].toString();
-                //                } else if (d[i] instanceof Object) {
-                //                    check(d[i]);
-                //                }
-                //            }
-                //        };
-                //        check(data);
-                //    } catch (e) {
-                //        data = x;
-                //    }
-                //
-                //    if (Apio.Configuration.type === "gateway") {
-                //        data.apioId = Apio.System.getApioIdentifier();
-                //        if (data.hasOwnProperty("protocol") && data.protocol.hasOwnProperty("address")) {
-                //            var p = {};
-                //            var keys = Object.keys(data.properties);
-                //            //for (var i = 0, found = false; !found && i < keys.length; i++) {
-                //            //    if (keys[i] !== "date") {
-                //            //        found = true;
-                //            //        p[data.protocol.property] = data.properties[keys[i]];
-                //            //    }
-                //            //}
-                //            //Apio.Communication.sendAddressBindToProperty("", data.protocol.address, p, data.apioId, data.objectId, data.protocol.name);
-                //            for (var i = 0; i < keys.length; i++) {
-                //                if (keys[i] !== "date") {
-                //                    p[data.protocol.property] = data.properties[keys[i]];
-                //                    Apio.Communication.sendAddressBindToProperty("", data.protocol.address, p, data.apioId, data.objectId, data.protocol.name);
-                //                }
-                //            }
-                //        } else {
-                //            console.log("data.objectId: ", data.objectId);
-                //            Apio.Communication.sendAddressBindToProperty("", data.address, data.properties, data.apioId, objects[data.objectId].protocol);
-                //        }
-                //    }
-                //
-                //    Apio.Object.update(data, function () {
-                //        if (Apio.Configuration.type === "gateway") {
-                //            if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
-                //                data.apioId = Apio.System.getApioIdentifier();
-                //                if (!data.hasOwnProperty("sendToCloud") || data.sendToCloud === true) {
-                //                    Apio.Remote.socket.emit("apio.server.object.update", data);
-                //                }
-                //                //Apio.Remote.socket.emit("apio.server.object.update", data);
-                //            }
-                //        } else {
-                //            //for (var i in Apio.io.sockets.connected) {
-                //            //    if (id !== i) {
-                //            //        socket.to(i).emit("apio_server_update", data);
-                //            //        socket.to(i).emit('apio.cloud.update', data);
-                //            //    }
-                //            //}
-                //            //socket.broadcast.emit("apio_server_update", data);
-                //
-                //            //socket.broadcast.emit('apio.cloud.update', data);
-                //            var socketId = Apio.connectedSockets[data.apioId][0];
-                //
-                //            //MODIFICA BIND ADDRESS DIRECTIVE CLOUD!!!!!!!!!
-                //            //va fatto un emit per ogni property legata allo stesso address!!!
-                //            Apio.io.sockets.connected[socketId].emit('apio.cloud.update', data);
-                //        }
-                //
-                //        Apio.servicesSocket.notification.emit("send_notification", data);
-                //
-                //        Apio.servicesSocket.log.emit("log_update", data);
-                //    }, id);
-                //    //});
-                //});
-
-                //APIO_CLIENT_UPDATE NUOVO
                 socket.on("apio_client_update", function (data) {
                     var x = data, id = this.id;
-                    //var x = data;
                     try {
                         data = eval("(" + data + ")");
                         var check = function (d) {
@@ -3003,20 +2380,9 @@ module.exports = function (enableCloudSocket) {
                                 if (!data.hasOwnProperty("sendToCloud") || data.sendToCloud === true) {
                                     Apio.Remote.socket.emit("apio.server.object.update", data);
                                 }
-                                //Apio.Remote.socket.emit("apio.server.object.update", data);
                             }
                         } else {
-                            //for (var i in Apio.io.sockets.connected) {
-                            //    if (id !== i) {
-                            //        socket.to(i).emit("apio_server_update", data);
-                            //        socket.to(i).emit('apio.cloud.update', data);
-                            //    }
-                            //}
-                            //socket.broadcast.emit("apio_server_update", data);
-
-                            //socket.broadcast.emit('apio.cloud.update', data);
                             var socketId = Apio.connectedSockets[data.apioId][0];
-
                             //MODIFICA BIND ADDRESS DIRECTIVE CLOUD!!!!!!!!!
                             //va fatto un emit per ogni property legata allo stesso address!!!
                             Apio.io.sockets.connected[socketId].emit('apio.cloud.update', data);
@@ -3027,7 +2393,6 @@ module.exports = function (enableCloudSocket) {
                         console.log("Invio log update");
                         Apio.servicesSocket.log.emit("log_update", data);
                     }, id);
-                    //});
                 });
 
                 socket.on("apio_logic", function (data) {
@@ -3064,31 +2429,6 @@ module.exports = function (enableCloudSocket) {
 
                 socket.on("apio_object_online", function (data) {
                     data = typeof data === "string" ? JSON.parse(data) : data;
-                    //if (!data.hasOwnProperty("apioId")) {
-                    //    data.apioId = socket.request.session.apioId;
-                    //}
-
-                    /*Apio.Database.db.collection("Objects").update({objectId: data.objectId}, {$set: {status: data.status}}, function (e, r) {
-                     if (e) {
-                     console.log("Unable to update object with objectId " + data.objectId);
-                     } else if (r) {
-                     //socket.broadcast.emit("apio_object_online", data);
-                     if (Apio.Configuration.type === "cloud") {
-                     //var socketId = Apio.connectedSockets[socket.request.session.apioId][0];
-                     //Apio.io.sockets.connected[socketId].emit("apio_object_online", data);
-                     for (var i in Apio.connectedSockets) {
-                     if (i === socket.request.session.apioId || validator.isEmail(i) || i === "admin") {
-                     for (var j in Apio.connectedSockets[i]) {
-                     Apio.io.sockets.connected[Apio.connectedSockets[i][j]].emit("apio_object_online", data);
-                     }
-                     }
-                     }
-                     } else if (Apio.Configuration.type === "gateway") {
-                     socket.broadcast.emit("apio_object_online", data);
-                     }
-                     }
-                     });*/
-
                     if (Apio.Configuration.type === "cloud") {
                         Apio.Database.db.collection("Objects").update({
                             apioId: data.apioId,
@@ -3112,11 +2452,6 @@ module.exports = function (enableCloudSocket) {
                                     }
                                 });
                                 Apio.io.sockets.connected[Apio.connectedSockets[data.apioId][0]].emit("apio_object_online", data);
-                                //Apio.io.emit("apio_object_online", data);
-                                //if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
-                                //    data.apioId = Apio.System.getApioIdentifier();
-                                //    Apio.Remote.socket.emit("apio_object_online", data) ;
-                                //}
                             }
                         });
                     } else if (Apio.Configuration.type === "gateway") {
@@ -3134,7 +2469,6 @@ module.exports = function (enableCloudSocket) {
                     }
                 });
 
-                //NEW APIS
                 socket.on("apio_get_object_by", function (id) {
                     Apio.Database.db.collection("Objects").findOne({objectId: id}, function (error, result) {
                         if (error) {
@@ -3185,21 +2519,11 @@ module.exports = function (enableCloudSocket) {
     };
 
     Apio.Database = {};
-    //La connessione non viene Tenuta sempre aperta per questioni di stabilità.
-    //Questa scelta può essere rivista in caso di necessità di migliori performance
-    //TODO carica dati da un file di configurazione, insieme ai dati della seriale ecc..
-    /*
-     * Take the configuration file of MongoDB and
-     * return a string which can be used for the
-     * connection to the DB
-     */
     Apio.Database.getConnectionString = function () {
         var c = Apio.Configuration.database;
         return "mongodb://" + c.hostname + ":" + c.port + "/" + c.database;
     };
-    /*
-     Returns the default database instance
-     */
+
     Apio.Database.getDatabaseInstance = function () {
         return Apio.Database.db;
     };
@@ -3219,7 +2543,6 @@ module.exports = function (enableCloudSocket) {
             }
             console.log("Apio.Database.connect() created a new connection to MongoDB");
             Apio.Database.db = db;
-            //if (Apio.Configuration.type === "gateway") {
             Apio.Database.db.collection("Communication").findOne({name: "integratedCommunication"}, function (err, doc) {
                 if (err) {
                     console.log("Error while getting integratedCommunication protocols: ", err);
@@ -3233,7 +2556,6 @@ module.exports = function (enableCloudSocket) {
                 if (err) {
                     console.log("Error while getting integratedCommunication protocols: ", err);
                 } else if (doc) {
-                    //addressBindToProperty = doc;
                     Apio.addressBindToProperty = doc;
                     delete Apio.addressBindToProperty._id;
                 }
@@ -3243,27 +2565,14 @@ module.exports = function (enableCloudSocket) {
                 if (err) {
                     console.log("Error while getting objects: ", err);
                 } else if (doc) {
-                    //OBJECTS RETEIVE VECCHIO
                     for (var i in doc) {
                         objects[doc[i].objectId] = doc[i];
                     }
-
-                    //OBJECTS RETEIVE NUOVO
-                    //for (var i in doc) {
-                    //    if (!objects.hasOwnProperty(doc[i].apioId)) {
-                    //        objects[doc[i].apioId] = {};
-                    //    }
-                    //
-                    //    objects[doc[i].apioId][doc[i].objectId] = doc[i];
-                    //}
                 }
             });
-            //}
 
             if (dump) {
                 Apio.Database.db.collection('Users').findOne({name: "verify"}, function (err, doc) {
-                    //console.log("ERR: ", err);
-                    //console.log("DOC: ", doc);
                     if (err) {
                         var sys = require('sys');
                         var exec = require('child_process').exec;
@@ -3435,14 +2744,6 @@ module.exports = function (enableCloudSocket) {
 
             Apio.Util.debug("Apio.Database.registerObject() Object Successfully registered");
 
-            //UPDATE OBJECTS VECCHIO
-            //if (Apio.Configuration.type === "gateway") {
-            //    objects[objectData.objectId] = objectData;
-            //    console.log("**********AGGIUNTO NUOVO OGGETTO*********", objects);
-            //}
-
-            //UPDATE OBJECTS NUOVO
-            //objects[objectData.apioId][objectData.objectId] = objectData;
             if (Apio.Configuration.type === "gateway") {
                 objects[objectData.objectId] = objectData;
             }
@@ -3503,55 +2804,14 @@ module.exports = function (enableCloudSocket) {
                     throw new Apio.Database.Error("Apio.Database.deleteObject() encountered an error while trying to connect to the database");
                 } else if (callback) {
                     console.log("Chiamo callback");
-                    //delete objects[id.apioId][id.objectId];
                     callback();
                 }
             });
         } else if (Apio.Configuration.type === "gateway") {
-            //NUOVO
             Apio.Database.db.collection("Objects").findOne({objectId: id}, function (err, obj) {
                 if (err) {
                     console.log("Error while retreiving object with objectId " + id + ": ", err);
                 } else if (obj) {
-                    //DELETING FROM COMMUNICATION
-                    //Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (err_bind, bind) {
-                    //    if (err_bind) {
-                    //        console.log("Error while getting addressBindToProperty communication: ", err_bind);
-                    //    } else if (bind) {
-                    //        delete bind._id;
-                    //        var protocols = Object.keys(bind);
-                    //        for (var i = 0, found = false; !found && i < protocols.length; i++) {
-                    //            if (protocols[i] === "name") {
-                    //                found = true;
-                    //                protocols.splice(i--, 1);
-                    //            }
-                    //        }
-                    //
-                    //        for (var p in protocols) {
-                    //            var addresses = Object.keys(bind[protocols[p]]);
-                    //            for (var a in addresses) {
-                    //                var properties = Object.keys(bind[protocols[p]][addresses[a]]);
-                    //                for (var prop in properties) {
-                    //                    if (typeof bind[protocols[p]][addresses[a]][properties[prop]] === "object") {
-                    //                        delete bind[protocols[p]][addresses[a]][properties[prop]][id];
-                    //                    }
-                    //                }
-                    //            }
-                    //
-                    //            delete bind[protocols[p]][obj.address];
-                    //        }
-                    //
-                    //        Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: bind}, function (err_updt) {
-                    //            if (err_updt) {
-                    //                console.log("Error while updating communication addressBindToProperty: ", err_updt);
-                    //            } else {
-                    //                console.log("Communication addressBindToProperty successfully updated");
-                    //                Apio.addressBindToProperty = JSON.parse(JSON.stringify(bind));
-                    //            }
-                    //        });
-                    //    }
-                    //});
-
                     var protocols = Object.keys(Apio.addressBindToProperty);
                     for (var i = 0, found = false; !found && i < protocols.length; i++) {
                         if (protocols[i] === "name") {
@@ -3603,7 +2863,6 @@ module.exports = function (enableCloudSocket) {
                         }
                     });
 
-                    //DELETING OBJECT
                     Apio.Database.db.collection("Objects").remove({objectId: id}, function (error) {
                         if (error) {
                             console.log("Error while removing object: ", error);
@@ -3617,17 +2876,6 @@ module.exports = function (enableCloudSocket) {
                     });
                 }
             });
-
-            //VECCHIO
-            //Apio.Database.db.collection("Objects").remove({objectId: id}, function (error) {
-            //    if (error) {
-            //        console.log("Error while removing object: ", error);
-            //        throw new Apio.Database.Error("Apio.Database.deleteObject() encountered an error while trying to connect to the database");
-            //    } else if (callback) {
-            //        console.log("Chiamo callback");
-            //        callback();
-            //    }
-            //});
         }
 
         var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
@@ -3996,22 +3244,6 @@ module.exports = function (enableCloudSocket) {
                     console.log("Setto il timeout dello stato " + event.triggeredStates[counter].name + " al valore " + delay)
                     setTimeout(function () {
 
-                        /*Apio.State.apply(event.triggeredStates[counter].name, function () {
-
-                         console.log(".........................Ho processato " + event.triggeredStates[counter].name);
-                         counter++;
-                         if (counter >= event.triggeredStates.length) {
-                         counter = 0;
-                         loopCounter++;
-                         console.log("\nFinito il ciclo")
-                         }
-                         if (loopCounter > loops) {
-                         console.log("\nFinito evento")
-                         } else {
-                         console.log("Dopo aver processato " + event.triggeredStates[counter].name + " vado avanti");
-                         processTriggeredState();
-                         }
-                         })*/
                         Apio.statesNameQueue.push(event.triggeredStates[counter].name);
 
                         console.log(".........................Ho processato " + event.triggeredStates[counter].name);
@@ -4051,7 +3283,6 @@ module.exports = function (enableCloudSocket) {
     }
 
     Apio.State.apply = function (stateName, callback, options) {
-        //Apio.sendNewState = false;
         getStateByName(stateName, function (error, state) {
             console.log("----------STATE VALE: -----------", state);
 
@@ -4067,7 +3298,6 @@ module.exports = function (enableCloudSocket) {
                 Apio.Database.updateProperty(state, function () {
                     Apio.Serial.send(state, function () {
                         console.log("+++++++++++++++++++METTO DENTRO: ++++++++++++++++", state);
-                        //Apio.sendNewState = true;
                         Apio.io.emit("apio_server_update", state);
 
                         Apio.Database.db.collection("Events").find({triggerState: stateName}).toArray(function (err, triggeredEvents) {
@@ -4086,8 +3316,6 @@ module.exports = function (enableCloudSocket) {
                     });
                 });
             } else {
-                //Apio.sendNewState = true;
-
                 Apio.Database.db.collection("Events").find({triggerState: stateName}).toArray(function (err, triggeredEvents) {
                     if (err) {
                         console.log("Error in applyState while fetching triggered events.")
@@ -4099,17 +3327,6 @@ module.exports = function (enableCloudSocket) {
                 });
             }
         });
-        //At this point, the http response has been sent
-        //but we keep looking for events to launch
-        /*Apio.Database.db.collection("Events").find({triggerState: stateName}).toArray(function (err, triggeredEvents) {
-         if (err) {
-         console.log("Error in applyState while fetching triggered events.")
-         } else {
-         triggeredEvents.forEach(function (event) {
-         Apio.Event.launch(event.name);
-         });
-         }
-         });*/
     };
 
     Apio.Planimetry = {};
@@ -4161,14 +3378,14 @@ module.exports = function (enableCloudSocket) {
 
     Apio.Users = {};
     Apio.Users.list = function (callback) {
-        Apio.Database.db.collection("Users").find({})
-            .toArray(function (err, users) {
-                if (err)  callback(err, null);
-                //console.log(users)
+        Apio.Database.db.collection("Users").find({}).toArray(function (err, users) {
+            if (err) {
+                callback(err, null);
+            } else {
                 callback(null, users)
-            })
-
-    }
+            }
+        });
+    };
 
     Apio.Users.create = function (usr, callback) {
         console.log("usr: ", usr);
@@ -4266,21 +3483,6 @@ module.exports = function (enableCloudSocket) {
         if (usr.apioId instanceof Array) {
             usr.apioId = usr.apioId[0]
         }
-        //Apio.Database.db.collection("Users").findAndModify({email: userEmail}, [["name", 1]], {$pull: {user: {email: email}}}, function (error, result) {
-        //    if (error) {
-        //        console.log("/apio/user/assignUser ERROR");
-        //        callback("500", null);
-        //    } else {
-        //        Apio.Database.deleteUser(email, function (err) {
-        //            if (err) {
-        //                console.log("error while deleting the user " + email + " from the db");
-        //                callback("500", null);
-        //            } else {
-        //                callback(null, "200");
-        //            }
-        //        });
-        //    }
-        //});
 
         if (Apio.Configuration.type === "cloud") {
             Apio.Database.db.collection("Users").findOne({
@@ -4339,14 +3541,11 @@ module.exports = function (enableCloudSocket) {
         var user = usr.user;
         var email = usr.email;
         if (method == "add") {
-            //var newUser = "\"user\" : [ { \"email\" : \""+req.body.user+"\"}"
             Apio.Database.db.collection("Users").findAndModify({email: email}, [["name", 1]], {$push: {user: {email: user}}}, function (error, result) {
                 if (error) {
                     console.log("/apio/user/assignUser ERROR");
-                    //res.send(500);
                     callback(error, null);
                 } else {
-                    //res.send(200);
                     callback(null, usr);
                 }
             });
@@ -4354,10 +3553,8 @@ module.exports = function (enableCloudSocket) {
             Apio.Database.db.collection("Users").findAndModify({email: email}, [["name", 1]], {$pull: {user: {email: user}}}, function (error, result) {
                 if (error) {
                     console.log("/apio/user/assignUser ERROR");
-                    //res.send(500);
                     callback(error, null)
                 } else {
-                    //res.send(200);
                     callback(null, usr)
                 }
             });
@@ -4486,36 +3683,6 @@ module.exports = function (enableCloudSocket) {
             } else if (result) {
                 //MODIFYING COMMUNICATION
                 if (Apio.Configuration.type === "gateway" && o.address !== result.address) {
-                    //Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (err_bind, bind) {
-                    //    if (err_bind) {
-                    //        console.log("Error while getting addressBindToProperty communication: ", err_bind);
-                    //    } else if (bind) {
-                    //        delete bind._id;
-                    //        for (var protocol in bind) {
-                    //            if (protocol !== "name") {
-                    //                var addresses = Object.keys(bind[protocol]);
-                    //                for (var a in addresses) {
-                    //                    if (addresses[a] === result.address) {
-                    //                        bind[protocol][o.address] = JSON.parse(JSON.stringify(bind[protocol][addresses[a]]));
-                    //                        delete bind[protocol][addresses[a]];
-                    //                    }
-                    //                }
-                    //            }
-                    //        }
-                    //
-                    //        Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: bind}, function (err_updt) {
-                    //            if (err_updt) {
-                    //                console.log("Error while updating communication addressBindToProperty: ", err_updt);
-                    //            } else {
-                    //                console.log("Communication addressBindToProperty successfully updated");
-                    //                Apio.addressBindToProperty = JSON.parse(JSON.stringify(bind));
-                    //                if (callback) {
-                    //                    callback(result);
-                    //                }
-                    //            }
-                    //        });
-                    //    }
-                    //});
                     for (var protocol in Apio.addressBindToProperty) {
                         if (protocol !== "name") {
                             var addresses = Object.keys(Apio.addressBindToProperty[protocol]);
@@ -4567,24 +3734,6 @@ module.exports = function (enableCloudSocket) {
                         callback(err, null);
                     } else {
                         callback(null, data);
-                        //request({
-                        //    json: true,
-                        //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                        //    method: "GET"
-                        //}, function (error, response, body) {
-                        //    if (error || !response || Number(response.statusCode) !== 200) {
-                        //        callback(null, data);
-                        //    } else if (body) {
-                        //        for (var i in body) {
-                        //            for (var j in data) {
-                        //                if (i === data[j].objectId) {
-                        //                    data[j].log = body[i];
-                        //                }
-                        //            }
-                        //        }
-                        //        callback(null, data);
-                        //    }
-                        //});
                     }
                 });
             } else {
@@ -4596,24 +3745,6 @@ module.exports = function (enableCloudSocket) {
                             callback(err, null);
                         } else {
                             callback(null, data);
-                            //request({
-                            //    json: true,
-                            //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                            //    method: "GET"
-                            //}, function (error, response, body) {
-                            //    if (error || !response || Number(response.statusCode) !== 200) {
-                            //        callback(null, data);
-                            //    } else if (body) {
-                            //        for (var i in body) {
-                            //            for (var j in data) {
-                            //                if (i === data[j].objectId) {
-                            //                    data[j].log = body[i];
-                            //                }
-                            //            }
-                            //        }
-                            //        callback(null, data);
-                            //    }
-                            //});
                         }
                     });
                 } else {
@@ -4626,24 +3757,6 @@ module.exports = function (enableCloudSocket) {
                             callback(err, null);
                         } else {
                             callback(null, data);
-                            //request({
-                            //    json: true,
-                            //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                            //    method: "GET"
-                            //}, function (error, response, body) {
-                            //    if (error || !response || Number(response.statusCode) !== 200) {
-                            //        callback(null, data);
-                            //    } else if (body) {
-                            //        for (var i in body) {
-                            //            for (var j in data) {
-                            //                if (i === data[j].objectId) {
-                            //                    data[j].log = body[i];
-                            //                }
-                            //            }
-                            //        }
-                            //        callback(null, data);
-                            //    }
-                            //});
                         }
                     });
                 }
@@ -4656,24 +3769,6 @@ module.exports = function (enableCloudSocket) {
                         callback(err, null);
                     } else {
                         callback(null, data);
-                        //request({
-                        //    json: true,
-                        //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                        //    method: "GET"
-                        //}, function (error, response, body) {
-                        //    if (error || !response || Number(response.statusCode) !== 200) {
-                        //        callback(null, data);
-                        //    } else if (body) {
-                        //        for (var i in body) {
-                        //            for (var j in data) {
-                        //                if (i === data[j].objectId) {
-                        //                    data[j].log = body[i];
-                        //                }
-                        //            }
-                        //        }
-                        //        callback(null, data);
-                        //    }
-                        //});
                     }
                 });
             } else {
@@ -4683,24 +3778,6 @@ module.exports = function (enableCloudSocket) {
                         callback(err, null);
                     } else {
                         callback(null, data);
-                        //request({
-                        //    json: true,
-                        //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                        //    method: "GET"
-                        //}, function (error, response, body) {
-                        //    if (error || !response || Number(response.statusCode) !== 200) {
-                        //        callback(null, data);
-                        //    } else if (body) {
-                        //        for (var i in body) {
-                        //            for (var j in data) {
-                        //                if (i === data[j].objectId) {
-                        //                    data[j].log = body[i];
-                        //                }
-                        //            }
-                        //        }
-                        //        callback(null, data);
-                        //    }
-                        //});
                     }
                 });
             }
@@ -4709,131 +3786,7 @@ module.exports = function (enableCloudSocket) {
 
     Apio.Object.listAll = function (user, callback) {
         if (Apio.Configuration.type == "cloud") {
-            //Devo listare tutti gli oggetti sia se sono cloud sia se sono nelle board insomma tutto
-            //Array completo questo array, la
-            /*console.log("Cerco i products");
-             Apio.Database.db.collection("Objects").find({
-             type: "products",
-             user: {email: String(user.email)}
-             }).toArray(function (err, data) {
-             if (err) {
-             callback(err, null);
-             } else {
-             callback(null, data);
-             //request({
-             //    json: true,
-             //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-             //    method: "GET"
-             //}, function (error, response, body) {
-             //    if (error || !response || Number(response.statusCode) !== 200) {
-             //        callback(null, data);
-             //    } else if (body) {
-             //        for (var i in body) {
-             //            for (var j in data) {
-             //                if (i === data[j].objectId) {
-             //                    data[j].log = body[i];
-             //                }
-             //            }
-             //        }
-             //        callback(null, data);
-             //    }
-             //});
-             }
-             });*/
-            /*
-             //Cerco i products
-             if(user.apioId=="Continue to Cloud"){
-             console.log("Cerco i products");
-             Apio.Database.db.collection("Objects").find({
-             type: "products",
-             user: {email: String(user.email)}
-             }).toArray(function (err, data) {
-             if (err) {
-             callback(err, null);
-             } else {
-             callback(null, data);
-             //request({
-             //    json: true,
-             //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-             //    method: "GET"
-             //}, function (error, response, body) {
-             //    if (error || !response || Number(response.statusCode) !== 200) {
-             //        callback(null, data);
-             //    } else if (body) {
-             //        for (var i in body) {
-             //            for (var j in data) {
-             //                if (i === data[j].objectId) {
-             //                    data[j].log = body[i];
-             //                }
-             //            }
-             //        }
-             //        callback(null, data);
-             //    }
-             //});
-             }
-             });
-             } else {
-             if (user.email == "admin" || user.email == "info@apio.cc") {
-             console.log("+++++1++++++Cerco oggetti con email (" + user.apioId + ")");
-             Apio.Database.db.collection("Objects").find({apioId: String(user.apioId)}).toArray(function (err, data) {
-             console.log(data);
-             if (err) {
-             callback(err, null);
-             } else {
-             callback(null, data);
-             //request({
-             //    json: true,
-             //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-             //    method: "GET"
-             //}, function (error, response, body) {
-             //    if (error || !response || Number(response.statusCode) !== 200) {
-             //        callback(null, data);
-             //    } else if (body) {
-             //        for (var i in body) {
-             //            for (var j in data) {
-             //                if (i === data[j].objectId) {
-             //                    data[j].log = body[i];
-             //                }
-             //            }
-             //        }
-             //        callback(null, data);
-             //    }
-             //});
-             }
-             });
-             } else {
-             console.log("+++++2++++++Cerco oggetti con email ()");
-             Apio.Database.db.collection("Objects").find({
-             apioId: String(user.apioId),
-             user: {email: String(user.email)}
-             }).toArray(function (err, data) {
-             if (err) {
-             callback(err, null);
-             } else {
-             callback(null, data);
-             //request({
-             //    json: true,
-             //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-             //    method: "GET"
-             //}, function (error, response, body) {
-             //    if (error || !response || Number(response.statusCode) !== 200) {
-             //        callback(null, data);
-             //    } else if (body) {
-             //        for (var i in body) {
-             //            for (var j in data) {
-             //                if (i === data[j].objectId) {
-             //                    data[j].log = body[i];
-             //                }
-             //            }
-             //        }
-             //        callback(null, data);
-             //    }
-             //});
-             }
-             });
-             }
-             }
-             */
+
         } else {
             if (user != "admin") {
                 console.log("+++++3++++++Cerco oggetti con email ()");
@@ -4842,24 +3795,6 @@ module.exports = function (enableCloudSocket) {
                         callback(err, null);
                     } else {
                         callback(null, data);
-                        //request({
-                        //    json: true,
-                        //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                        //    method: "GET"
-                        //}, function (error, response, body) {
-                        //    if (error || !response || Number(response.statusCode) !== 200) {
-                        //        callback(null, data);
-                        //    } else if (body) {
-                        //        for (var i in body) {
-                        //            for (var j in data) {
-                        //                if (i === data[j].objectId) {
-                        //                    data[j].log = body[i];
-                        //                }
-                        //            }
-                        //        }
-                        //        callback(null, data);
-                        //    }
-                        //});
                     }
                 });
             } else {
@@ -4869,24 +3804,6 @@ module.exports = function (enableCloudSocket) {
                         callback(err, null);
                     } else {
                         callback(null, data);
-                        //request({
-                        //    json: true,
-                        //    uri: "http://localhost:" + require("./services/services_setup.js").log.port + "/apio/logs",
-                        //    method: "GET"
-                        //}, function (error, response, body) {
-                        //    if (error || !response || Number(response.statusCode) !== 200) {
-                        //        callback(null, data);
-                        //    } else if (body) {
-                        //        for (var i in body) {
-                        //            for (var j in data) {
-                        //                if (i === data[j].objectId) {
-                        //                    data[j].log = body[i];
-                        //                }
-                        //            }
-                        //        }
-                        //        callback(null, data);
-                        //    }
-                        //});
                     }
                 });
             }
@@ -4894,9 +3811,6 @@ module.exports = function (enableCloudSocket) {
     };
 
     Apio.Object.update = function (data, callback, id) {
-        //Apio.Object.update = function (data, callback) {
-        //console.log("Sono dentro Object.update e data vale "+data)
-
         if (data.writeToDatabase === true) {
             Apio.Database.updateProperty(data, function () {
                 //UPDATE COLLECTION OBJECTS AND FORCE SERVICES TO DOWNLOAD NEW COLLECTIONS
@@ -4909,14 +3823,6 @@ module.exports = function (enableCloudSocket) {
 
                     data.apioId = Apio.System.getApioIdentifier();
                 }
-                //Connected clients are notified of the change in the database
-                //for (var i in Apio.io.sockets.connected) {
-                //    if (id !== i) {
-                //        socket.to(i).emit("apio_server_update", data);
-                //    }
-                //}
-
-                //socket.emit("apio_server_update", data);
 
                 for (var i in Apio.connectedSockets) {
                     var walk = true;
@@ -4934,15 +3840,11 @@ module.exports = function (enableCloudSocket) {
                     //per ogni elemeto di connectedSockets faccio un emit per ogni property risultante bindata con l'address della property attuale
                     for (var j in Apio.connectedSockets[i]) {
                         if (walk && Apio.connectedSockets[i][j] !== id && Apio.io.sockets.connected[Apio.connectedSockets[i][j]]) {
-
-
-                            //console.log('emit --> apio_server_update * DATA: ',	data);
                             Apio.io.sockets.connected[Apio.connectedSockets[i][j]].emit("apio_server_update", data);
                         }
                     }
                 }
 
-                //socket.broadcast.emit("apio.object.update", data);
                 if (Apio.Configuration.type === "gateway" && data && data.writeToSerial === true && Apio.Configuration.serial.enabled === true && (!data.hasOwnProperty("protocol") || Object.keys(data.protocol).length === 0)) {
                     Apio.Serial.send(data);
                 }
@@ -5180,19 +4082,6 @@ module.exports = function (enableCloudSocket) {
             searchQuery.apioId = data.apioId;
         }
 
-        //VECCHIO
-        //Apio.Database.db.collection("Objects").update(searchQuery, {$set: data}, function (error, result) {
-        //    if (error) {
-        //        console.log("Error while modifying object with objectId " + data.objectId);
-        //        callback("500", null)
-        //    } else if (result) {
-        //        console.log("Object with objectId " + data.objectId + " successfully modified");
-        //        callback(null, result);
-        //        Apio.io.emit("apio_server_update", {objectId: data.objectId});
-        //    }
-        //});
-
-        //NUOVO
         Apio.Database.db.collection("Objects").findAndModify(searchQuery, {}, {$set: data}, function (error, result) {
             if (error) {
                 console.log("Error while modifying object with objectId " + data.objectId);
@@ -5207,34 +4096,6 @@ module.exports = function (enableCloudSocket) {
                     console.log("**********MODIFICATO OGGETTO (2)*********", objects);
 
                     if (data.hasOwnProperty("address") && data.address !== result.address) {
-                        //Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (err_bind, bind) {
-                        //    if (err_bind) {
-                        //        console.log("Error while getting addressBindToProperty communication: ", err_bind);
-                        //    } else if (bind) {
-                        //        delete bind._id;
-                        //        for (var protocol in bind) {
-                        //            if (protocol !== "name") {
-                        //                var addresses = Object.keys(bind[protocol]);
-                        //                for (var a in addresses) {
-                        //                    if (addresses[a] === result.address) {
-                        //                        bind[protocol][data.address] = JSON.parse(JSON.stringify(bind[protocol][addresses[a]]));
-                        //                        delete bind[protocol][addresses[a]];
-                        //                    }
-                        //                }
-                        //            }
-                        //        }
-                        //
-                        //        Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: bind}, function (err_updt) {
-                        //            if (err_updt) {
-                        //                console.log("Error while updating communication addressBindToProperty: ", err_updt);
-                        //            } else {
-                        //                console.log("Communication addressBindToProperty successfully updated");
-                        //                Apio.addressBindToProperty = JSON.parse(JSON.stringify(bind));
-                        //            }
-                        //        });
-                        //    }
-                        //});
-
                         for (var protocol in Apio.addressBindToProperty) {
                             if (protocol !== "name") {
                                 var addresses = Object.keys(Apio.addressBindToProperty[protocol]);
@@ -5259,7 +4120,6 @@ module.exports = function (enableCloudSocket) {
 
                 console.log("Object with objectId " + data.objectId + " successfully modified");
                 callback(null, result);
-                //Apio.io.emit("apio_server_update", {objectId: data.objectId});
             }
         });
     };
@@ -5269,61 +4129,6 @@ module.exports = function (enableCloudSocket) {
     Apio.System = {
         ApioIdentifier: null
     };
-    /*Apio.System.logStorage = function(){
-     Apio.System.logStorageInterval  = setInterval(function(){
-     //console.log("LogStorage")
-     Apio.Database.db.stats(function(err, stats){
-     if(err){
-     console.log("Error while getting stats: ", err);
-     } else if(Number(stats.storageSize)/1024/1024 >= 35) {
-     console.log("DB reached to maximum size, appending data to file");
-     Apio.Database.db.collection("Objects").find().toArray(function(error, objs){
-     if(error){
-     console.log("Error while getting objects: ", error);
-     } else if(objs){
-     for(var i in objs){
-     var date = new Date(), day = date.getDate(), month = date.getMonth() + 1, year = date.getFullYear();
-     if(fs.existsSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json")){
-     var read = String(fs.readFileSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json"));
-     var data = JSON.parse(read === "" ? "{}" : read);
-     } else {
-     var data = {};
-     }
-
-     for(var j in objs[i].log){
-     if(typeof data[j] === "undefined"){
-     data[j] = {};
-     }
-
-     for(var k in objs[i].log[j]) {
-     data[j][k] = objs[i].log[j][k];
-     }
-     }
-     fs.writeFileSync("public/applications/"+objs[i].objectId+"/logs "+year+"-"+month+"-"+day+".json", JSON.stringify(data));
-     }
-     Apio.Database.db.collection("Objects").update({}, { $set : { log : {} } }, { multi: true }, function(e, r){
-     if(e){
-     console.log("Error while updating logs", e);
-     } else if(r){
-     Apio.Database.db.command({ compact: "Objects", paddingFactor: 1 }, function(er, re){
-     if(er){
-     console.log("Unable to compact collection Objects");
-     } else if(re){
-     console.log("Return of compact is: ", re);
-     }
-     });
-     }
-     });
-     }
-     });
-     }
-     });
-     }, 60000);
-     }
-     if(Apio.Configuration.type=="gateway"){
-     Apio.System.logStorage();
-     }*/
-
 
     Apio.System.launchEvent = function (eventName, callback) {
         Apio.Database.db.collection("Events").find({name: eventName}).toArray(function (error, data) {
@@ -5339,13 +4144,9 @@ module.exports = function (enableCloudSocket) {
                         e.triggeredStates.forEach(function (_e, _i, _v) {
                             console.log("Trovato stato da triggerare: " + _e);
                             console.log(_e)
-                            /*Apio.System.applyState(_e.name, function (err) {
-                             //
-                             }, true)*/
-
                             Apio.State.apply(_e.name);
                         })
-                    })
+                    });
                     if (callback)
                         callback(null);
                 } else {
@@ -5558,17 +4359,12 @@ module.exports = function (enableCloudSocket) {
                     curDate = new Date();
                 } while (curDate - date < millis);
             };
-            //console.log("arr vale:");
-            //console.log(arr);
             var contatore = 0;
             for (var i in arr) {
                 //Questo fix migliora gli eventi, c'è da verificare se comunque funziona tutto come dovrebbe.
                 if (contatore == 0) {
                     contatore = contatore + 1;
-
                 } else {
-
-
                     if (hounsensore == true && i == 0) {
                         console.log("Non mando la seguente cosa in seriale perchè ho un sensore")
                         console.log(arr[i])
@@ -5581,42 +4377,21 @@ module.exports = function (enableCloudSocket) {
                         });
                     }
                 }
-
-
             }
-            if ("undefined" !== typeof callback)
+
+            if ("undefined" !== typeof callback) {
                 callback(null);
+            }
+
             arr = [];
         }, eventTriggered);
-    }
-    Apio.System.checkEvent = function (state) {
-        //Se allo stato triggerato corrisponde un evento, lancia quell'evento
     };
 
-
-    /* Apio.System.getApioIdentifier = function () {
-     if (null !== Apio.System.ApioIdentifier && "undefined" !== typeof Apio.System.ApioIdentifier) {
-     return Apio.System.ApioIdentifier
-     } else {
-     if (fs.existsSync("./Identifier.apio")) {
-     Apio.System.ApioIdentifier = fs.readFileSync("./Identifier.apio", {
-     encoding: "utf-8"
-     }).trim();
-     } else {
-     Apio.System.ApioIdentifier = uuidgen.v4()
-     fs.writeFileSync("./Identifier.apio", Apio.System.ApioIdentifier);
-     }
-     return Apio.System.ApioIdentifier;
-     }
-
-     }*/
     Apio.System.getApioIdentifier = function () {
         if (null !== Apio.System.ApioIdentifier && "undefined" !== typeof Apio.System.ApioIdentifier) {
             return Apio.System.ApioIdentifier
         } else {
-            //if (fs.existsSync("./Identifier.apio")) {
             if (fs.existsSync(appRoot.path + "/Identifier.apio")) {
-                //Apio.System.ApioIdentifier = fs.readFileSync("./Identifier.apio", {
                 Apio.System.ApioIdentifier = fs.readFileSync(appRoot.path + "/Identifier.apio", {
                     encoding: "utf-8"
                 }).trim();
@@ -5633,7 +4408,6 @@ module.exports = function (enableCloudSocket) {
                         }
                     });
                 }
-                //fs.writeFileSync("./Identifier.apio", Apio.System.ApioIdentifier);
                 fs.writeFileSync(appRoot.path + "/Identifier.apio", Apio.System.ApioIdentifier);
             }
             return Apio.System.ApioIdentifier;
@@ -5667,81 +4441,7 @@ module.exports = function (enableCloudSocket) {
             fs.writeFileSync("./Secret.apio", key);
         }
         return key;
-    }
-    /*Apio.Event.launch = function (eventName, cb) {
-     var counter = 0;
-     var loops = 1;
-     var loopCounter = 1;
-
-     Apio.Database.db.collection("Events")
-     .findOne({
-     name: eventName
-     },
-     function (error, event) {
-
-     if (error) {
-     console.log("launchEvent() Error while fetching event " + eventName);
-     callback(error);
-     }
-     if (event !== null) {
-     console.log("Ecco gli scatenati");
-     console.log(event.triggeredStates)
-     if (event.hasOwnProperty("loop"))
-     loops = event.loop;
-     var processTriggeredState = function () {
-     var delay = 0;
-     if (event.triggeredStates[counter].hasOwnProperty("delay"))
-     delay = event.triggeredStates[counter].delay;
-     console.log("Setto il timeout dello stato " + event.triggeredStates[counter].name + " al valore " + event.triggeredStates[counter].delay)
-     setTimeout(function () {
-
-     Apio.State.apply(event.triggeredStates[counter].name, function () {
-
-     console.log("Ho processato " + event.triggeredStates[counter].name);
-     counter++;
-     if (counter >= event.triggeredStates.length) {
-     counter = 0;
-     loopCounter++;
-     console.log("\nFinito il ciclo")
-     }
-     if (loopCounter > loops) {
-     console.log("\nFinito evento")
-     } else {
-     processTriggeredState();
-     }
-     })
-     }, delay)
-
-     }
-     processTriggeredState();
-
-
-     }
-     })
-     }*/
-
-
-    /*Apio.System.notify = function(notification,callback) {
-     //Notifica a tutti gli utenti di un evento
-     //Questo viene fatto inviando una notifica ai client attivi
-     console.log("Ciao, sono Apio..System.notify e mi è arrivata questa notifica")
-     notification.timestamp = (new Date()).getTime();
-     console.log(notification);
-     Apio.Database.db.collection("Users").update({},{$push : {"unread_notifications" : notification}},function(err,data){
-     if (err)
-     console.log("Apio.System.notify Error, unable to send the notification");
-     else {
-     console.log("Emitto la notifica");
-     Apio.io.emit("apio_notification",notification);
-     if (callback)
-     callback();
-     }
-     })
-
-     }*/
-    /*
-     *
-     */
+    };
 
     Apio.System.userQueue = [];
     Apio.System.lastUserSent;
@@ -5814,7 +4514,7 @@ module.exports = function (enableCloudSocket) {
                 console.log("Errore di sistema: ", error);
             }
         });
-        //Apio.sendNewNotification = false;
+
         var areJSONsEqual = function (a, b) {
             function check(a, b) {
                 for (var attr in a) {
@@ -5904,32 +4604,8 @@ module.exports = function (enableCloudSocket) {
                                     Apio.System.notificationsQueue.push(notification);
                                 }
 
-                                /*if (notification.sendSMS && data[i].additional_info.sms) {
-                                 var req_data = {
-                                 json: true,
-                                 uri: "http://localhost:8095/sms/send",
-                                 method: "POST",
-                                 body: {
-                                 notificationText: notification.message/*,
-                                 numbers: data[i].additional_info.sms*/
-                                /*}
-                                 };
-                                 request(req_data, function (error, response, body) {
-                                 if (response) {
-                                 if (Number(response.statusCode) === 200) {
-                                 console.log("SMS inviato");
-                                 } else {
-                                 console.log("Apio SMS: Something went wrong");
-                                 }
-                                 } else {
-                                 console.log("Errore di sistema: ", error);
-                                 }
-                                 });
-                                 }*/
-
                                 var flag = false;
                                 for (var j in data[i].disabled_notification) {
-                                    //if (typeof data[i].disabled_notification !== "undefined" && data[i].disabled_notification.length > 0 && areJSONsEqual(data[i].disabled_notification[j], notification)) {
                                     if (data[i].disabled_notification[j].objectId === notification.objectId && data[i].disabled_notification[j].message === notification.message) {
                                         flag = true;
                                         break;
@@ -5950,23 +4626,18 @@ module.exports = function (enableCloudSocket) {
                                             console.log("Apio.System.notify Error, unable to send the notification");
                                         else {
                                             console.log("Emitto la notifica");
-                                            //notification.user = data[i].email;
-                                            //Apio.io.emit("apio_notification", notification);
-                                            //Apio.Remote.socket.emit("apio.server.notification", notification)
-                                            if (callback)
+                                            if (callback) {
                                                 callback();
+                                            }
                                         }
                                     });
                                 }
                             }
-
-                            //Apio.sendNewNotification = true;
                         }
                     }
                 });
             }
         });
-        //}
     };
 
     Apio.Serial = {};
@@ -6170,19 +4841,7 @@ module.exports = function (enableCloudSocket) {
 
     Apio.System.jobs = {};
 
-    //Questa funzione deve essere chiamata alla creazione dell'evento se quell'evento è scheduled
     Apio.System.registerCronEvent = function (event) {
-        /*
-         Seconds: 0-59
-         Minutes: 0-59
-         Hours: 0-23
-         Day of Month: 1-31
-         Months: 0-11
-         Day of Week: 0-6
-
-         * * * * * *
-         00 10 16 20 *
-         */
         console.log("Registro evento con timer (" + event.triggerTimer + ")");
         Apio.System.jobs[event.name] = new CronJob(event.triggerTimer,
             function () {
@@ -6194,7 +4853,8 @@ module.exports = function (enableCloudSocket) {
             },
             true,
             "Europe/Rome");
-    }
+    };
+
     Apio.System.resumeCronEvents = function () { //FIX
         //Trova tutti gli eventi schedulati
         Apio.Database.db.collection("Events").find({
@@ -6202,20 +4862,21 @@ module.exports = function (enableCloudSocket) {
                 $exists: true
             }
         }).toArray(function (err, docs) {
-
             docs.forEach(function (event, i, a) {
                 Apio.System.registerCronEvent(event);
             })
         })
-    }
+    };
+
     //FIXME SE riavvio il processo i cron task si perdono!
     //Devo scriverli nel db e caricarli al bootstrap dell'applicazione
     Apio.System.deleteCronEvent = function (eventName) {
-        if (Apio.System.jobs.hasOwnProperty(eventName))
+        if (Apio.System.jobs.hasOwnProperty(eventName)) {
             delete Apio.System.jobs[eventName];
-        else
+        } else {
             console.log("Apio.System.deleteCronEvent: unable to delete cron event " + eventName + " : the cron event does not exist;");
-    }
+        }
+    };
 
     Apio.System.sync = function (event, data) {
         if (Apio.Configuration.type === "gateway") {
@@ -6246,42 +4907,9 @@ module.exports = function (enableCloudSocket) {
 
     };
 
-    /* IN ALCUNI CASI POTREBBE NON FUNZIONARE LA CONFIGURAZIONE DI RETE E BISOGNA ATTIVARLO PER CAPIRE QUANDO SI È EFFETTIVAMENTE CONNESSI
-     var launchInterval = function () {
-     var pingInterval = setInterval(function () {
-     exec("nmap -p 8086 -Pn apio.cloudapp.net | grep 8086 | awk '{print $2}'", function (error, stdout, stderr) {
-     if (error || stderr) {
-     if (Apio.Remote.isCloudUp === true) {
-     Apio.Remote.socket.disconnect();
-     Apio.Remote.socket.close();
-     Apio.Remote.isCloudUp = false;
-     }
-     } else if (stdout) {
-     stdout = stdout.trim();
-     if (stdout === "open") {
-     if (Apio.Remote.isCloudUp === false) {
-     Apio.Remote.socket.open();
-     Apio.Remote.isCloudUp = true;
-     }
-     } else if (stdout === "closed") {
-     if (Apio.Remote.isCloudUp === true) {
-     Apio.Remote.socket.disconnect();
-     Apio.Remote.socket.close();
-     Apio.Remote.isCloudUp = false;
-     }
-     }
-     }
-     });
-     }, 10000);
-     };*/
-
     if ((enableCloudSocket === undefined || enableCloudSocket === true) && Apio.Configuration.remote.enabled === true && Apio.Configuration.type === "gateway") {
-        //Apio.Remote.socket = require("socket.io-client")(Apio.Configuration.remote.uri, {query: "associate=" + Apio.System.getApioIdentifier()});
-        //Apio.Remote.socket = singleton_socket;
         Apio.Remote.socket = singleton_socket.getInstance();
-        //Apio.Remote.socket = require("socket.io-client")(Apio.Configuration.remote.uri);
         Apio.Remote.isCloudUp = true;
-        //launchInterval();
     }
 
     return Apio;

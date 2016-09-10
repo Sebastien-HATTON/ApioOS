@@ -119,6 +119,54 @@ angular.module("ApioApplication").controller("ApioHomeController", ["$scope", "s
                 found = true;
             }
         }
+
+        $scope.objects.sort(function (a, b) {
+            if (a.type === "object") {
+                if (b.type === "object") {
+                    var numberInA = numberPositionInString(a.name.toLowerCase());
+                    var numberInB = numberPositionInString(b.name.toLowerCase());
+                    if (numberInA > -1 && numberInB > -1 && numberInA === numberInB) {
+                        var preNumA = a.name.toLowerCase().substring(0, numberInA);
+                        var numA = Number(a.name.toLowerCase().substring(numberInA));
+                        var preNumB = b.name.toLowerCase().substring(0, numberInB);
+                        var numB = Number(b.name.toLowerCase().substring(numberInB));
+                        if (preNumA === preNumB) {
+                            return numA - numB;
+                        } else {
+                            return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : Number(a.objectId) - Number(b.objectId);
+                        }
+                    } else {
+                        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : Number(a.objectId) - Number(b.objectId);
+                    }
+                } else if (b.type === "service") {
+                    return 1;
+                }
+            } else if (a.type === "service") {
+                if (b.type === "object") {
+                    return -1;
+                } else if (b.type === "service") {
+                    var numberInA = numberPositionInString(a.name.toLowerCase());
+                    var numberInB = numberPositionInString(b.name.toLowerCase());
+                    if (numberInA > -1 && numberInB > -1 && numberInA === numberInB) {
+                        var preNumA = a.name.toLowerCase().substring(0, numberInA);
+                        var numA = Number(a.name.toLowerCase().substring(numberInA));
+                        var preNumB = b.name.toLowerCase().substring(0, numberInB);
+                        var numB = Number(b.name.toLowerCase().substring(numberInB));
+                        if (preNumA === preNumB) {
+                            return numA - numB;
+                        } else {
+                            return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : Number(a.objectId) - Number(b.objectId);
+                        }
+                    } else {
+                        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : Number(a.objectId) - Number(b.objectId);
+                    }
+                }
+            }
+            //ORDINE PER OBJECTID
+            //return Number(a.objectId) - Number(b.objectId);
+            //ORDINE ALFABETICO (NON CONSIDERA IL TIPO DI OGGETTO)
+            //return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : a.name.toLowerCase() > b.name.toLowerCase() ? 1 : Number(a.objectId) - Number(b.objectId);
+        });
     });
 
     socket.on("apio_object_online", function (data) {
