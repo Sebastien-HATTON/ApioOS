@@ -1,5 +1,22 @@
 module.exports = function (Apio) {
     return {
+        getSocketConnection: function (req, res) {
+            if (req.session.apioId === "Continue to Cloud") {
+                res.status(200).send(true);
+            } else {
+                var index = Apio.syncedBoards.indexOf(req.session.apioId);
+                if (index > -1) {
+                    var socketIds = Apio.connectedSockets[req.session.apioId];
+                    if (socketIds) {
+                        res.status(200).send(Apio.io.sockets.connected[socketIds[socketIds.length - 1]].connected === true && Apio.io.sockets.connected[socketIds[socketIds.length - 1]].disconnected === false);
+                    } else {
+                        res.status(200).send(false);
+                    }
+                } else {
+                    res.status(200).send(false);
+                }
+            }
+        },
         change: function (req, res) {
             console.log(req.body.id);
             req.session.apioId = req.body.id;

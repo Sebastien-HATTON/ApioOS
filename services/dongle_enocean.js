@@ -34,7 +34,7 @@ var comCallback = 1;
 var Port = 8092;
 var enoceanApplianceOnOnce = 0;
 // var Apio = require("../apio.js")(configuration);
-var Apio = require("../apio.js")();
+var Apio = require("../apio.js")(false);
 var socket = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=enocean&token=" + Apio.Token.getFromText("enocean", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
 var socketServer = require("socket.io")(http);
 var objects = [];

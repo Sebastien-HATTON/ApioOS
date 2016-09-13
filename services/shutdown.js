@@ -40,7 +40,7 @@ module.exports = function (libraries) {
     var app = express();
     var http = libraries.http.Server(app);
     // var configuration = require("../configuration/default.js");
-    var configuration = require("../apio.js")().config.return().file;
+    var configuration = require("../apio.js")(false).config.return().file;
     var port = 8096;
     var Gpio = libraries.onoff.Gpio;
     var exec = libraries["child_process"].exec;
@@ -117,7 +117,7 @@ module.exports = function (libraries) {
      * Removes a module from the cache
      */
     PIN_22 = new Gpio(22, "out"),
-        PIN_23 = new Gpio(23, "in", "both");
+    PIN_23 = new Gpio(23, "in", "both");
 
     PIN_22.writeSync(1);
 //SERVER
@@ -129,7 +129,7 @@ module.exports = function (libraries) {
                 if (PIN_23.readSync() == 0) {
                     console.log("Spegnimento in Corso");
                     console.log("Avvio il Popup");
-                    //PIN_22.writeSync(0);
+                    PIN_22.writeSync(0);
                     request("http://localhost:" + configuration.http.port + "/apio/shutdown",
                         function (error, response, body) {
                             if (error || !response || Number(response.statusCode) !== 200) {
@@ -140,7 +140,7 @@ module.exports = function (libraries) {
                             }
                         });
                 }
-            }, 10000)
+            }, 500)
 
         } else if (value == 1) {
             console.log(value);

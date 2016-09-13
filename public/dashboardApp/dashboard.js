@@ -346,6 +346,27 @@ ApioDashboardApplication.controller("ApioDashboardGeneralController", ["$scope",
                     $scope.boardName = boards[0].name;
                 });
             });
+
+            setInterval(function () {
+                $http.post("/apio/boards/getSocketConnection").success(function (connected) {
+                    //connected = true if socket is connected
+                    if (connected) {
+                        if ($scope.systemOffline) {
+                            $scope.systemOffline = false;
+                            if (!$scope.$$phase) {
+                                $scope.$apply();
+                            }
+                        }
+                    } else {
+                        if (!$scope.systemOffline) {
+                            $scope.systemOffline = true;
+                            if (!$scope.$$phase) {
+                                $scope.$apply();
+                            }
+                        }
+                    }
+                });
+            }, 500);
         } else if ($scope.config.type === "gateway") {
             $http.get("/apio/getIPComplete").success(function (ip) {
                 var keys = Object.keys(ip.local);

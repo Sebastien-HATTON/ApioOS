@@ -25,7 +25,7 @@ var domain = require("domain");
 var exec = require("child_process").exec;
 var express = require("express");
 var fs = require("fs");
-var http = require("http");
+// var http = require("http");
 var path = require("path");
 var request = require("request");
 var session = require("express-session");
@@ -35,23 +35,10 @@ var Slack = require('node-slack');
 var webhook_url = "https://hooks.slack.com/services/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";
 var slack = new Slack(webhook_url);
 
-var nodemailer = require("nodemailer");
-var smtpTransport = require("nodemailer-smtp-transport");
-
-var transporter = nodemailer.createTransport(smtpTransport({
-    host: "smtps.aruba.it",
-    port: 465,
-    secure: true,
-    auth: {
-        user: "info@apio.cc",
-        pass: "@Pio22232425."
-    }
-}));
-
 var app = express();
+var http = require("http").Server(app);
 var integratedCommunication = require("./configuration/integratedCommunication.js");
 
-// var Apio = require("./apio.js")(configuration);
 var Apio = require("./apio.js")();
 
 var sessionMiddleware = session({
@@ -909,25 +896,17 @@ d.run(function () {
     app.get("/apio/boards/getDetailsFor/:boardsArr", routes.boards.getDetails);
     app.post("/apio/boards/change", routes.boards.change);
     app.post("/apio/boards/setName", routes.boards.setName);
+    app.post("/apio/boards/getSocketConnection", routes.boards.getSocketConnection);
     //Services Routes
     app.get("/apio/services", routes.services.getAll);
     app.post("/apio/service/:service/route/:route/data/:data", routes.services.postRequest);
     app.get("/apio/service/:service/route/:route", routes.services.getRequest);
 
-    var server = http.createServer(app);
-    Apio.io.listen(server);
-    server.listen(Apio.Configuration.http.port, function () {
+    // var server = http.createServer(app);
+    // Apio.io.listen(server);
+    http.listen(Apio.Configuration.http.port, function () {
         Apio.Util.log("APIO server started on port " + Apio.Configuration.http.port + " using the configuration:");
         console.log(util.inspect(Apio.Configuration, {colors: true}));
-
-        // exec("cd ./services && node apio_properties_adder.js", function (error, stdout, stderr) {
-        //     if (error || stderr) {
-        //         console.log("apio_properties_adder, error: ", error || stderr);
-        //     } else {
-        //         console.log("apio_properties_adder, success: ", stdout);
-        //     }
-        // });
-
         var gc = require("./services/garbage_collector.js");
         gc();
     });

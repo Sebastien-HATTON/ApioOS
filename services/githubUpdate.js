@@ -20,7 +20,7 @@
 
 module.exports = function (libraries) {
     // var Apio = require("../apio.js")(require("../configuration/default.js"));
-    var Apio = require("../apio.js")();
+    var Apio = require("../apio.js")(false);
     var MongoClient = libraries.mongodb.MongoClient;
     var bodyParser = libraries["body-parser"];
     // var configuration = require("../configuration/default.js");

@@ -73,6 +73,7 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
             });
         } else if ($scope.config.type === "cloud") {
             $http.post("/apio/rebootBoard").success();
+            $window.location = "app#/home";
         }
     };
 
@@ -91,6 +92,9 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
                     $window.location = "app#/home?clear=true";
                 }
             });
+        } else if ($scope.config.type === "cloud") {
+            $http.post("/apio/restartSystem").success();
+            $window.location = "app#/home";
         }
     };
 
@@ -109,6 +113,9 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
                     $window.location = "app#/home?clear=true";
                 }
             });
+        } else if ($scope.config.type === "cloud") {
+            $http.post("/apio/shutdownBoard").success();
+            $window.location = "app#/home";
         }
     };
 

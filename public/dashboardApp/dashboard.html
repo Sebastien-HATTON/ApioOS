@@ -297,7 +297,8 @@
                     <svg height="12" width="12">
                         <circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="red"/>
                     </svg>
-                    <span>ApioOS offline</span>
+                    <span ng-if="config.type === 'cloud'">Board offline</span>
+                    <span ng-if="config.type === 'gateway'">ApioOS offline</span>
                 </div>
             </div>
 

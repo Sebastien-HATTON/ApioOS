@@ -437,10 +437,12 @@ module.exports = function (enableCloudSocket) {
 
     Apio.boardsToSync = {};
     Apio.connectedSockets = {};
+    Apio.syncedBoards = [];
     Apio.Socket = {};
     Apio.Socket.init = function (httpInstance, sessionMiddleware) {
         if (!Apio.hasOwnProperty("io")) {
-            Apio.io = require("socket.io")(httpInstance);
+            Apio.io = require("socket.io")(httpInstance, {pingInterval: 2000, pingTimeout: 5000});
+
             Apio.io.use(function (socket, next) {
                 sessionMiddleware(socket.request, socket.request.res, next);
             });
@@ -711,6 +713,12 @@ module.exports = function (enableCloudSocket) {
 
                         if (Apio.connectedSockets[socketKeys[i]].length === 0) {
                             delete Apio.connectedSockets[socketKeys[i]];
+
+                            var index = Apio.syncedBoards.indexOf(socketKeys[i]);
+                            if (index > -1) {
+                                Apio.syncedBoards.splice(index, 1);
+                                console.log("Apio.syncedBoards: ", Apio.syncedBoards);
+                            }
                         }
                     }
 
@@ -2209,6 +2217,12 @@ module.exports = function (enableCloudSocket) {
                         var socketId = apioIdSockets[apioIdSockets.length - 1];
                         console.log("Alla board con apioId " + data.apio.system.apioId + " invio sync end");
                         Apio.io.sockets.connected[socketId].emit("apio.cloud.sync.end");
+
+                        if (Apio.syncedBoards.indexOf(data.apio.system.apioId) === -1) {
+                            Apio.syncedBoards.push(data.apio.system.apioId);
+                            console.log("--------------FINE SYNC------------------");
+                            console.log("Apio.syncedBoards: ", Apio.syncedBoards);
+                        }
 
                         Apio.Database.db.collection("systems").findOne({apioId: data.apio.system.apioId}, function (err, board) {
                             if (err) {
@@ -4909,7 +4923,6 @@ module.exports = function (enableCloudSocket) {
 
     if ((enableCloudSocket === undefined || enableCloudSocket === true) && Apio.Configuration.remote.enabled === true && Apio.Configuration.type === "gateway") {
         Apio.Remote.socket = singleton_socket.getInstance();
-        Apio.Remote.isCloudUp = true;
     }
 
     return Apio;

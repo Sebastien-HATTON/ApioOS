@@ -82,6 +82,7 @@ module.exports = function (libraries) {
 
     var socket = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=cloud&token=" + Apio.Token.getFromText("cloud", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
     var enableCloudUpdateInterval = undefined;
+    // var apioPingInterval = undefined;
 
     if (Apio.Configuration.remote.enabled) {
         Apio.Util.log("Setting up remote connection to " + Apio.Configuration.remote.uri);
@@ -570,14 +571,15 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("apio_shutdown_board", function (data) {
             socket.emit("send_to_client", {message: "apio_board_shutdown", data: data});
 
+            console.log("-------------------------CLOUD.JS--------------------");
+            console.log("apio_shutdown_board: ", data);
+
             var execShutdown = function () {
                 exec("sudo shutdown -h now", function (error, stdout, stderr) {
                     if (error || stderr) {
                         console.log("exec error: " + error || stderr);
-                        res.sendStatus(500);
                     } else if (stdout) {
                         console.log("Board is shutting down in a while, please wait");
-                        res.sendStatus(200);
                     }
                 });
             };

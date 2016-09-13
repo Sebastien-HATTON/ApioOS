@@ -1,6 +1,6 @@
 // var configuration = require("../configuration/default.js");
 // var Apio = require("../apio.js")(configuration);
-var Apio = require("../apio.js")();
+var Apio = require("../apio.js")(false);
 var bodyParser = require("body-parser");
 var compression = require("compression");
 var domain = require("domain");

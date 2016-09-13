@@ -213,12 +213,10 @@
  ****************************************************************************/
 
 var Apio = require('./apio.client.js');
-//var q = require("./bower_components/q");
 //Trova un modo migliore per iniettare le dipendenze
 window.Apio = Apio;
 window.$ = $;
 Apio.Socket.init();
-//Apio.socket = io();
 //Fixare questo scempio con la dependency injection
 Apio.appWidth = parseInt($("#ApioApplicationContainer").css('width'), 10);
 Apio.newWidth = parseInt($("#ApioApplicationContainer").css('width'), 10);
@@ -252,10 +250,6 @@ Apio.removeAngularScope = function (DOMElement, deleteDOMElement) {
 $("#notificationTrigger").on('click', function () {
     $("#notificationsCenter").toggle("slide", {direction: 'up'}, 500);
 });
-
-/*$("#notificationTrigger_mobile").on('click tap', function () {
- $("#notificationsCenter").toggle("slide", {direction: 'up'}, 500);
- });*/
 
 var ApioApplication = angular.module('ApioApplication', ['ui.bootstrap', 'ngRoute', 'hSweetAlert', 'angularFileUpload', 'fileSaver', 'ngFileReader', "ngMaterial"]);
 
@@ -302,7 +296,6 @@ window.affix = function (targetScoll, target, top, bottom, callback, callback1) 
     var firstInteract = 1;
     var interact = 0;
     $("#" + targetScoll).on("touchstart", function (event) {
-        //alert('');
         touch = 0;
         if (firstInteract == 1) {
             firstInteract = 0;
@@ -313,7 +306,6 @@ window.affix = function (targetScoll, target, top, bottom, callback, callback1) 
         }
     });
     $("#" + targetScoll).on("scroll", function (event) {
-        //alert('');
         touch = 0;
         if (firstInteract == 1) {
             firstInteract = 0;
@@ -330,28 +322,19 @@ window.affix = function (targetScoll, target, top, bottom, callback, callback1) 
         else {
             scroll = document.getElementById(targetScoll).scrollTop;
             if (touch == 0) {
-                //console.log(scroll+' '+top.top);
                 if (scroll >= top.top && interact == 0) {
                     interact = 1;
-                    //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOn');
-                    //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOff');
                     document.getElementById(target).style.marginTop = '-' + (top.top) + 'px';
                     callback();
-                    //alert('maggiore')
                 } else if (scroll <= top.top) {
                     interact = 0;
-                    //document.getElementById(targetScoll).classList.remove('webkitOverflowScrollingOn');
-                    //document.getElementById(targetScoll).classList.add('webkitOverflowScrollingOff');
                     document.getElementById(target).style.marginTop = ex_top + 'px'
                     callback1();
-                    //alert('minore')
                 }
             }
         }
     }, 100);
-
-}
-
+};
 
 ApioApplication.config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/home", {
@@ -516,45 +499,6 @@ ApioApplication.factory('DataSource', ['$http', function ($http) {
     }
 }]);
 
-/*
-
- ApioApplication.controller('ApioNotificationController',['$scope','$http','socket',function($scope,$http,socket){
- socket.on('apio_notification', function(notification) {
- console.log(notification)
- if (!("Notification" in window)) {
- alert("Apio Notification : " + notification.message);
- }
- // Let's check if the user is okay to get some notification
- else if (Notification.permission === "granted") {
- // If it's okay let's create a notification
- var notification = new Notification("Apio Notification", {
- body: notification.message,
- icon : '/images/Apio_Logo.png'
- });
-
- }
-
- // Otherwise, we need to ask the user for permission
- // Note, Chrome does not implement the permission static property
- // So we have to check for NOT 'denied' instead of 'default'
- else if (Notification.permission !== 'denied') {
- Notification.requestPermission(function(permission) {
- // If the user is okay, let's create a notification
- if (permission === "granted") {
- var notification = new Notification("Apio Notification", {
- body: notification.message,
- icon : '/images/Apio_Logo.png'
- });
- }
- });
- }
-
-
- });
- }])
- */
-
-
 ApioApplication.filter('removeUndefinedFilter', function () {
     return function (items) {
         var filtered = [];
@@ -698,17 +642,14 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
                     arr[parseInt(i)] = obj[i];
                 }
             }
-            console.log(arr)
             return arr;
         }
-    }
+    };
 
     return $window.sharedService;
 }]);
 
-//Apio.tagged = '';
-
-// Close the drawer menu when click on a link 
+// Close the drawer menu when click on a link
 ApioApplication.directive('menuClose', function () {
     return {
         restrict: 'AC',
@@ -731,68 +672,65 @@ var actualUser = {};
 
 ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "sweet", "$window", "$timeout", "$rootScope", "$location", "$mdDialog", function ($scope, $http, socket, sweet, $window, $timeout, $rootScope, $location, $mdDialog) {
     var configuration;
-    /* Definizione CloudShowBoard e Funzione che modifica bottone log-out/indietro */
+    // Definizione CloudShowBoard e Funzione che modifica bottone log-out/indietro
     $scope.platform = {};
     $scope.continueToCloud = false;
     $scope.cloudShowBoard = false;
-    //$scope.systemUpdated = false;
 
-    // setTimeout(function () {
-    //     // document.getElementById("apio-os-offline").style.display = "block";
-    //     $scope.systemOffline = true;
-    //     if (!$scope.$$phase) {
-    //         $scope.$apply();
-    //     }
-    // }, 5000);
-	var dialogInstall = false;
+    var dialogInstall = false;
     socket.on("auto_install_modal", function (data) {
         console.log("RICEVUTA RICHIESTA DI AUTO-INSTALLAZIONE!", data);
         var s = $scope.$new();
         s.modalData = data;
         if (data.protocol === "enocean" && data.hasOwnProperty("eep")) {
-	        if(!dialogInstall){
-		        dialogInstall = true;
-	            $mdDialog.show({
-	                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
-	                controller: "modal" + data.eep,
-	                clickOutsideToClose: false,
-	                bindToController: true,
-	                scope: s
-	            });
-				setTimeout(function(){dialogInstall = false;}, 5000);
+            if (!dialogInstall) {
+                dialogInstall = true;
+                $mdDialog.show({
+                    templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
+                    controller: "modal" + data.eep,
+                    clickOutsideToClose: false,
+                    bindToController: true,
+                    scope: s
+                });
+                setTimeout(function () {
+                    dialogInstall = false;
+                }, 5000);
             }
         } else if (data.protocol === "apio" && data.hasOwnProperty("eep")) {
             console.log("OGGETTO APIO");
-            if(!dialogInstall){
-	            dialogInstall = true;
-	            $mdDialog.show({
-	                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
-	                controller: "modal" + data.eep,
-	                clickOutsideToClose: false,
-	                bindToController: true,
-	                scope: s
-	            });
-	            setTimeout(function(){dialogInstall = false;}, 5000);
+            if (!dialogInstall) {
+                dialogInstall = true;
+                $mdDialog.show({
+                    templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
+                    controller: "modal" + data.eep,
+                    clickOutsideToClose: false,
+                    bindToController: true,
+                    scope: s
+                });
+                setTimeout(function () {
+                    dialogInstall = false;
+                }, 5000);
             }
         } else if (data.protocol === "z" && data.hasOwnProperty("eep")) {
             console.log("OGGETTO ZWAVE");
-            if(!dialogInstall){
-	            dialogInstall = true;
-	            $mdDialog.show({
-	                templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
-	                controller: "modal" + data.eep,
-	                clickOutsideToClose: false,
-	                bindToController: true,
-	                scope: s
-	            });
-            	setTimeout(function(){dialogInstall = false;}, 5000);
+            if (!dialogInstall) {
+                dialogInstall = true;
+                $mdDialog.show({
+                    templateUrl: "/applications/newfile/" + data.eep + "/template_modal.html",
+                    controller: "modal" + data.eep,
+                    clickOutsideToClose: false,
+                    bindToController: true,
+                    scope: s
+                });
+                setTimeout(function () {
+                    dialogInstall = false;
+                }, 5000);
             }
-            
+
         }
     });
 
     $rootScope.$on("$locationChangeSuccess", function () {
-        //$scope.nav_active_link = $location.url().split("/")[1];
         $scope.drawer_active_link = $location.url().split("/")[1];
     });
 
@@ -873,18 +811,13 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
 
     $scope.getPlatform = function () {
         $http.get('/apio/getPlatform').success(function (data) {
-            //console.log(data);
-            //alert(data.type);
-            //alert(data.apioId);
             $scope.platform = data;
 
             if (data.apioId == "Continue to Cloud") {
                 $scope.continueToCloud = true;
-                //$scope.currentUserEmail();
             }
             if (data.apioId != "Continue to Cloud" && data.type == "cloud") {
                 $scope.cloudShowBoard = true;
-                //$scope.currentUserEmail();
             }
         });
     };
@@ -893,7 +826,6 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     $scope.clickToMenu = function ($event) {
         console.log('CLICCKED');
         if ($event.target.id === 'homeButton') {
-
             if (document.getElementById('sottoMenuTag').classList.contains('displayNone')) {
                 document.getElementById('sottoMenuTag').classList.remove('displayNone')
 
@@ -901,9 +833,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             if (!document.getElementById('sottoMenuNotification').classList.contains('displayNone')) {
                 document.getElementById('sottoMenuNotification').classList.add('displayNone')
             }
-            //$scope.showDisabled = false;
-        }
-        else if ($event.target.id === 'notificationTrigger_mobile') {
+        } else if ($event.target.id === 'notificationTrigger_mobile') {
             if (!document.getElementById('sottoMenuTag').classList.contains('displayNone')) {
                 document.getElementById('sottoMenuTag').classList.add('displayNone')
             }
@@ -929,35 +859,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             console.log('quarto if');
             exBottonMenuId = $event.target.id;
         }
+    };
 
-
-    }
-    /*
-     $scope.closePopOver = function ($event) {
-     //$('#homeButtonMenu').popover('toggle');
-     if (document.getElementById('appHomeContainer') || document.getElementById('homeButtonMenu').getAttribute('aria-describedby')) {
-     $('#homeButtonMenu').popover('hide');
-     }
-     }
-     $scope.openHover = function () {
-     if (document.getElementById('appHomeContainer') && !document.getElementById('homeButtonMenu').getAttribute('aria-describedby')) {
-     var heightPopOver = document.documentElement.clientHeight;
-     //alert(heightPopOver)
-     $('#homeButtonMenu').popover('show');
-     var element = '';
-     var id = document.getElementById('homeButtonMenu').getAttribute('aria-describedby');
-     var nodeInThisId = document.getElementById(id).childNodes
-     for (var s in nodeInThisId) {
-     if (nodeInThisId[s].classList.contains('popover-content')) {
-     element = nodeInThisId[s];
-     break;
-     }
-     }
-     element.style.maxHeight = (heightPopOver) + 'px';
-     element.style.overflowY = 'scroll';
-     }
-     }
-     */
     $scope.getPlatform();
     $scope.launchBoardSimple = function (id) {
         if (typeof id === "string") {
@@ -976,12 +879,32 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             }
         }
     };
-    /* Fine */
-    $http.get('/apio/configuration/return').success(function (data, status) {
-        console.log(data);
+
+    $http.get("/apio/configuration/return").success(function (data) {
         configuration = data;
 
-        if (configuration.type === "gateway") {
+        if (configuration.type === "cloud") {
+            setInterval(function () {
+                $http.post("/apio/boards/getSocketConnection").success(function (connected) {
+                    //connected = true if socket is connected
+                    if (connected) {
+                        if ($scope.systemOffline) {
+                            $scope.systemOffline = false;
+                            if (!$scope.$$phase) {
+                                $scope.$apply();
+                            }
+                        }
+                    } else {
+                        if (!$scope.systemOffline) {
+                            $scope.systemOffline = true;
+                            if (!$scope.$$phase) {
+                                $scope.$apply();
+                            }
+                        }
+                    }
+                });
+            }, 500);
+        } else if (configuration.type === "gateway") {
             setInterval(function () {
                 if (Apio.socket.connected === false && Apio.socket.disconnected === true) {
                     if (!$scope.systemOffline) {
@@ -1004,7 +927,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 }
             }, 500);
         }
-    })
+    });
+
     $timeout(function () {
         if (document.getElementById("apioWaitLoadingSystemOperation")) {
             document.getElementById("apioWaitLoadingSystemOperation").classList.remove("apioWaitLoadingSystemOperationOn");
@@ -1041,11 +965,10 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             });
         }
     });
-    
+
     $http.get('/apio/update').success(function (data, status) {
-	    if(data){
-		    //alert("aggiornamento necessario")
-		    sweet.show({
+        if (data) {
+            sweet.show({
                 title: 'Conferma',
                 text: 'È disponibile un nuovo aggiornamento, vuoi installarlo?',
                 imageUrl: 'images/new-icon.png',
@@ -1057,32 +980,29 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showLoaderOnConfirm: false
             }, function (isConfirm) {
                 if (isConfirm) {
-                    //console.log(configuration.autoinstall.default);
                     socket.emit("git_pull", "");
                     alert('Scaricamento in background, verrai avvisato al termine');
-                    
+
 
                 } else {
                     sweet.show('Annullato', 'Aggiornamento non scaricato, puoi sempre installare dalla dashboard', 'error');
                 }
             });
-	    } else {
-		    //alert("Il sistema è aggiornato")
-		    $scope.systemUpdated = true;
-		    if (!$scope.$$phase) {
+        } else {
+            $scope.systemUpdated = true;
+            if (!$scope.$$phase) {
                 $scope.$apply();
             }
-		    setTimeout(function(){
-		    	$scope.systemUpdated = false;
-		    	if (!$scope.$$phase) {
+            setTimeout(function () {
+                $scope.systemUpdated = false;
+                if (!$scope.$$phase) {
                     $scope.$apply();
                 }
-		    }, 5000)
-	    }
-    })
+            }, 5000)
+        }
+    });
 
     socket.on("update_system", function (data) {
-        //var host = $location.host();
         if (data.type == "request") {
             sweet.show({
                 title: 'Conferma',
@@ -1096,15 +1016,12 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
-                    //console.log(configuration.autoinstall.default);
                     socket.emit("git_pull", "");
                     sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
-
                 } else {
                     sweet.show('Annullato', 'Aggiornamento non scaricato, puoi sempre installare dalla dashboard', 'error');
                 }
             });
-
         }
         if (data.type == "done") {
             sweet.show({
@@ -1119,14 +1036,6 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
-                    //console.log(configuration.autoinstall.default);
-                    //$http.get("/apio/getService/githubUpdate").success(function (service) {
-                    //$http.get("http://" + host + ":" + service.port + "/restartApp", {
-                    //
-                    //    }).success(function(){
-                    //   	sweet.show('OK!', 'Il sistema verrà riavviato e sarà disponibile a breve.', 'success');
-                    //   });
-                    //});
                     $http.post("/apio/rebootBoard").success(function () {
                         sweet.show('OK!', 'Il sistema verrà riavviato e sarà disponibile a breve.', 'success');
                     });
@@ -1135,16 +1044,12 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                     sweet.show('Annullato', 'Il nuovo sistema sarà disponibile al prossimo riavvio', 'error');
                 }
             });
-
         }
-
     });
 
     socket.on("apio_new_object", function (data) {
-        //alert(data);
         var d = new Date();
         var n = d.toDateString();
-        //var host = $location.host();
         if (data.hasOwnProperty("protocol")) {
             if (data.protocol === "enocean" && data.hasOwnProperty("eep")) {
                 //DOPO
@@ -1164,15 +1069,6 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 if (isConfirm) {
                     console.log(configuration.autoinstall.default);
                     if (configuration.type == "gateway") {
-                        //$http.get("/apio/getIP").success(function (ip) {
-                        //	$http.get("/apio/getService/autoInstall").success(function (service) {
-                        //   	$http.post("http://" + host + ":" + service.port + "/installNew", {
-                        //       	appId : data.appId
-                        //       }).success(function(){
-                        //       	sweet.show('Installata!', data.appId + ' installed', 'success');
-                        //       });
-                        //   });
-                        //});
                         $http.post("/apio/service/autoInstall/route/" + encodeURIComponent("/installNew") + "/data/" + encodeURIComponent(JSON.stringify({
                                 appId: data.appId,
                                 data: data
@@ -1189,12 +1085,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             });
         } else {
             console.log(data.autoInstall)
-            //var x = document.getElementById("autoInstall");
             $("#autoInstall").html($(data.autoInstall));
-
         }
-
-
     });
 
     $scope.img = {};
@@ -1209,7 +1101,6 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             $scope.user = user.user;
             if (user.user.additional_info.profileImage) {
                 $scope.img.userImage = $scope.user.email + '/' + user.user.additional_info.profileImage + '.png'
-                //$scope.$apply();
             }
 
             $scope.role = user.user.role;
@@ -1232,10 +1123,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
 
     $scope.actualTag = [];
 
-
     $scope.$watchCollection('objectId', function (n, o) {
-        //var tempTag;
-
         var tag = "<p><a onclick='angular.element(this).scope().setTagView(event)'>#tutti</a></p>";
 
         if ($rootScope.objectId) {
@@ -1254,11 +1142,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
         for (var r in $scope.actualTag) {
             tag += "<p><a onclick='angular.element(this).scope().setTagView(event)'>" + $scope.actualTag[r] + "</a></p>"
         }
-        //document.getElementById('homeButtonMenu').setAttribute('data-content', tag);
-        //document.getElementById('sottoMenuTag').innerHTML = tag;
         $scope.actualTag = [];
     });
-
 
     $scope.checkTag = function (a, b) {
         console.log('+++++++++++++++++++++++++++++', a);
@@ -1267,17 +1152,15 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
         l = a.split(" ");
         for (var s in l) {
             if (l[s] === b) {
-                console.log(l[s])
+                console.log(l[s]);
                 return true;
             }
         }
         return false;
-    }
+    };
 
     $scope.setTagView = function ($event) {
-        //$scope.tagged = $event.target.innerHTML;
         for (var s in $rootScope.objectId) {
-            //console.log($rootScope.objectId[s]);
             if (($rootScope.objectId[s] && $rootScope.objectId[s].tag && $scope.checkTag($rootScope.objectId[s].tag, $event.target.innerHTML) === true) || $event.target.innerHTML === '#tutti') {
                 if (document.getElementById($rootScope.objectId[s].objectId).classList.contains('displayNone')) {
                     document.getElementById($rootScope.objectId[s].objectId).classList.remove('displayNone');
@@ -1288,8 +1171,6 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 }
             }
         }
-        //Apio.tag = $event.target.innerHTML;
-        //document.getElementById('homeButtonMenu').setAttribute('data-content','<p>l#</p><p>#s</p><p>#p</p>');
     };
 
     console.log('$scope.user ******** ', $scope.user);
@@ -1298,16 +1179,10 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
 
     $scope.saveProfile = function () {
         console.log('il dato passato è ***** ', data);
-    }
+    };
 
     $scope.openUserProfile = function () {
-
         $scope.user = actualUser.user;
-        //var alert = $mdDialog.alert()
-        //.title('Ciao, ' + $scope.user.additional_info.userName)
-        //.textContent('This is an example of how easy dialogs can be!')
-        //.ok('Close');
-        //$mdDialog.show(alert);
 
         $mdDialog.show({
             templateUrl: '/dialog/appModifyUserProfile/index.html',
@@ -1319,16 +1194,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
 
 
         });
-
-    }
-
-    /*$scope.$watch('userImage',function(n){
-     //alert();
-     console.log("editImage ",n);
-     $scope.img.userImage = n;
-     });*/
+    };
 }]);
-
 
 Apio.runApioLoading = function (element, scroll, border) {
     if (element) {
@@ -1369,8 +1236,6 @@ Apio.runApioLoading = function (element, scroll, border) {
 };
 
 Apio.stopApioLoading = function () {
-    //alert('rimuovo animazione')
-
     var loaderInPage = document.getElementsByClassName('loaderAnimation')
     for (var ld in loaderInPage) {
         if (loaderInPage.item(ld) && loaderInPage.item(ld).classList && loaderInPage.item(ld).classList.contains('loadingPlay')) {
