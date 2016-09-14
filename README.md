@@ -7,6 +7,7 @@ ApioOS
 * the first WebOs that link everything on internet: Things, Services, Cloud Platform and People.
 * a framework that let developers create WebApp for control Things or Services that link Objects, Data and APIs.
 * a ready to use Internet of things Platform
+* a smart-gateway for your WiFi, EnOcean, Z-Wave, Apio objects.
 
 ##ApioOS offers:
 * 24/7 monitoring
