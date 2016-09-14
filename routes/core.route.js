@@ -420,14 +420,18 @@ module.exports = function (Apio) {
                 Apio.io.emit("apio_shutdown");
                 setTimeout(function () {
                     var execShutdown = function () {
-                        exec("sudo shutdown -h now", function (error, stdout, stderr) {
-                            if (error || stderr) {
-                                console.log("exec error: " + error || stderr);
-                                res.sendStatus(500);
-                            } else if (stdout) {
-                                console.log("Board is shutting down in a while, please wait");
-                                res.sendStatus(200);
-                            }
+                        exec("echo 1-1 | tee /sys/bus/usb/drivers/usb/unbind", function () {
+                            setTimeout(function () {
+                                exec("sudo shutdown -h now", function (error, stdout, stderr) {
+                                    if (error || stderr) {
+                                        console.log("exec error: " + error || stderr);
+                                        res.sendStatus(500);
+                                    } else if (stdout) {
+                                        console.log("Board is shutting down in a while, please wait");
+                                        res.sendStatus(200);
+                                    }
+                                });
+                            }, 1000);
                         });
                     };
 
