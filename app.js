@@ -25,7 +25,6 @@ var domain = require("domain");
 var exec = require("child_process").exec;
 var express = require("express");
 var fs = require("fs");
-// var http = require("http");
 var path = require("path");
 var request = require("request");
 var session = require("express-session");
@@ -163,8 +162,6 @@ d.run(function () {
                 console.log("Error while check existence of Objects: ", err);
             } else if (names.length) {
                 console.log("Collection Objects Exists");
-                //Se esiste la collection metto la roba dentro...
-
             } else {
                 console.log("Collection Objects DOESN'T Exists, creating....");
                 Apio.Database.db.createCollection("Objects", function (error, collection) {
@@ -228,11 +225,8 @@ d.run(function () {
                 console.log("Collection Communication Exists");
                 Apio.Database.db.collection("Communication").findAndModify({name: "integratedCommunication"}, [["name", 1]], {$set: integratedCommunication}, function (err, result) {
                     if (err) {
-                        //Apio.Util.debug("Apio.Database.updateProperty() encountered an error while trying to update the property on the database: ");
                         console.log(err);
-                        //throw new Apio.Database.Error("Apio.Database.updateProperty() encountered an error while trying to update the property on the database");
                     } else if (null === result) {
-                        //throw new Apio.Database.Error("Apio.Database.updateProperty() the object with id " + data.objectId + "  does not exist.");
                         Apio.Database.db.collection("Communication").insert(integratedCommunication, function (error, result1) {
                             if (error) {
                                 console.log("Error while inserting Communication integratedCommunication: ", error);
@@ -242,10 +236,6 @@ d.run(function () {
                         });
 
                     } else {
-                        //Apio.Util.debug("Apio.Database.updateProperty() Successfully updated the  object " + data.objectId);
-                        //if (callback) {
-                        //    callback();
-                        //}
                         console.log("Ok")
                     }
                 });
@@ -352,7 +342,6 @@ d.run(function () {
                             }
                         });
                     } else if (service === "enocean") {
-                        // require("./services/dongle_enocean.old.js")(require("./apioLibraries.js"));
                         exec("ps aux | grep enocean | awk '{print $2}'", function (error, stdout, stderr) {
                             if (error) {
                                 console.log("exec error: " + error);
@@ -902,12 +891,110 @@ d.run(function () {
     app.post("/apio/service/:service/route/:route/data/:data", routes.services.postRequest);
     app.get("/apio/service/:service/route/:route", routes.services.getRequest);
 
-    // var server = http.createServer(app);
-    // Apio.io.listen(server);
     http.listen(Apio.Configuration.http.port, function () {
         Apio.Util.log("APIO server started on port " + Apio.Configuration.http.port + " using the configuration:");
         console.log(util.inspect(Apio.Configuration, {colors: true}));
         var gc = require("./services/garbage_collector.js");
         gc();
+
+        //Check if wvdial is installed
+        exec("which wvdial", function (error_w, stdout_w) {
+            if (error_w) {
+                console.log("Error while checking for wvdial: ", error_w);
+            } else if (stdout_w) {
+                var wdComponents = __dirname.split("/");
+                var user = undefined;
+                for (var x = 0; !user && x < wdComponents.length; x++) {
+                    if (wdComponents[x] === "home") {
+                        user = wdComponents[x + 1];
+                    }
+                }
+
+                if (user) {
+                    var changeOwnerAndPermissionsAndRestart = function () {
+                        exec("chown pi:crontab /var/spool/cron/crontabs/" + user + " && chmod 600 /var/spool/cron/crontabs/" + user + " && service cron restart", function (error_op) {
+                            if (error_op) {
+                                console.log("Error while changing owner and/or permissions: ", error_op);
+                            } else {
+                                console.log("Owner and permissions successfully changed");
+                            }
+                        });
+                    };
+
+                    fs.stat(__dirname + "/3GConnect.js", function (error_3g, stats_3g) {
+                        if (error_3g) {
+                            console.log("Error while getting starts of " + __dirname + "/3GConnect.js: ", error_3g);
+                        } else if (stats_3g) {
+                            fs.stat("/var/spool/cron/crontabs/" + user, function (error_s, stats_s) {
+                                if (error_s) {
+                                    console.log("No crontab existing, creating file");
+                                    fs.writeFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n0 4 * * * sudo reboot", function (error) {
+                                        if (error) {
+                                            console.log("Error while creating new crontab: ", error);
+                                        } else {
+                                            console.log("New crontab successfully created");
+                                            changeOwnerAndPermissionsAndRestart();
+                                        }
+                                    });
+                                } else if (stats_s) {
+                                    console.log("crontab exists, appending data to file");
+                                    fs.readFile("/var/spool/cron/crontabs/" + user, "utf8", function (error_r, content) {
+                                        if (error_r) {
+                                            console.log("Error while reading /var/spool/cron/crontabs/" + user + ": ", error_r);
+                                        } else if (content) {
+                                            if (content.indexOf("sudo node " + __dirname + "/3GConnect.js") === -1) {
+                                                fs.appendFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n", function (error_a1) {
+                                                    if (error_a1) {
+                                                        console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
+                                                    } else if (content.indexOf("sudo reboot") === -1) {
+                                                        fs.appendFile("/var/spool/cron/crontabs/" + user, "0 4 * * * sudo reboot\n", function (error_a2) {
+                                                            if (error_a2) {
+                                                                console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a2);
+                                                            } else {
+                                                                console.log("crontab successfully installed");
+                                                                changeOwnerAndPermissionsAndRestart();
+                                                            }
+                                                        });
+                                                    } else {
+                                                        changeOwnerAndPermissionsAndRestart();
+                                                    }
+                                                });
+                                            } else if (content.indexOf("sudo reboot") === -1) {
+                                                fs.appendFile("/var/spool/cron/crontabs/" + user, "0 4 * * * sudo reboot\n", function (error_a1) {
+                                                    if (error_a1) {
+                                                        console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
+                                                    } else {
+                                                        console.log("crontab successfully installed");
+                                                        changeOwnerAndPermissionsAndRestart();
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            console.log("crontab already installed");
+                                        }
+                                    });
+                                } else {
+                                    console.log("Unable to get stats: either the file doesn't exist or insufficient permissions, try to rewrite");
+                                    fs.writeFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n0 4 * * * sudo reboot", function (error) {
+                                        if (error) {
+                                            console.log("Error while creating new crontab: ", error);
+                                        } else {
+                                            console.log("New crontab successfully created");
+                                            changeOwnerAndPermissionsAndRestart();
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            console.log("Unable to get starts of " + __dirname + "/3GConnect.js, probably file is corrupted");
+                        }
+                    });
+                } else {
+                    console.log("Unable to find any user, cron will be not installed");
+                }
+            } else {
+                console.log("wvdial not installed");
+            }
+        });
     });
 });
