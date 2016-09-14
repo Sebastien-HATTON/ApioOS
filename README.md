@@ -8,7 +8,6 @@ ApioOS
 * a framework that let developers create WebApp for control Things or Services that link Objects, Data and APIs.
 * a ready to use Internet of things Platform
 
-![](http://www.apio.cc//images/img_ApioOS/os_overview-home.png)
 ##ApioOS offers:
 * 24/7 monitoring
 * Remote control
@@ -17,7 +16,7 @@ ApioOS
 * Weekly/Monthly custom reports
 * Analytics
 
-
+![](http://www.apio.cc//images/img_ApioOS/os_overview-home.png)
  
 # Installation
 * [Installing ApioOS on a RaspberryPi 3](https://github.com/ApioLab/ApioOS/wiki/How-to-Install-on-Raspberry-3)
