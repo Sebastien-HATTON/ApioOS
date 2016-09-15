@@ -132,7 +132,7 @@ module.exports = function (enableCloudSocket) {
         secure: true,
         auth: {
             user: "info@apio.cc",
-            pass: "@Pio22232425."
+            pass: "@Pio22232425"
         }
     }));
 

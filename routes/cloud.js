@@ -21,7 +21,7 @@ var transporter = nodemailer.createTransport(smtpTransport({
     secure: true,
     auth: {
         user: "info@apio.cc",
-        pass: "@Pio22232425."
+        pass: "@Pio22232425"
     }
 }));
 

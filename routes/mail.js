@@ -12,8 +12,8 @@ module.exports = function (Apio) {
         port: 465,
         secure: true,
         auth: {
-            user: "apioos@apio.cc",
-            pass: "Prova1234"
+            user: "info@apio.cc",
+            pass: "@Pio22232425"
         }
     }));
 
