@@ -30,7 +30,7 @@ var request = require("request");
 var session = require("express-session");
 var util = require("util");
 
-var Slack = require('node-slack');
+var Slack = require("node-slack");
 var webhook_url = "https://hooks.slack.com/services/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";
 var slack = new Slack(webhook_url);
 
@@ -644,7 +644,7 @@ d.run(function () {
                         }
                     }
                     var name = "";
-                    if (Apio.Configuration.hasOwnProperty('name')) {
+                    if (Apio.Configuration.hasOwnProperty("name")) {
                         name = Apio.Configuration.name;
 
                     } else {
@@ -897,104 +897,161 @@ d.run(function () {
         var gc = require("./services/garbage_collector.js");
         gc();
 
-        //Check if wvdial is installed
-        exec("which wvdial", function (error_w, stdout_w) {
-            if (error_w) {
-                console.log("Error while checking for wvdial: ", error_w);
-            } else if (stdout_w) {
-                var wdComponents = __dirname.split("/");
-                var user = undefined;
-                for (var x = 0; !user && x < wdComponents.length; x++) {
-                    if (wdComponents[x] === "home") {
-                        user = wdComponents[x + 1];
-                    }
+        var changeOwnerAndPermissionsAndRestart = function (user) {
+            exec("chown " + user + ":crontab /var/spool/cron/crontabs/" + user + " && chmod 600 /var/spool/cron/crontabs/" + user + " && service cron restart", function (error_op) {
+                if (error_op) {
+                    console.log("Error while changing owner and/or permissions: ", error_op);
+                } else {
+                    console.log("Owner and permissions successfully changed");
                 }
+            });
+        };
 
-                if (user) {
-                    var changeOwnerAndPermissionsAndRestart = function () {
-                        exec("chown pi:crontab /var/spool/cron/crontabs/" + user + " && chmod 600 /var/spool/cron/crontabs/" + user + " && service cron restart", function (error_op) {
-                            if (error_op) {
-                                console.log("Error while changing owner and/or permissions: ", error_op);
+        if (Apio.Configuration.type === "cloud") {
+            var wdComponents = __dirname.split("/");
+            var user = undefined;
+            for (var x = 0; !user && x < wdComponents.length; x++) {
+                if (wdComponents[x] === "home") {
+                    user = wdComponents[x + 1];
+                }
+            }
+
+            if (user) {
+                fs.stat("/var/spool/cron/crontabs/" + user, function (error_s, stats_s) {
+                    if (error_s) {
+                        console.log("No crontab existing, creating file");
+                        fs.writeFile("/var/spool/cron/crontabs/" + user, "0 0 */15 * * sudo reboot\n", function (error) {
+                            if (error) {
+                                console.log("Error while creating new crontab: ", error);
                             } else {
-                                console.log("Owner and permissions successfully changed");
+                                console.log("New crontab successfully created");
+                                changeOwnerAndPermissionsAndRestart(user);
                             }
                         });
-                    };
-
-                    fs.stat(__dirname + "/3GConnect.js", function (error_3g, stats_3g) {
-                        if (error_3g) {
-                            console.log("Error while getting starts of " + __dirname + "/3GConnect.js: ", error_3g);
-                        } else if (stats_3g) {
-                            fs.stat("/var/spool/cron/crontabs/" + user, function (error_s, stats_s) {
-                                if (error_s) {
-                                    console.log("No crontab existing, creating file");
-                                    fs.writeFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n0 4 * * * sudo reboot", function (error) {
-                                        if (error) {
-                                            console.log("Error while creating new crontab: ", error);
+                    } else if (stats_s) {
+                        console.log("crontab exists, appending data to file");
+                        fs.readFile("/var/spool/cron/crontabs/" + user, "utf8", function (error_r, content) {
+                            if (error_r) {
+                                console.log("Error while reading /var/spool/cron/crontabs/" + user + ": ", error_r);
+                            } else if (content) {
+                                if (content.indexOf("sudo reboot") === -1) {
+                                    fs.appendFile("/var/spool/cron/crontabs/" + user, "0 0 */15 * * sudo reboot\n", function (error_a1) {
+                                        if (error_a1) {
+                                            console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
                                         } else {
-                                            console.log("New crontab successfully created");
-                                            changeOwnerAndPermissionsAndRestart();
-                                        }
-                                    });
-                                } else if (stats_s) {
-                                    console.log("crontab exists, appending data to file");
-                                    fs.readFile("/var/spool/cron/crontabs/" + user, "utf8", function (error_r, content) {
-                                        if (error_r) {
-                                            console.log("Error while reading /var/spool/cron/crontabs/" + user + ": ", error_r);
-                                        } else if (content) {
-                                            if (content.indexOf("sudo node " + __dirname + "/3GConnect.js") === -1) {
-                                                fs.appendFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n", function (error_a1) {
-                                                    if (error_a1) {
-                                                        console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
-                                                    } else if (content.indexOf("sudo reboot") === -1) {
-                                                        fs.appendFile("/var/spool/cron/crontabs/" + user, "0 4 * * * sudo reboot\n", function (error_a2) {
-                                                            if (error_a2) {
-                                                                console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a2);
-                                                            } else {
-                                                                console.log("crontab successfully installed");
-                                                                changeOwnerAndPermissionsAndRestart();
-                                                            }
-                                                        });
-                                                    } else {
-                                                        changeOwnerAndPermissionsAndRestart();
-                                                    }
-                                                });
-                                            } else if (content.indexOf("sudo reboot") === -1) {
-                                                fs.appendFile("/var/spool/cron/crontabs/" + user, "0 4 * * * sudo reboot\n", function (error_a1) {
-                                                    if (error_a1) {
-                                                        console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
-                                                    } else {
-                                                        console.log("crontab successfully installed");
-                                                        changeOwnerAndPermissionsAndRestart();
-                                                    }
-                                                });
-                                            }
-                                        } else {
-                                            console.log("crontab already installed");
-                                        }
-                                    });
-                                } else {
-                                    console.log("Unable to get stats: either the file doesn't exist or insufficient permissions, try to rewrite");
-                                    fs.writeFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n0 4 * * * sudo reboot", function (error) {
-                                        if (error) {
-                                            console.log("Error while creating new crontab: ", error);
-                                        } else {
-                                            console.log("New crontab successfully created");
-                                            changeOwnerAndPermissionsAndRestart();
+                                            console.log("crontab successfully installed");
+                                            changeOwnerAndPermissionsAndRestart(user);
                                         }
                                     });
                                 }
-                            });
-                        } else {
-                            console.log("Unable to get starts of " + __dirname + "/3GConnect.js, probably file is corrupted");
-                        }
-                    });
-                } else {
-                    console.log("Unable to find any user, cron will be not installed");
-                }
+                            } else {
+                                console.log("crontab already installed");
+                            }
+                        });
+                    } else {
+                        console.log("Unable to get stats: either the file doesn't exist or insufficient permissions, try to rewrite");
+                        fs.writeFile("/var/spool/cron/crontabs/" + user, "0 0 */15 * * sudo reboot\n", function (error) {
+                            if (error) {
+                                console.log("Error while creating new crontab: ", error);
+                            } else {
+                                console.log("New crontab successfully created");
+                                changeOwnerAndPermissionsAndRestart(user);
+                            }
+                        });
+                    }
+                });
             } else {
-                console.log("wvdial not installed");
+                console.log("Unable to find any user, cron will be not installed");
             }
-        });
+        } else if (Apio.Configuration.type === "gateway") {
+            exec("which wvdial", function (error_w, stdout_w) {
+                if (error_w) {
+                    console.log("Error while checking for wvdial: ", error_w);
+                } else if (stdout_w) {
+                    var wdComponents = __dirname.split("/");
+                    var user = undefined;
+                    for (var x = 0; !user && x < wdComponents.length; x++) {
+                        if (wdComponents[x] === "home") {
+                            user = wdComponents[x + 1];
+                        }
+                    }
+
+                    if (user) {
+                        fs.stat(__dirname + "/3GConnect.js", function (error_3g, stats_3g) {
+                            if (error_3g) {
+                                console.log("Error while getting starts of " + __dirname + "/3GConnect.js: ", error_3g);
+                            } else if (stats_3g) {
+                                fs.stat("/var/spool/cron/crontabs/" + user, function (error_s, stats_s) {
+                                    if (error_s) {
+                                        console.log("No crontab existing, creating file");
+                                        fs.writeFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n0 4 * * * sudo reboot\n", function (error) {
+                                            if (error) {
+                                                console.log("Error while creating new crontab: ", error);
+                                            } else {
+                                                console.log("New crontab successfully created");
+                                                changeOwnerAndPermissionsAndRestart(user);
+                                            }
+                                        });
+                                    } else if (stats_s) {
+                                        console.log("crontab exists, appending data to file");
+                                        fs.readFile("/var/spool/cron/crontabs/" + user, "utf8", function (error_r, content) {
+                                            if (error_r) {
+                                                console.log("Error while reading /var/spool/cron/crontabs/" + user + ": ", error_r);
+                                            } else if (content) {
+                                                if (content.indexOf("sudo node " + __dirname + "/3GConnect.js") === -1) {
+                                                    fs.appendFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n", function (error_a1) {
+                                                        if (error_a1) {
+                                                            console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
+                                                        } else if (content.indexOf("sudo reboot") === -1) {
+                                                            fs.appendFile("/var/spool/cron/crontabs/" + user, "0 4 * * * sudo reboot\n", function (error_a2) {
+                                                                if (error_a2) {
+                                                                    console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a2);
+                                                                } else {
+                                                                    console.log("crontab successfully installed");
+                                                                    changeOwnerAndPermissionsAndRestart(user);
+                                                                }
+                                                            });
+                                                        } else {
+                                                            changeOwnerAndPermissionsAndRestart(user);
+                                                        }
+                                                    });
+                                                } else if (content.indexOf("sudo reboot") === -1) {
+                                                    fs.appendFile("/var/spool/cron/crontabs/" + user, "0 4 * * * sudo reboot\n", function (error_a1) {
+                                                        if (error_a1) {
+                                                            console.log("Error while appending on /var/spool/cron/crontabs/" + user + ": ", error_a1);
+                                                        } else {
+                                                            console.log("crontab successfully installed");
+                                                            changeOwnerAndPermissionsAndRestart(user);
+                                                        }
+                                                    });
+                                                }
+                                            } else {
+                                                console.log("crontab already installed");
+                                            }
+                                        });
+                                    } else {
+                                        console.log("Unable to get stats: either the file doesn't exist or insufficient permissions, try to rewrite");
+                                        fs.writeFile("/var/spool/cron/crontabs/" + user, "*/2 * * * * sudo node " + __dirname + "/3GConnect.js\n0 4 * * * sudo reboot\n", function (error) {
+                                            if (error) {
+                                                console.log("Error while creating new crontab: ", error);
+                                            } else {
+                                                console.log("New crontab successfully created");
+                                                changeOwnerAndPermissionsAndRestart(user);
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                console.log("Unable to get starts of " + __dirname + "/3GConnect.js, probably file is corrupted");
+                            }
+                        });
+                    } else {
+                        console.log("Unable to find any user, cron will be not installed");
+                    }
+                } else {
+                    console.log("wvdial not installed");
+                }
+            });
+        }
     });
 });
