@@ -72,8 +72,19 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
                 }
             });
         } else if ($scope.config.type === "cloud") {
-            $http.post("/apio/rebootBoard").success();
-            $window.location = "app#/home";
+            sweet.show({
+                title: "Board is rebooting",
+                text: "You'll be redirect to the home screen",
+                type: "success",
+                closeOnConfirm: true,
+                showCancelButton: false,
+                showLoaderOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $http.post("/apio/rebootBoard").success();
+                    $window.location = "app#/home";
+                }
+            });
         }
     };
 
@@ -93,8 +104,19 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
                 }
             });
         } else if ($scope.config.type === "cloud") {
-            $http.post("/apio/restartSystem").success();
-            $window.location = "app#/home";
+            sweet.show({
+                title: "System is restarting",
+                text: "You'll be redirect to the home screen",
+                type: "success",
+                closeOnConfirm: true,
+                showCancelButton: false,
+                showLoaderOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $http.post("/apio/restartSystem").success();
+                    $window.location = "app#/home";
+                }
+            });
         }
     };
 
@@ -114,8 +136,19 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
                 }
             });
         } else if ($scope.config.type === "cloud") {
-            $http.post("/apio/shutdownBoard").success();
-            $window.location = "app#/home";
+            sweet.show({
+                title: "Board is shutting down",
+                text: "You'll be redirect to the home screen",
+                type: "success",
+                closeOnConfirm: true,
+                showCancelButton: false,
+                showLoaderOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $http.post("/apio/shutdownBoard").success();
+                    $window.location = "app#/home";
+                }
+            });
         }
     };
 
