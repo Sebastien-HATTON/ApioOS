@@ -1291,12 +1291,11 @@ module.exports = function (enableCloudSocket) {
                                 if (err) {
 
                                 } else {
-                                    console.log("delete file")
+                                    console.log("delete file");
                                     var o = {
                                         type: "done"
                                     };
-                                    Apio.io.emit("update_system", o)
-
+                                    Apio.io.emit("update_system", o);
                                 }
                             });
                         });
@@ -2473,7 +2472,16 @@ module.exports = function (enableCloudSocket) {
                             if (e) {
                                 console.log("Error while updating object with objectId " + data.objectId + ": ", e);
                             } else if (r) {
-                                Apio.io.emit("apio_object_online", data);
+                                // Apio.io.emit("apio_object_online", data);
+                                for (var e in Apio.connectedSockets) {
+                                    if (e === "admin" || validator.isEmail(e)) {
+                                        var socketIds = Apio.connectedSockets[e];
+                                        for (var i in socketIds) {
+                                            Apio.io.sockets.connected[socketIds[i]].emit("apio_object_online", data);
+                                        }
+                                    }
+                                }
+
                                 if (Apio.Configuration.remote.enabled && Apio.isBoardSynced && (!data.hasOwnProperty("sendToCloud") || data.sendToCloud === true)) {
                                     data.apioId = Apio.System.getApioIdentifier();
                                     Apio.Remote.socket.emit("apio_object_online", data);

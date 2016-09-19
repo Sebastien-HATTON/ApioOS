@@ -1003,45 +1003,5 @@ module.exports = function (Apio) {
                 }
             });
         }
-        // update: function (req, res) {
-        //     var lastCommit = fs.readFileSync(".git/refs/heads/master", "utf-8");
-        //     var date = fs.statSync(".git/refs/heads/master")
-        //     date = date.mtime
-        //     console.log(date)
-        //     console.log("Last Commit: ", lastCommit);
-        //     //lastCommit = lastCommit.split("\t")[0];
-        //     console.log("Last Commit: ", lastCommit);
-        //     /*request.get("https://raw.githubusercontent.com/ApioLab/updates/master/version.json", {
-        //      json: true
-        //      }, function (err, httpResponse) {
-        //      if (err) {
-        //      console.log("Error: ", err);
-        //      } else if (httpResponse.statusCode === 200) {
-        //      //execReboot();
-        //      console.log("Risposta ",httpResponse)
-        //      res.status(200).send(false)
-        //      }
-        //      });*/
-        //     fetch("https://raw.githubusercontent.com/ApioLab/updates/master/version.json").then(function (res) {
-        //         return res.text();
-        //     }).then(function (body) {
-        //         //console.log("Body", body);
-        //         var remoteCommit = JSON.parse(body);
-        //         console.log("1:", remoteCommit.commit);
-        //         remoteCommit.date = new Date(remoteCommit.apioOs);
-        //         console.log("1.date ", remoteCommit.date);
-        //
-        //         console.log("2:", lastCommit);
-        //         console.log("2.date:", date);
-        //
-        //         console.log("Verifico la condizione ", remoteCommit.commit.substring(0, 7) != lastCommit.substring(0, 7) && date.getFullYear() <= remoteCommit.date.getFullYear() && date.getMonth() <= remoteCommit.date.getMonth() && date.getDate() <= remoteCommit.date.getDate() && date.getHours() <= remoteCommit.date.getHours() && date.getMinutes() < remoteCommit.date.getMinutes())
-        //         if (remoteCommit.commit.substring(0, 7) != lastCommit.substring(0, 7) && date.getFullYear() <= remoteCommit.date.getFullYear() && date.getMonth() <= remoteCommit.date.getMonth() && date.getDate() <= remoteCommit.date.getDate() && date.getHours() <= remoteCommit.date.getHours() && date.getMinutes() < remoteCommit.date.getMinutes()) {
-        //             res.status(200).send(true);
-        //         } else {
-        //             res.status(200).send(false);
-        //         }
-        //     });
-        //
-        // }
     }
 };

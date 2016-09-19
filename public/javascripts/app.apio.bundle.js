@@ -212,14 +212,14 @@
  *                                                                          *
  ****************************************************************************/
 
-var Apio = require('./apio.client.js');
+var Apio = require("./apio.client.js");
 //Trova un modo migliore per iniettare le dipendenze
 window.Apio = Apio;
 window.$ = $;
 Apio.Socket.init();
 //Fixare questo scempio con la dependency injection
-Apio.appWidth = parseInt($("#ApioApplicationContainer").css('width'), 10);
-Apio.newWidth = parseInt($("#ApioApplicationContainer").css('width'), 10);
+Apio.appWidth = parseInt($("#ApioApplicationContainer").css("width"));
+Apio.newWidth = parseInt($("#ApioApplicationContainer").css("width"));
 Apio.currentApplication = 0;
 
 Apio.removeAngularScope = function (DOMElement, deleteDOMElement) {
@@ -247,11 +247,11 @@ Apio.removeAngularScope = function (DOMElement, deleteDOMElement) {
     }
 };
 
-$("#notificationTrigger").on('click', function () {
-    $("#notificationsCenter").toggle("slide", {direction: 'up'}, 500);
+$("#notificationTrigger").on("click", function () {
+    $("#notificationsCenter").toggle("slide", {direction: "up"}, 500);
 });
 
-var ApioApplication = angular.module('ApioApplication', ['ui.bootstrap', 'ngRoute', 'hSweetAlert', 'angularFileUpload', 'fileSaver', 'ngFileReader', "ngMaterial"]);
+var ApioApplication = angular.module("ApioApplication", ["ui.bootstrap", "ngRoute", "hSweetAlert", "angularFileUpload", "fileSaver", "ngFileReader", "ngMaterial"]);
 
 window.swipe = function (target, callback) {
     var startX, startY;
@@ -265,7 +265,7 @@ window.swipe = function (target, callback) {
         var distY = event.originalEvent.changedTouches[0].pageY - startY;
         if (!$(event.target).is("input") && distX > parseFloat($("#" + target).css("width")) / 3 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))) {
             $("#" + target).hide("slide", {
-                direction: 'right'
+                direction: "right"
             }, 700, callback());
         }
     });
@@ -280,7 +280,7 @@ window.swipe = function (target, callback) {
         var distY = event.pageY - startY;
         if (!$(event.target).is("input") && distX > parseFloat($("#" + target).css("width")) / 3 && ((distY >= 0 && distY <= 40) || (distY >= -40 && distY <= 0))) {
             $("#" + target).hide("slide", {
-                direction: 'right'
+                direction: "right"
             }, 700, callback());
         }
     });
@@ -301,7 +301,7 @@ window.affix = function (targetScoll, target, top, bottom, callback, callback1) 
             firstInteract = 0;
             if (top === null) {
                 top = {};
-                top.top = $('#' + target).offset().top;
+                top.top = $("#" + target).offset().top;
             }
         }
     });
@@ -311,7 +311,7 @@ window.affix = function (targetScoll, target, top, bottom, callback, callback1) 
             firstInteract = 0;
             if (top === null) {
                 top = {};
-                top.top = $('#' + target).offset().top;
+                top.top = $("#" + target).offset().top;
             }
         }
     });
@@ -324,11 +324,11 @@ window.affix = function (targetScoll, target, top, bottom, callback, callback1) 
             if (touch == 0) {
                 if (scroll >= top.top && interact == 0) {
                     interact = 1;
-                    document.getElementById(target).style.marginTop = '-' + (top.top) + 'px';
+                    document.getElementById(target).style.marginTop = "-" + (top.top) + "px";
                     callback();
                 } else if (scroll <= top.top) {
                     interact = 0;
-                    document.getElementById(target).style.marginTop = ex_top + 'px'
+                    document.getElementById(target).style.marginTop = ex_top + "px"
                     callback1();
                 }
             }
@@ -388,7 +388,7 @@ ApioApplication.service("sharedProperties", function () {
 });
 
 
-ApioApplication.factory('socket', function ($rootScope) {
+ApioApplication.factory("socket", function ($rootScope) {
     return {
         emit: function (eventName, data, callback) {
             Apio.socket.emit(eventName, data, function () {
@@ -422,7 +422,7 @@ ApioApplication.factory('socket', function ($rootScope) {
     };
 });
 
-ApioApplication.factory('objectService', ['$rootScope', '$http', function ($rootScope, $http) {
+ApioApplication.factory("objectService", ["$rootScope", "$http", function ($rootScope, $http) {
     return {
         list: function () {
             return $http.get("/apio/database/getObjects").then(function (response) {
@@ -437,47 +437,47 @@ ApioApplication.factory('objectService', ['$rootScope', '$http', function ($root
     };
 }]);
 
-ApioApplication.factory('boardsService', ['$rootScope', '$http', function ($rootScope, $http) {
+ApioApplication.factory("boardsService", ["$rootScope", "$http", function ($rootScope, $http) {
     return {
         list: function () {
-            return $http.get('/apio/boards').then(function (response) {
+            return $http.get("/apio/boards").then(function (response) {
                 return response;
             });
         }
     }
 }]);
 
-ApioApplication.factory('planimetryService', ['$rootScope', '$http', function ($rootScope, $http) {
+ApioApplication.factory("planimetryService", ["$rootScope", "$http", function ($rootScope, $http) {
     return {
         list: function () {
-            return $http.get('/apio/database/getPlanimetry').then(function (response) {
+            return $http.get("/apio/database/getPlanimetry").then(function (response) {
                 return response;
             });
         }
     }
 }]);
 
-ApioApplication.factory('userService', ['$rootScope', '$http', function ($rootScope, $http) {
+ApioApplication.factory("userService", ["$rootScope", "$http", function ($rootScope, $http) {
     return {
         list: function () {
-            return $http.get('/apio/user').then(function (response) {
+            return $http.get("/apio/user").then(function (response) {
                 return response;
             });
         }
     }
 }]);
 
-ApioApplication.directive('ngTouchEnd', function () {
+ApioApplication.directive("ngTouchEnd", function () {
     return function (scope, element, attrs) {
-        element.bind('touchend', function (e) {
-            element.removeClass('active');
-            scope.$apply(attrs['ngouchEnd'], element);
+        element.bind("touchend", function (e) {
+            element.removeClass("active");
+            scope.$apply(attrs["ngouchEnd"], element);
         });
     };
 });
 
 
-ApioApplication.factory('DataSource', ['$http', function ($http) {
+ApioApplication.factory("DataSource", ["$http", function ($http) {
     return {
         get: function (url, callback) {
             $http.get(url, {
@@ -499,11 +499,11 @@ ApioApplication.factory('DataSource', ['$http', function ($http) {
     }
 }]);
 
-ApioApplication.filter('removeUndefinedFilter', function () {
+ApioApplication.filter("removeUndefinedFilter", function () {
     return function (items) {
         var filtered = [];
         items.forEach(function (x) {
-            if ('undefined' !== typeof x)
+            if ("undefined" !== typeof x)
                 filtered.push(x);
         });
 
@@ -511,9 +511,9 @@ ApioApplication.filter('removeUndefinedFilter', function () {
     }
 });
 
-var apioProperty = angular.module('apioProperty', ['ApioApplication', 'ngMaterial']);
+var apioProperty = angular.module("apioProperty", ["ApioApplication", "ngMaterial"]);
 
-ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'userService', 'boardsService', 'objectService', '$http', "$location", function ($rootScope, $window, socket, userService, boardsService, objectService, $http, $location) {
+ApioApplication.service("currentObject", ["$rootScope", "$window", "socket", "userService", "boardsService", "objectService", "$http", "$location", function ($rootScope, $window, socket, userService, boardsService, objectService, $http, $location) {
     var modifying = false;
     var obj = {};
     var recording = false;
@@ -539,19 +539,19 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
             return obj;
         },
         isModifying: function (val) {
-            if ('undefined' == typeof val)
+            if ("undefined" == typeof val)
                 return modifying;
             else
                 modifying = val;
         },
         isRecording: function (val) {
-            if ('undefined' == typeof val)
+            if ("undefined" == typeof val)
                 return recording;
             else
                 recording = val;
         },
         recordingStateName: function (name) {
-            if ('undefined' === typeof name)
+            if ("undefined" === typeof name)
                 return _recordingObjectName;
             else
                 _recordingObjectName = name;
@@ -562,16 +562,16 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
                 properties: {}
             };
             packet.properties[prop] = value;
-            socket.emit('apio_client_stream', packet);
+            socket.emit("apio_client_stream", packet);
         },
         update: function (prop, value, writeDb, writeSerial) {
-            if ('undefined' == typeof writeDb)
+            if ("undefined" == typeof writeDb)
                 writeDb = true;
-            if ('undefined' == typeof writeSerial)
+            if ("undefined" == typeof writeSerial)
                 writeSerial = true;
             obj.properties[prop] = value;
             console.log(obj.apioId);
-            console.log('currentObject.update DATA OBJ ', obj);
+            console.log("currentObject.update DATA OBJ ", obj);
             var o = {
                 address: obj.address,
                 apioId: obj.apioId,
@@ -581,16 +581,16 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
                 writeToDatabase: writeDb,
                 writeToSerial: writeSerial
             };
-            if (obj.hasOwnProperty('propertiesAdditionalInfo') && typeof obj.propertiesAdditionalInfo[prop] !== "undefined" && typeof obj.propertiesAdditionalInfo[prop].protocol !== "undefined") {
+            if (obj.hasOwnProperty("propertiesAdditionalInfo") && typeof obj.propertiesAdditionalInfo[prop] !== "undefined" && typeof obj.propertiesAdditionalInfo[prop].protocol !== "undefined") {
                 o.protocol = obj.propertiesAdditionalInfo[prop].protocol;
             }
             o.properties[prop] = value;
-            socket.emit('apio_client_update', o);
+            socket.emit("apio_client_update", o);
         },
         updateMultiple: function (update, writeDb, writeSerial) {
-            if ('undefined' == typeof writeDb)
+            if ("undefined" == typeof writeDb)
                 writeDb = true;
-            if ('undefined' == typeof writeSerial)
+            if ("undefined" == typeof writeSerial)
                 writeSerial = true;
             var o = {}
             o.apioId = obj.apioId;
@@ -598,7 +598,7 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
             o.properties = update;
             o.writeToDatabase = writeDb;
             o.writeToSerial = writeSerial;
-            socket.emit('apio_client_update', o);
+            socket.emit("apio_client_update", o);
         },
         record: function (key, value) {
             if (typeof key === "undefined" && typeof value === "undefined") {
@@ -627,7 +627,7 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
             var self = this;
             objectService.getById(obj.objectId).then(function (d) {
                 self.set(d.data);
-                if ('function' == typeof c)
+                if ("function" == typeof c)
                     c()
             })
 
@@ -650,18 +650,18 @@ ApioApplication.service('currentObject', ['$rootScope', '$window', 'socket', 'us
 }]);
 
 // Close the drawer menu when click on a link
-ApioApplication.directive('menuClose', function () {
+ApioApplication.directive("menuClose", function () {
     return {
-        restrict: 'AC',
+        restrict: "AC",
         link: function ($scope, $element) {
-            $element.bind('click', function () {
-                var drawer = angular.element(document.querySelector('.mdl-layout__drawer'));
+            $element.bind("click", function () {
+                var drawer = angular.element(document.querySelector(".mdl-layout__drawer"));
                 if (drawer) {
-                    drawer.toggleClass('is-visible');
+                    drawer.toggleClass("is-visible");
                 }
-                var drawer = angular.element(document.querySelector('.mdl-layout__obfuscator'));
+                var drawer = angular.element(document.querySelector(".mdl-layout__obfuscator"));
                 if (drawer) {
-                    drawer.toggleClass('is-visible');
+                    drawer.toggleClass("is-visible");
                 }
             });
         }
@@ -810,7 +810,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     });
 
     $scope.getPlatform = function () {
-        $http.get('/apio/getPlatform').success(function (data) {
+        $http.get("/apio/getPlatform").success(function (data) {
             $scope.platform = data;
 
             if (data.apioId == "Continue to Cloud") {
@@ -822,41 +822,41 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
         });
     };
 
-    var exBottonMenuId = '';
+    var exBottonMenuId = "";
     $scope.clickToMenu = function ($event) {
-        console.log('CLICCKED');
-        if ($event.target.id === 'homeButton') {
-            if (document.getElementById('sottoMenuTag').classList.contains('displayNone')) {
-                document.getElementById('sottoMenuTag').classList.remove('displayNone')
+        console.log("CLICCKED");
+        if ($event.target.id === "homeButton") {
+            if (document.getElementById("sottoMenuTag").classList.contains("displayNone")) {
+                document.getElementById("sottoMenuTag").classList.remove("displayNone")
 
             }
-            if (!document.getElementById('sottoMenuNotification').classList.contains('displayNone')) {
-                document.getElementById('sottoMenuNotification').classList.add('displayNone')
+            if (!document.getElementById("sottoMenuNotification").classList.contains("displayNone")) {
+                document.getElementById("sottoMenuNotification").classList.add("displayNone")
             }
-        } else if ($event.target.id === 'notificationTrigger_mobile') {
-            if (!document.getElementById('sottoMenuTag').classList.contains('displayNone')) {
-                document.getElementById('sottoMenuTag').classList.add('displayNone')
+        } else if ($event.target.id === "notificationTrigger_mobile") {
+            if (!document.getElementById("sottoMenuTag").classList.contains("displayNone")) {
+                document.getElementById("sottoMenuTag").classList.add("displayNone")
             }
-            if (document.getElementById('sottoMenuNotification').classList.contains('displayNone')) {
-                document.getElementById('sottoMenuNotification').classList.remove('displayNone')
+            if (document.getElementById("sottoMenuNotification").classList.contains("displayNone")) {
+                document.getElementById("sottoMenuNotification").classList.remove("displayNone")
             }
 
         }
-        if (document.getElementById('menuMobileContratto').getAttribute('aria-expanded') === 'false' && ($event.target.id === 'notificationTrigger_mobile' || $event.target.id === 'homeButton')) {
-            console.log('primo if');
-            $('#menuMobileContratto').collapse('show');
+        if (document.getElementById("menuMobileContratto").getAttribute("aria-expanded") === "false" && ($event.target.id === "notificationTrigger_mobile" || $event.target.id === "homeButton")) {
+            console.log("primo if");
+            $("#menuMobileContratto").collapse("show");
             exBottonMenuId = $event.target.id;
         } else if ($event.target.id === exBottonMenuId) {
-            console.log('secondo if');
-            $('#menuMobileContratto').collapse('hide');
-            document.getElementById('sottoMenuNotification').classList.add('displayNone')
-            exBottonMenuId = '';
-        } else if (exBottonMenuId === '' && ($event.target.id === 'notificationTrigger_mobile' || $event.target.id === 'homeButton')) {
-            console.log('terzo if');
-            $('#menuMobileContratto').collapse('show');
+            console.log("secondo if");
+            $("#menuMobileContratto").collapse("hide");
+            document.getElementById("sottoMenuNotification").classList.add("displayNone")
+            exBottonMenuId = "";
+        } else if (exBottonMenuId === "" && ($event.target.id === "notificationTrigger_mobile" || $event.target.id === "homeButton")) {
+            console.log("terzo if");
+            $("#menuMobileContratto").collapse("show");
             exBottonMenuId = $event.target.id;
         } else {
-            console.log('quarto if');
+            console.log("quarto if");
             exBottonMenuId = $event.target.id;
         }
     };
@@ -966,26 +966,24 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
         }
     });
 
-    $http.get('/apio/update').success(function (data, status) {
+    $http.get("/apio/update").success(function (data) {
         if (data) {
             sweet.show({
-                title: 'Conferma',
-                text: 'È disponibile un nuovo aggiornamento, vuoi installarlo?',
-                imageUrl: 'images/new-icon.png',
+                title: "Conferma",
+                text: "È disponibile un nuovo aggiornamento, vuoi installarlo?",
+                imageUrl: "images/new-icon.png",
                 showCancelButton: true,
-                confirmButtonColor: '#177537',
-                confirmButtonText: 'Yes!',
+                confirmButtonColor: "#177537",
+                confirmButtonText: "Yes!",
                 closeOnConfirm: true,
                 closeOnCancel: false,
                 showLoaderOnConfirm: false
             }, function (isConfirm) {
                 if (isConfirm) {
                     socket.emit("git_pull", "");
-                    alert('Scaricamento in background, verrai avvisato al termine');
-
-
+                    alert("Scaricamento in background, verrai avvisato al termine");
                 } else {
-                    sweet.show('Annullato', 'Aggiornamento non scaricato, puoi sempre installare dalla dashboard', 'error');
+                    sweet.show("Annullato", "Aggiornamento non scaricato, puoi sempre installare dalla dashboard", "error");
                 }
             });
         } else {
@@ -993,55 +991,54 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             if (!$scope.$$phase) {
                 $scope.$apply();
             }
+
             setTimeout(function () {
                 $scope.systemUpdated = false;
                 if (!$scope.$$phase) {
                     $scope.$apply();
                 }
-            }, 5000)
+            }, 5000);
         }
     });
 
     socket.on("update_system", function (data) {
         if (data.type == "request") {
             sweet.show({
-                title: 'Conferma',
-                text: 'È disponibile un nuovo aggiornamento, vuoi installarlo?',
-                imageUrl: 'images/new-icon.png',
+                title: "Conferma",
+                text: "È disponibile un nuovo aggiornamento, vuoi installarlo?",
+                imageUrl: "images/new-icon.png",
                 showCancelButton: true,
-                confirmButtonColor: '#177537',
-                confirmButtonText: 'Yes!',
+                confirmButtonColor: "#177537",
+                confirmButtonText: "Yes!",
                 closeOnConfirm: false,
                 closeOnCancel: false,
                 showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
                     socket.emit("git_pull", "");
-                    sweet.show('Scaricamento in corso!', 'Scaricamento in background, verrai avvisato al termine', 'success');
+                    sweet.show("Scaricamento in corso!", "Scaricamento in background, verrai avvisato al termine", "success");
                 } else {
-                    sweet.show('Annullato', 'Aggiornamento non scaricato, puoi sempre installare dalla dashboard', 'error');
+                    sweet.show("Annullato", "Aggiornamento non scaricato, puoi sempre installare dalla dashboard", "error");
                 }
             });
-        }
-        if (data.type == "done") {
+        } else if (data.type == "done") {
             sweet.show({
-                title: 'Conferma',
-                text: 'Aggiornamento scaricato, vuoi riavviare il sistema?',
-                imageUrl: 'images/new-icon.png',
+                title: "Conferma",
+                text: "Aggiornamento scaricato, vuoi riavviare il sistema?",
+                imageUrl: "images/new-icon.png",
                 showCancelButton: true,
-                confirmButtonColor: '#177537',
-                confirmButtonText: 'Yes!',
+                confirmButtonColor: "#177537",
+                confirmButtonText: "Yes!",
                 closeOnConfirm: false,
                 closeOnCancel: false,
                 showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
                     $http.post("/apio/rebootBoard").success(function () {
-                        sweet.show('OK!', 'Il sistema verrà riavviato e sarà disponibile a breve.', 'success');
+                        sweet.show("OK!", "Il sistema verrà riavviato e sarà disponibile a breve.", "success");
                     });
-
                 } else {
-                    sweet.show('Annullato', 'Il nuovo sistema sarà disponibile al prossimo riavvio', 'error');
+                    sweet.show("Annullato", "Il nuovo sistema sarà disponibile al prossimo riavvio", "error");
                 }
             });
         }
@@ -1056,12 +1053,12 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             }
         } else if (data.autoInstall == "false") {
             sweet.show({
-                title: 'Conferma',
-                text: 'Connesso ' + data.appId + ',\nData: ' + n + ',\n vuoi installare?',
-                imageUrl: 'images/new-icon.png',
+                title: "Conferma",
+                text: "Connesso " + data.appId + ",\nData: " + n + ",\n vuoi installare?",
+                imageUrl: "images/new-icon.png",
                 showCancelButton: true,
-                confirmButtonColor: '#177537',
-                confirmButtonText: 'Yes!',
+                confirmButtonColor: "#177537",
+                confirmButtonText: "Yes!",
                 closeOnConfirm: false,
                 closeOnCancel: false,
                 showLoaderOnConfirm: true
@@ -1073,14 +1070,14 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                                 appId: data.appId,
                                 data: data
                             }))).success(function () {
-                            sweet.show('Installata!', data.appId + ' installed', 'success');
+                            sweet.show("Installata!", data.appId + " installed", "success");
                         });
                     } else {
                         socket.emit("apio.remote.autoinstall", data.appId);
-                        sweet.show('Installata!', data.appId + ' installed', 'success');
+                        sweet.show("Installata!", data.appId + " installed", "success");
                     }
                 } else {
-                    sweet.show('Annullato', data.appId + ' not installed', 'error');
+                    sweet.show("Annullato", data.appId + " not installed", "error");
                 }
             });
         } else {
@@ -1090,17 +1087,17 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     });
 
     $scope.img = {};
-    $scope.img.userImage = 'default.png';
+    $scope.img.userImage = "default.png";
 
     $http.get("/apio/user/getSession").success(function (session) {
         $http.post("/apio/user/getUser", {
             email: session
         }).success(function (user) {
-            console.log('USER******* ', user);
+            console.log("USER******* ", user);
             actualUser = user;
             $scope.user = user.user;
             if (user.user.additional_info.profileImage) {
-                $scope.img.userImage = $scope.user.email + '/' + user.user.additional_info.profileImage + '.png'
+                $scope.img.userImage = $scope.user.email + "/" + user.user.additional_info.profileImage + ".png"
             }
 
             $scope.role = user.user.role;
@@ -1123,7 +1120,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
 
     $scope.actualTag = [];
 
-    $scope.$watchCollection('objectId', function (n, o) {
+    $scope.$watchCollection("objectId", function (n, o) {
         var tag = "<p><a onclick='angular.element(this).scope().setTagView(event)'>#tutti</a></p>";
 
         if ($rootScope.objectId) {
@@ -1146,7 +1143,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     });
 
     $scope.checkTag = function (a, b) {
-        console.log('+++++++++++++++++++++++++++++', a);
+        console.log("+++++++++++++++++++++++++++++", a);
         console.log(b);
         var l = [];
         l = a.split(" ");
@@ -1161,38 +1158,36 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
 
     $scope.setTagView = function ($event) {
         for (var s in $rootScope.objectId) {
-            if (($rootScope.objectId[s] && $rootScope.objectId[s].tag && $scope.checkTag($rootScope.objectId[s].tag, $event.target.innerHTML) === true) || $event.target.innerHTML === '#tutti') {
-                if (document.getElementById($rootScope.objectId[s].objectId).classList.contains('displayNone')) {
-                    document.getElementById($rootScope.objectId[s].objectId).classList.remove('displayNone');
+            if (($rootScope.objectId[s] && $rootScope.objectId[s].tag && $scope.checkTag($rootScope.objectId[s].tag, $event.target.innerHTML) === true) || $event.target.innerHTML === "#tutti") {
+                if (document.getElementById($rootScope.objectId[s].objectId).classList.contains("displayNone")) {
+                    document.getElementById($rootScope.objectId[s].objectId).classList.remove("displayNone");
                 }
             } else {
-                if (!document.getElementById($rootScope.objectId[s].objectId).classList.contains('displayNone')) {
-                    document.getElementById($rootScope.objectId[s].objectId).classList.add('displayNone');
+                if (!document.getElementById($rootScope.objectId[s].objectId).classList.contains("displayNone")) {
+                    document.getElementById($rootScope.objectId[s].objectId).classList.add("displayNone");
                 }
             }
         }
     };
 
-    console.log('$scope.user ******** ', $scope.user);
+    console.log("$scope.user ******** ", $scope.user);
 
     $scope.dataProfileToSave = {};
 
     $scope.saveProfile = function () {
-        console.log('il dato passato è ***** ', data);
+        console.log("il dato passato è ***** ", data);
     };
 
     $scope.openUserProfile = function () {
         $scope.user = actualUser.user;
 
         $mdDialog.show({
-            templateUrl: '/dialog/appModifyUserProfile/index.html',
-            controller: 'modifyUserProfile',
+            templateUrl: "/dialog/appModifyUserProfile/index.html",
+            controller: "modifyUserProfile",
             clickOutsideToClose: true,
             bindToController: true,
             scope: $scope,
             preserveScope: true
-
-
         });
     };
 }]);
@@ -1204,31 +1199,31 @@ Apio.runApioLoading = function (element, scroll, border) {
         var offsetTop;
         if (typeof border === "undefined") {
             if (element && element.style && element.style.borderRadius) {
-                borderRadius = 'border-radius:' + element.style.borderRadius;
+                borderRadius = "border-radius:" + element.style.borderRadius;
             } else if (element.firstChild && element.firstChild.style && element.firstChild.style.borderRadius) {
-                borderRadius = 'border-radius:' + element.firstChild.style.borderRadius;
+                borderRadius = "border-radius:" + element.firstChild.style.borderRadius;
             } else {
-                borderRadius = '';
+                borderRadius = "";
             }
         } else {
-            borderRadius = 'border-radius:' + border + 'px';
+            borderRadius = "border-radius:" + border + "px";
         }
         if (scroll == true) {
-            offsetLeft = 'left:' + element.offsetLeft + 'px;';
-            offsetTop = 'top:' + element.offsetTop + 'px;';
+            offsetLeft = "left:" + element.offsetLeft + "px;";
+            offsetTop = "top:" + element.offsetTop + "px;";
         } else {
-            offsetLeft = '';
-            offsetTop = '';
+            offsetLeft = "";
+            offsetTop = "";
         }
         var firstElement = document.createElement("DIV");
-        firstElement.setAttribute("style", 'position:absolute; ' + offsetTop + ' ' + offsetLeft + '');
+        firstElement.setAttribute("style", "position:absolute; " + offsetTop + " " + offsetLeft + "");
         firstElement.innerHTML = '<div id="loading" class="loading " style="width:' + element.offsetWidth + 'px !important; height:' + element.offsetHeight + 'px;' + borderRadius + '; margin: 0 auto;"><div id="loadingRoller" class=""><div class="loaderAnimation loadingRoller"></div></div></div>';
         element.insertBefore(firstElement, element.firstChild);
         setTimeout(function () {
-            var loaderInPage = document.getElementsByClassName('loaderAnimation')
+            var loaderInPage = document.getElementsByClassName("loaderAnimation")
             for (var ld in loaderInPage) {
-                if (loaderInPage.item(ld) && !loaderInPage.item(ld).classList.contains('loadingPlay')) {
-                    loaderInPage.item(ld).classList.add('loadingPlay')
+                if (loaderInPage.item(ld) && !loaderInPage.item(ld).classList.contains("loadingPlay")) {
+                    loaderInPage.item(ld).classList.add("loadingPlay")
                 }
             }
         }, 200);
@@ -1236,18 +1231,18 @@ Apio.runApioLoading = function (element, scroll, border) {
 };
 
 Apio.stopApioLoading = function () {
-    var loaderInPage = document.getElementsByClassName('loaderAnimation')
+    var loaderInPage = document.getElementsByClassName("loaderAnimation")
     for (var ld in loaderInPage) {
-        if (loaderInPage.item(ld) && loaderInPage.item(ld).classList && loaderInPage.item(ld).classList.contains('loadingPlay')) {
-            loaderInPage.item(ld).classList.remove('loadingPlay');
+        if (loaderInPage.item(ld) && loaderInPage.item(ld).classList && loaderInPage.item(ld).classList.contains("loadingPlay")) {
+            loaderInPage.item(ld).classList.remove("loadingPlay");
         }
     }
 
     setTimeout(function () {
-        var loading = document.getElementsByClassName('loading')
+        var loading = document.getElementsByClassName("loading")
         for (var ld in loading) {
             if (loaderInPage.item(ld) && loaderInPage.item(ld).parentNode) {
-                loading.item(ld).parentNode.removeChild(document.getElementById('loading'));
+                loading.item(ld).parentNode.removeChild(document.getElementById("loading"));
             }
         }
     }, 200);
