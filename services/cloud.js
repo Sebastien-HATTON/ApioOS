@@ -43,7 +43,6 @@ module.exports = function (libraries) {
 
     var Socket = undefined;
     var mailSocketConnected = false;
-    var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
 
     var socketServer = libraries["socket.io"](http);
 
@@ -1314,6 +1313,8 @@ module.exports = function (libraries) {
                         }
                     });
                 }], function (err, results) {
+                    var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+
                     payload.apio.objects = results[0];
                     payload.apio.states = results[1];
                     payload.apio.events = results[2];
