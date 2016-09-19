@@ -1272,34 +1272,63 @@ module.exports = function (enableCloudSocket) {
                     Apio.Serial.send(data);
                 });
 
-                socket.on("update_system", function (data) {
+                socket.on("update_system", function (apioId) {
                     var o = {
-                        name: data,
+                        // name: data,
                         type: "request"
                     };
-                    Apio.io.emit("update_system", o);
+
+                    // Apio.io.emit("update_system", o);
+
+                    for (var x in Apio.connectedSockets) {
+                        if (x === "admin" || validator.isEmail(x)) {
+                            var socketIds = Apio.connectedSockets[x];
+                            for (var i in socketIds) {
+                                if (apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                    Apio.io.sockets.connected[socketIds[i]].emit("update_system", o);
+                                }
+                            }
+                        }
+                    }
                 });
 
-                socket.on("git_pull", function (data) {
-                    var uri = "https://raw.githubusercontent.com/ApioLab/updates/master/apio_updater.sh";
-                    var path = "apio_updater.sh";
-                    request({uri: uri}).pipe(fs.createWriteStream(path)).on('close', function () {
-                        exec("sudo chmod +x apio_updater.sh && sudo ./apio_updater.sh", function (error, stdout, stderr) {
-                            console.log("Scaricato e aggiornato riavvio necessario");
-                            console.log("Scaricato e aggiornato riavvio necessario ", stdout);
-                            fs.unlink("apio_updater.sh", function (err) {
-                                if (err) {
+                socket.on("git_pull", function (apioId) {
+                    if (Apio.Configuration.type === "cloud") {
+                        var socketId = Apio.connectedSockets[apioId][0];
+                        Apio.io.sockets.connected[socketId].emit("update_system");
+                    } else if (Apio.Configuration.type === "gateway") {
+                        var uri = "https://raw.githubusercontent.com/ApioLab/updates/master/apio_updater.sh";
+                        var path = "apio_updater.sh";
+                        request({uri: uri}).pipe(fs.createWriteStream(path)).on('close', function () {
+                            exec("sudo chmod +x apio_updater.sh && sudo ./apio_updater.sh", function (error, stdout, stderr) {
+                                console.log("Scaricato e aggiornato riavvio necessario");
+                                console.log("Scaricato e aggiornato riavvio necessario ", stdout);
+                                fs.unlink("apio_updater.sh", function (err) {
+                                    if (err) {
 
-                                } else {
-                                    console.log("delete file");
-                                    var o = {
-                                        type: "done"
-                                    };
-                                    Apio.io.emit("update_system", o);
-                                }
+                                    } else {
+                                        console.log("delete file");
+                                        var o = {
+                                            type: "done"
+                                        };
+
+                                        // Apio.io.emit("update_system", o);
+
+                                        for (var x in Apio.connectedSockets) {
+                                            if (x === "admin" || validator.isEmail(x)) {
+                                                var socketIds = Apio.connectedSockets[x];
+                                                for (var i in socketIds) {
+                                                    if (apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                                        Apio.io.sockets.connected[socketIds[i]].emit("update_system", o);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
                             });
                         });
-                    });
+                    }
                 });
 
                 //BEGIN:CLOUD

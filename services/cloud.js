@@ -108,6 +108,43 @@ module.exports = function (libraries) {
             console.log("-------------DISCONNESSO");
         });
 
+        Apio.Remote.socket.on("check_updates", function () {
+            request({
+                json: true,
+                method: "GET",
+                uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/update"
+            }, function (err, response, body) {
+                if (err || !response || Number(response.statusCode) !== 200) {
+                    console.log("Error while sending mail: ", err);
+                } else {
+                    Apio.Remote.socket.emit("board_update", body);
+                }
+            });
+        });
+
+        Apio.Remote.socket.on("update_system", function () {
+            request({uri: "https://raw.githubusercontent.com/ApioLab/updates/master/apio_updater.sh"}).pipe(fs.createWriteStream("apio_updater.sh")).on("close", function () {
+                exec("sudo chmod +x apio_updater.sh && sudo ./apio_updater.sh", function (error, stdout, stderr) {
+                    console.log("Scaricato e aggiornato riavvio necessario ", stdout);
+                    fs.unlink("apio_updater.sh", function (err) {
+                        if (err) {
+
+                        } else {
+                            console.log("delete file");
+                            Apio.Remote.socket.emit("send_to_client", {
+                                apioId: Apio.System.getApioIdentifierCloud(),
+                                data: {
+                                    type: "done"
+                                },
+                                message: "update_system",
+                                sendToCloud: false
+                            });
+                        }
+                    });
+                });
+            });
+        });
+
         Apio.Remote.socket.on("close_autoInstall_modal", function () {
             socketServer.emit("send_to_client", {
                 data: {

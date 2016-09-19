@@ -951,57 +951,77 @@ module.exports = function (Apio) {
             res.send(Apio.Configuration);
         },
         update: function (req, res) {
-            fs.readFile(".git/HEAD", "utf8", function (err, head) {
-                if (err) {
+            if (Apio.Configuration.type === "cloud") {
+                if (req.session.apioId === "Continue to Cloud") {
                     res.status(200).send(false);
-                } else if (head) {
-                    var ref_file = head.split("ref:")[1].trim();
-                    var ref_file_components = ref_file.split("/");
-                    var version_file = undefined;
-
-                    if (ref_file_components[ref_file_components.length - 1] === "master") {
-                        version_file = "version.json";
-                    } else {
-                        version_file = "version_" + ref_file_components[ref_file_components.length - 1] + ".json";
-                    }
-
-                    fs.readFile(".git/" + ref_file, "utf8", function (err_c, lastCommit) {
-                        if (err_c) {
-                            res.status(200).send(false);
-                        } else if (lastCommit) {
-                            fs.stat(".git/" + ref_file, function (err_s, stats) {
-                                if (err_s) {
-                                    res.status(200).send(false);
-                                } else if (stats) {
-                                    var date = stats.mtime;
-                                    console.log("date: ", date);
-                                    console.log("lastCommit: ", lastCommit);
-                                    fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
-                                        return res.text();
-                                    }).then(function (body) {
-                                        var remoteCommit = JSON.parse(body);
-                                        console.log("remoteCommit.commit: ", remoteCommit.commit);
-                                        remoteCommit.date = new Date(remoteCommit.apioOs);
-                                        console.log("remoteCommit.date: ", remoteCommit.date);
-
-                                        if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
-                                            res.status(200).send(true);
-                                        } else {
-                                            res.status(200).send(false);
-                                        }
-                                    });
-                                } else {
-                                    res.status(200).send(false);
-                                }
-                            });
-                        } else {
-                            res.status(200).send(false);
-                        }
-                    });
                 } else {
-                    res.status(200).send(false);
+                    var socketId = Apio.connectedSockets[req.session.apioId];
+                    if (Apio.io.sockets.connected.hasOwnProperty(socketId)) {
+                        Apio.io.sockets.connected[socketId].emit("check_updates");
+                        req.pause();
+
+                        delete Apio.io.sockets.connected[socketId]._events["board_update"];
+                        Apio.io.sockets.connected[socketId].on("board_update", function (data) {
+                            req.resume();
+                            res.status(200).send(data);
+                        });
+                    } else {
+                        res.status(200).send(false);
+                    }
                 }
-            });
+            } else if (Apio.Configuration.type === "gateway") {
+                fs.readFile(".git/HEAD", "utf8", function (err, head) {
+                    if (err) {
+                        res.status(200).send(false);
+                    } else if (head) {
+                        var ref_file = head.split("ref:")[1].trim();
+                        var ref_file_components = ref_file.split("/");
+                        var version_file = undefined;
+
+                        if (ref_file_components[ref_file_components.length - 1] === "master") {
+                            version_file = "version.json";
+                        } else {
+                            version_file = "version_" + ref_file_components[ref_file_components.length - 1] + ".json";
+                        }
+
+                        fs.readFile(".git/" + ref_file, "utf8", function (err_c, lastCommit) {
+                            if (err_c) {
+                                res.status(200).send(false);
+                            } else if (lastCommit) {
+                                fs.stat(".git/" + ref_file, function (err_s, stats) {
+                                    if (err_s) {
+                                        res.status(200).send(false);
+                                    } else if (stats) {
+                                        var date = stats.mtime;
+                                        console.log("date: ", date);
+                                        console.log("lastCommit: ", lastCommit);
+                                        fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
+                                            return res.text();
+                                        }).then(function (body) {
+                                            var remoteCommit = JSON.parse(body);
+                                            console.log("remoteCommit.commit: ", remoteCommit.commit);
+                                            remoteCommit.date = new Date(remoteCommit.apioOs);
+                                            console.log("remoteCommit.date: ", remoteCommit.date);
+
+                                            if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
+                                                res.status(200).send(true);
+                                            } else {
+                                                res.status(200).send(false);
+                                            }
+                                        });
+                                    } else {
+                                        res.status(200).send(false);
+                                    }
+                                });
+                            } else {
+                                res.status(200).send(false);
+                            }
+                        });
+                    } else {
+                        res.status(200).send(false);
+                    }
+                });
+            }
         }
     }
 };

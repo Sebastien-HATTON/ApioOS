@@ -786,8 +786,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showLoaderOnConfirm: false
             }, function (isConfirm) {
                 if (isConfirm) {
-                    socket.emit("git_pull", "");
-                    alert("Scaricamento in background, verrai avvisato al termine");
+                    socket.emit("git_pull", $scope.session.apioId);
+                    sweet.show("Scaricamento in corso!", "Scaricamento in background, verrai avvisato al termine", "success");
                 } else {
                     sweet.show("Annullato", "Aggiornamento non scaricato, puoi sempre installare dalla dashboard", "error");
                 }
@@ -821,7 +821,7 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
-                    socket.emit("git_pull", "");
+                    socket.emit("git_pull", $scope.session.apioId);
                     sweet.show("Scaricamento in corso!", "Scaricamento in background, verrai avvisato al termine", "success");
                 } else {
                     sweet.show("Annullato", "Aggiornamento non scaricato, puoi sempre installare dalla dashboard", "error");
@@ -840,9 +840,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
-                    $http.post("/apio/rebootBoard").success(function () {
-                        sweet.show("OK!", "Il sistema verrà riavviato e sarà disponibile a breve.", "success");
-                    });
+                    $http.post("/apio/rebootBoard").success();
+                    sweet.show("OK!", "Il sistema verrà riavviato e sarà disponibile a breve.", "success");
                 } else {
                     sweet.show("Annullato", "Il nuovo sistema sarà disponibile al prossimo riavvio", "error");
                 }
