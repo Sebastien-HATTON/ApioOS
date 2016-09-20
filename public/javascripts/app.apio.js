@@ -781,29 +781,15 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 showCancelButton: true,
                 confirmButtonColor: "#177537",
                 confirmButtonText: "Yes!",
-                closeOnConfirm: true,
+                closeOnConfirm: false,
                 closeOnCancel: false,
                 showLoaderOnConfirm: false
             }, function (isConfirm) {
                 if (isConfirm) {
                     socket.emit("git_pull", $scope.session.apioId);
-                    sweet.show({
-                        title: "Scaricamento in corso!",
-                        text: "Scaricamento in background, verrai avvisato al termine",
-                        type: "success",
-                        showCancelButton: false,
-                        closeOnConfirm: true,
-                        showLoaderOnConfirm: false
-                    });
+                    sweet.show("Scaricamento in corso!", "Scaricamento in background, verrai avvisato al termine", "success");
                 } else {
-                    sweet.show({
-                        title: "Annullato",
-                        text: "Aggiornamento non scaricato, puoi sempre installare dalla dashboard",
-                        type: "error",
-                        showCancelButton: false,
-                        closeOnConfirm: true,
-                        showLoaderOnConfirm: false
-                    });
+                    sweet.show("Annullato", "Aggiornamento non scaricato, puoi sempre installare dalla dashboard", "error");
                 }
             });
         } else {
@@ -836,23 +822,9 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             }, function (isConfirm) {
                 if (isConfirm) {
                     socket.emit("git_pull", $scope.session.apioId);
-                    sweet.show({
-                        title: "Scaricamento in corso!",
-                        text: "Scaricamento in background, verrai avvisato al termine",
-                        type: "success",
-                        showCancelButton: false,
-                        closeOnConfirm: true,
-                        showLoaderOnConfirm: false
-                    });
+                    sweet.show("Scaricamento in corso!", "Scaricamento in background, verrai avvisato al termine", "success");
                 } else {
-                    sweet.show({
-                        title: "Annullato",
-                        text: "Aggiornamento non scaricato, puoi sempre installare dalla dashboard",
-                        type: "error",
-                        showCancelButton: false,
-                        closeOnConfirm: true,
-                        showLoaderOnConfirm: false
-                    });
+                    sweet.show("Annullato", "Aggiornamento non scaricato, puoi sempre installare dalla dashboard", "error");
                 }
             });
         } else if (data.type == "done") {
@@ -869,23 +841,9 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
             }, function (isConfirm) {
                 if (isConfirm) {
                     $http.post("/apio/rebootBoard").success();
-                    sweet.show({
-                        title: "OK!",
-                        text: "Il sistema verrà riavviato e sarà disponibile a breve.",
-                        type: "success",
-                        showCancelButton: false,
-                        closeOnConfirm: true,
-                        showLoaderOnConfirm: false
-                    });
+                    sweet.show("OK!", "Il sistema verrà riavviato e sarà disponibile a breve.", "success");
                 } else {
-                    sweet.show({
-                        title: "Annullato",
-                        text: "Il nuovo sistema sarà disponibile al prossimo riavvio",
-                        type: "error",
-                        showCancelButton: false,
-                        closeOnConfirm: true,
-                        showLoaderOnConfirm: false
-                    });
+                    sweet.show("Annullato", "Il nuovo sistema sarà disponibile al prossimo riavvio", "error");
                 }
             });
         }
