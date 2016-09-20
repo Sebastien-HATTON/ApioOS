@@ -817,8 +817,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 confirmButtonColor: "#177537",
                 confirmButtonText: "Yes!",
                 closeOnConfirm: false,
-                closeOnCancel: false,
-                showLoaderOnConfirm: true
+                closeOnCancel: false//,
+                // showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
                     socket.emit("git_pull", $scope.session.apioId);
@@ -836,8 +836,8 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 confirmButtonColor: "#177537",
                 confirmButtonText: "Yes!",
                 closeOnConfirm: false,
-                closeOnCancel: false,
-                showLoaderOnConfirm: true
+                closeOnCancel: false//,
+                // showLoaderOnConfirm: true
             }, function (isConfirm) {
                 if (isConfirm) {
                     $http.post("/apio/rebootBoard").success();
