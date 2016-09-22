@@ -1031,14 +1031,16 @@ module.exports = function (enableCloudSocket) {
                 });
 
                 socket.on("apio_object_change_settings.fromgateway", function (data) {
-                    Apio.Database.db.collection("Objects").update({
-                        apioId: data.apioId,
-                        objectId: data.objectId
-                    }, {$set: data}, function (error) {
-                        if (error) {
-                            console.log("Error while updating object with objectId " + data.objectId + " and apioId " + data.apioId + ": ", error);
-                        } else {
-                            console.log("Object with objectId " + data.objectId + " and apioId " + data.apioId + " successfully updated");
+                    Apio.Object.changeSettings(data, function () {
+                        for (var x in Apio.connectedSockets) {
+                            if (x === "admin" || validator.isEmail(x)) {
+                                var socketIds = Apio.connectedSockets[x];
+                                for (var i in socketIds) {
+                                    if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                        Apio.io.sockets.connected[socketIds[i]].emit("apio_object_change_settings", data);
+                                    }
+                                }
+                            }
                         }
                     });
                 });

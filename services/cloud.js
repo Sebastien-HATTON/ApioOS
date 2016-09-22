@@ -848,21 +848,18 @@ module.exports = function (libraries) {
         });
 
         Apio.Remote.socket.on("ask_dongle_settings", function (data) {
-            if (Apio.hasOwnProperty("Configuration") && Apio.Configuration.hasOwnProperty("dongle")) {
+            socketServer.emit("send_to_client", {
+                who: "dongle",
+                data: "s0:panId:-",
+                message: "apio_serial_send"
+            });
+            socket.on("dongle_settings", function (data) {
                 socketServer.emit("send_to_client", {
-                    data: Apio.Configuration.dongle,
+                    data: data,
                     message: "get_dongle_setting"
                 });
-            } else {
-                try {
-                    socketServer.emit("send_to_client", {
-                        data: require("../configuration/dongle.js"),
-                        message: "get_dongle_setting"
-                    });
-                } catch (e) {
-                    socketServer.emit("send_to_client", {data: {}, message: "get_dongle_setting"});
-                }
-            }
+                socket.off("dongle_settings");
+            });
         });
 
         Apio.Remote.socket.on("ask_logics", function () {
