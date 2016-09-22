@@ -184,6 +184,16 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+app.get("/apio/dongle/getOpening", function (req, res) {
+    socketServer.emit("send_to_client", {message: "ask_dongle_opening", who: req.query.apioId});
+    req.pause();
+    socket.on("get_dongle_opening", function (data) {
+        req.resume();
+        res.status(200).send(data);
+        socket.off("get_dongle_opening");
+    });
+});
+
 app.get("/apio/dongle/getSettings", function (req, res) {
     req.pause();
     //socketServer.emit("send_to_client", {data: req.query.apioId, message: "ask_dongle_settings", who: req.query.apioId});

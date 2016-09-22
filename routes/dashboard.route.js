@@ -957,6 +957,12 @@ module.exports = function (Apio) {
                                     res.send({id: dummy});
 
                                     Apio.io.emit("apio_server_new", object.mongo.objectId);
+
+                                    var servicesKeys = Object.keys(Apio.servicesSocket);
+                                    servicesKeys.forEach(function (service) {
+                                        Apio.servicesSocket[service].emit("update_collections");
+                                    });
+
                                     if (Apio.Configuration.type === "cloud") {
                                         var socketId = Apio.connectedSockets[req.session.apioId][0];
                                         var obj = {

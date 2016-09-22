@@ -39,7 +39,7 @@ module.exports = function (Apio) {
                     }, function (error, response, body) {
                         if (response) {
                             if (Number(response.statusCode) === 200) {
-                                if (body) {
+                                if (body !== undefined) {
                                     res.status(200).send(body);
                                 } else {
                                     res.sendStatus(200);
@@ -89,7 +89,7 @@ module.exports = function (Apio) {
                         console.log("body: ", body);
                         if (response) {
                             if (Number(response.statusCode) === 200) {
-                                if (body) {
+                                if (body !== undefined) {
                                     res.status(200).send(body);
                                 } else {
                                     res.sendStatus(200);

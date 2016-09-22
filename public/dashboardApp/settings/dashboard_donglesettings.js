@@ -1,18 +1,16 @@
-angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettingsController', ['$rootScope', '$scope', 'sweet', 'userService', 'objectService', '$http', 'socket', function ($rootScope, $scope, sweet, userService, objectService, $http, socket) {
+angular.module("ApioDashboardApplication").controller("ApioDashboardDongleSettingsController", ["$rootScope", "$scope", "sweet", "userService", "objectService", "$http", "socket", function ($rootScope, $scope, sweet, userService, objectService, $http, socket) {
     socket.on("dongle_update", function (data) {
-        $rootScope.$emit('terminal.dongle.echo', data)
+        $rootScope.$emit("terminal.dongle.echo", data)
     });
 
     $http.get("/apio/user/getSessionComplete").success(function (session) {
         $scope.session = session;
     });
-    
 
     socket.on("dongle_onoff_update", function (data) {
         if ($scope.session.apioId === data.apioId) {
             $scope.active = data.value;
         }
-        //$scope.active = data;
     });
 
     socket.on("dongle_settings_changed", function (data) {
@@ -21,26 +19,14 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
             $scope.currentPanId = data.value.panId;
             $scope.currentDataRate = data.value.dataRate;
         }
-        //$scope.currentFirmwareVersion = data.firmwareVersion;
-        //$scope.currentPanId = data.panId;
-        //$scope.currentDataRate = data.dataRate;
     });
-    
+
     socket.on("dongle_settings", function (data) {
-    	
-        /*if ($scope.session.apioId === data.apioId) {
-            $scope.currentFirmwareVersion = data.value.firmwareVersion;
-            $scope.currentPanId = data.value.panId;
-            $scope.currentDataRate = data.value.dataRate;
-        }*/
-        //$scope.currentFirmwareVersion = data.firmwareVersion;
-        //$scope.currentPanId = data.panId;
-        //$scope.currentDataRate = data.dataRate;
         $scope.currentPanId = data.panId;
     });
 
     $scope.selected = 1;
-    $scope.active = true;
+    // $scope.active = true;
     $scope.currentDataRate = "3";
     $scope.launchSection = function (value) {
         $scope.selected = value;
@@ -84,12 +70,16 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
         {id: 15, name: "-16.5 dBm"}
     ];
 
+    $http.get("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/getOpening")).success(function (data) {
+        $scope.active = data;
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
+    });
+
     $scope.dongleSettings = function () {
         $http.get("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/getSettings")).success(function (data) {
-            //$scope.currentFirmwareVersion = data.firmwareVersion;
             $scope.currentPanId = data.panId;
-            //$scope.currentDataRate = data.dataRate;
-            //$scope.currentRadioPower = data.radioPower;
         });
     };
 
@@ -98,7 +88,6 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
                 firmwareVersion: $scope.currentFirmwareVersion,
                 panId: $scope.newPanId,
                 dataRate: $scope.currentDataRate
-                //radioPower: $scope.currentRadioPower
             }))).success(function (data) {
         }).error(function (data) {
         });
@@ -146,16 +135,15 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
     };
 
     $scope.currentUserEmail = function () {
-        $http.get('/apio/user/getSession').success(function (data) {
+        $http.get("/apio/user/getSession").success(function (data) {
             console.log(data);
-            $http.post('/apio/user/getUser', {
+            $http.post("/apio/user/getUser", {
                 email: data
             }).success(function (a) {
                 console.log(a);
                 $scope.currentUserActive = a.user;
                 console.log($scope.currentUserActive);
             });
-            //$scope.currentUserActive = data;
         });
     };
 
@@ -163,8 +151,7 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
 
     $scope.confirmChange = function () {
         console.log($scope.userEmail + " " + $scope.userPassword);
-        //$('#addUser').modal('hide');
-        $http.post('/apio/user/changePassword', {
+        $http.post("/apio/user/changePassword", {
             email: $scope.currentUserActive.email,
             password: $scope.exPassword,
             newPassword: $scope.newPassword
@@ -181,10 +168,6 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
                     confirmButtonText: "Ok",
                     closeOnConfirm: true
                 }, function () {
-                    //$('#addUser').modal('hide');
-                    //$scope.switchPage('Objects');
-                    //$state.go('objects.objectsLaunch');
-                    //location.reload();
                 });
             } else {
                 sweet.show({
@@ -196,9 +179,6 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
                     confirmButtonText: "Ok",
                     closeOnConfirm: true
                 }, function () {
-                    //$('#addUser').modal('hide');
-                    //$scope.switchPage('Objects');
-                    //$state.go('objects.objectsLaunch');
                     location.reload();
                 });
             }
@@ -213,7 +193,6 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardDongleSettin
                 confirmButtonText: "Ok",
                 closeOnConfirm: true
             }, function () {
-                //$('#addUser').modal('hide');
                 location.reload();
             });
         });

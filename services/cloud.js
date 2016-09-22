@@ -822,6 +822,31 @@ module.exports = function (libraries) {
             });
         });
 
+        Apio.Remote.socket.on("ask_dongle_opening", function (data) {
+            request({
+                json: true,
+                method: "GET",
+                uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/getOpening")
+            }, function (err, response, body) {
+                if (err || !response || Number(response.statusCode) !== 200) {
+                    socketServer.emit("send_to_client", {
+                        data: false,
+                        message: "get_dongle_opening"
+                    });
+                } else if (body) {
+                    socketServer.emit("send_to_client", {
+                        data: body,
+                        message: "get_dongle_opening"
+                    });
+                } else {
+                    socketServer.emit("send_to_client", {
+                        data: false,
+                        message: "get_dongle_opening"
+                    });
+                }
+            });
+        });
+
         Apio.Remote.socket.on("ask_dongle_settings", function (data) {
             if (Apio.hasOwnProperty("Configuration") && Apio.Configuration.hasOwnProperty("dongle")) {
                 socketServer.emit("send_to_client", {
