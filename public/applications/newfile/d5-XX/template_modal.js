@@ -19,8 +19,6 @@
  ****************************************************************************/
 
 angular.module("ApioApplication").controller("modald5-XX", ["$scope", "$http", "$mdDialog", "socket", function ($scope, $http, $mdDialog, socket) {
-	
-	
     socket.on("close_autoInstall_modal", function () {
         $mdDialog.hide();
     });
@@ -31,15 +29,6 @@ angular.module("ApioApplication").controller("modald5-XX", ["$scope", "$http", "
             $mdDialog.hide();
         });
     };
-    
-    function trapFocus(ev) {
-      var dialog = document.querySelector('md-dialog');
-
-      if (dialog && !dialog.contains(ev.target)) {
-        ev.stopImmediatePropagation();
-        dialog.focus();
-      }
-    }
 
     $scope.confirm = function (type) {
         $http.get("/apio/user/getSessionComplete").success(function (session) {
@@ -51,7 +40,7 @@ angular.module("ApioApplication").controller("modald5-XX", ["$scope", "$http", "
                 message: "apio_install_new_object_final",
                 data: $scope.modalData
             });
-            console.log('$scope.modalData',$scope.modalData);
+            console.log('$scope.modalData', $scope.modalData);
             $mdDialog.hide();
         });
     };

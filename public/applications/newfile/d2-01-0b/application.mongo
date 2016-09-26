@@ -1,6 +1,4 @@
 {
-  "address": "01925593",
-  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
   "appId": "d2-01-0b",
   "connected": true,
   "created": "2015-12-16",
@@ -8,7 +6,6 @@
   "log": {},
   "name": "Smart Plug",
   "notifications": {},
-  "objectId": "_TMP_",
   "properties": {
     "plug1": {
       "type": "trigger",
@@ -22,7 +19,7 @@
       "label": "Power [W]",
       "style": "margin-bottom:0;",
       "type": "unlimitedsensor",
-      "value": "0.00"
+      "value": "0"
     }
   },
   "protocol": "enocean",

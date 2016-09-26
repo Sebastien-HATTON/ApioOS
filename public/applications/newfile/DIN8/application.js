@@ -3,15 +3,15 @@ app.controller("defaultController", ["$scope", "currentObject", "objectService",
     $scope.object = currentObject.get();
     console.log("Sono il defaultController e l'oggetto è: ", $scope.object);
     $scope.allObjects = {};
-    
+
     $scope.reset = false;
-    
+
     $scope.modbusInstalled = [];
     $scope.viewConfirmList = false;
     $scope.callbackInstallModbus = true;
     $scope.selectedValue = "1";
     $scope.addressModbus = 1;
-	$scope.nameModbus;
+    $scope.nameModbus;
     $scope.installedShow = function () {
         if ($scope.modbusInstalled.length > 0) {
             return true;
@@ -22,43 +22,41 @@ app.controller("defaultController", ["$scope", "currentObject", "objectService",
 
     socket.on("apio_server_new", function (data) {
         console.log("data socket service ", data);
-       
-        
         objectService.getById(data).then(function (data) {
             console.log("apio_server_new", data.data);
-            console.log("verifico se è stato specificato un nome: ",$scope.nameModbus);
-            
+            console.log("verifico se è stato specificato un nome: ", $scope.nameModbus);
+
             $scope.callbackInstallModbus = true;
-            
+
             $scope.addressModbus = 1;
-	        $scope.selectedValue = "";
-	        $scope.object.properties.modbus = 1;
-            
-            $scope.nameModbus =  document.getElementById('nameModbus').value
-            
-            if(typeof $scope.nameModbus != "undefined" && $scope.nameModbus != ""){
-		    //alert($scope.nameModbus);
-		    
-		    	data.data.name = $scope.nameModbus
-		    
-	            var o = {
-	            address: data.data.address,
-	            id: data.data.objectId,
-	            name: data.data.name,
-	            services: [],
-	            tag: ""
-		        };
-		        console.log("ChangeSettings la richiesta: ", o);
-		
-		        $http.post("/apio/app/changeSettings", o).success(function (data) {
-			        
-			        document.getElementById("nameModbus").value = "";
-					$scope.nameModbus = '';
-			        console.log("SUCCES CHANGE NAME", $scope.nameModbus,$scope.callbackInstallModbus);
-		        });
-	        } else {
-			    //alert("Name App campo vuoto!");
-		    }
+            $scope.selectedValue = "";
+            $scope.object.properties.modbus = 1;
+
+            $scope.nameModbus = document.getElementById('nameModbus').value
+
+            if (typeof $scope.nameModbus != "undefined" && $scope.nameModbus != "") {
+                //alert($scope.nameModbus);
+
+                data.data.name = $scope.nameModbus
+
+                var o = {
+                    address: data.data.address,
+                    id: data.data.objectId,
+                    name: data.data.name,
+                    services: [],
+                    tag: ""
+                };
+                console.log("ChangeSettings la richiesta: ", o);
+
+                $http.post("/apio/app/changeSettings", o).success(function (data) {
+
+                    document.getElementById("nameModbus").value = "";
+                    $scope.nameModbus = '';
+                    console.log("SUCCES CHANGE NAME", $scope.nameModbus, $scope.callbackInstallModbus);
+                });
+            } else {
+                //alert("Name App campo vuoto!");
+            }
             if (data.data.parentAddress == $scope.object.address) {
                 $scope.modbusInstalled.push(data.data);
             }
@@ -125,32 +123,31 @@ app.controller("defaultController", ["$scope", "currentObject", "objectService",
 
     $scope.addModbus = function (objectId) {
         console.log("$scope.addressModbus ", $scope.addressModbus);
-        console.log("document.getElementById('addressModbus').value",document.getElementById("addressModbus").value);
-        if(document.getElementById("addressModbus").value != 0 && document.getElementById("addressModbus").value != null){
-	        console.log("OK!");
-        var newAddressApio = "0";
-        var tempAddressApio = "0";
-        for (var s in $scope.allObjects) {
-            if (Number(newAddressApio) < Number($scope.allObjects[s].objectId)) {
-                newAddressApio = $scope.allObjects[s].objectId;
+        console.log("document.getElementById('addressModbus').value", document.getElementById("addressModbus").value);
+        if (document.getElementById("addressModbus").value != 0 && document.getElementById("addressModbus").value != null) {
+            console.log("OK!");
+            var newAddressApio = "0";
+            var tempAddressApio = "0";
+            for (var s in $scope.allObjects) {
+                if (Number(newAddressApio) < Number($scope.allObjects[s].objectId)) {
+                    newAddressApio = $scope.allObjects[s].objectId;
+                }
+                console.log("newAddressApio ", newAddressApio);
             }
-            console.log("newAddressApio ", newAddressApio);
-        }
-        newAddressApio = String(Number(newAddressApio) + 1);
-        $scope.addressModbus = newAddressApio + "|" + document.getElementById("addressModbus").value;
-        var property = $scope.object.db.modbus[$scope.object.properties.modbus].split(" ");
-        property = property[0] + property[1]
-        currentObject.update(property, $scope.addressModbus, false, true);
-        
-        document.getElementById("addressModbus").value = "";
-        
-        $scope.callbackInstallModbus = false;
-        $scope.viewConfirmList = false;
-        
-        
-        
+            newAddressApio = String(Number(newAddressApio) + 1);
+            $scope.addressModbus = newAddressApio + "|" + document.getElementById("addressModbus").value;
+            var property = $scope.object.db.modbus[$scope.object.properties.modbus].split(" ");
+            property = property[0] + property[1]
+            currentObject.update(property, $scope.addressModbus, false, true);
+
+            document.getElementById("addressModbus").value = "";
+
+            $scope.callbackInstallModbus = false;
+            $scope.viewConfirmList = false;
+
+
         } else {
-	        alert('ATTENZIONE! Inserisci un Address Modbus!')
+            alert('ATTENZIONE! Inserisci un Address Modbus!')
         }
 
     };
@@ -174,16 +171,16 @@ app.controller("defaultController", ["$scope", "currentObject", "objectService",
             $scope.viewConfirmList = false;
         }
     };
-    
-    $scope.resetDIN = function(){
-	    currentObject.update("reset", "1", false, true);
-	    $scope.reset = true;
+
+    $scope.resetDIN = function () {
+        currentObject.update("reset", "1", false, true);
+        $scope.reset = true;
     }
-    
-     socket.on("apio_server_update", function (data) {
-	    if($scope.reset && data.objectId == $scope.object.objectId && data.command == "hi"){
-		    $scope.reset = false;
-	    }
+
+    socket.on("apio_server_update", function (data) {
+        if ($scope.reset && data.objectId == $scope.object.objectId && data.command == "hi") {
+            $scope.reset = false;
+        }
     });
 
     objectService.list().then(function (data) {

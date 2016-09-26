@@ -1,1 +1,42 @@
-{"address":"18","apioId":"69e03242-46ed-4992-8efa-1d872f6b4c16","appId":"EstronSDM220","category":"modbus","connected":true,"created":"2015-10-24","db":{},"log":{},"name":"Energy Meter","notifications":{},"objectId":"_TMP_","properties":{"current":{"label":"Corrente [A]","type":"unlimitedsensor","value":"null"},"energy":{"label":"Energia [kWh]","style":"display:none;","type":"unlimitedsensor","value":"null"},"frequency":{"label":"Frequenza di Rete [Hz]","type":"unlimitedsensor","value":"null"},"power":{"label":"Potenza Attuale [W]","style":"display:none;","type":"unlimitedsensor","value":"null"},"voltage":{"label":"Tensione [V]","type":"unlimitedsensor","value":"null"}},"protocol":"l","tag":"#energia","type":"object"}
+{
+  "appId": "EstronSDM220",
+  "category": "modbus",
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "name": "Energy Meter",
+  "notifications": {},
+  "properties": {
+    "current": {
+      "label": "Corrente [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "energy": {
+      "label": "Energia [kWh]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "frequency": {
+      "label": "Frequenza di Rete [Hz]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "power": {
+      "label": "Potenza Attuale [W]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "voltage": {
+      "label": "Tensione [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    }
+  },
+  "protocol": "l",
+  "tag": "#energia",
+  "type": "object"
+}

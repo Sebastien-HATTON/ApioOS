@@ -18,18 +18,28 @@
  *                                                                          *
  ****************************************************************************/
 
-angular.module("ApioApplication").controller("modala5-07-01", ["$scope", "$mdDialog", "socket", function ($scope, $mdDialog, socket) {
-    $scope.cancel = function () {
+angular.module("ApioApplication").controller("modala5-07-01", ["$scope", "$http", "$mdDialog", "socket", function ($scope, $http, $mdDialog, socket) {
+    socket.on("close_autoInstall_modal", function () {
         $mdDialog.hide();
+    });
+
+    $scope.cancel = function () {
+        $http.get("/apio/user/getSessionComplete").success(function (session) {
+            socket.emit("close_autoInstall_modal", session.apioId);
+            $mdDialog.hide();
+        });
     };
 
     $scope.confirm = function () {
-        socket.emit("send_to_service", {
-            service: "autoInstall",
-            message: "apio_install_new_object_final",
-            data: $scope.modalData
+        $http.get("/apio/user/getSessionComplete").success(function (session) {
+            $scope.modalData.apioId = session.apioId;
+            socket.emit("close_autoInstall_modal", session.apioId);
+            socket.emit("send_to_service", {
+                service: "autoInstall",
+                message: "apio_install_new_object_final",
+                data: $scope.modalData
+            });
+            $mdDialog.hide();
         });
-
-        $mdDialog.hide();
     };
 }]);

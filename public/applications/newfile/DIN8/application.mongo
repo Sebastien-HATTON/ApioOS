@@ -1,6 +1,4 @@
 {
-  "address": "3082",
-  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
   "appId": "DIN8",
   "connected": true,
   "created": "2016-06-15",
@@ -21,7 +19,6 @@
   "marker": {},
   "name": "DIN 1",
   "notifications": {},
-  "objectId": "_TMP_",
   "properties": {
     "adc1": {
       "hi": false,

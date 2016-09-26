@@ -1,1 +1,82 @@
-{"address":"18","apioId":"69e03242-46ed-4992-8efa-1d872f6b4c16","appId":"Selco200to400","category":"modbus","connected":true,"created":"2015-10-24","db":{},"log":{},"name":"Inverter Selco Series STL","notifications":{},"objectId":"_TMP_","properties" : { "ACCurrent1" : { "type" : "unlimitedsensor", "label" : "Corrente AC1 [A]", "value" : "0" }, "ACCurrent2" : { "type" : "unlimitedsensor", "label" : "Corrente AC2 [A]", "value" : "0" }, "ACCurrent3" : { "type" : "unlimitedsensor", "label" : "Corrente AC3 [A]", "value" : "0" }, "ACVoltage1" : { "type" : "unlimitedsensor", "label" : "Voltage AC1 [V]", "style" : "margin-bottom:0;", "value" : "0" }, "ACVoltage2" : { "type" : "unlimitedsensor", "label" : "Voltage AC2 [V]", "style" : "margin-bottom:0;", "value" : "0" }, "ACVoltage3" : { "type" : "unlimitedsensor", "label" : "Voltage AC3 [V]", "value" : "0" }, "Allarm" : { "type" : "unlimitedsensor", "label" : "Allarmi", "value" : "0" }, "DCCurrent1" : { "type" : "unlimitedsensor", "label" : "Corrente DC1 [A]", "value" : "0" }, "DCCurrent2" : { "type" : "unlimitedsensor", "label" : "Corrente DC2 [A]", "value" : "0" }, "DCVoltage1" : { "type" : "unlimitedsensor", "label" : "Voltage DC1 [V]", "value" : "0" }, "DCVoltage2" : { "type" : "unlimitedsensor", "label" : "Voltage DC2 [V]", "value" : "0" }, "Status" : { "type" : "unlimitedsensor", "label" : "Stato Inverter", "value" : "0" }, "TotalEnergy" : { "type" : "unlimitedsensor", "label" : "Energia Totale [KW/h]", "value" : "0" } },"protocol":"l","tag":"#energia ","type":"object"}
+{
+  "appId": "Selco200to400",
+  "category": "modbus",
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "name": "Inverter Selco Series STL",
+  "notifications": {},
+  "properties": {
+    "ACCurrent1": {
+      "type": "unlimitedsensor",
+      "label": "Corrente AC1 [A]",
+      "value": "0"
+    },
+    "ACCurrent2": {
+      "type": "unlimitedsensor",
+      "label": "Corrente AC2 [A]",
+      "value": "0"
+    },
+    "ACCurrent3": {
+      "type": "unlimitedsensor",
+      "label": "Corrente AC3 [A]",
+      "value": "0"
+    },
+    "ACVoltage1": {
+      "type": "unlimitedsensor",
+      "label": "Voltage AC1 [V]",
+      "style": "margin-bottom:0;",
+      "value": "0"
+    },
+    "ACVoltage2": {
+      "type": "unlimitedsensor",
+      "label": "Voltage AC2 [V]",
+      "style": "margin-bottom:0;",
+      "value": "0"
+    },
+    "ACVoltage3": {
+      "type": "unlimitedsensor",
+      "label": "Voltage AC3 [V]",
+      "value": "0"
+    },
+    "Allarm": {
+      "type": "unlimitedsensor",
+      "label": "Allarmi",
+      "value": "0"
+    },
+    "DCCurrent1": {
+      "type": "unlimitedsensor",
+      "label": "Corrente DC1 [A]",
+      "value": "0"
+    },
+    "DCCurrent2": {
+      "type": "unlimitedsensor",
+      "label": "Corrente DC2 [A]",
+      "value": "0"
+    },
+    "DCVoltage1": {
+      "type": "unlimitedsensor",
+      "label": "Voltage DC1 [V]",
+      "value": "0"
+    },
+    "DCVoltage2": {
+      "type": "unlimitedsensor",
+      "label": "Voltage DC2 [V]",
+      "value": "0"
+    },
+    "Status": {
+      "type": "unlimitedsensor",
+      "label": "Stato Inverter",
+      "value": "0"
+    },
+    "TotalEnergy": {
+      "type": "unlimitedsensor",
+      "label": "Energia Totale [KW/h]",
+      "value": "0"
+    }
+  },
+  "protocol": "l",
+  "tag": "#energia ",
+  "type": "object"
+}

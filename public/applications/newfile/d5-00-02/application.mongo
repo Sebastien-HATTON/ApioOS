@@ -1,1 +1,30 @@
-{"address":"","connected":true,"created":"2015-10-24","db":{},"log":{},"marker":{},"name":"Sensore Finestra","notifications":{},"objectId":"_TMP_","properties":{"window":{"type":"trigger","value":"1","labelon":"Finestra Aperta","labeloff":"Finestra Chiusa","valueon":"1","valueoff":"0"},"log":{"type":"dynamicview","value":"0","label":"Log"}},"protocol":"enocean","services":[],"status":"1","tag":"","type":"object","user":[]}
+{
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "marker": {},
+  "name": "Sensore Finestra",
+  "notifications": {},
+  "properties": {
+    "window": {
+      "type": "trigger",
+      "value": "0",
+      "labelon": "Finestra Aperta",
+      "labeloff": "Finestra Chiusa",
+      "valueon": "1",
+      "valueoff": "0"
+    },
+    "log": {
+      "type": "dynamicview",
+      "value": "0",
+      "label": "Log"
+    }
+  },
+  "protocol": "enocean",
+  "services": [],
+  "status": "1",
+  "tag": "",
+  "type": "object",
+  "user": []
+}

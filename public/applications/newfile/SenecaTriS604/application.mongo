@@ -8,149 +8,149 @@
   "name": "Energy Meter",
   "notifications": {},
   "properties": {
-    "apparentPower" : {
-        "label" : "Potenza Apparente Totale [VA]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
-        },
-    "apparentPower1" : {
-        "label" : "Potenza Apparente 1 [VA]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "apparentPower": {
+      "label": "Potenza Apparente Totale [VA]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "apparentPower2" : {
-        "label" : "Potenza Apparente 2 [VA]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "apparentPower1": {
+      "label": "Potenza Apparente 1 [VA]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "apparentPower3" : {
-        "label" : "Potenza Apparente 3 [VA]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "apparentPower2": {
+      "label": "Potenza Apparente 2 [VA]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "current" : {
-        "label" : "Corrente [A]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "apparentPower3": {
+      "label": "Potenza Apparente 3 [VA]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "current1" : {
-        "label" : "Corrente 1 [A]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "current": {
+      "label": "Corrente [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "current2" : {
-        "label" : "Corrente 2 [A]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "current1": {
+      "label": "Corrente 1 [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "current3" : {
-        "label" : "Corrente 3 [A]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "current2": {
+      "label": "Corrente 2 [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "expEnergy" : {
-        "label" : "Export Energy [Wh]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "current3": {
+      "label": "Corrente 3 [A]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "expLagAppEnergy" : {
-        "label" : "Export Apparent Energy [VAh]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "expEnergy": {
+      "label": "Export Energy [Wh]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "frequency" : {
-        "label" : "Frequenza di Rete [Hz]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "expLagAppEnergy": {
+      "label": "Export Apparent Energy [VAh]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "impEnergy" : {
-        "label" : "Import Energy [Wh]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "frequency": {
+      "label": "Frequenza di Rete [Hz]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "impLagAppEnergy" : {
-        "label" : "Import Apparent Energy [VAh]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "impEnergy": {
+      "label": "Import Energy [Wh]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "plusInfo" : {
-        "type" : "collapse",
-        "label" : "More Info",
-        "value" : "0"
+    "impLagAppEnergy": {
+      "label": "Import Apparent Energy [VAh]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "power" : {
-        "label" : "Potenza Attuale [W]",
-        "style" : "display:none;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "plusInfo": {
+      "type": "collapse",
+      "label": "More Info",
+      "value": "0"
     },
-    "power1" : {
-        "label" : "Potenza Attuale 1 [W]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "power": {
+      "label": "Potenza Attuale [W]",
+      "style": "display:none;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "power2" : {
-        "label" : "Potenza Attuale 2 [W]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "power1": {
+      "label": "Potenza Attuale 1 [W]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "power3" : {
-        "label" : "Potenza Attuale 3 [W]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "power2": {
+      "label": "Potenza Attuale 2 [W]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "reactivePower" : {
-        "label" : "Potenza Reattiva Totale [var]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "power3": {
+      "label": "Potenza Attuale 3 [W]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "reactivePower1" : {
-        "label" : "Potenza Reattiva 1 [var]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "reactivePower": {
+      "label": "Potenza Reattiva Totale [var]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "reactivePower2" : {
-        "label" : "Potenza Reattiva 2 [var]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "reactivePower1": {
+      "label": "Potenza Reattiva 1 [var]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "reactivePower3" : {
-        "label" : "Potenza Reattiva 3 [var]",
-        "style" : "margin-bottom: 0;",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "reactivePower2": {
+      "label": "Potenza Reattiva 2 [var]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "voltage" : {
-        "label" : "Tensione [V]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "reactivePower3": {
+      "label": "Potenza Reattiva 3 [var]",
+      "style": "margin-bottom: 0;",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "voltage1" : {
-        "label" : "Voltage 1 [V]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "voltage": {
+      "label": "Tensione [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "voltage2" : {
-        "label" : "Voltage 2 [V]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "voltage1": {
+      "label": "Voltage 1 [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
     },
-    "voltage3" : {
-        "label" : "Voltage 3 [V]",
-        "type" : "unlimitedsensor",
-        "value" : "0"
+    "voltage2": {
+      "label": "Voltage 2 [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "voltage3": {
+      "label": "Voltage 3 [V]",
+      "type": "unlimitedsensor",
+      "value": "0"
     }
   },
   "protocol": "l",

@@ -1,1 +1,30 @@
-{"address":"","connected":true,"created":"2015-10-24","db":{},"log":{},"marker":{},"name":"Sensore Porta","notifications":{},"objectId":"_TMP_","properties":{"door":{"type":"trigger","value":"1","labelon":"Porta Aperta","labeloff":"Porta Chiusa","valueon":"1","valueoff":"0"},"log":{"type":"dynamicview","value":"0","label":"Log"}},"protocol":"enocean","services":[],"status":"1","tag":"#casa","type":"object","user":[{"email":"utente_di_prova"}]}
+{
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "marker": {},
+  "name": "Sensore Porta",
+  "notifications": {},
+  "properties": {
+    "door": {
+      "type": "trigger",
+      "value": "0",
+      "labelon": "Porta Aperta",
+      "labeloff": "Porta Chiusa",
+      "valueon": "1",
+      "valueoff": "0"
+    },
+    "log": {
+      "type": "dynamicview",
+      "value": "0",
+      "label": "Log"
+    }
+  },
+  "protocol": "enocean",
+  "services": [],
+  "status": "1",
+  "tag": "#casa",
+  "type": "object",
+  "user": []
+}

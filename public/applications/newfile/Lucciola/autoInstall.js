@@ -110,10 +110,10 @@ app.controller('defaultController', ['$scope', 'currentObject', "$http", 'sweet'
                     appId: "Lucciola",
                     data: {
                         manutentore: $scope.manutentore,
-                        manutenzione : [{
-                        	date : day,
-                        	manutentore : $scope.manutentore
-                        		
+                        manutenzione: [{
+                            date: day,
+                            manutentore: $scope.manutentore
+
                         }],
                         sorvegliante: $scope.personaSorveglianza,
                         competente: $scope.personaCompetente,

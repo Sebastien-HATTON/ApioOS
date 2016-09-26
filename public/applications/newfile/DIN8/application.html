@@ -44,9 +44,9 @@
                 <list propertyName="modbus" label="Select Modbus Device" style="margin: 0;"
                       listener="selectDevice()"></list>
                 <div ng-show="!viewConfirmList && !callbackInstallModbus">
-	                <div style="width:40px; margin-left:auto; margin-right:auto;">
-	                	<md-progress-circular md-mode="indeterminate"></md-progress-circular>
-	                </div>
+                    <div style="width: 40px; margin-left: auto; margin-right: auto;">
+                        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                    </div>
                 </div>
                 <md-list>
                     <md-list-item class="viewConfirmList" ng-show="viewConfirmList">
@@ -56,25 +56,25 @@
                                    ng-model="addressModbus" placeholder="Digita il suo Modbus Address" required
                                    md-maxlength="3">
                         </md-input-container>
-                        <md-input-container style="width: 100%; margin-left:10%;">
-                        	<label>Nome App</label>
-							<input id="nameModbus" name="address" md-maxlength="20" minlength="4"
+                        <md-input-container style="width: 100%; margin-left: 10%;">
+                            <label>Nome App</label>
+                            <input id="nameModbus" name="address" md-maxlength="20" minlength="4"
                                    ng-model="nameModbus" placeholder="Digita un nome da Assegnare al Meter">
                         </md-input-container>
-
-                        
                     </md-list-item>
                     <md-list-item class="viewConfirmList" ng-show="viewConfirmList">
-                    <div class="col-xs-6">
-                    	<div style="width:30px; margin-left:auto; margin-right:auto;">
-                    		<i class="material-icons" style="font-size:30px;" ng-click="discardModbus(modbus.objectId)">highlight_off</i>
-                    	</div>
-                    </div>
-                    <div class="col-xs-6">
-	                    <div style="width:30px; margin-left:auto; margin-right:auto;">
-                        	<i class="material-icons" style="font-size:30px;" ng-click="addModbus(modbus.objectId)">done</i>
-	                    </div>
-                    </div>
+                        <div class="col-xs-6">
+                            <div style="width:30px; margin-left:auto; margin-right:auto;">
+                                <i class="material-icons" style="font-size: 30px;"
+                                   ng-click="discardModbus(modbus.objectId)">highlight_off</i>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div style="width: 30px; margin-left: auto; margin-right: auto;">
+                                <i class="material-icons" style="font-size: 30px;"
+                                   ng-click="addModbus(modbus.objectId)">done</i>
+                            </div>
+                        </div>
                     </md-list-item>
                     <md-toolbar style="background-color: #009688;" ng-show="installedShow()">
                         <div class="md-toolbar-tools">
@@ -88,7 +88,6 @@
                     </md-list-item>
                 </md-list>
             </collapse>
-
             <sensor propertyname="adc1" label="adc1" event="false"></sensor>
             <sensor propertyname="adc2" label="adc2" event="false"></sensor>
             <sensor propertyname="adc3" label="adc3" event="false"></sensor>
@@ -105,14 +104,22 @@
             <trigger propertyname="dig6" labelon="do6on" labeloff="do6off" valueon="1" valueoff="0"></trigger>
             <trigger propertyname="dig7" labelon="do7on" labeloff="do7off" valueon="1" valueoff="0"></trigger>
             <trigger propertyname="dig8" labelon="do8on" labeloff="do8off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din1" event="false" labelon="di1on" labeloff="di1off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din2" event="false" labelon="di2on" labeloff="di2off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din3" event="false" labelon="di3on" labeloff="di3off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din4" event="false" labelon="di4on" labeloff="di4off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din5" event="false" labelon="di5on" labeloff="di5off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din6" event="false" labelon="di6on" labeloff="di6off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din7" event="false" labelon="di7on" labeloff="di7off" valueon="1" valueoff="0"></trigger>
-            <trigger propertyname="din8" event="false" labelon="di8on" labeloff="di8off" valueon="1" valueoff="0"></trigger>
+            <trigger propertyname="din1" event="false" labelon="di1on" labeloff="di1off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din2" event="false" labelon="di2on" labeloff="di2off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din3" event="false" labelon="di3on" labeloff="di3off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din4" event="false" labelon="di4on" labeloff="di4off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din5" event="false" labelon="di5on" labeloff="di5off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din6" event="false" labelon="di6on" labeloff="di6off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din7" event="false" labelon="di7on" labeloff="di7off" valueon="1"
+                     valueoff="0"></trigger>
+            <trigger propertyname="din8" event="false" labelon="di8on" labeloff="di8off" valueon="1"
+                     valueoff="0"></trigger>
             <trigger propertyname="rel1" labelon="rel1on" labeloff="rel1off" valueon="1" valueoff="0"></trigger>
             <trigger propertyname="rel2" labelon="rel2on" labeloff="rel2off" valueon="1" valueoff="0"></trigger>
             <trigger propertyname="rel3" labelon="rel3on" labeloff="rel3off" valueon="1" valueoff="0"></trigger>
@@ -121,14 +128,14 @@
             <trigger propertyname="rel6" labelon="rel6on" labeloff="rel6off" valueon="1" valueoff="0"></trigger>
             <log label="Log"></log>
             <div>
-	            <div ng-show="!reset" style="width:74px; margin-left:auto; margin-right:auto;">
-		            <md-button ng-click="resetDIN()" class="md-fab md-warn" aria-label="FAB">
-					  RESET
-					</md-button>
-	            </div>
-	            <div ng-show="reset" style="width:40px; margin-left:auto; margin-right:auto;">
-	            	<md-progress-circular  md-mode="indeterminate"></md-progress-circular>
-	            </div>	
+                <div ng-show="!reset" style="width: 74px; margin-left: auto; margin-right: auto;">
+                    <md-button ng-click="resetDIN()" class="md-fab md-warn" aria-label="FAB">
+                        RESET
+                    </md-button>
+                </div>
+                <div ng-show="reset" style="width: 40px; margin-left: auto; margin-right: auto;">
+                    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                </div>
             </div>
         </div>
     </div>

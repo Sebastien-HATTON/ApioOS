@@ -19,13 +19,13 @@
 -                                                                           -
 ---------------------------------------------------------------------------->
 <style>
-.titleNewInstall{
-	background-color: #7ac170;
-	color: white;
-	min-height: 50px;
-	line-height: 50px;
-	font-size: 20px;
-}
+    .titleNewInstall {
+        background-color: #7ac170;
+        color: white;
+        min-height: 50px;
+        line-height: 50px;
+        font-size: 20px;
+    }
 </style>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -42,33 +42,31 @@
 <body>
 <md-dialog>
     <md-dialog-content>
-    	<div class="col-xs-12 titleNewInstall">
-    		<span>You're installing the Rocker Sensors F6-XX-XX, wanna proceed?</span>
-    	</div>
-   		<div class="col-xs-6" style="height:450px;">
-	   		<div style="display: table; height:100%;">
-		        <div style="display:table-cell; vertical-align:middle;">
-					<img style="width:100%;" src="/applications/newfile/f6/rocker.png">
-		        </div>
-	   		</div>
+        <div class="col-xs-12 titleNewInstall">
+            <span>You're installing the Rocker Sensors F6-XX-XX, wanna proceed?</span>
         </div>
-        <div class="col-xs-6" style="height:450px;">
-	        <div style="display: table; height:100%;">
-		        <div style="display:table-cell; vertical-align:middle;">
-		            <span></span>
-		            <span>The Enocean Rocker based on The PTM 210. It is a miniaturized batteryless switch module (40 mm x 40 mm x 11.2 mm) which allows the realization of very slim on-wall mountable rocker switches or remote controls. The actuating force is around 7 N only over a travel of 1.8 mm. Optionally, one or two switch rockers or up to four push buttons can be realized.</span>
-					<br>
-					<br>
-		            <div style="width:220px; margin-left:auto; margin-right:auto;">
-			            <md-button ng-click="cancel()">No</md-button>
-			            <md-button ng-click="confirm()">Yes</md-button>
-			        </div>
-		        </div>
-	        </div>
+        <div class="col-xs-6" style="height: 450px;">
+            <div style="display: table; height: 100%;">
+                <div style="display: table-cell; vertical-align: middle;">
+                    <img style="width: 100%;" src="/applications/newfile/f6/rocker.png">
+                </div>
+            </div>
         </div>
-        <div class="col-xs-12">
-	        
+        <div class="col-xs-6" style="height: 450px;">
+            <div style="display: table; height: 100%;">
+                <div style="display: table-cell; vertical-align: middle;">
+                    <span></span>
+                    <span>The Enocean Rocker based on The PTM 210. It is a miniaturized batteryless switch module (40 mm x 40 mm x 11.2 mm) which allows the realization of very slim on-wall mountable rocker switches or remote controls. The actuating force is around 7 N only over a travel of 1.8 mm. Optionally, one or two switch rockers or up to four push buttons can be realized.</span>
+                    <br>
+                    <br>
+                    <div style="width: 220px; margin-left: auto; margin-right: auto;">
+                        <md-button ng-click="cancel()">No</md-button>
+                        <md-button ng-click="confirm()">Yes</md-button>
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="col-xs-12"></div>
     </md-dialog-content>
 </md-dialog>
 </body>

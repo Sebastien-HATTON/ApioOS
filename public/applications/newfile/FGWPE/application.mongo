@@ -1,11 +1,8 @@
 {
-  "address": "6",
-  "apioId": "69e03242-46ed-4992-8efa-1d872f6b4c16",
   "appId": "FGWPE",
   "db": {},
   "name": "Fibaro Smart Plug 1",
   "notifications": {},
-  "objectId": "_TMP_",
   "properties": {
     "power": {
       "label": "Power [W]",
