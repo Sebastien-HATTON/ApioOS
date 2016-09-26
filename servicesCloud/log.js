@@ -94,10 +94,12 @@ d.on("error", function (err) {
 
 socket_server.on("connection", function (socket) {
     socket.on("close", function (data) {
-        delete usersLogsFiles[data.user][data.objectId];
+        if (usersLogsFiles[data.user] && usersLogsFiles[data.user][data.objectId]) {
+            delete usersLogsFiles[data.user][data.objectId];
 
-        if (Object.keys(usersLogsFiles[data.user]).length === 0) {
-            delete usersLogsFiles[data.user];
+            if (Object.keys(usersLogsFiles[data.user]).length === 0) {
+                delete usersLogsFiles[data.user];
+            }
         }
     });
 
@@ -144,15 +146,17 @@ socket_server.on("connection", function (socket) {
     });
 
     socket.on("log_update", function (data) {
-        sql_db.query(data.query.replace("`" + data.objectId + "`", "`" + data.objectId + "_" + data.apioId + "`"), function (error, result) {
-            if (error) {
-                console.log("Error while inserting logs in table " + data.objectId + ": ", error);
-            } else if (result) {
-                console.log("Data in table " + data.objectId + " successfully interted, result: ", result);
-            } else {
-                console.log("No result");
-            }
-        });
+        if (data.query) {
+            sql_db.query(data.query.replace("`" + data.objectId + "`", "`" + data.objectId + "_" + data.apioId + "`"), function (error, result) {
+                if (error) {
+                    console.log("Error while inserting logs in table " + data.objectId + ": ", error);
+                } else if (result) {
+                    console.log("Data in table " + data.objectId + " successfully interted, result: ", result);
+                } else {
+                    console.log("No result");
+                }
+            });
+        }
     });
 });
 
@@ -173,7 +177,8 @@ MongoClient.connect("mongodb://" + configuration.database.hostname + ":" + confi
     }
 });
 
-http.listen(port, function () {
+http.listen(port, "localhost", function () {
+// http.listen(port, function () {
     console.log("APIO Log Service correctly started on port " + port);
 });
 

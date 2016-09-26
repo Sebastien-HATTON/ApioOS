@@ -3754,7 +3754,9 @@ module.exports = function (enableCloudSocket) {
                     objects[o.objectId].objectId = o.objectId;
                     objects[o.objectId].services = o.services;
                     objects[o.objectId].tag = o.tag;
-                    objects[o.objectId].sleepTime = o.sleepTime;
+                    if (o.hasOwnProperty("sleep")) {
+                        objects[o.objectId].sleep = o.sleep;
+                    }
 
                     console.log("**********MODIFICATO OGGETTO (1)*********", objects);
 
@@ -3947,7 +3949,7 @@ module.exports = function (enableCloudSocket) {
 
                 //CHECK IF IN THE BIND THERE'S ONE OR MORE PROPERTIES HAVE BEEN DELETED
                 for (var prop in tempProps) {
-                    if (tempProps[prop] !== "objectId" && tempProps[prop] !== "type" && !newProperties.hasOwnProperty(tempProps[prop])) {
+                    if (tempProps[prop] !== "objectId" && tempProps[prop] !== "type" && tempProps[prop] !== "sleep" && !newProperties.hasOwnProperty(tempProps[prop])) {
                         //THIS PROPERTY HAS BEEN DELETED SO I DELETE IT FROM THE BIND
                         delete Apio.addressBindToProperty[protocol][address][tempProps[prop]];
                     }

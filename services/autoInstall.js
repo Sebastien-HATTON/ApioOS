@@ -42,12 +42,12 @@ module.exports = function (libraries) {
     var http = libraries.http.Server(app);
     var socketServer = libraries["socket.io"](http);
 
-    app.use(function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        next();
-    });
+    // app.use(function (req, res, next) {
+    //     res.header("Access-Control-Allow-Origin", "*");
+    //     res.header("Access-Control-Allow-Methods", "GET, POST");
+    //     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    //     next();
+    // });
 
     app.use(bodyParser.json({
         limit: "50mb"
@@ -984,6 +984,10 @@ module.exports = function (libraries) {
                                             to_add[data.protocol + "." + data.address][prop] = {};
                                         }
 
+                                        if (collection.hasOwnProperty("sleepTime") && collection.sleepTime === true) {
+                                            to_add[data.protocol + "." + data.address].sleep = true;
+                                        }
+
                                         Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: to_add}, function (err_comm_updt) {
                                             if (err_comm_updt) {
                                                 console.log("Error while updating communication addressBindToProperty: ", err_comm_updt);
@@ -1115,7 +1119,8 @@ module.exports = function (libraries) {
         });
     });
 
-    http.listen(port, function () {
+    http.listen(port, "localhost", function () {
+    // http.listen(port, function () {
         Apio.Database.connect(function () {
         });
 

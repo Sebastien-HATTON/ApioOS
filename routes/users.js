@@ -54,19 +54,30 @@ module.exports = function (Apio) {
                         });
                     });
                 } else {
-                    Apio.Database.db.collection("Users").findOne({
-                        "apioId.code": req.session.apioId,
-                        email: req.body.email
-                    }, function (err, data) {
-                        for (var x = 0; data.role === undefined && x < data.apioId.length; x++) {
-                            if (data.apioId[x].code === req.session.apioId) {
-                                data.role = data.apioId[x].role;
-                            }
-                        }
-                        res.send({
-                            user: data
+                    if (req.body.email === "info@apio.cc") {
+                        Apio.Database.db.collection("Users").findOne({
+                            email: req.body.email
+                        }, function (err, data) {
+                            data.role = "superAdmin";
+                            res.send({
+                                user: data
+                            });
                         });
-                    });
+                    } else {
+                        Apio.Database.db.collection("Users").findOne({
+                            "apioId.code": req.session.apioId,
+                            email: req.body.email
+                        }, function (err, data) {
+                            for (var x = 0; data.role === undefined && x < data.apioId.length; x++) {
+                                if (data.apioId[x].code === req.session.apioId) {
+                                    data.role = data.apioId[x].role;
+                                }
+                            }
+                            res.send({
+                                user: data
+                            });
+                        });
+                    }
                 }
             } else if (Apio.Configuration.type === "gateway") {
                 Apio.Database.db.collection("Users").findOne({email: req.body.email}, function (err, data) {

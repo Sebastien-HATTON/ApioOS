@@ -27,7 +27,6 @@
   },
   "protocol": "enocean",
   "services": [],
-  "sleepTime": 60000,
   "tag": "#servizi ",
   "type": "object"
 }

@@ -87,12 +87,12 @@ module.exports = function (libraries) {
         }
     });
 
-    app.use(function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        next();
-    });
+    // app.use(function (req, res, next) {
+    //     res.header("Access-Control-Allow-Origin", "*");
+    //     res.header("Access-Control-Allow-Methods", "GET, POST");
+    //     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    //     next();
+    // });
 
     app.use(bodyParser.json({
         limit: "50mb"
@@ -191,7 +191,8 @@ module.exports = function (libraries) {
         console.log("Caught exception: " + err);
     });
 
-    http.listen(port, function () {
+    http.listen(port, "localhost", function () {
+    // http.listen(port, function () {
         console.log("Apio Github attivo");
         Apio.Database.connect(function () {
         });

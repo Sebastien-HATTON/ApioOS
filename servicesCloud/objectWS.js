@@ -49,7 +49,8 @@ var WebSocketServer = require('ws').Server;
 //var uuidgen = libraries["node-uuid"];
 
 var app = express();
-var http = require("http");
+// var http = require("http");
+var http = require("http").Server(app);
 var socketServer = require("socket.io")(http);
 //var http = libraries.http.Server(app);
 //var socketServer = libraries["socket.io"](http);
@@ -714,10 +715,13 @@ Apio.ws.listen = function () {
 
 }
 
-var server = http.createServer(app);
-var wss = new WebSocketServer({server: server})
+// var server = http.createServer(app);
+var wss = new WebSocketServer({server: http})
+// var wss = new WebSocketServer({server: server})
 
-server.listen(port, function () {
+// server.listen(port, function () {
+http.listen(port, "localhost", function () {
+// http.listen(port, function () {
     log("APIO ObjectWs Service correctly started on port ");
     Apio.Database.connect(function () {
         //Apio.Serial.searchDongle();

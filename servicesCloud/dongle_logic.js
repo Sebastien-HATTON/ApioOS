@@ -187,22 +187,71 @@ app.use(bodyParser.urlencoded({
 app.get("/apio/dongle/getOpening", function (req, res) {
     socketServer.emit("send_to_client", {message: "ask_dongle_opening", who: req.query.apioId});
     req.pause();
-    socket.on("get_dongle_opening", function (data) {
-        req.resume();
-        res.status(200).send(data);
-        socket.off("get_dongle_opening");
+    // socket.on("get_dongle_opening", function (data) {
+    //     req.resume();
+    //     res.status(200).send(data);
+    //     socket.off("get_dongle_opening");
+    // });
+
+    var fn = function (data) {
+        if (req.query.apioId === data.apioId) {
+            req.resume();
+            res.status(200).send(data.data);
+        }
+    };
+
+    req.on("close", function() {
+        socket.removeListener("get_dongle_opening", fn);
     });
+
+    req.on("end", function() {
+        socket.removeListener("get_dongle_opening", fn);
+    });
+
+    req.on("timeout", function() {
+        socket.removeListener("get_dongle_opening", fn);
+    });
+
+    req.on("error", function() {
+        socket.removeListener("get_dongle_opening", fn);
+    });
+
+    socket.on("get_dongle_opening", fn);
 });
 
 app.get("/apio/dongle/getSettings", function (req, res) {
-    req.pause();
-    //socketServer.emit("send_to_client", {data: req.query.apioId, message: "ask_dongle_settings", who: req.query.apioId});
     socketServer.emit("send_to_client", {message: "ask_dongle_settings", who: req.query.apioId});
-    socket.on("get_dongle_setting", function (data) {
-        req.resume();
-        res.status(200).send(data);
-        socket.off("get_dongle_setting");
+    req.pause();
+    // socket.on("get_dongle_setting", function (data) {
+    //     req.resume();
+    //     res.status(200).send(data);
+    //     socket.off("get_dongle_setting");
+    // });
+
+    var fn = function (data) {
+        if (req.query.apioId === data.apioId) {
+            req.resume();
+            res.status(200).send(data.data);
+        }
+    };
+
+    req.on("close", function() {
+        socket.removeListener("get_dongle_setting", fn);
     });
+
+    req.on("end", function() {
+        socket.removeListener("get_dongle_setting", fn);
+    });
+
+    req.on("timeout", function() {
+        socket.removeListener("get_dongle_setting", fn);
+    });
+
+    req.on("error", function() {
+        socket.removeListener("get_dongle_setting", fn);
+    });
+
+    socket.on("get_dongle_setting", fn);
 });
 
 app.get("/apio/dongle/updateDongle", function (req, res) {
@@ -224,27 +273,38 @@ app.post("/apio/dongle/onoff", function (req, res) {
 });
 
 app.get("/apio/logic", function (req, res) {
-    //fs.stat("./apio_logic/" + req.query.apioId, function (err, stats) {
-    //    if (err) {
-    //        res.status(200).send([]);
-    //    } else if (stats) {
-    //        fs.readdir("./apio_logic/" + req.query.apioId, function (error, files) {
-    //            if (error) {
-    //                res.status(500).send(error);
-    //            } else if (files) {
-    //                res.status(200).send(files);
-    //            }
-    //        });
-    //    }
-    //});
-
     socketServer.emit("send_to_client", {message: "ask_logics", who: req.query.apioId});
     req.pause();
-    socket.on("get_logics", function (data) {
-        req.resume();
-        res.status(200).send(data);
-        socket.off("get_logics");
+    // socket.on("get_logics", function (data) {
+    //     req.resume();
+    //     res.status(200).send(data);
+    //     socket.off("get_logics");
+    // });
+
+    var fn = function (data) {
+        if (req.query.apioId === data.apioId) {
+            req.resume();
+            res.status(200).send(data.data);
+        }
+    };
+
+    req.on("close", function() {
+        socket.removeListener("get_logics", fn);
     });
+
+    req.on("end", function() {
+        socket.removeListener("get_logics", fn);
+    });
+
+    req.on("timeout", function() {
+        socket.removeListener("get_logics", fn);
+    });
+
+    req.on("error", function() {
+        socket.removeListener("get_logics", fn);
+    });
+
+    socket.on("get_logics", fn);
 });
 
 app.post("/apio/logic/delete", function (req, res) {
@@ -354,21 +414,38 @@ app.post("/apio/logic/newFile", function (req, res) {
 });
 
 app.post("/apio/logic/file", function (req, res) {
-    //fs.readFile("./apio_logic/" + req.body.apioId + "/" + req.body.file, {encoding: "utf8"}, function (err, file) {
-    //    if (err) {
-    //        res.status(500).send(err);
-    //    } else if (file) {
-    //        res.status(200).send(file);
-    //    }
-    //});
-
     socketServer.emit("send_to_client", {data: req.body.file, message: "ask_logic_file", who: req.body.apioId});
     req.pause();
-    socket.on("get_logic_file", function (data) {
-        req.resume();
-        res.status(200).send(data);
-        socket.off("get_logic_file");
+    // socket.on("get_logic_file", function (data) {
+    //     req.resume();
+    //     res.status(200).send(data);
+    //     socket.off("get_logic_file");
+    // });
+
+    var fn = function (data) {
+        if (req.body.apioId === data.apioId) {
+            req.resume();
+            res.status(200).send(data.data);
+        }
+    };
+
+    req.on("close", function() {
+        socket.removeListener("get_logic_file", fn);
     });
+
+    req.on("end", function() {
+        socket.removeListener("get_logic_file", fn);
+    });
+
+    req.on("timeout", function() {
+        socket.removeListener("get_logic_file", fn);
+    });
+
+    req.on("error", function() {
+        socket.removeListener("get_logic_file", fn);
+    });
+
+    socket.on("get_logic_file", fn);
 });
 
 process.on("uncaughtException", function (err) {
@@ -413,6 +490,7 @@ socketServer.on("connection", function (Socket) {
     //});
 });
 
-http.listen(port, function () {
+http.listen(port, "localhost", function () {
+// http.listen(port, function () {
     console.log("APIO Dongle Service correctly started on port ");
 });

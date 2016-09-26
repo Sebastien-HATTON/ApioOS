@@ -98,7 +98,7 @@ module.exports = {
                 "02": "function(){console.log('SET LOCAL')}"
             },
             "recive": {
-                "01": "(function(data,enocean){ var convertData = []; convertData[0] = data.raw[0] + data.raw[1]; convertData[1] = data.raw[2] + data.raw[3]; convertData[2] = data.raw[4] + data.raw[5]; convertData[3] = data.raw[6] + data.raw[7]; var data = { suplyVoltage : '', lux : '' }; console.log('CONVERTDATA ', convertData); console.log('CONVERTDATA1 ', convertData[1]); console.log('CONVERTDATA2 ', convertData[2]); var rangeSelect = parseInt(convertData[3],16).toString(2); console.log('RANGE SELECTED ',rangeSelect); if(rangeSelect[3] == 1){ data.lux = String((parseInt(convertData[1],16)*(30000/255)+(300-(parseInt(convertData[1],16)*300/255))).toFixed( 2 )); } else if(rangeSelect[3] == 0){ data.lux = String((parseInt(convertData[1],16)*(60000/255)+(600-(parseInt(convertData[1],16)*600/255))).toFixed( 2 )); } data.suplyVoltage = String((parseInt(convertData[0],16)*5.1/255).toFixed( 2 )); console.log('return***** ',data); return data; })"
+                "01": "(function(data,enocean){ var convertData = []; convertData[0] = data.raw[0] + data.raw[1]; convertData[1] = data.raw[2] + data.raw[3]; convertData[2] = data.raw[4] + data.raw[5]; convertData[3] = data.raw[6] + data.raw[7]; var data = { supplyVoltage : '', lux : '' }; console.log('CONVERTDATA ', convertData); console.log('CONVERTDATA1 ', convertData[1]); console.log('CONVERTDATA2 ', convertData[2]); var rangeSelect = parseInt(convertData[3],16).toString(2); console.log('RANGE SELECTED ',rangeSelect); if(rangeSelect[3] == 1){ data.lux = String((parseInt(convertData[1],16)*(30000/255)+(300-(parseInt(convertData[1],16)*300/255))).toFixed( 2 )); } else if(rangeSelect[3] == 0){ data.lux = String((parseInt(convertData[1],16)*(60000/255)+(600-(parseInt(convertData[1],16)*600/255))).toFixed( 2 )); } data.supplyVoltage = String((parseInt(convertData[0],16)*5.1/255).toFixed( 2 )); console.log('return***** ',data); return data; })"
             }
         },
         "a5-07-01": {
@@ -118,20 +118,12 @@ module.exports = {
                 "01": "(function(dataObject, enocean) { var property = { temperature: '' }; var temperature = parseInt(dataObject.raw.substring(4, 6),16); console.log('temperature hex: ', temperature); temperature = ((temperature - 255) * (40 / -255)).toFixed(2); console.log('temperature converted int: ', temperature); property.temperature = String(temperature); return property; })"
             }
         },
-        "f6-02-01": {
+        "f6": {
             "send": {
                 "01": "(function(){})"
             },
             "recive": {
-                "01": "(function(data,enocean){if (data.raw === '50') {if (data.trigger === 0) {data.trigger = 1;console.log(1);var properties= {onoff: '1',optionalData:{trigger:data.trigger}};return properties;} else {data.trigger = 0;console.log(0);var properties= {onoff: '0',optionalData:{trigger:data.trigger}};return properties;}} else if(data.raw === '70'){if (data.trigger1 === 0) {data.trigger1 = 1;console.log(1);var properties= {onoff1: '1',optionalData:{trigger1:data.trigger1}};return properties} else {data.trigger1 = 0;console.log(0);var properties= {onoff1: '0',optionalData:{trigger1:data.trigger1}};return properties;}}})"
-            }
-        },
-        "f6-02-02": {
-            "send": {
-                "01": "(function(){})"
-            },
-            "recive": {
-                "01": "(function(data,enocean){if (data.raw === '50') {if (data.trigger === 0) {data.trigger = 1;console.log(1);var properties= {onoff: '1',optionalData:{trigger:data.trigger}};return properties;} else {data.trigger = 0;console.log(0);var properties= {onoff: '0',optionalData:{trigger:data.trigger}};return properties;}} else if(data.raw === '70'){if (data.trigger1 === 0) {data.trigger1 = 1;console.log(1);var properties= {onoff1: '1',optionalData:{trigger1:data.trigger1}};return properties} else {data.trigger1 = 0;console.log(0);var properties= {onoff1: '0',optionalData:{trigger1:data.trigger1}};return properties;}}})"
+                "01": "(function(data, enocean,proprieta) {if (data.raw === '50') { if (proprieta.onoff.value === '0') { console.log(1); var properties = { onoff: '1' }; return properties; } else { var properties = { onoff: '0' }; return properties; } } else if (data.raw === '70') { if (proprieta.onoff1.value === '0') { var properties = { onoff1: '1' }; return properties } else { var properties = { onoff1: '0' }; return properties; } } else if (data.raw === '30') { if (proprieta.onoff2.value === '0') { var properties = { onoff2: '1' }; return properties } else { var properties = { onoff2: '0' }; return properties; } } else if (data.raw === '10') { if (proprieta.onoff3.value === '0') { var properties = { onoff3: '1' }; return properties } else { var properties = { onoff3: '0' }; return properties; } } else if (data.raw === '37') { if (proprieta.onoff4.value === '0') { var properties = { onoff4: '1' }; return properties } else { var properties = { onoff4: '0' }; return properties; } } else if (data.raw === '15') { if (proprieta.onoff5.value === '0') { var properties = { onoff5: '1' }; return properties } else { var properties = { onoff5: '0' }; return properties; } } })"
             }
         },
         "d5-00-01": {
@@ -139,7 +131,15 @@ module.exports = {
                 "01": "(function(){})"
             },
             "recive": {
-                "01": "((function(data,enocean){var porta;if(data.raw == '08'){porta = '1';} else if(data.raw == '09'){porta = '0';}console.log(data.raw);var properties = {porta: porta};return properties;}))"
+                "01": "(function(data,enocean){var contact;if(data.raw == '08'){contact = '1';} else if(data.raw == '09'){contact = '0';}console.log(data.raw);var properties = {door: contact};return properties;})"
+            }
+        },
+        "d5-00-02": {
+            "send": {
+                "01": "(function(){})"
+            },
+            "recive": {
+                "01": "(function(data,enocean){var contact;if(data.raw == '08'){contact = '1';} else if(data.raw == '09'){contact = '0';}console.log(data.raw);var properties = {window: contact};return properties;})"
             }
         },
         "a5-20-01": {

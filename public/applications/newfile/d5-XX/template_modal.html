@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--Copyright 2014-2015 Alex Benfaremo, Alessandro Chelli, Lorenzo Di Berardino, Matteo Di Sabatino-->
+
+<!---------------------------------- LICENSE --------------------------------
+-                                                                           -
+- This file is part of ApioOS.                                              -
+-                                                                           -
+- ApioOS is free software released under the GPLv2 license: you can         -
+- redistribute it and/or modify it under the terms of the GNU General       -
+- Public License version 2 as published by the Free Software Foundation.    -
+-                                                                           -
+- ApioOS is distributed in the hope that it will be useful, but             -
+- WITHOUT ANY WARRANTY; without even the implied warranty of                -
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              -
+- GNU General Public License version 2 for more details.                    -
+-                                                                           -
+- To read the license either open the file COPYING.txt or                   -
+- visit <http://www.gnu.org/licenses/gpl2.txt>                              -
+-                                                                           -
+---------------------------------------------------------------------------->
+<style>
+.titleNewInstall{
+	background-color: #7ac170;
+	color: white;
+	min-height: 50px;
+	line-height: 50px;
+	font-size: 20px;
+}
+</style>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>New D5-00-XX Object</title>
+    <link rel="shortcut icon" type="image/x-icon" href="public/apio_assets/img/favicon.ico"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="yes"/>
+</head>
+<body>
+<md-dialog>
+    <md-dialog-content style="overflow:hidden;">
+    	<div class="col-xs-12 titleNewInstall">
+    		<span>You're installing the Single Contact, wanna proceed?</span>
+    	</div>
+   		<div class="col-xs-6" style="height:450px;">
+	   		<div style="display: table; height:100%;">
+		        <div style="display:table-cell; vertical-align:middle;">
+					<img style="width:100%;" src="/applications/newfile/d5-XX/singleContact.jpg">
+		        </div>
+	   		</div>
+        </div>
+        <div class="col-xs-6" style="height:450px;">
+	        <div style="display: table; height:100%;">
+		        <div style="display:table-cell; vertical-align:middle;">
+		            <span></span>
+		            <span>Indoor Opening Sensor is a wireless and battery-less sensor that accurately senses the opening and closing movements of doors and windows, and sends the signals to EnOcean controller. The sensor can be used to trigger customized events, like setting off an alarm, sending an email or turning on the lights, whenever an intrusion is detected. Although the sensor comes powered by a solar panel, it provides the flexibility to add an optional CR1216 battery (not included) in case you want to use the sensor in dark areas. It also comes with easy-to-install wall mounting plates for convenient and hassle-free installation.</span>
+					<br>
+					<br>
+					<div layout-gt-sm="row">
+						
+						
+					</div>
+		            <div style="width:355px; margin-left:auto; margin-right:auto;" ng-show="typeSelected != false">
+			            <md-button ng-click="cancel()">No</md-button>
+			            <md-button ng-click="confirm('d5-00-01')">Door</md-button>
+			            <md-button ng-click="confirm('d5-00-02')">Window</md-button>
+			        </div>
+		        </div>
+	        </div>
+        </div>
+        <div class="col-xs-12">
+	        
+        </div>
+    </md-dialog-content>
+</md-dialog>
+</body>
+</html>

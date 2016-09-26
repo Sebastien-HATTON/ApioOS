@@ -483,6 +483,18 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
     $scope.continueToCloud = false;
     $scope.cloudShowBoard = false;
 
+    socket.on("zwave_reset", function (data) {
+        var alert = $mdDialog.alert({
+            title: "Attention",
+            textContent: data,
+            ok: "Close"
+        });
+
+        $mdDialog.show(alert).finally(function () {
+            alert = undefined;
+        });
+    });
+
     var dialogInstall = false;
     socket.on("auto_install_modal", function (data) {
         console.log("RICEVUTA RICHIESTA DI AUTO-INSTALLAZIONE!", data);

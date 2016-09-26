@@ -47,13 +47,13 @@ module.exports = function (libraries) {
     var request = libraries.request;
 
 //socketServer.listen(server);
-    app.use(function (req, res, next) {
-        res.header("Accept", "*");
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        next();
-    });
+//     app.use(function (req, res, next) {
+//         res.header("Accept", "*");
+//         res.header("Access-Control-Allow-Origin", "*");
+//         res.header("Access-Control-Allow-Methods", "GET, POST");
+//         res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+//         next();
+//     });
     app.use(bodyParser.json({
         limit: "50mb"
     }));
@@ -148,7 +148,8 @@ module.exports = function (libraries) {
     });
 
 
-    http.listen(port, function () {
+    http.listen(port, "localhost", function () {
+    // http.listen(port, function () {
         console.log("APIO Shutdown Service on " + port);
         var gc = require("./garbage_collector.js");
         gc();

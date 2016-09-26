@@ -205,7 +205,8 @@ module.exports = function (libraries) {
         });
     });
 
-    http.listen(port, function () {
+    http.listen(port, "localhost", function () {
+    // http.listen(port, function () {
         console.log("Service autoInstall correctly started on port " + port);
         Apio.Database.connect(function () {
             console.log("Successfully connected to the DB");

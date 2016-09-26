@@ -22,14 +22,112 @@
 var Apio = require("../apio.js")(false);
 var fs = require("fs");
 var com = require("serialport");
-var request = require("request")
+var request = require("request");
+//dipendenze Z-Wave
+var OpenZWave = require("openzwave-shared");
+var os = require("os");
+var searchDongleFlag = 0;
+var searchDongleInterval = undefined;
+var zwavePort = undefined;
+//Istanza
+var zwave = new OpenZWave({
+    ConsoleOutput: false
+});
 Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=zwave&token=" + Apio.Token.getFromText("zwave", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
 
+var compatibleDongle = {
+    zWay: {
+        productId: "0x0200",
+        vendorId: "0x0658"
+    }
+};
 
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
+var usage = require('usage');
+var searchDongle = function () {
+    var searchDongleInterval = setInterval(function () {
+        found = 0;
+        com.list(function (err, ports) {
+            if (err) {
+                console.log("Unable to get serial ports, error: ", err);
+            } else {
+                ports.forEach(function (port, portsRef, index) {
+                    console.log(port);
+                    for (var a in compatibleDongle) {
+                        if (compatibleDongle[a].productId === port.productId && compatibleDongle[a].vendorId === port.vendorId) {
+                            console.log("OK");
+                            console.log("There is DONGLE");
+                            console.log("#############port.comName###########");
+                            console.log("port.comName: ", port.comName);
+                            zwavePort = port.comName;
+                            zwave.connect(port.comName);
+                            searchDongleFlag = 0;
+                            if (searchDongleInterval) {
+                                clearInterval(searchDongleInterval);
+                            }
+                            found = 1;
+                            break;
+                        }
+                    }
 
+                    if (index === portsRef.length - 1) {
+                        if (found) {
+
+                        } else {
+                            console.log("No DONGLE");
+                            found = 0;
+                        }
+                    }
+                })
+            }
+        });
+
+    }, 20000)
+}
+var pid = process.pid // you can use any valid PID instead
+var options = {keepHistory: true};
+setInterval(function () {
+    usage.lookup(pid, options, function (err, result) {
+        console.log("Memory: ", result);
+        if (result.cpu > 90) {
+            //Controllo le seriali
+            found = 0;
+            com.list(function (err, ports) {
+                if (err) {
+                    console.log("Unable to get serial ports, error: ", err);
+                } else {
+                    ports.forEach(function (port) {
+                        console.log(port);
+                        for (var a in compatibleDongle) {
+                            if (compatibleDongle[a].productId === port.productId && compatibleDongle[a].vendorId === port.vendorId) {
+                                console.log("OK")
+                                found = 1
+                                break;
+                            }
+                        }
+                        if (found) {
+                            //console.log("There is DONGLE")
+                        } else {
+
+                            console.log("No DONGLE");
+                            console.log("disconnecting...");
+                            zwave.disconnect(zwavePort);
+                            process.exit();
+                            //zwave.disconnect();
+                            if (!searchDongleFlag) {
+                                searchDongle();
+                                searchDongleFlag = 1;
+                            }
+
+                        }
+                    })
+                }
+            });
+        }
+    });
+}, 30000);
 
 var socketServer = require("socket.io")(http);
 
@@ -42,12 +140,6 @@ var objects = {};
 var communication = {};
 var bindToProperty = {};
 
-var compatibleDongle = {
-    zWay: {
-        productId: "0x0200",
-        vendorId: "0x0658"
-    }
-}
 //Carico in RAM i dati relativi alla comunicazione.
 var communication = {};
 var bindToProperty = {};
@@ -113,6 +205,10 @@ var zwaveSendToDevice = function (data, addInfo) {
         zwave.setValue(nodeId, classZ, instance, index, value);
     } catch (ex) {
         console.log("Expection while send info to node: ", ex);
+        var o = {};
+        o.message = "zwave_reset";
+        o.data = "It seems that the object is not present in this Z-Wave Network. Please reset it and install it again!";
+        Apio.io.emit("send_to_client", o);
     }
 
     /*var s = communication["enocean"]
@@ -236,14 +332,6 @@ Apio.io.on("apio_zwave_send", function (data) {
 //var express = require("express");
 //var http = require("http");
 //var app = express();
-//dipendenze Z-Wave
-var OpenZWave = require("openzwave-shared");
-var os = require("os");
-
-//Istanza
-var zwave = new OpenZWave({
-    ConsoleOutput: false
-});
 
 //In questa variabile verranno instanzaiti tutti i nodi. Questa cosa serve per inviare e ricevere ai diversi nodi che sono in rete.
 var nodes = [];
@@ -263,7 +351,7 @@ zwave.on("driver ready", function (homeid) {
 //Evento che parte se c'è qualche problema con il driver ZWave
 zwave.on("driver failed", function () {
     console.log("failed to start driver");
-    zwave.disconnect();
+    zwave.disconnect(zwavePort);
     process.exit();
 });
 
@@ -623,7 +711,7 @@ com.list(function (err, ports) {
     if (err) {
         console.log("Unable to get serial ports, error: ", err);
     } else {
-        ports.forEach(function (port) {
+        ports.forEach(function (port, portsRef, index) {
             console.log(port);
             for (var a in compatibleDongle) {
                 //console.log(compatibleDongle[a].productId+ " === "+port.productId +" && "+ port.vendorId+" ==="  +compatibleDongle[a].vendorId, compatibleDongle[a].productId.trim() === port.productId.trim(), compatibleDongle[a].vendorId.trim() === port.vendorId.trim());
@@ -631,17 +719,34 @@ com.list(function (err, ports) {
                 //console.log(compatibleDongle[a].productId+ " === "+port.productId +" && "+ port.vendorId+" ==="  +compatibleDongle[a].vendorId, compatibleDongle[a].productId.trim() === port.productId.trim(), compatibleDongle[a].vendorId.trim() === port.vendorId.trim())
                 //}
                 if (compatibleDongle[a].productId === port.productId && compatibleDongle[a].vendorId === port.vendorId) {
-                    console.log("OK")
+                    console.log("OK");
+                    console.log("Starting ZWAVE network");
+                    console.log("#############port.comName###########");
+                    console.log("port.comName: ", port.comName);
+                    zwavePort = port.comName;
                     zwave.connect(port.comName);
-                    found = 1
+                    searchDongleFlag = 0;
+                    if (searchDongleInterval) {
+                        clearInterval(searchDongleInterval);
+                    }
+                    found = 1;
                     break;
                 }
             }
-            if (found) {
-                console.log("Starting ZWAVE network")
-                //zwave.connect(port.comName);
-            } else {
-                console.log("No DONGLE")
+
+            if (index === portsRef.length - 1) {
+                if (found) {
+                    //zwave.connect(port.comName);
+                } else {
+                    console.log("No DONGLE");
+                    setTimeout(function () {
+                        console.log("-------------------NO DONGLE-------------------");
+                        process.exit()
+                    }, 10000);
+
+                    //searchDongle();
+                    //searchDongleFlag = 1;
+                }
             }
             /*if (String(port.manufacturer) === "Apio Dongle" || String(port.manufacturer) === "Apio_Dongle") {
              //console.log('Chiamo Apio.Serial.init()');
@@ -663,6 +768,7 @@ com.list(function (err, ports) {
 //seguendo la procedura di accoppiamento di quel nodo.
 //{Le fibaro smart plug si accoppiano quando vengono alimentate se il dongle è in learning mode}
 app.get("/addNode", function (req, res) {
+    console.log("/addNode");
     if (zwave.hasOwnProperty("beginControllerCommand")) {
         zwave.beginControllerCommand("AddDevice", true);
         flagLearn = true
@@ -693,6 +799,11 @@ app.get("/cancelControllerCommand", function (req, res) {
     zwave.cancelControllerCommand();
     flagLearn = false
     flagRemove = false;
+    res.send(200)
+});
+
+app.get("/hardReset", function (req, res) {
+    zwave.hardReset();
     res.send(200)
 });
 
@@ -744,7 +855,7 @@ app.get("/enablePoll/:nodeId/:class/:intensity", function (req, res) {
 
 process.on("SIGINT", function () {
     console.log("disconnecting...");
-    zwave.disconnect();
+    zwave.disconnect(zwavePort);
     process.exit();
 });
 
@@ -789,7 +900,8 @@ socketServer.on("connection", function (Socket) {
     });
 });
 
-http.listen(port, function () {
+http.listen(port, "localhost", function () {
+// http.listen(port, function () {
     console.log("Server start at port " + port);
     Apio.Database.connect(function () {
         Apio.Database.db.collection("Services").findOne({name: "zwave"}, function (err, service) {

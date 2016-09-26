@@ -139,26 +139,26 @@
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-default" ng-click="change3gSettings()">Update settings</button>
                 </div>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn" ng-class="status3g === 'disabled' ? 'btn-success' : 'btn-danger'"
-                            ng-click="enable3g()">Click to {{status3g === "disabled" ? "enable" : "disable"}}
-                    </button>
-                </div>
+                <!--<div class="btn-group" role="group">-->
+                    <!--<button type="button" class="btn" ng-class="status3g === 'disabled' ? 'btn-success' : 'btn-danger'"-->
+                            <!--ng-click="enable3g()">Click to {{status3g === "disabled" ? "enable" : "disable"}}-->
+                    <!--</button>-->
+                <!--</div>-->
             </div>
-            <div class="btn-group btn-group-justified" role="group" aria-label="Mobile broadband setting-2"
-                 style="margin-top: 25px;">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn" ng-class="is3gRunning === 'active' ? 'btn-danger' : 'btn-success'"
-                            ng-disabled="status3g === 'disabled'" ng-click="runstop3g()">Click to {{is3gRunning ===
-                        "active" ? "stop" : "start"}}
-                    </button>
-                </div>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-default" ng-disabled="status3g === 'disabled'"
-                            ng-click="restart3g()">Restart service
-                    </button>
-                </div>
-            </div>
+            <!--<div class="btn-group btn-group-justified" role="group" aria-label="Mobile broadband setting-2"-->
+                 <!--style="margin-top: 25px;">-->
+                <!--<div class="btn-group" role="group">-->
+                    <!--<button type="button" class="btn" ng-class="is3gRunning === 'active' ? 'btn-danger' : 'btn-success'"-->
+                            <!--ng-disabled="status3g === 'disabled'" ng-click="runstop3g()">Click to {{is3gRunning ===-->
+                        <!--"active" ? "stop" : "start"}}-->
+                    <!--</button>-->
+                <!--</div>-->
+                <!--<div class="btn-group" role="group">-->
+                    <!--<button type="button" class="btn btn-default" ng-disabled="status3g === 'disabled'"-->
+                            <!--ng-click="restart3g()">Restart service-->
+                    <!--</button>-->
+                <!--</div>-->
+            <!--</div>-->
         </div>
     </div>
 </div>

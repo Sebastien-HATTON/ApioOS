@@ -333,21 +333,21 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
         });
     });
 
-    $http.get("/apio/service/networking/route/" + encodeURIComponent("/apio/3g/status")).success(function (status) {
-        $scope.status3g = status;
-        if (!$scope.$$phase) {
-            $scope.$apply();
-        }
-    }).error(function (error) {
-        sweet.show({
-            title: "Error while getting 3G status",
-            text: error,
-            type: "error",
-            closeOnConfirm: true,
-            showCancelButton: false,
-            showLoaderOnConfirm: true
-        });
-    });
+    // $http.get("/apio/service/networking/route/" + encodeURIComponent("/apio/3g/status")).success(function (status) {
+    //     $scope.status3g = status;
+    //     if (!$scope.$$phase) {
+    //         $scope.$apply();
+    //     }
+    // }).error(function (error) {
+    //     sweet.show({
+    //         title: "Error while getting 3G status",
+    //         text: error,
+    //         type: "error",
+    //         closeOnConfirm: true,
+    //         showCancelButton: false,
+    //         showLoaderOnConfirm: true
+    //     });
+    // });
 
     $http.get("/apio/service/networking/route/" + encodeURIComponent("/apio/3g/data")).success(function (data) {
         $scope.apn = data.apn;
@@ -384,19 +384,19 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
         });
     });
 
-    $http.get("/apio/service/networking/route/" + encodeURIComponent("/apio/3g/run")).success(function (data) {
-        $scope.is3gRunning = data;
-        if (!$scope.$$phase) {
-            $scope.$apply();
-        }
-    }).error(function (error) {
-        sweet.show({
-            title: "Error while getting if 3g is running or not",
-            text: error,
-            type: "error",
-            closeOnConfirm: true,
-            showCancelButton: false,
-            showLoaderOnConfirm: true
-        });
-    });
+    // $http.get("/apio/service/networking/route/" + encodeURIComponent("/apio/3g/run")).success(function (data) {
+    //     $scope.is3gRunning = data;
+    //     if (!$scope.$$phase) {
+    //         $scope.$apply();
+    //     }
+    // }).error(function (error) {
+    //     sweet.show({
+    //         title: "Error while getting if 3g is running or not",
+    //         text: error,
+    //         type: "error",
+    //         closeOnConfirm: true,
+    //         showCancelButton: false,
+    //         showLoaderOnConfirm: true
+    //     });
+    // });
 }]);

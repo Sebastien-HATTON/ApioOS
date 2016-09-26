@@ -28,18 +28,19 @@ module.exports = function (libraries) {
     // var configuration = require("../configuration/default.js");
     var exec = libraries.child_process.exec;
     // var Apio = require("../apio.js")(configuration, false);
-    var Apio = require("../apio.js")(false);
+    // var Apio = require("../apio.js")(false);
+    var Apio = require("../apio.js")();
     var socketClient = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port, {query: "associate=networking&token=" + Apio.Token.getFromText("networking", fs.readFileSync("./" + Apio.Configuration.type + "_key.apio", "utf8"))});
     var socketServer = libraries["socket.io"](http);
     var spawn = libraries.child_process.spawn;
     var port = 8111;
 
-    app.use(function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        next();
-    });
+    // app.use(function (req, res, next) {
+    //     res.header("Access-Control-Allow-Origin", "*");
+    //     res.header("Access-Control-Allow-Methods", "GET, POST");
+    //     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    //     next();
+    // });
 
     app.use(bodyParser.json({
         limit: "50mb"
@@ -436,8 +437,17 @@ module.exports = function (libraries) {
             if (data.status === "client") {
                 fs.readFile("/etc/wpa_supplicant/wpa_supplicant.conf", "utf8", function (err, content) {
                     if (err) {
-                        socketServer.emit("send_to_client", {
-                            data: err,
+                        // socketServer.emit("send_to_client", {
+                        //     data: err,
+                        //     message: "apio_wifi_switchStatus_error"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier(),
+                                data: err
+                            },
                             message: "apio_wifi_switchStatus_error"
                         });
                     } else if (content) {
@@ -469,15 +479,33 @@ module.exports = function (libraries) {
 
                         fs.writeFile("/etc/wpa_supplicant/wpa_supplicant.conf", content.join("\n"), function (error) {
                             if (error) {
-                                socketServer.emit("send_to_client", {
-                                    data: error,
+                                // socketServer.emit("send_to_client", {
+                                //     data: error,
+                                //     message: "apio_wifi_switchStatus_error"
+                                // });
+
+                                Apio.Remote.socket.emit("send_to_client", {
+                                    who: "networking",
+                                    data: {
+                                        apioId: Apio.System.getApioIdentifier(),
+                                        data: error
+                                    },
                                     message: "apio_wifi_switchStatus_error"
                                 });
                             } else {
                                 fs.readFile("/etc/network/interfaces", "utf8", function (err, content) {
                                     if (err) {
-                                        socketServer.emit("send_to_client", {
-                                            data: err,
+                                        // socketServer.emit("send_to_client", {
+                                        //     data: err,
+                                        //     message: "apio_wifi_switchStatus_error"
+                                        // });
+
+                                        Apio.Remote.socket.emit("send_to_client", {
+                                            who: "networking",
+                                            data: {
+                                                apioId: Apio.System.getApioIdentifier(),
+                                                data: err
+                                            },
                                             message: "apio_wifi_switchStatus_error"
                                         });
                                     } else if (content) {
@@ -497,19 +525,45 @@ module.exports = function (libraries) {
 
                                         fs.writeFile("/etc/network/interfaces", content.join("\n"), function (error) {
                                             if (error) {
-                                                socketServer.emit("send_to_client", {
-                                                    data: error,
+                                                // socketServer.emit("send_to_client", {
+                                                //     data: error,
+                                                //     message: "apio_wifi_switchStatus_error"
+                                                // });
+
+                                                Apio.Remote.socket.emit("send_to_client", {
+                                                    who: "networking",
+                                                    data: {
+                                                        apioId: Apio.System.getApioIdentifier(),
+                                                        data: error
+                                                    },
                                                     message: "apio_wifi_switchStatus_error"
                                                 });
                                             } else {
                                                 exec("update-rc.d hostapd remove", function (error_) {
                                                     if (error_) {
-                                                        socketServer.emit("send_to_client", {
-                                                            data: error_,
+                                                        // socketServer.emit("send_to_client", {
+                                                        //     data: error_,
+                                                        //     message: "apio_wifi_switchStatus_error"
+                                                        // });
+
+                                                        Apio.Remote.socket.emit("send_to_client", {
+                                                            who: "networking",
+                                                            data: {
+                                                                apioId: Apio.System.getApioIdentifier(),
+                                                                data: error_
+                                                            },
                                                             message: "apio_wifi_switchStatus_error"
                                                         });
                                                     } else {
-                                                        socketServer.emit("send_to_client", {
+                                                        // socketServer.emit("send_to_client", {
+                                                        //     message: "apio_wifi_switchStatus_ok"
+                                                        // });
+
+                                                        Apio.Remote.socket.emit("send_to_client", {
+                                                            who: "networking",
+                                                            data: {
+                                                                apioId: Apio.System.getApioIdentifier()
+                                                            },
                                                             message: "apio_wifi_switchStatus_ok"
                                                         });
                                                     }
@@ -525,8 +579,17 @@ module.exports = function (libraries) {
             } else if (data.status === "hotspot") {
                 fs.readFile("/etc/network/interfaces", "utf8", function (err, content) {
                     if (err) {
-                        socketServer.emit("send_to_client", {
-                            data: err,
+                        // socketServer.emit("send_to_client", {
+                        //     data: err,
+                        //     message: "apio_wifi_switchStatus_error"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier(),
+                                data: err
+                            },
                             message: "apio_wifi_switchStatus_error"
                         });
                     } else if (content) {
@@ -546,20 +609,46 @@ module.exports = function (libraries) {
 
                         fs.writeFile("/etc/network/interfaces", content.join("\n"), function (error) {
                             if (error) {
-                                socketServer.emit("send_to_client", {
-                                    data: error,
+                                // socketServer.emit("send_to_client", {
+                                //     data: error,
+                                //     message: "apio_wifi_switchStatus_error"
+                                // });
+
+                                Apio.Remote.socket.emit("send_to_client", {
+                                    who: "networking",
+                                    data: {
+                                        apioId: Apio.System.getApioIdentifier(),
+                                        data: error
+                                    },
                                     message: "apio_wifi_switchStatus_error"
                                 });
                             } else {
                                 exec("update-rc.d hostapd defaults && update-rc.d hostapd enable", function (error_) {
                                     if (error_) {
-                                        socketServer.emit("send_to_client", {
-                                            data: error_,
+                                        // socketServer.emit("send_to_client", {
+                                        //     data: error_,
+                                        //     message: "apio_wifi_switchStatus_error"
+                                        // });
+
+                                        Apio.Remote.socket.emit("send_to_client", {
+                                            who: "networking",
+                                            data: {
+                                                apioId: Apio.System.getApioIdentifier(),
+                                                data: error_
+                                            },
                                             message: "apio_wifi_switchStatus_error"
                                         });
                                     } else {
-                                        socketServer.emit("send_to_client", {
-                                            data: err,
+                                        // socketServer.emit("send_to_client", {
+                                        //     data: err,
+                                        //     message: "apio_wifi_switchStatus_ok"
+                                        // });
+
+                                        Apio.Remote.socket.emit("send_to_client", {
+                                            who: "networking",
+                                            data: {
+                                                apioId: Apio.System.getApioIdentifier()
+                                            },
                                             message: "apio_wifi_switchStatus_ok"
                                         });
                                     }
@@ -574,8 +663,17 @@ module.exports = function (libraries) {
         Socket.on("apio_3g_data", function (data) {
             fs.readFile("/etc/wvdial.conf", "utf8", function (error, content) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "apio_3g_data_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: error
+                        },
                         message: "apio_3g_data_error"
                     });
                 } else if (content) {
@@ -602,18 +700,43 @@ module.exports = function (libraries) {
 
                     fs.writeFile("/etc/wvdial.conf", content.join("\n"), function (error1) {
                         if (error1) {
-                            socketServer.emit("send_to_client", {
-                                data: error1,
+                            // socketServer.emit("send_to_client", {
+                            //     data: error1,
+                            //     message: "apio_3g_data_error"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier(),
+                                    data: error1
+                                },
                                 message: "apio_3g_data_error"
                             });
                         } else {
-                            socketServer.emit("send_to_client", {
+                            // socketServer.emit("send_to_client", {
+                            //     message: "apio_3g_data_ok"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier()
+                                },
                                 message: "apio_3g_data_ok"
                             });
                         }
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
+                    // socketServer.emit("send_to_client", {
+                    //     message: "apio_3g_data_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier()
+                        },
                         message: "apio_3g_data_error"
                     });
                 }
@@ -623,9 +746,18 @@ module.exports = function (libraries) {
         Socket.on("apio_3g_restart", function () {
             exec("pkill wvdial", function (error) {
                 if (error && error.killed !== false) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
-                        message: "apio_3g_restart_error"
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "apio_3g_restart_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: error
+                        },
+                        message: "apio_3g_data_error"
                     });
                 } else {
                     var wvdial = spawn("wvdial", [], {
@@ -636,15 +768,32 @@ module.exports = function (libraries) {
                     wvdial.stderr.on("data", function (error) {
                         if (flag) {
                             flag = false;
-                            socketServer.emit("send_to_client", {
-                                data: error,
+                            // socketServer.emit("send_to_client", {
+                            //     data: error,
+                            //     message: "apio_3g_restart_ok"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier(),
+                                    data: error
+                                },
                                 message: "apio_3g_restart_ok"
                             });
                         }
                     });
 
-                    socketServer.emit("send_to_client", {
-                        message: "apio_3g_restart_error"
+                    // socketServer.emit("send_to_client", {
+                    //     message: "apio_3g_restart_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier()
+                        },
+                        message: "apio_3g_data_error"
                     });
                 }
             });
@@ -653,26 +802,61 @@ module.exports = function (libraries) {
         Socket.on("apio_3g_get_run", function (data) {
             exec("ps aux | grep wvdial | awk '{print $2}'", function (error, stdout) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "apio_3g_get_run_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: error
+                        },
                         message: "apio_3g_get_run_error"
                     });
                 } else if (stdout) {
                     stdout = stdout.split("\n");
                     stdout.pop();
                     if (stdout.length > 2) {
-                        socketServer.emit("send_to_client", {
-                            data: "active",
+                        // socketServer.emit("send_to_client", {
+                        //     data: "active",
+                        //     message: "apio_3g_get_run_ok"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier(),
+                                data: "active"
+                            },
                             message: "apio_3g_get_run_ok"
                         });
                     } else {
-                        socketServer.emit("send_to_client", {
-                            data: "dead",
+                        // socketServer.emit("send_to_client", {
+                        //     data: "dead",
+                        //     message: "apio_3g_get_run_ok"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier(),
+                                data: "dead"
+                            },
                             message: "apio_3g_get_run_ok"
                         });
                     }
                 } else {
-                    socketServer.emit("send_to_client", {
+                    // socketServer.emit("send_to_client", {
+                    //     message: "apio_3g_get_run_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier()
+                        },
                         message: "apio_3g_get_run_error"
                     });
                 }
@@ -689,28 +873,63 @@ module.exports = function (libraries) {
                 wvdial.stderr.on("data", function (error) {
                     if (flag) {
                         flag = false;
-                        socketServer.emit("send_to_client", {
-                            data: error,
+                        // socketServer.emit("send_to_client", {
+                        //     data: error,
+                        //     message: "apio_3g_set_run_ok"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier(),
+                                data: error
+                            },
                             message: "apio_3g_set_run_ok"
                         });
                     }
                 });
 
                 wvdial.on("error", function (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "apio_3g_set_run_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: error
+                        },
                         message: "apio_3g_set_run_error"
                     });
                 });
             } else {
                 exec("pkill wvdial", function (error) {
                     if (error && error.killed !== false) {
-                        socketServer.emit("send_to_client", {
-                            data: error,
+                        // socketServer.emit("send_to_client", {
+                        //     data: error,
+                        //     message: "apio_3g_set_run_error"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier(),
+                                data: error
+                            },
                             message: "apio_3g_set_run_error"
                         });
                     } else {
-                        socketServer.emit("send_to_client", {
+                        // socketServer.emit("send_to_client", {
+                        //     message: "apio_3g_set_run_ok"
+                        // });
+
+                        Apio.Remote.socket.emit("send_to_client", {
+                            who: "networking",
+                            data: {
+                                apioId: Apio.System.getApioIdentifier()
+                            },
                             message: "apio_3g_set_run_ok"
                         });
                     }
@@ -721,8 +940,17 @@ module.exports = function (libraries) {
         Socket.on("apio_3g_status", function () {
             fs.readFile("/etc/rc.local", "utf8", function (error, content) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "apio_3g_status_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: error
+                        },
                         message: "apio_3g_status_error"
                     });
                 } else if (content) {
@@ -740,18 +968,43 @@ module.exports = function (libraries) {
 
                     fs.writeFile("/etc/rc.local", content.join("\n"), function (error1) {
                         if (error1) {
-                            socketServer.emit("send_to_client", {
-                                data: error1,
+                            // socketServer.emit("send_to_client", {
+                            //     data: error1,
+                            //     message: "apio_3g_status_error"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier(),
+                                    data: error1
+                                },
                                 message: "apio_3g_status_error"
                             });
                         } else {
-                            socketServer.emit("send_to_client", {
+                            // socketServer.emit("send_to_client", {
+                            //     message: "apio_3g_status_ok"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier()
+                                },
                                 message: "apio_3g_status_ok"
                             });
                         }
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
+                    // socketServer.emit("send_to_client", {
+                    //     message: "apio_3g_status_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier()
+                        },
                         message: "apio_3g_status_error"
                     });
                 }
@@ -761,8 +1014,17 @@ module.exports = function (libraries) {
         Socket.on("apio_hotspot_name", function (data) {
             fs.readFile("/etc/hostapd/hostapd.conf", "utf8", function (err, content) {
                 if (err) {
-                    socketServer.emit("send_to_client", {
-                        data: err,
+                    // socketServer.emit("send_to_client", {
+                    //     data: err,
+                    //     message: "apio_hotspot_name_error"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: err
+                        },
                         message: "apio_hotspot_name_error"
                     });
                 } else if (content) {
@@ -776,12 +1038,29 @@ module.exports = function (libraries) {
 
                     fs.writeFile("/etc/hostapd/hostapd.conf", content.join("\n"), function (error) {
                         if (error) {
-                            socketServer.emit("send_to_client", {
-                                data: error,
+                            // socketServer.emit("send_to_client", {
+                            //     data: error,
+                            //     message: "apio_hotspot_name_error"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier(),
+                                    data: error
+                                },
                                 message: "apio_hotspot_name_error"
                             });
                         } else {
-                            socketServer.emit("send_to_client", {
+                            // socketServer.emit("send_to_client", {
+                            //     message: "apio_hotspot_name_ok"
+                            // });
+
+                            Apio.Remote.socket.emit("send_to_client", {
+                                who: "networking",
+                                data: {
+                                    apioId: Apio.System.getApioIdentifier()
+                                },
                                 message: "apio_hotspot_name_ok"
                             });
                         }
@@ -791,7 +1070,8 @@ module.exports = function (libraries) {
         });
     });
 
-    http.listen(port, function () {
+    http.listen(port, "localhost", function () {
+    // http.listen(port, function () {
         console.log("Service networking correctly started on port " + port);
 
         var gc = require("./garbage_collector.js");

@@ -15,7 +15,6 @@
   },
   "protocol": "enocean",
   "services": [],
-  "sleepTime": 60000,
   "tag": "",
   "type": "object",
   "user": []

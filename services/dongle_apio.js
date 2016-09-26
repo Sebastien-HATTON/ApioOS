@@ -64,13 +64,13 @@ Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.h
 var app = express();
 var http = require("http").Server(app);
 
-app.use(function (req, res, next) {
-    res.header("Accept", "*");
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-    next();
-});
+// app.use(function (req, res, next) {
+//     res.header("Accept", "*");
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Methods", "GET, POST");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+//     next();
+// });
 
 app.use(bodyParser.json({
     limit: "50mb"
@@ -1310,6 +1310,13 @@ Apio.Serial.read = function (data) {
                 var o = {}
                 o.panId = data.properties[propertyName];
                 socketServer.emit("send_to_client", {
+                    apioId: Apio.System.getApioIdentifier(),
+                    data: o,
+                    message: "dongle_settings"
+                });
+
+                socketServer.emit("send_to_client", {
+                    who: "cloud",
                     data: o,
                     message: "dongle_settings"
                 });
@@ -1723,6 +1730,8 @@ socketServer.on("connection", function (Socket) {
                         objects[data.objectId].properties[p].value = data.properties[p];
                     }
                 }
+            } else {
+                console.log("RICEVUTO DA SOCKET: ", data);
             }
 
             Apio.Serial.send(data);
@@ -1752,6 +1761,7 @@ socketServer.on("connection", function (Socket) {
             if (err) {
                 ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
             } else if (doc) {
+                objects = {};
                 for (var i in doc) {
                     objects[doc[i].objectId] = doc[i];
                 }
@@ -1760,7 +1770,7 @@ socketServer.on("connection", function (Socket) {
     });
 });
 
-http.listen(port, function () {
+http.listen(port, "localhost", function () {
     ////console.log("...Start sh...");
     console.log("APIO Dongle Service correctly started on port ");
     Apio.Database.connect(function () {

@@ -55,7 +55,7 @@
   },
   "protocol": "enocean",
   "services": [],
-  "sleepTime": 60000,
+  "sleepTime": true,
   "tag": "",
   "type": "object"
 }

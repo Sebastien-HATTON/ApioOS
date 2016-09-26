@@ -676,18 +676,45 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("ask_wifi_status", function () {
             exec("service hostapd status | grep Active | awk '{print $2}'", function (error, stdout) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "get_wifi_status"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: error
+                        },
                         message: "get_wifi_status"
                     });
                 } else if (stdout.trim() === "active") {
-                    socketServer.emit("send_to_client", {
-                        data: "hotspot",
+                    // socketServer.emit("send_to_client", {
+                    //     data: "hotspot",
+                    //     message: "get_wifi_status"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: "hotspot"
+                        },
                         message: "get_wifi_status"
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
-                        data: "client",
+                    // socketServer.emit("send_to_client", {
+                    //     data: "client",
+                    //     message: "get_wifi_status"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: "client"
+                        },
                         message: "get_wifi_status"
                     });
                 }
@@ -697,8 +724,17 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("ask_wifi_ssids", function () {
             exec("iwlist wlan0 scan | grep ESSID | cut -d ':' -f2", function (error, stdout) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "get_wifi_ssids"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: error
+                        },
                         message: "get_wifi_ssids"
                     });
                 } else {
@@ -707,8 +743,17 @@ module.exports = function (libraries) {
                     if (arr[arr.length - 1] === "") {
                         arr.pop();
                     }
-                    socketServer.emit("send_to_client", {
-                        data: arr,
+                    // socketServer.emit("send_to_client", {
+                    //     data: arr,
+                    //     message: "get_wifi_ssids"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: arr
+                        },
                         message: "get_wifi_ssids"
                     });
                 }
@@ -718,17 +763,43 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("ask_wifi_currentSsid", function () {
             exec("iwgetid -r", function (error, stdout) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "get_wifi_currentSsid"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: error
+                        },
                         message: "get_wifi_currentSsid"
                     });
                 } else if (stdout) {
-                    socketServer.emit("send_to_client", {
-                        data: stdout,
+                    // socketServer.emit("send_to_client", {
+                    //     data: stdout,
+                    //     message: "get_wifi_currentSsid"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: stdout
+                        },
                         message: "get_wifi_currentSsid"
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
+                    // socketServer.emit("send_to_client", {
+                    //     message: "get_wifi_currentSsid"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud()
+                        },
                         message: "get_wifi_currentSsid"
                     });
                 }
@@ -738,8 +809,17 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("ask_3g_status", function () {
             fs.readFile("/etc/rc.local", "utf8", function (error, content) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "get_3g_status"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: error
+                        },
                         message: "get_3g_status"
                     });
                 } else if (content) {
@@ -748,20 +828,46 @@ module.exports = function (libraries) {
                         if (content[i].indexOf("wvdial") > -1) {
                             found = true;
                             if (content[i][0] === "#") {
-                                socketServer.emit("send_to_client", {
-                                    data: "disabled",
+                                // socketServer.emit("send_to_client", {
+                                //     data: "disabled",
+                                //     message: "get_3g_status"
+                                // });
+
+                                Apio.Remote.socket.emit("send_to_client", {
+                                    who: "networking",
+                                    data: {
+                                        apioId: Apio.System.getApioIdentifierCloud(),
+                                        data: "disabled"
+                                    },
                                     message: "get_3g_status"
                                 });
                             } else {
-                                socketServer.emit("send_to_client", {
-                                    data: "enabled",
+                                // socketServer.emit("send_to_client", {
+                                //     data: "enabled",
+                                //     message: "get_3g_status"
+                                // });
+
+                                Apio.Remote.socket.emit("send_to_client", {
+                                    who: "networking",
+                                    data: {
+                                        apioId: Apio.System.getApioIdentifierCloud(),
+                                        data: "enabled"
+                                    },
                                     message: "get_3g_status"
                                 });
                             }
                         }
                     }
                 } else {
-                    socketServer.emit("send_to_client", {
+                    // socketServer.emit("send_to_client", {
+                    //     message: "get_3g_status"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud()
+                        },
                         message: "get_3g_status"
                     });
                 }
@@ -771,8 +877,17 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("ask_3g_data", function () {
             fs.readFile("/etc/wvdial.conf", "utf8", function (error, content) {
                 if (error) {
-                    socketServer.emit("send_to_client", {
-                        data: error,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error,
+                    //     message: "get_3g_data"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: error
+                        },
                         message: "get_3g_data"
                     });
                 } else if (content) {
@@ -794,12 +909,29 @@ module.exports = function (libraries) {
                         }
                     }
 
-                    socketServer.emit("send_to_client", {
-                        data: obj,
+                    // socketServer.emit("send_to_client", {
+                    //     data: obj,
+                    //     message: "get_3g_data"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: obj
+                        },
                         message: "get_3g_data"
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
+                    // socketServer.emit("send_to_client", {
+                    //     message: "get_3g_data"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud()
+                        },
                         message: "get_3g_data"
                     });
                 }
@@ -809,13 +941,31 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("ask_hotspot_name", function () {
             exec("cat /etc/hostapd/hostapd.conf | grep ssid | cut -d '=' -f2", function (error, stdout, stderr) {
                 if (error || stderr) {
-                    socketServer.emit("send_to_client", {
-                        data: error || stderr,
+                    // socketServer.emit("send_to_client", {
+                    //     data: error || stderr,
+                    //     message: "get_hotspot_name"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: error || stderr
+                        },
                         message: "get_hotspot_name"
                     });
                 } else if (stdout) {
-                    socketServer.emit("send_to_client", {
-                        data: stdout,
+                    // socketServer.emit("send_to_client", {
+                    //     data: stdout,
+                    //     message: "get_hotspot_name"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "networking",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: stdout
+                        },
                         message: "get_hotspot_name"
                     });
                 }
@@ -829,18 +979,45 @@ module.exports = function (libraries) {
                 uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/getOpening")
             }, function (err, response, body) {
                 if (err || !response || Number(response.statusCode) !== 200) {
-                    socketServer.emit("send_to_client", {
-                        data: false,
+                    // socketServer.emit("send_to_client", {
+                    //     data: false,
+                    //     message: "get_dongle_opening"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: false
+                        },
                         message: "get_dongle_opening"
                     });
                 } else if (body) {
-                    socketServer.emit("send_to_client", {
-                        data: body,
+                    // socketServer.emit("send_to_client", {
+                    //     data: body,
+                    //     message: "get_dongle_opening"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: body
+                        },
                         message: "get_dongle_opening"
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
-                        data: false,
+                    // socketServer.emit("send_to_client", {
+                    //     data: false,
+                    //     message: "get_dongle_opening"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: false
+                        },
                         message: "get_dongle_opening"
                     });
                 }
@@ -854,8 +1031,17 @@ module.exports = function (libraries) {
                 message: "apio_serial_send"
             });
             socket.on("dongle_settings", function (data) {
-                socketServer.emit("send_to_client", {
-                    data: data,
+                // socketServer.emit("send_to_client", {
+                //     data: data,
+                //     message: "get_dongle_setting"
+                // });
+
+                Apio.Remote.socket.emit("send_to_client", {
+                    who: "dongle",
+                    data: {
+                        apioId: Apio.System.getApioIdentifierCloud(),
+                        data: data
+                    },
                     message: "get_dongle_setting"
                 });
                 socket.off("dongle_settings");
@@ -866,18 +1052,45 @@ module.exports = function (libraries) {
             fs.readdir("./services/apio_logic", function (error, files) {
                 if (error) {
                     console.log("Error while reading folder ./services/apio_logic: ", error);
-                    socketServer.emit("send_to_client", {
-                        data: [],
+                    // socketServer.emit("send_to_client", {
+                    //     data: [],
+                    //     message: "get_logics"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: []
+                        },
                         message: "get_logics"
                     });
                 } else if (files) {
-                    socketServer.emit("send_to_client", {
-                        data: files,
+                    // socketServer.emit("send_to_client", {
+                    //     data: files,
+                    //     message: "get_logics"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: files
+                        },
                         message: "get_logics"
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
-                        data: [],
+                    // socketServer.emit("send_to_client", {
+                    //     data: [],
+                    //     message: "get_logics"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: []
+                        },
                         message: "get_logics"
                     });
                 }
@@ -886,20 +1099,50 @@ module.exports = function (libraries) {
 
         Apio.Remote.socket.on("ask_logic_file", function (file) {
             fs.readFile("./services/apio_logic/" + file, function (error, content) {
+                console.log("@@@@@@@@@@@@@@@@@@@ask_logic_file@@@@@@@@@@@@@@@@@@@");
+                console.log("error: ", error);
+                console.log("content: ", content);
                 if (error) {
                     console.log("Error while reading file ./services/apio_logic/" + file + ": ", error);
-                    socketServer.emit("send_to_client", {
-                        data: "",
+                    // socketServer.emit("send_to_client", {
+                    //     data: "",
+                    //     message: "get_logic_file"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: ""
+                        },
                         message: "get_logic_file"
                     });
                 } else if (content) {
-                    socketServer.emit("send_to_client", {
-                        data: content,
+                    // socketServer.emit("send_to_client", {
+                    //     data: content,
+                    //     message: "get_logic_file"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: content
+                        },
                         message: "get_logic_file"
                     });
                 } else {
-                    socketServer.emit("send_to_client", {
-                        data: "",
+                    // socketServer.emit("send_to_client", {
+                    //     data: "",
+                    //     message: "get_logic_file"
+                    // });
+
+                    Apio.Remote.socket.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifierCloud(),
+                            data: ""
+                        },
                         message: "get_logic_file"
                     });
                 }
@@ -1740,12 +1983,12 @@ module.exports = function (libraries) {
     }
 
     log("Provo a partire");
-    app.use(function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        next();
-    });
+    // app.use(function (req, res, next) {
+    //     res.header("Access-Control-Allow-Origin", "*");
+    //     res.header("Access-Control-Allow-Methods", "GET, POST");
+    //     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    //     next();
+    // });
 
     app.use(bodyParser.json({
         limit: "50mb"
@@ -1828,7 +2071,8 @@ module.exports = function (libraries) {
         }
     });
 
-    http.listen(port, function () {
+    http.listen(port, "localhost", function () {
+    // http.listen(port, function () {
         log("APIO Cloud Service correctly started on port " + port);
         Apio.Database.connect(function () {
         });

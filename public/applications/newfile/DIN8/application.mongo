@@ -285,8 +285,7 @@
   },
   "protocol": "l",
   "services": [],
-  "sleepTime": 60000,
-  "tag": "#ufficio #sviluppoUfficio #apioWhite ",
+  "tag": "#apioWhite",
   "type": "object",
   "user": []
 }

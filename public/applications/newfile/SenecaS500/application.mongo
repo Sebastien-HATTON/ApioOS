@@ -85,7 +85,6 @@
   },
   "protocol": "l",
   "services": [],
-  "sleepTime": null,
   "tag": "",
   "type": "object"
 }

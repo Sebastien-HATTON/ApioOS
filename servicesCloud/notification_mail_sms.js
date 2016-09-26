@@ -2862,6 +2862,7 @@ app.post("/apio/sms/updateProperties", function (req, res) {
 });
 //AGGIUNTA SMS FINE
 
-http.listen(port, function () {
+http.listen(port, "localhost", function () {
+// http.listen(port, function () {
     console.log("APIO Notification Service correctly started on port " + port);
 });
