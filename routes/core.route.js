@@ -988,27 +988,33 @@ module.exports = function (Apio) {
                             if (err_c) {
                                 res.status(200).send(false);
                             } else if (lastCommit) {
-                                fs.stat(".git/" + ref_file, function (err_s, stats) {
-                                    if (err_s) {
+                                exec("git show -s --format=%ci", function (error_g, date) {
+                                    if (error_g) {
                                         res.status(200).send(false);
-                                    } else if (stats) {
-                                        var date = stats.mtime;
+                                    } else if (date) {
+                                        date = new Date(date);
                                         console.log("date: ", date);
                                         console.log("lastCommit: ", lastCommit);
-                                        fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
-                                            return res.text();
-                                        }).then(function (body) {
-                                            var remoteCommit = JSON.parse(body);
-                                            console.log("remoteCommit.commit: ", remoteCommit.commit);
-                                            remoteCommit.date = new Date(remoteCommit.apioOs);
-                                            console.log("remoteCommit.date: ", remoteCommit.date);
-
-                                            if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
-                                                res.status(200).send(true);
-                                            } else {
-                                                res.status(200).send(false);
-                                            }
-                                        });
+                                        var fetch_fn = function () {
+                                            fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
+                                                return res.text();
+                                            }).then(function (body) {
+                                                var remoteCommit = JSON.parse(body);
+                                                console.log("remoteCommit.commit: ", remoteCommit.commit);
+                                                remoteCommit.date = new Date(remoteCommit.apioOs);
+                                                console.log("remoteCommit.date: ", remoteCommit.date);
+                                                if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
+                                                    res.status(200).send(true);
+                                                } else {
+                                                    res.status(200).send(false);
+                                                }
+                                            }).catch(function (err) {
+                                                console.log("Caught error while fetching: ", err);
+                                                console.log("Trying to fetch again");
+                                                fetch_fn();
+                                            });
+                                        };
+                                        fetch_fn();
                                     } else {
                                         res.status(200).send(false);
                                     }
