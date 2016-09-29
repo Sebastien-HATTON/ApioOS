@@ -984,33 +984,41 @@ module.exports = function (Apio) {
                             version_file = "version_" + ref_file_components[ref_file_components.length - 1] + ".json";
                         }
 
-                        exec("git show -s --format=%ci", function (error_g, date) {
-                            if (error_g) {
+                        fs.readFile(".git/" + ref_file, "utf8", function (err_c, lastCommit) {
+                            if (err_c) {
                                 res.status(200).send(false);
-                            } else if (date) {
-                                date = new Date(date);
-                                console.log("date: ", date);
-                                console.log("lastCommit: ", lastCommit);
-                                var fetch_fn = function () {
-                                    fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
-                                        return res.text();
-                                    }).then(function (body) {
-                                        var remoteCommit = JSON.parse(body);
-                                        console.log("remoteCommit.commit: ", remoteCommit.commit);
-                                        remoteCommit.date = new Date(remoteCommit.apioOs);
-                                        console.log("remoteCommit.date: ", remoteCommit.date);
-                                        if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
-                                            res.status(200).send(true);
-                                        } else {
-                                            res.status(200).send(false);
-                                        }
-                                    }).catch(function (err) {
-                                        console.log("Caught error while fetching: ", err);
-                                        console.log("Trying to fetch again");
+                            } else if (lastCommit) {
+                                exec("git show -s --format=%ci", function (error_g, date) {
+                                    if (error_g) {
+                                        res.status(200).send(false);
+                                    } else if (date) {
+                                        date = new Date(date);
+                                        console.log("date: ", date);
+                                        console.log("lastCommit: ", lastCommit);
+                                        var fetch_fn = function () {
+                                            fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
+                                                return res.text();
+                                            }).then(function (body) {
+                                                var remoteCommit = JSON.parse(body);
+                                                console.log("remoteCommit.commit: ", remoteCommit.commit);
+                                                remoteCommit.date = new Date(remoteCommit.apioOs);
+                                                console.log("remoteCommit.date: ", remoteCommit.date);
+                                                if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
+                                                    res.status(200).send(true);
+                                                } else {
+                                                    res.status(200).send(false);
+                                                }
+                                            }).catch(function (err) {
+                                                console.log("Caught error while fetching: ", err);
+                                                console.log("Trying to fetch again");
+                                                fetch_fn();
+                                            });
+                                        };
                                         fetch_fn();
-                                    });
-                                };
-                                fetch_fn();
+                                    } else {
+                                        res.status(200).send(false);
+                                    }
+                                });
                             } else {
                                 res.status(200).send(false);
                             }
