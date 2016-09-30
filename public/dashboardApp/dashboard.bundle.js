@@ -499,42 +499,6 @@ ApioDashboardApplication.controller("ApioDashboardGeneralController", ["$scope",
         });
     };
 
-    $scope.shutdown = function () {
-        console.log("shutdown");
-        sweet.show({
-            title: "Are you sure?.",
-            text: "The system will be shutdown",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: "btn-warning",
-            cancelButtonClass: "btn-info",
-            confirmButtonText: "Yes",
-            cancelButtonText: "No",
-            closeOnConfirm: false,
-            closeOnCancel: true
-        }, function (isConfirm) {
-            if (isConfirm) {
-                $http.get("/apio/shutdown").success(function (data, status, header) {
-                    console.log("success()");
-                    sweet.show({
-                        title: "Done!",
-                        text: "The system will be shutdown now",
-                        type: "success",
-                        showCancelButton: false,
-                        confirmButtonClass: "btn-success",
-                        confirmButtonText: "Ok",
-                        closeOnConfirm: true
-                    }, function () {
-                        $state.go($state.current, {}, {reload: true});
-                    });
-
-                }).error(function (data, status, header) {
-                    console.log("failure()");
-                });
-            }
-        });
-    };
-
     $scope.pageHooks = {
         Events: function () {
             $http.get("/apio/event").success(function (data) {

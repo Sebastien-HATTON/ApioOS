@@ -19,6 +19,10 @@
     <div ng-controller="defaultController">
         <topappapplication></topappapplication>
         <div id="app" style="display: block;">
+            <collapse propertyName="moreInfo" label="More Info">
+                <uploadimage propertyname="img" label="Immagine"></uploadimage>
+                <note propertyName="note" label="Note"></note>
+            </collapse>
             <graph graphname="analytics" plot="TotalEnergy" type="avg-15"></graph>
             <unlimitedsensor propertyname="TotalEnergy" label="Energia Totale [KW/h]"></unlimitedsensor>
             <unlimitedsensor propertyname="Status" label="Stato Inverter"></unlimitedsensor>

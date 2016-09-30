@@ -18,6 +18,7 @@
  *                                                                          *
  ****************************************************************************/
 
+var fs = require("fs");
 var mysql = require("mysql");
 var validator = require("validator");
 module.exports = function (Apio) {
@@ -192,6 +193,73 @@ module.exports = function (Apio) {
                 }
             });
         },
+        reverseChanges: function (req, res) {
+            var applicationPath = Apio.Configuration.type === "gateway" ? "public/applications/" + req.body.objectId + "/" + req.body.objectId + ".html" : "public/boards/" + req.session.apioId + "/" + req.body.objectId + "/" + req.body.objectId + ".html";
+            fs.readFile(applicationPath, "utf8", function (error, content) {
+                if (error) {
+                    res.status(500).send(error);
+                } else if (content) {
+                    content = content.split("<");
+
+                    //Adjustment for possible attributes containing "<" as value
+                    for (var i = 0; i < content.length; i++) {
+                        if (content[i].indexOf(">") === -1) {
+                            content[i] += "<" + content[i + 1];
+                            content.splice(i + 1, 1);
+                        }
+                    }
+
+                    for (var p in req.body.properties) {
+                        for (var x in content) {
+                            if (content[x].toLowerCase().indexOf("propertyname=\"" + req.body.properties[p].property + "\"") > -1) {
+                                for (var u in req.body.properties[p]) {
+                                    if (u !== "graph" && u !== "hi" && u !== "type" && u !== "value") {
+                                        var startIndex = content[x].toLowerCase().indexOf(u + "=") + (u + "=").length + 1;
+                                        var endIndex = content[x].toLowerCase().indexOf("\"", startIndex);
+                                        var prevValue = content[x].substring(startIndex, endIndex);
+                                        content[x] = content[x].replace(u + "=\"" + prevValue + "\"", u + "=\"" + req.body.properties[p][u] + "\"");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    fs.writeFile(applicationPath, content.join("<"), function (error_w) {
+                        if (error_w) {
+                            res.status(500).send(error_w);
+                        } else {
+                            var servicesKeys = Object.keys(Apio.servicesSocket);
+                            servicesKeys.forEach(function (service) {
+                                Apio.servicesSocket[service].emit("update_collections");
+                            });
+
+                            var emitObj = {
+                                apioId: req.session.apioId,
+                                objectId: req.body.objectId,
+                                properties: {}
+                            };
+
+                            for (var p in req.body.properties) {
+                                emitObj.properties[p] = req.body.properties[p].value;
+                            }
+
+                            for (var e in Apio.connectedSockets) {
+                                if (e === "admin" || validator.isEmail(e)) {
+                                    var socketIds = Apio.connectedSockets[e];
+                                    for (var i in socketIds) {
+                                        if (req.session.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                            Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", emitObj);
+                                        }
+                                    }
+                                }
+                            }
+
+                            res.sendStatus(200);
+                        }
+                    });
+                }
+            });
+        },
         modify: function (req, res) {
             var object = typeof req.body.object === "string" ? JSON.parse(req.body.object) : req.body.object;
             object.objectId = req.params.id;
@@ -201,7 +269,6 @@ module.exports = function (Apio) {
                 if (err) {
                     console.log("Error while modifying object with objectId " + object.objectId);
                     res.status(500).send();
-
                 } else {
                     console.log("Object with objectId " + object.objectId + " successfully modified");
                     res.status(200).send({update: false});
@@ -213,8 +280,14 @@ module.exports = function (Apio) {
                             var socketIds = Apio.connectedSockets[x];
                             for (var i in socketIds) {
                                 if (req.session.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
-                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_refresh", {apioId: req.session.apioId, objectId: req.params.id});
-                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", {apioId: req.session.apioId, objectId: req.params.id});
+                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_refresh", {
+                                        apioId: req.session.apioId,
+                                        objectId: req.params.id
+                                    });
+                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", {
+                                        apioId: req.session.apioId,
+                                        objectId: req.params.id
+                                    });
                                 }
                             }
                         }

@@ -20,83 +20,99 @@
 
 //var Nightmare = require("nightmare");
 var exec = require("child_process").exec;
-var fs = require("fs");
+var fs = require("fs-extra");
 var request = require("request");
-var formidable = require('formidable');
+var formidable = require("formidable");
 var validator = require("validator");
-var fetch = require('node-fetch');
+var fetch = require("node-fetch");
 module.exports = function (Apio) {
     return {
         manageDriveFile: function (req, res) {
             //in case of request from to cloud
-            console.log('********* REQ manageDriveFile *********');
+            console.log("********* REQ manageDriveFile *********");
             var url = undefined;
-            var newPath = '';
-            var oldPath = '';
-            var imageName = '';
-            var imageType = '';
-            url = "public/users/" + req.session.email + '/temp';
-            console.log('URL FOMRIDABLE ', "public/users/" + req.session.email + '/temp');
-            //ATTENTION!!! rendere asyncrono le operazioni di fs e innestare le callback di conseguenza
-            if (!fs.existsSync(url)) {
-                fs.mkdirSync(url);
-            }
-
-
-            //res.writeHead(200, {'Content-Type': 'application/json'});
-            res.setHeader("Content-Type", "application/json");
-            var form = new formidable.IncomingForm();
-            form.uploadDir = url;
-            form.keepExtensions = true;
-
-            form.parse(req, function (err, fields, files) {
-                console.log('file uploaded: ', files);
-                console.log('fields uploaded: ', fields);
-                if (err) {
+            var newPath = "";
+            var oldPath = "";
+            var imageName = "";
+            var imageType = "";
+            url = "public/users/" + req.session.email + "/temp";
+            console.log("URL FOMRIDABLE ", "public/users/" + req.session.email + "/temp");
+            fs.mkdirs(url, function (err_m1) {
+                if (err_m1) {
                     res.status(500).send(true);
                 } else {
-                    newPath = 'public/' + fields.uploadPath;
-                    oldPath = files.file.path;
-                    imageName = fields.imageName;
+                    res.setHeader("Content-Type", "application/json");
+                    var form = new formidable.IncomingForm();
+                    form.uploadDir = url;
+                    form.keepExtensions = true;
 
-                    var tmpType = files.file.type.split('/');
-                    imageType = tmpType[1];
-                }
-            });
+                    form.parse(req, function (err, fields, files) {
+                        console.log("file uploaded: ", files);
+                        console.log("fields uploaded: ", fields);
+                        if (err) {
+                            res.status(500).send(true);
+                        } else {
+                            newPath = "public/" + fields.uploadPath;
+                            oldPath = files.file.path;
+                            imageName = fields.imageName;
 
-            form.on('file', function (name, file) {
-                console.log("END UPLOAD FILE ", name, file);
-
-            });
-            form.on('end', function () {
-                console.log('END UPLOAD');
-                console.log(oldPath);
-                console.log(newPath);
-                if (!fs.existsSync(newPath)) {
-                    console.log('******** MAKE A PATH IN OBJECT ********')
-                    fs.mkdirSync(newPath);
-                }
-                if (fs.existsSync(newPath + '/' + imageName + '.' + imageType)) {
-                    fs.unlinkSync(newPath + '/' + imageName + '.' + imageType)
-                }
-
-                fs.renameSync(oldPath, newPath + '/' + imageName + '.' + imageType);
-                exec("sudo chown -R azureuser:azureuser .", function (err) {
-                    if (err) {
-                        res.status(500).send(true);
-                    } else {
-                        res.status(200).send(true);
-                        if (fs.existsSync(oldPath)) {
-                            fs.unlinkSync(oldPath);
+                            var tmpType = files.file.type.split("/");
+                            imageType = tmpType[1];
                         }
-                    }
-                });
+                    });
 
+                    form.on("file", function (name, file) {
+                        console.log("END UPLOAD FILE ", name, file);
+                    });
 
+                    form.on("end", function () {
+                        console.log("END UPLOAD");
+                        console.log(oldPath);
+                        console.log(newPath);
+                        fs.mkdirs(newPath, function (err_m2) {
+                            if (err_m2) {
+                                res.status(500).send(true);
+                            } else {
+                                fs.stat(newPath + "/" + imageName + "." + imageType, function (err_s, stats) {
+                                    var final = function () {
+                                        fs.rename(oldPath, newPath + "/" + imageName + "." + imageType, function (err_r) {
+                                            if (err_r) {
+                                                res.status(500).send(true);
+                                            } else {
+                                                fs.stat(oldPath, function (err_s2, stats2) {
+                                                    if (err_s2) {
+                                                        res.status(200).send(true);
+                                                    } else if (stats2) {
+                                                        fs.unlink(oldPath, function (err_u2) {
+                                                            if (err_u2) {
+                                                                res.status(500).send(true)
+                                                            } else {
+                                                                res.status(200).send(true);
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    };
+
+                                    if (err_s) {
+                                        final();
+                                    } else if (stats) {
+                                        fs.unlink(newPath + "/" + imageName + "." + imageType, function (err) {
+                                            if (err) {
+                                                res.status(500).send(true)
+                                            } else {
+                                                final();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
             });
-
-
-            //build the case of gateway
         },
         getBindToProperty: function (req, res) {
             Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (error, obj) {
