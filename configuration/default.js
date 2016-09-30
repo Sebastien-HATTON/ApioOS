@@ -95,7 +95,7 @@ module.exports = {
     },
     remote: {
         enabled: true,
-        uri: "http://apio-dev-disa.cloudapp.net"
+        uri: "http://www.apio.cloud"
     },
     serial: {
         baudrate: 115200,
