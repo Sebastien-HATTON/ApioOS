@@ -975,7 +975,7 @@ Apio.Serial.sendInterval = function () {
         for (var i = 0; i < Apio.Serial.verifyQueue.length; i++) {
             if (Apio.Serial.verifyQueue[i] !== null) {
                 //if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].timestamp >= 1500) {
-                if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].processTime >= 800 && ts - Apio.Serial.verifyQueue[i].timestamp < 60 * 1000) {
+                if (Apio.Serial.verifyQueue[i] !== undefined && ts - Apio.Serial.verifyQueue[i].processTime >= 300 && ts - Apio.Serial.verifyQueue[i].timestamp < 30 * 1000) {
                     //Apio.Serial.queue.push(Apio.Serial.verifyQueue.splice(i--, 1)[0].message);
                     //////////console.log("Apio.Serial.verifyQueue[i]: ", Apio.Serial.verifyQueue[i]);
                     var message = Apio.Serial.verifyQueue[i].message.split(":");
@@ -1028,7 +1028,7 @@ Apio.Serial.sendInterval = function () {
                     //} else {
 
                     //}
-                } else if (ts - Apio.Serial.verifyQueue[i].timestamp > 60 * 1000) {
+                } else if (ts - Apio.Serial.verifyQueue[i].timestamp > 30 * 1000) {
                     Apio.Serial.verifyQueue[i] = null;
                 }
             } else {
