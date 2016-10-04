@@ -869,6 +869,7 @@ d.run(function () {
     app.patch("/apio/object/:id", routes.objects.update);
     app.put("/apio/object/:id", routes.objects.update);
     app.put("/apio/modifyObject/:id", routes.objects.modify);
+    app.post("/apio/object/reverseChanges", routes.objects.reverseChanges);
     app.post("/apio/object/addNotification", routes.objects.addNotification);
     app.get("/apio/object/:obj", routes.objects.requireOne);
     app.get("/apio/objects", routes.objects.listAll);

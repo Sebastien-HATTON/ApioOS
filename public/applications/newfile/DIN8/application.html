@@ -35,6 +35,10 @@
     <div ng-controller="defaultController">
         <topappapplication></topappapplication>
         <div id="app" style="display: block;">
+            <collapse propertyName="moreInfo" label="More Info">
+                <uploadimage propertyname="img" label="Immagine"></uploadimage>
+                <note propertyName="note" label="Note"></note>
+            </collapse>
             <collapse label="+ RS485" propertyname="rs485">
                 <md-toolbar style="background-color: #009688;">
                     <div class="md-toolbar-tools">

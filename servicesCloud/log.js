@@ -268,9 +268,9 @@ app.get("/apio/log/exportXLSX", function (req, res) {
                 }
             }
 
-            sql_db.query("SELECT * FROM `" + req.params.objectId + "_" + req.query.apioId + "` ORDER BY timestamp DESC LIMIT 0, " + (50 * 250), function (error, result) {
+            sql_db.query("SELECT * FROM `" + req.query.objectId + "_" + req.query.apioId + "` ORDER BY timestamp DESC LIMIT 0, " + (50 * 250), function (error, result) {
                 if (error) {
-                    console.log("Error while getting logs from table " + req.params.objectId + "_" + req.query.apioId + ": ", error);
+                    console.log("Error while getting logs from table " + req.query.objectId + "_" + req.query.apioId + ": ", error);
                 } else {
                     var obj = {};
                     for (var i in result) {

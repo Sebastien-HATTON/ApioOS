@@ -30,102 +30,86 @@ apioProperty.directive("uploadimage", ["currentObject", "socket", "$http", "File
         compile: function () {
             return {
                 pre: function (scope, elem, attrs) {
-
-                    var uploadOptions = scope.uploadOptions = {cazzo: "figa"}
                     scope.showProgressBarUploadImag = false;
                     scope.progressBarUploadImag = 0;
 
                     var uploader = scope.uploader = new FileUploader({
-                        url: '/apio/manage/file',
+                        url: "/apio/manage/file",
                         autoUpload: true,
                         removeAfterUpload: true
-                        //formData : [{cazzo : 'figa'}]
                     });
-
                 },
                 // link
                 post: function (scope, elem, attrs) {
-
-
                     scope.changeImmage = function () {
-                        $('#' + scope.propertyname + 'imageChange').trigger('click');
-                    }
+                        $("#" + scope.propertyname + "imageChange").trigger("click");
+                    };
 
                     scope.deleteImmage = function () {
-                        scope.object.properties[scope.propertyname] = '0';
-                        scope.model = '0';
+                        scope.object.properties[scope.propertyname] = "0";
+                        scope.model = "0";
                         console.log("scope.model: ", scope.model);
                         currentObject.update(scope.propertyname, scope.model, true, false);
-                    }
+                    };
 
                     scope.object = currentObject.get();
                     //Inizializzo la proprietà con i dati memorizzati nel DB
                     scope.propertyname = attrs.propertyname;
                     scope.label = attrs["label"];
-                    scope.uploadPath = attrs["url"]
 
                     if (scope.object.properties[scope.propertyname]) {
                         scope.model = scope.object.properties[scope.propertyname].replace(",", ".");
                     }
+
                     $http.get("/apio/getPlatform").success(function (data) {
                         if (data.type == "gateway") {
                             scope.object.apioId = data.apioId;
                         }
-                        if (data.type == "cloud") {
-                        }
-
                     });
                     scope.currentObject = currentObject;
 
-                    if (attrs.hasOwnProperty('path')) {
-                        scope.path = attrs['path']
-                    } else {
-                        console.log('+++++++ scope.path +++++++');
-                        console.log(scope.object.objectId);
-
-                        scope.path = 'boards/' + scope.object.apioId + '/' + scope.object.objectId + '/filesUpload';
-                    }
-
                     scope.uploader.onAfterAddingFile = function (item) {
-
-                        //var formData = [{cazzo : 'figa'}]
-                        //item.formData.push({path: scope.path + item._file.name});
-                        scope.path = 'boards/' + scope.object.apioId + '/' + scope.object.objectId + '/filesUpload';
-                        console.log('onAfterAddingFile', item);
+                        scope.path = "boards/" + scope.object.apioId + "/" + scope.object.objectId + "/filesUpload";
+                        console.log("onAfterAddingFile", item);
                         item.formData.push({uploadPath: String(scope.path), imageName: scope.propertyname});
-                        var tempType = item.file.type.split('/');
-                        scope.path = scope.path + '/' + scope.propertyname + '.' + tempType[1];
-                        console.log('onBeforeUploadItem', item);
+                        var tempType = item.file.type.split("/");
+                        scope.path = scope.path + "/" + scope.propertyname + "." + tempType[1];
+                        console.log("onBeforeUploadItem", item);
                         scope.showProgressBarUploadImag = true;
                     };
 
                     scope.uploader.onProgressAll = function (progress) {
-                        console.info('onProgressAll', progress);
+                        console.info("onProgressAll", progress);
                         scope.progressBarUploadImag = progress;
                         if (progress === 100) {
                             scope.progressBarUploadImag = 110;
-
                         }
                     };
 
                     scope.uploader.onCompleteItem = function (fileItem, response, status, headers) {
-                        console.info('onCompleteItem', fileItem, response, status, headers);
+                        console.info("onCompleteItem", fileItem, response, status, headers);
                         scope.showProgressBarUploadImag = false;
                         scope.object.properties[scope.propertyname] = scope.path;
-                        scope.model = scope.path;
+                        scope.model = scope.path + "?decache=" + Math.random();
+                        if (!scope.$$phase) {
+                            scope.$apply();
+                        }
                         console.log("scope.model: ", scope.model);
                         currentObject.update(scope.propertyname, scope.model, true, false);
                     };
 
                     scope.isRecorded = function () {
                         return scope.currentObject.record(scope.propertyname);
-                    }
+                    };
+
                     scope.addPropertyToRecording = function () {
                         scope.currentObject.record(scope.propertyname, scope.model);
-                    }
+                    };
+
                     scope.removePropertyFromRecording = function () {
                         scope.currentObject.removeFromRecord(scope.propertyname);
-                    }
+                    };
+
                     //Serve per il cloud: aggiorna in tempo reale il valore di una proprietà che è stata modificata da un"altro utente
                     socket.on("apio_server_update", function (data) {
                         if (data.apioId === scope.object.apioId && data.objectId === scope.object.objectId && currentObject.isRecording() == false) {
@@ -137,28 +121,22 @@ apioProperty.directive("uploadimage", ["currentObject", "socket", "$http", "File
                                     $property = {
                                         name: scope.propertyname,
                                         value: data.properties[scope.propertyname]
-                                    }
+                                    };
                                     var fn = scope.$parent[attrs["push"]];
                                     if (typeof fn === "function") {
                                         var params = [$property];
                                         fn.apply(scope.$parent, params);
-                                    }
-                                    else {
+                                    } else {
                                         throw new Error("The Push attribute must be a function name present in scope")
                                     }
-                                }
-                                else {
+                                } else {
                                     scope.model = data.properties[scope.propertyname].replace(",", ".");
                                 }
-                                //In particolare questa parte aggiorna il cloud nel caso siano state definite delle correlazioni
-                                /*if(attrs["correlation"]){
-                                 scope.$parent.$eval(attrs["correlation"]);
-                                 }*/
-                                //
                             }
                         }
                     });
                     //
+
                     socket.on("apio_server_update_", function (data) {
                         if (data.objectId === scope.object.objectId && !scope.currentObject.isRecording()) {
                             scope.model = data.properties[scope.propertyname].replace(",", ".");
@@ -168,7 +146,6 @@ apioProperty.directive("uploadimage", ["currentObject", "socket", "$http", "File
                     scope.$on("propertyUpdate", function () {
                         scope.object = currentObject.get();
                     });
-
                     //
 
                     var event = attrs["event"] ? attrs["event"] : "mouseup touchend";
@@ -177,8 +154,6 @@ apioProperty.directive("uploadimage", ["currentObject", "socket", "$http", "File
                         scope.object.properties[scope.propertyname] = scope.model;
                         //
                         if (!currentObject.isRecording()) {
-
-
                             //Se è stato definito un listener da parte dell'utente lo eseguo altrimenti richiamo currentObject.update che invia i dati al DB e alla seriale
                             if (attrs["listener"]) {
                                 scope.$parent.$eval(attrs["listener"]);
@@ -192,10 +167,6 @@ apioProperty.directive("uploadimage", ["currentObject", "socket", "$http", "File
                             if (attrs["correlation"]) {
                                 scope.$parent.$eval(attrs["correlation"]);
                             }
-
-                            //Esegue codice javascript contenuto nei tag angular; dovendo modificare i valori dell'input bisogna dare a scope.$apply la funzione read
-                            //scope.$apply(read);
-                            //
                         }
                     });
                     //

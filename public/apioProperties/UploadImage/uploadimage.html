@@ -20,29 +20,23 @@
     ---------------------------------------------------------------------------->
 
     <link type="text/css" rel="stylesheet" href="apioProperties/UploadImage/uploadimage.css"/>
-    <div style="display:table; width:100%;">
-        <div id="{{propertyname}}label" class="testo_proprietaiPhone" style="cursor:pointer;" ng-click="changeImmage()">
+    <div style="display: table; width: 100%;">
+        <div id="{{propertyname}}label" class="testo_proprietaiPhone" style="cursor: pointer;" ng-click="changeImmage()">
             {{label}}
         </div>
         <div>
-            <input id="{{propertyname}}imageChange" nv-file-select options="uploadOptions" uploader="uploader" class=""
-                   type="file" style="display:none;">
-            <div class="glyphicon glyphicon-picture" style="float:right;font-size: 20px; line-height: 40px;"
+            <input id="{{propertyname}}imageChange" nv-file-select uploader="uploader" type="file" style="display: none;">
+            <div class="glyphicon glyphicon-picture" style="float: right; font-size: 20px; line-height: 40px;"
                  ng-show="model == '0' && !showProgressBarUploadImag" ng-click="changeImmage()"></div>
 
             <md-progress-circular md-mode="determinate" value="{{progressBarUploadImag}}"
                                   ng-show="showProgressBarUploadImag" style="float: right;"></md-progress-circular>
-
-            <div class="glyphicon glyphicon-remove" style="float:right;font-size: 20px; line-height: 40px;"
+            <div class="glyphicon glyphicon-remove" style="float: right; font-size: 20px; line-height: 40px;"
                  ng-show="model != '0' && !showProgressBarUploadImag" ng-click="deleteImmage()"></div>
         </div>
     </div>
-    <!--<div id="{{propertyname}}image"  ng-model="model" ng-show="model != 0" style="width:100%; float:none; min-height: 200px; display: table-row;">
-        <img src="{{model}}">
-    </div>-->
-
     <div id="{{propertyname}}image" ng-model="model" ng-show="model != '0' && !showProgressBarUploadImag"
          class="imgUpload" ng-click="changeImmage()">
-        <img src="{{model}}" style="width:100%;">
+        <img ng-src="{{model}}" style="width: 100%;">
     </div>
 </div>

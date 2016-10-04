@@ -94,9 +94,53 @@
     - visit <http://www.gnu.org/licenses/gpl2.txt>                              -
     -                                                                           -
     ---------------------------------------------------------------------------->
+    <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="propertiesModal"
+         class="modal fade">
+        <div class="modal-dialog" style="width: fit-content;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Modify Apio Application Properties</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-responsive table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th>Propertyname</th>
+                            <th>Label on</th>
+                            <th>Label off</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="v in modificationData" ng-if="v.type === 'number' || v.type === 'sensor' || v.type === 'slider' || v.type === 'text' || v.type === 'trigger' || v.type === 'unlimitedsensor' || v.type === 'asyncdisplay'">
+                            <td>{{v.property}}</td>
+                            <td ng-if="v.hasOwnProperty('labelon') && v.hasOwnProperty('labeloff') && !v.hasOwnProperty('label')"><input type="text" ng-model="v.labelon"/></td>
+                            <td ng-if="v.hasOwnProperty('labelon') && v.hasOwnProperty('labeloff') && !v.hasOwnProperty('label')"><input type="text" ng-model="v.labeloff"/></td>
+                            <td ng-if="!v.hasOwnProperty('labelon') && !v.hasOwnProperty('labeloff') && v.hasOwnProperty('label')"><input type="text" ng-model="v.label"/></td>
+                            <td ng-if="!v.hasOwnProperty('labelon') && !v.hasOwnProperty('labeloff') && v.hasOwnProperty('label')"><input type="text" ng-model="v.label"/></td>
+                            <td><input type="text" ng-model="v.value"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger" aria-label="Cancel"
+                                ng-click="abortNewProperties()" style="font-weight: 300;">
+                            <i class="fa fa-times" aria-hidden="true"></i> <span class="hidden-xs">Cancel</span>
+                        </button>
+                        <button type="button" class="btn btn-success" aria-label="Save"
+                                ng-click="saveNewProperties()" style="font-weight: 300;">
+                            <i class="fa fa-times" aria-hidden="true"></i> <span class="hidden-xs">Save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="appModal" class="modal fade">
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width: fit-content;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" data-dismiss="modal" class="close">
@@ -161,9 +205,14 @@
                                     style="font-weight: 300;">
                                 <i class="fa fa-cog" aria-hidden="true"></i> <span class="hidden-xs">Settings</span>
                             </button>
-                            <button type="button" class="btn btn-default" aria-label="Edit App"
+                            <button type="button" class="btn btn-default" aria-label="Edit App Properties"
+                                    ng-click="modifyApioApplicationProperties()">
+                                <i class="fa fa-edit" aria-hidden="true"></i> <span class="hidden-xs">Edit App Properties</span>
+                            </button>
+                            <button type="button" class="btn btn-default" aria-label="Edit App Code"
                                     ng-click="modifyApioApplication()">
-                                <i class="fa fa-edit" aria-hidden="true"></i> <span class="hidden-xs">Edit App</span>
+                                <i class="fa fa-edit" aria-hidden="true"></i> <span
+                                    class="hidden-xs">Edit App Code</span>
                             </button>
                             <button type="button" class="btn btn-default" aria-label="Export Apio App"
                                     ng-click="exportApioApplication()">

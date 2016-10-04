@@ -291,6 +291,58 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardLaunchContro
         });
     };
 
+    $scope.modifyApioApplicationProperties = function () {
+        $("#appModal").modal("hide");
+        $("#propertiesModal").modal();
+        $scope.modificationData = [];
+        for (var p in $scope.currentApplication.properties) {
+            var temp = {
+                property: p
+            };
+
+            for (var o in $scope.currentApplication.properties[p]) {
+                temp[o] = $scope.currentApplication.properties[p][o];
+            }
+
+            $scope.modificationData.push(temp);
+        }
+    };
+
+    $scope.abortNewProperties = function () {
+        $("#propertiesModal").modal("hide");
+        $scope.modificationData = [];
+    };
+
+    $scope.saveNewProperties = function () {
+        var modData = {};
+        for (var f in $scope.modificationData) {
+            for (var h in $scope.modificationData[f]) {
+                if (h !== "property" && h !== "$$hashKey") {
+                    if (!modData.hasOwnProperty($scope.modificationData[f].property)) {
+                        modData[$scope.modificationData[f].property] = {};
+                    }
+
+                    modData[$scope.modificationData[f].property][h] = $scope.modificationData[f][h];
+                }
+            }
+        }
+
+        $http.put("/apio/modifyObject/" + $scope.currentApplication.objectId, {object: {properties: modData}}).success(function () {
+            console.log("Object " + $scope.currentApplication.objectId + " successfully modified");
+            $http.post("/apio/object/reverseChanges", {
+                properties: modData,
+                objectId: $scope.currentApplication.objectId
+            }).success(function () {
+                console.log("HTML file successfully written");
+                $scope.currentApplication.properties = modData;
+            }).error(function (error) {
+                console.log("Error while written file: ", error);
+            });
+        }).error(function (error) {
+            console.log("Error while modifying object " + $scope.currentApplication.objectId + " : ", error);
+        });
+    };
+
     $scope.modifyApioApplication = function () {
         console.log("Modifying the application " + $scope.currentApplication.objectId);
         //$scope.ino = "";
