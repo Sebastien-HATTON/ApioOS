@@ -723,12 +723,17 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                 });
             }, 500);
         } else if (configuration.type === "gateway") {
+            var lastOffline = undefined;
             setInterval(function () {
                 if (Apio.socket.connected === false && Apio.socket.disconnected === true) {
                     if (!$scope.systemOffline) {
                         $scope.systemOffline = true;
                         if (!$scope.$$phase) {
                             $scope.$apply();
+                        }
+
+                        if (lastOffline === undefined) {
+                            lastOffline = new Date();
                         }
                     }
                 } else {
@@ -738,9 +743,13 @@ ApioApplication.controller("ApioMainController", ["$scope", "$http", "socket", "
                             $scope.$apply();
                         }
 
-                        setTimeout(function () {
-                            $window.location = "/";
-                        }, 500);
+                        if (lastOffline && new Date() - lastOffline >= 5 * 60 * 1000) {
+                            setTimeout(function () {
+                                $window.location = "/";
+                            }, 500);
+                        }
+
+                        lastOffline = undefined;
                     }
                 }
             }, 500);
