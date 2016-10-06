@@ -1410,7 +1410,7 @@ Apio.Serial.read = function (data) {
                     if (isLogSocketConnected) {
                         logSocket.emit("log_update", data);
                     } else {
-                        Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
+                        /*Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
                             if (err) {
                                 //console.log("Error while getting object with objectId " + data.objectId + ": ", err);
                             } else if (object) {
@@ -1431,7 +1431,7 @@ Apio.Serial.read = function (data) {
                                     }
                                 });
                             }
-                        });
+                        });*/
                     }
 
                     if (Apio.Configuration.type === "cloud") {
