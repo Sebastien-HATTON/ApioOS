@@ -1054,5 +1054,42 @@ d.run(function () {
                 }
             });
         }
+
+        fs.readFile("/etc/mongodb.conf", "utf8", function (err, content) {
+            if (err) {
+                console.log("Error while reading /etc/mongodb.conf: ", err);
+            } else if (content) {
+                content = content.split("\n");
+                for (var x in content) {
+                    if (content[x].indexOf("logpath=/var/log/mongodb/mongodb.log") > -1) {
+                        content[x] = "logpath=/tmp/mongodb.log";
+                        fs.writeFile("/etc/mongodb.conf", content.join("\n"), function (err_w) {
+                            if (err_w) {
+                                console.log("Error while writing file /etc/mongodb: ", err_w);
+                            } else {
+                                console.log("Changed path of mongodb.log");
+                                exec("service mongodb restart", function (error) {
+                                    if (error) {
+                                        console.log("Error while restarting mongodb: ", error);
+                                    } else {
+                                        request.post("http://localhost:" + Apio.Configuration.http.port + "/apio/restartSystem", {
+                                            json: true
+                                        }, function (err, httpResponse) {
+                                            if (err) {
+                                                console.log("Error while restarting ApioOS: ", err);
+                                            } else {
+                                                console.log("Restarting ApioOS");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            } else {
+                console.log("The file /etc/mongodb.conf is empty");
+            }
+        });
     });
 });
