@@ -1062,7 +1062,7 @@ d.run(function () {
                 content = content.split("\n");
                 for (var x in content) {
                     if (content[x].indexOf("logpath=/var/log/mongodb/mongodb.log") > -1) {
-                        content[x] = "logpath=/tmp/mongodb.log";
+                        content[x] = "logpath=/dev/null";
                         fs.writeFile("/etc/mongodb.conf", content.join("\n"), function (err_w) {
                             if (err_w) {
                                 console.log("Error while writing file /etc/mongodb: ", err_w);

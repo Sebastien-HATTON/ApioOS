@@ -2629,22 +2629,38 @@ module.exports = function (enableCloudSocket) {
                     if (err) {
                         var sys = require('sys');
                         var exec = require('child_process').exec;
-                        var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio");
+                        var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio", function () {
+                            if (callback) {
+                                callback();
+                            }
+                        });
                     } else if (doc) {
                         console.log("Il database c'è faccio il dump");
                         var sys = require('sys');
                         var exec = require('child_process').exec;
-                        var child = exec("mongodump --out ./backup");
+                        var child = exec("mongodump --out ./backup", function () {
+                            if (callback) {
+                                callback();
+                            }
+                        });
                     } else {
                         console.log("Il database non c'è faccio il restore");
                         var sys = require('sys');
                         var exec = require('child_process').exec;
                         if (fs.existsSync("./backup/apio")) {
                             console.log("C'è il backup fs.exist");
-                            var child = exec("mongorestore ./backup/apio -d apio");
+                            var child = exec("mongorestore ./backup/apio -d apio", function () {
+                                if (callback) {
+                                    callback();
+                                }
+                            });
                         } else if (fs.existsSync("./data/apio")) {
                             console.log("Non c'è il backup fs.exist");
-                            var child = exec("mongorestore ./data/apio -d apio");
+                            var child = exec("mongorestore ./data/apio -d apio", function () {
+                                if (callback) {
+                                    callback();
+                                }
+                            });
                         } else {
                             Apio.Database.db.collection("Users").insert({
                                 disabled_notification: [],
@@ -2656,15 +2672,15 @@ module.exports = function (enableCloudSocket) {
                                 } else {
                                     console.log("Verify successfully interted");
                                 }
+
+                                if (callback) {
+                                    callback();
+                                }
                             });
                         }
                     }
                 });
-
-            }
-
-
-            if (callback) {
+            } else if (callback) {
                 callback();
             }
         });
