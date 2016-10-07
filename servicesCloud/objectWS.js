@@ -725,7 +725,7 @@ http.listen(port, "localhost", function () {
     log("APIO ObjectWs Service correctly started on port ");
     Apio.Database.connect(function () {
         //Apio.Serial.searchDongle();
-    });
+    }, false);
     Apio.ws.listen();
     console.log(webSocket)
 

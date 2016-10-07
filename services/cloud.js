@@ -2075,7 +2075,7 @@ module.exports = function (libraries) {
     // http.listen(port, function () {
         log("APIO Cloud Service correctly started on port " + port);
         Apio.Database.connect(function () {
-        });
+        }, false);
 
         var gc = require("./garbage_collector.js");
         gc();

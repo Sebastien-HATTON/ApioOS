@@ -598,7 +598,7 @@ module.exports = function (libraries) {
     http.listen(port, "localhost", function () {
     // http.listen(port, function () {
         Apio.Database.connect(function () {
-        });
+        }, false);
 
         var gc = require("./garbage_collector.js");
         gc();

@@ -210,6 +210,6 @@ module.exports = function (libraries) {
         console.log("Service autoInstall correctly started on port " + port);
         Apio.Database.connect(function () {
             console.log("Successfully connected to the DB");
-        });
+        }, false);
     });
 };

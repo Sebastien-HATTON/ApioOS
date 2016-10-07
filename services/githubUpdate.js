@@ -195,7 +195,7 @@ module.exports = function (libraries) {
     // http.listen(port, function () {
         console.log("Apio Github attivo");
         Apio.Database.connect(function () {
-        });
+        }, false);
 
         var gc = require("./garbage_collector.js");
         gc();

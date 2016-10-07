@@ -65,7 +65,7 @@ d.run(function () {
 
     Apio.Database.connect(function () {
         require("./notification.js")(Apio, app, socketServer, socketClient);
-    });
+    }, false);
 
     http.listen(9001, function () {
         console.log("APIO Log Service correctly started on port 9001");

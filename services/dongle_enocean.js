@@ -150,7 +150,7 @@ Apio.Database.connect(function () {
     })
 
 
-});
+}, false);
 
 /*var enoceanTrigger1 = {
  "70":{

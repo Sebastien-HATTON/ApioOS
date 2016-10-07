@@ -143,42 +143,6 @@ var bindToProperty = {};
 //Carico in RAM i dati relativi alla comunicazione.
 var communication = {};
 var bindToProperty = {};
-Apio.Database.connect(function () {
-    Apio.Object.list("admin", function (err, oBjects) {
-            if (err) {
-
-            } else {
-                // console.log('OBJECTS IS: ', oBjects);
-                //objects = JSON.parse(JSON.stringify(oBjects));
-                for (var i in oBjects) {
-                    objects[oBjects[i].objectId] = oBjects[i];
-                }
-
-                // console.log("°°°°°°°°°°°°°°°°objects°°°°°°°°°°°°°°°", objects);
-            }
-        }
-    )
-    Apio.Database.db.collection("Communication").findOne({'name': 'integratedCommunication'}, function (err, doc) {
-        if (err) {
-            ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
-        } else if (doc) {
-
-            communication = doc;
-            // console.log('la collection communication contiene: ', communication)
-        }
-    })
-    Apio.Database.db.collection("Communication").findOne({'name': 'addressBindToProperty'}, function (err, doc) {
-        if (err) {
-            ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
-        } else if (doc) {
-
-            bindToProperty = doc;
-            // console.log('la collection communication contiene: ', communication)
-        }
-    })
-
-
-});
 
 var zwaveSendToDevice = function (data, addInfo) {
     console.log();
@@ -943,7 +907,40 @@ http.listen(port, "localhost", function () {
                 });
             }
         });
-    });
+
+        Apio.Object.list("admin", function (err, oBjects) {
+                if (err) {
+
+                } else {
+                    // console.log('OBJECTS IS: ', oBjects);
+                    //objects = JSON.parse(JSON.stringify(oBjects));
+                    for (var i in oBjects) {
+                        objects[oBjects[i].objectId] = oBjects[i];
+                    }
+
+                    // console.log("°°°°°°°°°°°°°°°°objects°°°°°°°°°°°°°°°", objects);
+                }
+            }
+        )
+        Apio.Database.db.collection("Communication").findOne({'name': 'integratedCommunication'}, function (err, doc) {
+            if (err) {
+                ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
+            } else if (doc) {
+
+                communication = doc;
+                // console.log('la collection communication contiene: ', communication)
+            }
+        })
+        Apio.Database.db.collection("Communication").findOne({'name': 'addressBindToProperty'}, function (err, doc) {
+            if (err) {
+                ////console.log("Error while trying to retrieve the serial address. Aborting Serial.send");
+            } else if (doc) {
+
+                bindToProperty = doc;
+                // console.log('la collection communication contiene: ', communication)
+            }
+        })
+    }, false);
 
     var gc = require("./garbage_collector.js");
     gc();
