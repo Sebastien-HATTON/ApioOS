@@ -169,14 +169,14 @@ socket_server.on("connection", function (socket) {
                                 if (fields.indexOf(i) > -1) {
                                     if (query_string) {
                                         if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                                            query_string += ", " + i + " = '" + String(data.properties[i]).replace(",", ".") + "'";
+                                            query_string += ", `" + i + "` = '" + String(data.properties[i]).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
 
                                             log[i][timestamp] = String(data.properties[i]).replace(",", ".");
                                         } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                                            query_string += ", " + i + " = '" + String(object.properties[i].value).replace(",", ".") + "'";
+                                            query_string += ", `" + i + "` = '" + String(object.properties[i].value).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
@@ -184,16 +184,16 @@ socket_server.on("connection", function (socket) {
                                             log[i][timestamp] = String(object.properties[i].value).replace(",", ".");
                                         }
                                     } else {
-                                        query_string = "INSERT INTO `" + data.objectId + "` SET timestamp = '" + timestamp + "'";
+                                        query_string = "INSERT INTO `" + data.objectId + "` SET `timestamp` = '" + timestamp + "'";
                                         if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                                            query_string += ", " + i + " = '" + String(data.properties[i]).replace(",", ".") + "'";
+                                            query_string += ", `" + i + "` = '" + String(data.properties[i]).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
 
                                             log[i][timestamp] = String(data.properties[i]).replace(",", ".");
                                         } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                                            query_string += ", " + i + " = '" + String(object.properties[i].value).replace(",", ".") + "'";
+                                            query_string += ", `" + i + "` = '" + String(object.properties[i].value).replace(",", ".") + "'";
                                             if (!log.hasOwnProperty(i)) {
                                                 log[i] = {};
                                             }
@@ -204,13 +204,13 @@ socket_server.on("connection", function (socket) {
                                 }
                             }
 
-                            socket_server.emit("send_to_client", {
-                                message: "log_update",
-                                data: {
-                                    log: log,
-                                    objectId: data.objectId
-                                }
-                            });
+                            // socket_server.emit("send_to_client", {
+                            //     message: "log_update",
+                            //     data: {
+                            //         log: log,
+                            //         objectId: data.objectId
+                            //     }
+                            // });
 
                             socket_server.emit("send_to_cloud_service", {
                                 data: {
@@ -548,14 +548,16 @@ app.get("/apio/log/getSumFileByDate/objectId/:objectId/date/:date", function (re
             for (var i = 0; i < tsArray.length - 1; i++) {
                 var query = "SELECT ";
                 for (var j in object.properties) {
-                    if (query === "SELECT ") {
-                        query += "SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
-                    } else {
-                        query += ", SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
+                    if (object.properties[j].type != "log") {
+                        if (query === "SELECT ") {
+                            query += "SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        } else {
+                            query += ", SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        }
                     }
                 }
 
-                query += ", " + tsArray[i] + " AS timestamp FROM `" + req.params.objectId + "` WHERE (timestamp >= " + tsArray[i] + " AND timestamp < " + tsArray[i + 1] + ")";
+                query += ", " + tsArray[i] + " AS `timestamp` FROM `" + req.params.objectId + "` WHERE (`timestamp` >= " + tsArray[i] + " AND `timestamp` < " + tsArray[i + 1] + ")";
 
                 if (final) {
                     final += " UNION " + query;
@@ -564,7 +566,7 @@ app.get("/apio/log/getSumFileByDate/objectId/:objectId/date/:date", function (re
                 }
             }
 
-            final = "SELECT * FROM (" + final + ") AS T WHERE " + j + " IS NOT NULL";
+            final = "SELECT * FROM (" + final + ") AS T";
 
             sql_db.query(final).on("result", function (row) {
                 processRow(row);
@@ -605,14 +607,16 @@ app.get("/apio/log/getSumFileByRange/objectId/:objectId/from/:from/daysNumber/:d
             for (var i = 0; i < tsArray.length - 1; i++) {
                 var query = "SELECT ";
                 for (var j in object.properties) {
-                    if (query === "SELECT ") {
-                        query += "SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
-                    } else {
-                        query += ", SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
+                    if (object.properties[j].type != "log") {
+                        if (query === "SELECT ") {
+                            query += "SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        } else {
+                            query += ", SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        }
                     }
                 }
 
-                query += ", " + tsArray[i] + " AS timestamp FROM `" + req.params.objectId + "` WHERE (timestamp >= " + tsArray[i] + " AND timestamp < " + tsArray[i + 1] + ")";
+                query += ", " + tsArray[i] + " AS `timestamp` FROM `" + req.params.objectId + "` WHERE (`timestamp` >= " + tsArray[i] + " AND `timestamp` < " + tsArray[i + 1] + ")";
 
                 if (final) {
                     final += " UNION " + query;
@@ -621,7 +625,7 @@ app.get("/apio/log/getSumFileByRange/objectId/:objectId/from/:from/daysNumber/:d
                 }
             }
 
-            final = "SELECT * FROM (" + final + ") AS T WHERE " + j + " IS NOT NULL";
+            final = "SELECT * FROM (" + final + ") AS T";
 
             sql_db.query(final).on("result", function (row) {
                 processRow(row);

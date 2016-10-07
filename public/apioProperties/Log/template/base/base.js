@@ -15,6 +15,7 @@ angular.module("ApioApplicationLog", ["apioProperty"]).controller("defaultContro
         });
 
         socket.off("log_update");
+        socket.off("apio_server_update");
 
         for (var i in openSockets) {
             openSockets[i]();
@@ -339,9 +340,8 @@ angular.module("ApioApplicationLog", ["apioProperty"]).controller("defaultContro
     } else {
         $scope.tableLabels = [];
         $scope.tableProperties = [];
-
         for (var i in $scope.object.properties) {
-            if (i !== "date") {
+            if (i !== "date" && $scope.object.propertiesAdditionalInfo[i].type !== "log") {
                 $scope.tableProperties.push(i);
             }
         }
@@ -352,6 +352,49 @@ angular.module("ApioApplicationLog", ["apioProperty"]).controller("defaultContro
             }
         }
     }
+
+    socket.on("apio_server_update", function (data) {
+        if ($scope.object.objectId === data.objectId) {
+            var ts = new Date().getTime();
+            var index = isInArray(ts);
+            if (index > -1) {
+                for (var p in $scope.object.properties) {
+                    if (data.properties.hasOwnProperty(p)) {
+                        $scope.grouppedData[index][p] = String(data.properties[p]).replace(",", ".");
+                    } else {
+                        $scope.grouppedData[index][p] = String($scope.object.properties[p]).replace(",", ".");
+                    }
+                }
+            } else {
+                var obj = {
+                    date: parseDate(ts),
+                    timestamp: ts
+                };
+
+                for (var p in $scope.object.properties) {
+                    if (data.properties.hasOwnProperty(p)) {
+                        obj[p] = String(data.properties[p]).replace(",", ".");
+                    } else {
+                        obj[p] = String($scope.object.properties[p]).replace(",", ".");
+                    }
+                }
+
+                $scope.grouppedData.push(obj);
+                obj = {};
+            }
+
+            $scope.grouppedData.sort(function (a, b) {
+                return b.timestamp - a.timestamp;
+            });
+
+            $scope.logsMessage = "";
+
+            $scope.log_ready = true;
+            if (!$scope.$$phase) {
+                $scope.$apply();
+            }
+        }
+    });
 
     $scope.grouppedData = [];
     $http.get("/apio/user/getSessionComplete").success(function (session) {
