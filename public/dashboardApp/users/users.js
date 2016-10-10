@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 
-angular.module('ApioDashboardApplication').controller('ApioDashboardUsersController', ['$scope', 'socket', 'userService', 'objectService', '$http', '$rootScope', '$state', 'sweet', function ($scope, socket, userService, objectService, $http, $rootScope, $state, sweet) {
+angular.module('ApioDashboardApplication').controller('ApioDashboardUsersController', ['$scope', 'socket', 'userService', 'objectService', '$http', '$rootScope', '$state', 'sweet', "$window", function ($scope, socket, userService, objectService, $http, $rootScope, $state, sweet, $window) {
     //$('.selectpicker').selectpicker();
     /*socket.on('apio_server_update',function(e) {
 
@@ -350,7 +350,11 @@ angular.module('ApioDashboardApplication').controller('ApioDashboardUsersControl
                     //$('#addUser').modal('hide');
                     //$scope.switchPage('Objects');
                     //$state.go('objects.objectsLaunch');
-                    location.reload();
+                    if ($scope.session.email === $scope.currentUser.email && $scope.currentUser.role === "guest") {
+                        $window.location = "/app#/home";
+                    } else {
+                        location.reload();
+                    }
                 });
             }
         });

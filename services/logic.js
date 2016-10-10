@@ -26,8 +26,6 @@ var express = require("express");
 var fs = require("fs");
 var app = express();
 var http = require("http").Server(app);
-// var configuration = require("../configuration/default.js");
-// var Apio = require("../apio.js")(configuration, false);
 var Apio = require("../apio.js")(false);
 Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=logic&token=" + Apio.Token.getFromText("logic", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
 var request = require("request");
@@ -44,13 +42,6 @@ process.on("SIGINT", function () {
     process.exit();
 });
 
-// app.use(function (req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*");
-//     res.header("Access-Control-Allow-Methods", "GET, POST");
-//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-//     next();
-// });
-
 app.use(bodyParser.json({
     limit: "50mb"
 }));
@@ -63,6 +54,7 @@ app.use(bodyParser.urlencoded({
 process.on("uncaughtException", function (unexp) {
     console.log("-----------uncaughtException----------", unexp);
     socketServer.emit("send_to_client", {
+        apioId: Apio.System.getApioIdentifier(),
         message: "logic_error",
         data: String(unexp)
     });
@@ -95,8 +87,6 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
         console.log("Unable to connect to mongodb://" + Apio.Configuration.database.hostname + ":" + Apio.Configuration.database.port + "/" + Apio.Configuration.database.database + ": ", error);
     } else if (db) {
         database = db;
-
-        //CONTROLLO ESISTENZA DEI DOCUMENTI DI LOGIC - INIZIO
         db.collection("Services").findOne({name: "logic"}, function (error, service) {
             if (error) {
                 console.log("Error while getting service Logic: ", error);
@@ -134,8 +124,6 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
                 });
             }
         });
-        //CONTROLLO ESISTENZA DEI DOCUMENTI DI LOGIC - FINE
-
         db.collection("Objects").find().toArray(function (err, objects) {
             if (err) {
                 console.log("Unable to find object with objectId " + data.objectId + ": ", err);
@@ -216,12 +204,12 @@ app.post("/apio/logic/modifyFile", function (req, res) {
     clearInterval(loop);
     for (var i in logics) {
         if (logics[i].name === req.body.name) {
+            require.uncache("./apio_logic/" + req.body.name);
             logics.splice(i, 1);
             break;
         }
     }
 
-    require.uncache("./apio_logic/" + req.body.name);
     fs.writeFileSync("./apio_logic/" + req.body.newName, req.body.file);
     var o = {};
     setTimeout(function () {
@@ -234,10 +222,6 @@ app.post("/apio/logic/modifyFile", function (req, res) {
             res.sendStatus(200);
         } catch (ex) {
             console.log("Exception while requiring file (1): ", ex);
-            //socketServer.emit("send_to_client", {
-            //    message: "logic_error",
-            //    data: String(ex)
-            //});
             res.status(500).send(String(ex));
         } finally {
             if (req.body.newName != req.body.name && fs.existsSync("./apio_logic/" + req.body.name)) {
@@ -273,10 +257,6 @@ app.post("/apio/logic/newFile", function (req, res) {
             res.sendStatus(200);
         } catch (ex) {
             console.log("Exception while requiring file (2): ", ex);
-            //socketServer.emit("send_to_client", {
-            //    message: "logic_error",
-            //    data: String(ex)
-            //});
             res.status(500).send(String(ex));
         } finally {
             socketServer.emit("send_to_client", {
@@ -294,6 +274,7 @@ app.post("/apio/logic/newFile", function (req, res) {
 });
 
 Apio.logic = {
+    logArray: [],
     setProperty: function (id, p, v, writeDb, writeSerial) {
         if (typeof obj[id] === 'undefined' && !writeDb) {
             obj[id] = {
@@ -391,7 +372,7 @@ Apio.logic = {
                 a();
                 this.previousTimestamp = new Date().getTime();
                 this.timestamp = new Date().getTime();
-            } else /*if (this.previousTimestamp != 0)*/ {
+            } else {
                 this.timestamp = new Date().getTime();
                 if (this.timestamp - this.previousTimestamp >= (time + 1000)) {
                     this.previousTimestamp = new Date().getTime();
@@ -417,10 +398,7 @@ Apio.logic = {
         this.timestamp = new Date().getTime();
     },
     log: function (data) {
-        socketServer.emit("send_to_client", {
-            message: "logic_log",
-            data: typeof data === "object" ? JSON.stringify(data) : String(data)
-        });
+        this.logArray.push(typeof data === "object" ? JSON.stringify(data) : String(data));
     }
 };
 
@@ -446,10 +424,6 @@ var initialSetup = function () {
             logics.push(o);
         } catch (ex) {
             console.log("Exception while requiring file (3): ", ex);
-            //socketServer.emit("send_to_client", {
-            //    message: "logic_error",
-            //    data: String(ex)
-            //});
         }
     }
 };
@@ -461,6 +435,16 @@ var intervalLogic = function () {
             for (var i in logics) {
                 logics[i].loop();
             }
+        }
+
+        if (Apio.logic.logArray.length) {
+            socketServer.emit("send_to_client", {
+                apioId: Apio.System.getApioIdentifier(),
+                message: "logic_log",
+                data: Apio.logic.logArray
+            });
+
+            Apio.logic.logArray = [];
         }
     }, 100);
 };
@@ -487,6 +471,7 @@ socketServer.on("connection", function (Socket) {
     });
 
     Socket.on("apio_logic_modify", function (data) {
+        var errors = false;
         data.apioId = Apio.System.getApioIdentifier();
 
         clearInterval(loop);
@@ -496,16 +481,52 @@ socketServer.on("connection", function (Socket) {
         for (var i = 0; !found && i < logics.length; i++) {
             if (logics[i].name === data.newName) {
                 found = true;
-                require.uncache("./apio_logic/" + data.newName);
-                logics[i].loop = require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer);
+                try {
+                    require.uncache("./apio_logic/" + data.newName);
+                    logics[i].loop = require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer);
+                } catch (ex) {
+                    // socketServer.emit("send_to_client", {
+                    //     apioId: Apio.System.getApioIdentifier(),
+                    //     message: "logic_error",
+                    //     data: String(ex)
+                    // });
+
+                    socketServer.emit("send_to_client", {
+                        who: "dongle",
+                        data: {
+                            apioId: Apio.System.getApioIdentifier(),
+                            data: String(ex)
+                        },
+                        message: "apio_logic_modify_error"
+                    });
+                    errors = true;
+                }
             }
         }
 
         if (!found) {
-            logics.push({
-                loop: require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer),
-                name: data.newName
-            });
+            try {
+                logics.push({
+                    loop: require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer),
+                    name: data.newName
+                });
+            } catch (ex) {
+                // socketServer.emit("send_to_client", {
+                //     apioId: Apio.System.getApioIdentifier(),
+                //     message: "logic_error",
+                //     data: String(ex)
+                // });
+
+                socketServer.emit("send_to_client", {
+                    who: "dongle",
+                    data: {
+                        apioId: Apio.System.getApioIdentifier(),
+                        data: String(ex)
+                    },
+                    message: "apio_logic_modify_error"
+                });
+                errors = true;
+            }
         }
 
         if (data.newName !== data.name && fs.existsSync("./apio_logic/" + data.name)) {
@@ -522,31 +543,72 @@ socketServer.on("connection", function (Socket) {
         intervalLogic();
 
         socketServer.emit("send_to_client", {
+            apioId: Apio.System.getApioIdentifier(),
             message: "apio_logic_modify",
             data: data
         });
+
+        if (!errors) {
+            socketServer.emit("send_to_client", {
+                who: "dongle",
+                data: {
+                    apioId: Apio.System.getApioIdentifier(),
+                    data: data
+                },
+                message: "apio_logic_modify_ok"
+            });
+        }
     });
 
     Socket.on("apio_logic_new", function (data) {
+        var errors = false;
         data.apioId = Apio.System.getApioIdentifier();
         fs.writeFileSync("./apio_logic/" + data.newName, data.file);
 
         clearInterval(loop);
-        logics.push({
-            loop: require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer),
-            name: data.newName
-        });
+        try {
+            logics.push({
+                loop: require("./apio_logic/" + data.newName)(Apio.logic, request, socketServer),
+                name: data.newName
+            });
+        } catch (ex) {
+            // socketServer.emit("send_to_client", {
+            //     apioId: Apio.System.getApioIdentifier(),
+            //     message: "logic_error",
+            //     data: String(ex)
+            // });
+
+            socketServer.emit("send_to_client", {
+                who: "dongle",
+                data: {
+                    apioId: Apio.System.getApioIdentifier(),
+                    data: String(ex)
+                },
+                message: "apio_logic_new_error"
+            });
+            errors = true;
+        }
         intervalLogic();
 
         socketServer.emit("send_to_client", {
             message: "apio_logic_new",
             data: data
         });
+
+        if (!errors) {
+            socketServer.emit("send_to_client", {
+                who: "dongle",
+                data: {
+                    apioId: Apio.System.getApioIdentifier(),
+                    data: data
+                },
+                message: "apio_logic_new_ok"
+            });
+        }
     });
 });
 
 http.listen(port, "localhost", function () {
-// http.listen(port, function () {
     initialSetup();
     intervalLogic();
 

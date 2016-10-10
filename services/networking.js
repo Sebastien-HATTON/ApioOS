@@ -172,6 +172,7 @@ module.exports = function (libraries) {
 
     app.post("/apio/wifi/switchStatus", function (req, res) {
         if (req.body.status === "client") {
+            //PREVEDERE ROLLBACK QUI
             fs.readFile("/etc/wpa_supplicant/wpa_supplicant.conf", "utf8", function (err, content) {
                 if (err) {
                     res.status(500).send(err);
@@ -1071,7 +1072,6 @@ module.exports = function (libraries) {
     });
 
     http.listen(port, "localhost", function () {
-    // http.listen(port, function () {
         console.log("Service networking correctly started on port " + port);
 
         var gc = require("./garbage_collector.js");

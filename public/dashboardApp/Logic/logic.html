@@ -208,13 +208,6 @@
 ---------------------------------------------------------------------------->
 
 <div class="container-fluid">
-
-    <!--
-    <div class="row section_title">
-        <h1>Rules</h1>
-    </div>
-    -->
-
     <div class="row section_menu">
         <ul role="tablist" class="nav nav-tabs">
             <li role="presentation" class="active">
@@ -229,7 +222,7 @@
     <div id="ObjectsList" class="row" ng-show="selected==1">
         <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="fileEditor"
              class="modal fade">
-            <div class="modal-dialog" style="width:90%;" role="document">
+            <div class="modal-dialog" style="width: 90%;" role="document">
                 <div class="modal-content">
                     <div class="modal-header customModalHeader">
                         <button type="button" data-dismiss="modal" class="close">
@@ -239,12 +232,10 @@
 
                         <form class="form-inline">
                             <div class="form-group">
-                                <!--<label class="" for="exampleInputEmail3">Logic Name:</label>-->
                                 <span class="label label-default">Rule</span>
                                 <input class="form-control" ng-model="currentlogic" placeholder="">
                             </div>
                             <div class="form-group firstOptionDevelopement">
-                                <!--<label class="" for="exampleInputPassword3">Object Name:</label>-->
                                 <span class="label label-default">Name [{{objects[selectedObject].objectId}}]</span>
                                 <select class="form-control" ng-model="selectedObject">
                                     <option></option>
@@ -253,11 +244,7 @@
                                     </option>
                                 </select>
                             </div>
-                            <!--<div class="form-group" >
-                                <input style="width:40px; text-align:center;" ng-model="selectedObject">
-                            </div>-->
                             <div class="form-group">
-                                <!--<label class="" for="exampleInputPassword3">Property:</label>-->
                                 <span class="label label-default">Property</span>
                                 <select class="form-control" ng-model="selectedProperty">
                                     <option></option>
@@ -267,13 +254,9 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <!--<label class="" for="exampleInputPassword3">Methods:</label>-->
                                 <span class="label label-default">Methods</span>
-                                <select id="selectMethods" style="width:100px;" class="form-control"
+                                <select id="selectMethods" style="width: 100px;" class="form-control"
                                         ng-model="selectMethods">
-                                    <!--<option>listen("objectId","propertyName",function(){});</option>
-                                    <option>setProperty("objectId","propertyName","value")</option>
-                                    <option>getProperty("objectId","propertyName")</option>-->
                                     <option>listen</option>
                                     <option>setProperty</option>
                                     <option>getProperty</option>
@@ -284,24 +267,24 @@
                                         title="After the click , move the cursor and press the space bar on the keyboard"></button>
                             </div>
 
-                            <div class="btn-group" role="group" aria-label="..." style="float:right; margin-right: 2%;">
+                            <div class="btn-group" role="group" aria-label="..."
+                                 style="float: right; margin-right: 2%;">
                                 <button type="button" class="btn btn-default glyphicon glyphicon-trash"
                                         ng-click="delete()"></button>
                                 <button id="save" type="button" class="btn btn-default glyphicon glyphicon-floppy-save"
                                         ng-click="runner()"></button>
                             </div>
 
-                            <div class="btn-group" role="group" aria-label="..." style="float:right; margin-right: 2%;">
+                            <div class="btn-group" role="group" aria-label="..."
+                                 style="float: right; margin-right: 2%;">
                                 <button type="button" class="btn btn-default glyphicon glyphicon-book"
                                         data-toggle="button" aria-pressed="false" autocomplete="off"
                                         ng-click="openCloseWiki()"></button>
                                 <button type="button" class="btn btn-default glyphicon glyphicon-console"
                                         ng-click="openCloseConsole()"></button>
                                 <button type="button" class="btn btn-default glyphicon glyphicon-ok-sign"></button>
-                                <!--<button type="button" class="btn " aria-label="Change Password" ng-click="save()">-->
                             </div>
                         </form>
-                        <!--<h4 id="myModalLabel" class="modal-title">{{currentlogic}}</h4>-->
                     </div>
                     <div class="modal-body customModalBody">
                         <style>
@@ -309,8 +292,7 @@
                                 height: 550px;
                             }
                         </style>
-                        <!-------------------------------------------------------- crea il panel ------->
-                        <div id="EditorPanel0" class="" style="padding:0;"
+                        <div id="EditorPanel0" style="padding: 0;"
                              ng-class="{'col-md-6':showHelpDevelop!='editor'}">
                             <section id="EditorPanel" class="tab-pane">
                                 <div class="panel">
@@ -325,21 +307,19 @@
                             </section>
                         </div>
                         <div id="consolePannel" class="col-md-6 " style="padding: 0.4%;"
-                             ng-show="showHelpDevelop=='console'">
+                             ng-show="showHelpDevelop == 'console'">
                             <div class="row">
-                                <div class="col-md-12">
-                                    <button type="button" ng-click="clearConsole()">Clear console</button>
+                                <div class="col-md-12" style="padding-bottom: 1%;">
+                                    <button type="button" class="btn btn-danger" style="width: 100%;"
+                                            ng-click="clearConsole()">
+                                        <div style="text-align: center;">
+                                            <span class="glyphicon glyphicon-remove pull-left"></span>
+                                            <span>Clear console</span>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                             <div class="row">
-                                <!--<div class="col-md-12">-->
-                                <!--<div class="alert alert-warning" role="alert">Don't Worry, Be Happy!</div>-->
-                                <!--</div>-->
-                                <!--<div class="col-md-12">-->
-                                <!--<div class="alert alert-danger" role="alert">-->
-                                <!--{{console_text}}-->
-                                <!--</div>-->
-                                <!--</div>-->
                                 <div class="col-md-12" ng-repeat="log in console_logs track by $index">
                                     <div class="alert alert-{{log.type}}" role="alert">
                                         {{log.message}}
@@ -350,14 +330,13 @@
                         <div id="wikiPannel" class="col-md-6 " ng-show="showHelpDevelop=='wiki'">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <!--<div class="alert alert-warning" role="alert">Wiki Under Costruction</div>-->
-                                    <div class="col-md-1 affix" style="padding:0; margin-top:4%;">
-                                        <div ng-repeat="wiki in dictionaryMethods" style="text-align:right;">
+                                    <div class="col-md-1 affix" style="padding: 0; margin-top: 4%;">
+                                        <div ng-repeat="wiki in dictionaryMethods" style="text-align: right;">
                                             <span id="{{wiki.wiki.name}}" ng-click="showWikiDescription($event)"
                                                   class="label cursor label-primary">{{wiki.wiki.name}}</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-2" style="padding:0; margin-top:4%;"></div>
+                                    <div class="col-md-2" style="padding: 0; margin-top: 4%;"></div>
                                     <div ng-repeat="wikiDescription in dictionaryMethods"
                                          ng-bind-html="translateHtml(wikiDescription.wiki.description)"
                                          class="col-md-10" ng-show="wikiView==wikiDescription.wiki.name">
@@ -371,41 +350,10 @@
                             </div>
                         </div>
                     </div>
-
-                    <!--<div class="modal-footer customModalFooter">
-
-
-
-<!--	                    <div class="btn-toolbar" role="toolbar" style="float: right;">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default" aria-label="Change Password"
-                                        ng-click="save()">
-                                    <span class="fa fa-floppy-o" aria-hidden="true"></span> Save
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="btn-toolbar" role="toolbar" style="float: right;">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default" aria-label="Change Password"
-                                        ng-click="runner()">
-                                    <span class="glyphicon glyphicon-flash" aria-hidden="false"></span> Run
-                                </button>
-                            </div>
-                        </div>
-                         <div class="btn-toolbar" role="toolbar" style="float: left;">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default" aria-label="Change Password"
-                                        ng-click="delete()">
-                                    <span class="fa fa-trash" aria-hidden="true"></span> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>-->
                 </div>
             </div>
         </div>
-        <div class="row" style="margin-left: 0px; margin-right: 0px;">
+        <div class="row" style="margin-left: 0; margin-right: 0;">
             <div class="col-md-2 col-sm-4 col-xs-6 add_container">
                 <button ng-click="newLogicFile()" ng-class="{virtual : virtualObject}"
                         class="btn btn-default add_button">
@@ -428,17 +376,16 @@
         </div>
     </div>
     <div ng-show="selected==2" angular-terminal="logic">
-        <div id="wikiPannel" style="height:480px;" class="col-md-12">
+        <div id="wikiPannel" style="height: 480px;" class="col-md-12">
             <div class="row">
                 <div class="col-md-12">
-                    <!--<div class="alert alert-warning" role="alert">Wiki Under Costruction</div>-->
-                    <div class="col-md-1 affix" style="padding:0; margin-top:4%;">
-                        <div ng-repeat="wiki in dictionaryMethods" style="text-align:right;">
+                    <div class="col-md-1 affix" style="padding: 0; margin-top: 4%;">
+                        <div ng-repeat="wiki in dictionaryMethods" style="text-align: right;">
                             <span id="{{wiki.wiki.name}}" ng-click="showWikiDescription($event)"
                                   class="label cursor label-primary">{{wiki.wiki.name}}</span>
                         </div>
                     </div>
-                    <div class="col-md-2" style="padding:0; margin-top:4%;"></div>
+                    <div class="col-md-2" style="padding: 0; margin-top: 4%;"></div>
                     <div ng-repeat="wikiDescription in dictionaryMethods"
                          ng-bind-html="translateHtml(wikiDescription.wiki.description)" class="col-md-10"
                          ng-show="wikiView==wikiDescription.wiki.name">

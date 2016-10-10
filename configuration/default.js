@@ -94,8 +94,8 @@ module.exports = {
         logfile: "./logs/log.json"
     },
     remote: {
-        enabled: true,
-        uri: "http://apio-dev-disa.cloudapp.net"
+        enabled: false,
+        uri: "http://www.apio.cloud"
     },
     serial: {
         baudrate: 115200,

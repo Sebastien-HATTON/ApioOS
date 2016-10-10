@@ -304,16 +304,16 @@ module.exports = function (libraries) {
             var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
             var condition_array = [];
             for (var p in object.properties) {
-                if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
-                    condition_array.push(p + " TEXT");
+                if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
+                    condition_array.push("`" + p + "` TEXT");
                 } else if (["number", "trigger", "unclickabletrigger"].indexOf(object.properties[p].type) > -1) {
-                    condition_array.push(p + " INT");
+                    condition_array.push("`" + p + "` INT");
                 } else if (["sensor", "slider", "unlimitedsensor"].indexOf(object.properties[p].type) > -1) {
-                    condition_array.push(p + " DOUBLE");
+                    condition_array.push("`" + p + "` DOUBLE");
                 }
             }
 
-            var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
+            var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", `timestamp` BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
 
             sql_db.query("CREATE TABLE `" + object.objectId + "` (" + condition_string + ")", function (error, result) {
                 if (error) {
@@ -321,7 +321,7 @@ module.exports = function (libraries) {
                     sql_db.end();
                 } else if (result) {
                     console.log("Created table " + object.objectId + ", result: ", result);
-                    sql_db.query("CREATE INDEX timestamp ON `" + object.objectId + "` (timestamp)", function (e_i, r_i) {
+                    sql_db.query("CREATE INDEX timestamp ON `" + object.objectId + "` (`timestamp`)", function (e_i, r_i) {
                         if (e_i) {
                             console.log("Error while creating index: ", e_i);
                         } else {

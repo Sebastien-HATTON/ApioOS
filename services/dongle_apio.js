@@ -368,8 +368,12 @@ app.get("/apio/dongle/getSettings", function (req, res) {
             clearInterval(interval);
             if (Object.keys(Apio.Serial.serialPort).length && Apio.Serial.serialPort.isOpen()) {
                 Apio.Serial.serialPort.write("s0:panId:-");
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(500);
             }
-            res.sendStatus(200);
+        } else {
+            res.sendStatus(500);
         }
     }, 0);
 });

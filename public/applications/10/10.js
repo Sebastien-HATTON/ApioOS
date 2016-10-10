@@ -93,7 +93,7 @@ app.controller("defaultController", ["$scope", "currentObject", "$http", "shared
         }
     }));
 
-    openEvents.push($scope.$on("apio_graph_draw_end", function () {
+    openEvents.push($scope.$on("apio_graph_draw_end", function () {
         var plot = JSON.parse($scope.toPlot);
         console.log("plot: ", plot);
     }));

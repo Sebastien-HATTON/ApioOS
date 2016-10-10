@@ -57,12 +57,12 @@ module.exports = function (libraries) {
             var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
             var condition_array = [];
             for (var p in object.properties) {
-                if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
-                    condition_array.push(p + " TEXT");
+                if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
+                    condition_array.push("`" + p + "` TEXT");
                 } else if (["number", "trigger", "unclickabletrigger"].indexOf(object.properties[p].type) > -1) {
-                    condition_array.push(p + " INT");
+                    condition_array.push("`" + p + "` INT");
                 } else if (["sensor", "slider", "unlimitedsensor"].indexOf(object.properties[p].type) > -1) {
-                    condition_array.push(p + " DOUBLE");
+                    condition_array.push("`" + p + "` DOUBLE");
                 }
             }
 
@@ -206,7 +206,7 @@ module.exports = function (libraries) {
     });
 
     http.listen(port, "localhost", function () {
-    // http.listen(port, function () {
+        // http.listen(port, function () {
         console.log("Service autoInstall correctly started on port " + port);
         Apio.Database.connect(function () {
             console.log("Successfully connected to the DB");

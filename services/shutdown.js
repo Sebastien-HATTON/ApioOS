@@ -117,39 +117,81 @@ module.exports = function (libraries) {
      * Removes a module from the cache
      */
     PIN_22 = new Gpio(22, "out"),
-    PIN_23 = new Gpio(23, "in", "both");
+        PIN_23 = new Gpio(23, "in", "both");
 
+    PIN_27 = new Gpio(27, "in", "both");
     PIN_22.writeSync(1);
 //SERVER
+    //UPS_APIO
+    if (!configuration.hasOwnProperty('UPS') || configuration.UPS == "UPS_APIO") {
+        console.log("UPS_APIO");
+        PIN_23.watch(function (err, value) {
+            //console.log(PIN_23.readSync());
+            if (value == 0) {
+                setTimeout(function () {
+                    if (PIN_23.readSync() == 0) {
+                        console.log("Spegnimento in Corso");
+                        console.log("Avvio il Popup");
+                        PIN_22.writeSync(0);
+                        request("http://localhost:" + configuration.http.port + "/apio/shutdown",
+                            function (error, response, body) {
+                                if (error || !response || Number(response.statusCode) !== 200) {
+                                    console.log("fallito")
+                                } else {
+                                    console.log("popup Avviato")
+                                    console.log("Spengo");
+                                }
+                            });
+                    }
+                }, 500)
 
-    PIN_23.watch(function (err, value) {
-        //console.log(PIN_23.readSync());
-        if (value == 0) {
-            setTimeout(function () {
-                if (PIN_23.readSync() == 0) {
-                    console.log("Spegnimento in Corso");
-                    console.log("Avvio il Popup");
-                    PIN_22.writeSync(0);
-                    request("http://localhost:" + configuration.http.port + "/apio/shutdown",
-                        function (error, response, body) {
-                            if (error || !response || Number(response.statusCode) !== 200) {
-                                console.log("fallito")
-                            } else {
-                                console.log("popup Avviato")
-                                console.log("Spengo");
-                            }
-                        });
-                }
-            }, 500)
+            } else if (value == 1) {
+                console.log(value);
+            }
+        });
+    } else if (configuration.UPS == "UPS_PICO") {
+        console.log("UPS_PICO");
+        PIN_27.watch(function (err, value) {
+            //console.log(PIN_23.readSync());
+            if (value == 0) {
+                request("http://localhost:" + configuration.http.port + "/apio/shutdown",
+                    function (error, response, body) {
+                        if (error || !response || Number(response.statusCode) !== 200) {
+                            console.log("fallito")
+                        } else {
+                            console.log("popup Avviato")
+                            console.log("Spengo");
+                        }
+                    });
+                /*setTimeout(function () {
+                 if (PIN_23.readSync() == 0) {
+                 console.log("Spegnimento in Corso");
+                 console.log("Avvio il Popup");
+                 PIN_22.writeSync(0);
+                 request("http://localhost:" + configuration.http.port + "/apio/shutdown",
+                 function (error, response, body) {
+                 if (error || !response || Number(response.statusCode) !== 200) {
+                 console.log("fallito")
+                 } else {
+                 console.log("popup Avviato")
+                 console.log("Spengo");
+                 }
+                 });
+                 }
+                 }, 500)
 
-        } else if (value == 1) {
-            console.log(value);
-        }
-    });
+                 } else if (value == 1) {
+                 console.log(value);
+                 }*/
+            }
+        });
+
+    }
+    //UPS_PICO
 
 
     http.listen(port, "localhost", function () {
-    // http.listen(port, function () {
+        // http.listen(port, function () {
         console.log("APIO Shutdown Service on " + port);
         var gc = require("./garbage_collector.js");
         gc();

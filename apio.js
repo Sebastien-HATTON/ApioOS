@@ -126,6 +126,10 @@ module.exports = function (enableCloudSocket) {
     var uuidgen = require("node-uuid");
     var validator = require("validator");
 
+    //NEW
+    var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+    //NEW
+
     var transporter = nodemailer.createTransport(smtpTransport({
         host: "smtps.aruba.it",
         port: 465,
@@ -438,6 +442,7 @@ module.exports = function (enableCloudSocket) {
     Apio.boardsToSync = {};
     Apio.connectedSockets = {};
     Apio.syncedBoards = [];
+    Apio.boardsLastDisconnection = {};
     Apio.Socket = {};
     Apio.Socket.init = function (httpInstance, sessionMiddleware) {
         if (!Apio.hasOwnProperty("io")) {
@@ -512,7 +517,7 @@ module.exports = function (enableCloudSocket) {
                             if (err) {
                                 console.log("Error while getting stats of file /tmp/" + data.name + ": ", err);
                             } else if (stats.size) {
-                                var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                                // var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
                                 sql_db.query("LOAD DATA LOCAL INFILE '/tmp/" + data.name + "' INTO TABLE `" + data.table + "` FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\n' (" + data.fields.join() + ")", function (s_e) {
                                     if (s_e) {
                                         console.log("Error loading CSV: ", s_e);
@@ -523,7 +528,7 @@ module.exports = function (enableCloudSocket) {
                                                 console.log("Error while unlinking file /tmp/" + data.name + ": ", u_e);
                                             } else {
                                                 console.log("File /tmp/" + data.name + " successfully unlinked");
-                                                sql_db.end();
+                                                // sql_db.end();
                                             }
                                         });
                                     }
@@ -702,12 +707,17 @@ module.exports = function (enableCloudSocket) {
                 }
 
                 socket.on("disconnect", function () {
+                    var isUUIDGood = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
                     var socketKeys = Object.keys(Apio.connectedSockets);
                     for (var i = 0, found = false; !found && i < socketKeys.length; i++) {
                         for (var j = 0; !found && j < Apio.connectedSockets[socketKeys[i]].length; j++) {
                             if (Apio.connectedSockets[socketKeys[i]][j] === socket.id) {
                                 found = true;
                                 Apio.connectedSockets[socketKeys[i]].splice(j, 1);
+
+                                if (isUUIDGood.test(socketKeys[i])) {
+                                    Apio.boardsLastDisconnection[socketKeys[i]] = new Date();
+                                }
                             }
                         }
 
@@ -802,6 +812,134 @@ module.exports = function (enableCloudSocket) {
                 socket.on("apio.update.apio.app", function (data) {
                     fs.writeFileSync("public/boards/" + data.apioId + "/" + data.objectId + "/" + data.objectId + ".html", data.html);
                     fs.writeFileSync("public/boards/" + data.apioId + "/" + data.objectId + "/" + data.objectId + ".js", data.js);
+
+                    var searchQuery = {
+                        objectId: data.objectId
+                    };
+
+                    if (Apio.Configuration.type === "cloud") {
+                        searchQuery.apioId = data.apioId;
+                    }
+
+                    fs.readFile("public/boards/" + data.apioId + "/" + data.objectId + "/" + data.objectId + ".html", "utf8", function (e_r, content) {
+                        if (e_r) {
+                            console.log("Error while reading file: ", e_r);
+                        } else if (content) {
+                            var htmlparser = require("htmlparser");
+                            var handler = new htmlparser.DefaultHandler(function (error, dom) {
+                                if (error) {
+                                    console.log("error while instancing handler: ", error);
+                                }
+                            });
+                            var parser = new htmlparser.Parser(handler);
+                            parser.parseComplete(content);
+                            var parsed = handler.dom;
+
+                            var properties = {};
+
+                            var retrieve = function (base) {
+                                for (var x in base) {
+                                    if (base[x]) {
+                                        if (base[x].hasOwnProperty("attribs") && base[x].attribs.hasOwnProperty("propertyname")) {
+                                            properties[base[x].attribs.propertyname] = {
+                                                type: base[x].name
+                                            };
+
+                                            for (var j in base[x].attribs) {
+                                                if (j !== "propertyname") {
+                                                    properties[base[x].attribs.propertyname][j] = base[x].attribs[j];
+                                                }
+                                            }
+                                        } else if (base[x].hasOwnProperty("children")) {
+                                            retrieve(base[x].children);
+                                        }
+                                    }
+                                }
+                            };
+
+                            retrieve(parsed);
+
+                            Apio.Database.db.collection("Objects").update(searchQuery, {$set: {properties: properties}}, function (b_e) {
+                                if (b_e) {
+                                    console.log("Error while updating binds: ", b_e);
+                                } else {
+                                    var final = function (table, database, field, type) {
+                                        sql_db.query("call add_modify_column(\"" + table + "\", \"" + database + "\", \"" + field + "\", \"" + type + "\")", function (e_f, r_f) {
+                                            if (e_f) {
+                                                console.log("Error while calling procedure: ", e_f);
+                                            } else {
+                                                console.log("r_f: ", r_f);
+                                            }
+                                        });
+                                    };
+
+                                    var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                                    var props = Object.keys(properties);
+                                    var table_name = undefined;
+                                    if (Apio.Configuration.type === "cloud") {
+                                        table_name = searchQuery.objectId + "_" + searchQuery.apioId;
+                                    } else if (Apio.Configuration.type === "gateway") {
+                                        table_name = searchQuery.objectId;
+                                    }
+
+                                    sql_db.query("SHOW COLUMNS FROM `" + table_name + "`", function (error, cols) {
+                                        if (error) {
+                                            console.log("Error while creating table: ", error);
+                                        } else if (cols) {
+                                            var columns = [];
+                                            for (var x in cols) {
+                                                if (cols[x].Field !== "id" && cols[x].Field !== "timestamp") {
+                                                    columns.push(cols[x].Field);
+                                                }
+                                            }
+
+                                            columns.forEach(function (col) {
+                                                if (props.indexOf(col) === -1) {
+                                                    sql_db.query("ALTER TABLE `" + table_name + "` DROP COLUMN `" + col + "`", function (err, r_a_t) {
+                                                        if (err) {
+                                                            console.log("Error while altering table " + table_name + ": ", err);
+                                                        } else if (r_a_t) {
+                                                            console.log("Column " + col + " successfully deleted from table " + table_name + ": ", r_a_t);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    props.forEach(function (p) {
+                                        var colType = "";
+                                        if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(properties[p].type) > -1) {
+                                            colType = "TEXT";
+                                        } else if (["number", "trigger", "unclickabletrigger"].indexOf(properties[p].type) > -1) {
+                                            colType = "INT";
+                                        } else if (["sensor", "slider", "unlimitedsensor"].indexOf(properties[p].type) > -1) {
+                                            colType = "DOUBLE";
+                                        }
+
+                                        sql_db.query("SELECT * FROM information_schema.routines where ROUTINE_NAME LIKE 'add_modify_column'", function (error, result) {
+                                            if (error) {
+                                                console.log("Error while creating table: ", error);
+                                            } else {
+                                                if (result.length) {
+                                                    final(table_name, "Logs", p, colType);
+                                                } else {
+                                                    sql_db.query("CREATE PROCEDURE add_modify_column(IN tablename TEXT, IN db_name TEXT, IN columnname TEXT, IN columntype TEXT)\nBEGIN\nIF NOT EXISTS (SELECT NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = tablename AND table_schema = db_name AND column_name = columnname) THEN SET @ddl = CONCAT('alter table `', tablename, '` add column (`', columnname, '` ', columntype, ')'); PREPARE STMT FROM @ddl; EXECUTE STMT; ELSE SET @ddl = CONCAT('alter table `', tablename, '` modify `', columnname, '` ', columntype); PREPARE STMT FROM @ddl; EXECUTE STMT; END IF;\nEND", function (e_p, r_p) {
+                                                        if (e_p) {
+                                                            console.log("Error while creating procedure: ", e_p);
+                                                        } else {
+                                                            console.log("r_p: ", r_p);
+                                                            final(table_name, "Logs", p, colType);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                    });
                 });
 
                 socket.on("apio.upload.app", function (data) {
@@ -1264,16 +1402,6 @@ module.exports = function (enableCloudSocket) {
                     console.log("close, data: ", data);
                 });
 
-                socket.on("input", function (data) {
-                    console.log(data);
-                    Apio.Database.updateProperty(data, function () {
-                        socket.broadcast.emit("apio_server_update_", data);
-                    });
-                    console.log("input");
-                    console.log(data);
-                    Apio.Serial.send(data);
-                });
-
                 socket.on("update_system", function (apioId) {
                     var o = {
                         // name: data,
@@ -1370,7 +1498,6 @@ module.exports = function (enableCloudSocket) {
                     }
                     Apio.Object.update(data, function () {
                         console.log("apio_client_update dalla board o da un client connesso");
-                        socket.broadcast.emit("apio_server_update", data);
                         Apio.servicesSocket.notification.emit("send_notification", data);
                     });
                 });
@@ -1542,6 +1669,15 @@ module.exports = function (enableCloudSocket) {
                                     }
                                 }
                             }
+
+                            sql_db.query("DROP TABLE `" + data.objectId + "_" + data.apioId + "`", function (error, result) {
+                                if (error) {
+                                    console.log("Error while dropping table: ", error);
+                                } else {
+                                    console.log("Table " + table + " successfully deleted, result: ", result);
+                                    // sql_db.end();
+                                }
+                            });
                         }
                     });
                 });
@@ -1575,7 +1711,11 @@ module.exports = function (enableCloudSocket) {
                                 Apio.Database.db.collection("systems").update({apioId: data.apioId}, {$set: {test: hash}}, function (err) {
                                     if (!err) {
                                         Apio.Util.log("successfully created a temporary test for apioOS with id " + data.apioId);
-                                        Apio.io.to(data.apioId).emit("apio.remote.handshake.test", {factor: randomuuid});
+                                        if (!Apio.boardsLastDisconnection.hasOwnProperty(data.apioId) || new Date() - Apio.boardsLastDisconnection[data.apioId] >= 20 * 60 * 1000) {
+                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.test", {factor: randomuuid});
+                                        } else {
+                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.reset");
+                                        }
                                         //Ora aspetto che mi restituisce il test che deve essere uguale ad hash
                                     } else {
                                         Apio.Util.log("An error has occurred while creating the token. Sono cazzi, non ho ancora implementato un meccanismo di retry");
@@ -1600,118 +1740,225 @@ module.exports = function (enableCloudSocket) {
                                 Apio.Util.log("Authentication error");
                                 Apio.io.to(data.apioId).emit("apio.remote.handshake.test.error");
                             } else {
-                                var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
-                                sql_db.connect(function (err) {
-                                    if (err) {
-                                        console.log("Error while connecting to MySQL: ", err);
+                                // var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                                // sql_db.connect(function (err) {
+                                //     if (err) {
+                                //         console.log("Error while connecting to MySQL: ", err);
+                                //     } else {
+                                //         console.log("Successfully connected to MySQL");
+                                //         Apio.Database.db.collection("Objects").find({apioId: data.apioId}).toArray(function (o_e, objects) {
+                                //             if (o_e) {
+                                //                 console.log("Error while getting objects with apioId " + data.apioId + ": ", o_e);
+                                //             } else {
+                                //                 var final = "";
+                                //                 for (var i in objects) {
+                                //                     if (Object.keys(objects[i].properties).length && objects[i].name.indexOf("Dongle") === -1) {
+                                //                         var q = "SELECT MAX(timestamp) AS timestamp, \"" + objects[i].objectId + "\" AS objectId FROM `" + objects[i].objectId + "_" + data.apioId + "`";
+                                //                         if (final) {
+                                //                             final += " UNION " + q;
+                                //                         } else {
+                                //                             final = q;
+                                //                         }
+                                //                     }
+                                //                 }
+                                //
+                                //                 if (final) {
+                                //                     sql_db.query(final, function (s_e, records) {
+                                //                         if (s_e) {
+                                //                             console.log("Error while getting timestamp from tables: ", s_e);
+                                //                         }
+                                //
+                                //                         var result = {};
+                                //                         for (var i in records) {
+                                //                             result[records[i].objectId] = records[i].timestamp;
+                                //                         }
+                                //                         // sql_db.end();
+                                //
+                                //                         var basePath = "public/boards/" + data.apioId;
+                                //                         var modMap = {};
+                                //
+                                //                         var recursiveRetrieve = function (dir) {
+                                //                             var files = fs.readdirSync(dir);
+                                //                             for (var i in files) {
+                                //                                 var stats = fs.statSync(dir + "/" + files[i]);
+                                //                                 if (stats.isDirectory()) {
+                                //                                     recursiveRetrieve(dir + "/" + files[i]);
+                                //                                 } else {
+                                //                                     modMap[(dir + "/" + files[i]).replace(basePath + "/", "")] = stats.mtime.getTime();
+                                //                                 }
+                                //                             }
+                                //                         };
+                                //
+                                //                         if (fs.existsSync(basePath)) {
+                                //                             recursiveRetrieve(basePath);
+                                //                         }
+                                //
+                                //                         if (data.test === system.test) {
+                                //                             var randomToken = Date.now() + ":" + uuidgen.v4();
+                                //                             Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                //                             Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                //                             //console.log("Asking " + data.apioId + " for sync data...");
+                                //                             //Così ho notificato una sola board che voglio i suoi dati
+                                //                             //socket.emit("apio.remote.sync.request");
+                                //                             console.log("Asking " + data.apioId + " for sync data...");
+                                //                             Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                //                                 files: modMap,
+                                //                                 timestampObj: result
+                                //                             });
+                                //                             //console.log("Waiting for sync data...")
+                                //                         } else {
+                                //                             Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
+                                //                             var randomToken = Date.now() + ":" + uuidgen.v4();
+                                //                             Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                //                             Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                //                             //console.log("Asking " + data.apioId + " for sync data...");
+                                //                             //Così ho notificato una sola board che voglio i suoi dati
+                                //                             //socket.emit("apio.remote.sync.request");
+                                //                             console.log("Asking " + data.apioId + " for sync data...");
+                                //                             Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                //                                 files: modMap,
+                                //                                 timestampObj: result
+                                //                             });
+                                //                         }
+                                //                     });
+                                //                 } else {
+                                //                     if (data.test === system.test) {
+                                //                         var randomToken = Date.now() + ":" + uuidgen.v4();
+                                //                         Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                //                         Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                //                         //console.log("Asking " + data.apioId + " for sync data...");
+                                //                         //Così ho notificato una sola board che voglio i suoi dati
+                                //                         //socket.emit("apio.remote.sync.request");
+                                //                         console.log("Asking " + data.apioId + " for sync data...");
+                                //                         Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                //                             files: {},
+                                //                             timestampObj: {}
+                                //                         });
+                                //                         //console.log("Waiting for sync data...")
+                                //                     } else {
+                                //                         Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
+                                //                         var randomToken = Date.now() + ":" + uuidgen.v4();
+                                //                         Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                //                         Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                //                         //console.log("Asking " + data.apioId + " for sync data...");
+                                //                         //Così ho notificato una sola board che voglio i suoi dati
+                                //                         //socket.emit("apio.remote.sync.request");
+                                //                         console.log("Asking " + data.apioId + " for sync data...");
+                                //                         Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                //                             files: {},
+                                //                             timestampObj: {}
+                                //                         });
+                                //                     }
+                                //                 }
+                                //             }
+                                //         });
+                                //     }
+                                // });
+
+                                Apio.Database.db.collection("Objects").find({apioId: data.apioId}).toArray(function (o_e, objects) {
+                                    if (o_e) {
+                                        console.log("Error while getting objects with apioId " + data.apioId + ": ", o_e);
                                     } else {
-                                        console.log("Successfully connected to MySQL");
-                                        Apio.Database.db.collection("Objects").find({apioId: data.apioId}).toArray(function (o_e, objects) {
-                                            if (o_e) {
-                                                console.log("Error while getting objects with apioId " + data.apioId + ": ", o_e);
-                                            } else {
-                                                var final = "";
-                                                for (var i in objects) {
-                                                    if (Object.keys(objects[i].properties).length && objects[i].name.indexOf("Dongle") === -1) {
-                                                        var q = "SELECT MAX(timestamp) AS timestamp, \"" + objects[i].objectId + "\" AS objectId FROM `" + objects[i].objectId + "_" + data.apioId + "`";
-                                                        if (final) {
-                                                            final += " UNION " + q;
-                                                        } else {
-                                                            final = q;
-                                                        }
-                                                    }
-                                                }
-
+                                        var final = "";
+                                        for (var i in objects) {
+                                            if (Object.keys(objects[i].properties).length && objects[i].name.indexOf("Dongle") === -1) {
+                                                var q = "SELECT MAX(timestamp) AS `timestamp`, \"" + objects[i].objectId + "\" AS `objectId` FROM `" + objects[i].objectId + "_" + data.apioId + "`";
                                                 if (final) {
-                                                    sql_db.query(final, function (s_e, records) {
-                                                        if (s_e) {
-                                                            console.log("Error while getting timestamp from tables: ", s_e);
-                                                        }
-
-                                                        var result = {};
-                                                        for (var i in records) {
-                                                            result[records[i].objectId] = records[i].timestamp;
-                                                        }
-                                                        sql_db.end();
-
-                                                        var basePath = "public/boards/" + data.apioId;
-                                                        var modMap = {};
-
-                                                        var recursiveRetrieve = function (dir) {
-                                                            var files = fs.readdirSync(dir);
-                                                            for (var i in files) {
-                                                                var stats = fs.statSync(dir + "/" + files[i]);
-                                                                if (stats.isDirectory()) {
-                                                                    recursiveRetrieve(dir + "/" + files[i]);
-                                                                } else {
-                                                                    modMap[(dir + "/" + files[i]).replace(basePath + "/", "")] = stats.mtime.getTime();
-                                                                }
-                                                            }
-                                                        };
-
-                                                        if (fs.existsSync(basePath)) {
-                                                            recursiveRetrieve(basePath);
-                                                        }
-
-                                                        if (data.test === system.test) {
-                                                            var randomToken = Date.now() + ":" + uuidgen.v4();
-                                                            Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
-                                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
-                                                            //console.log("Asking " + data.apioId + " for sync data...");
-                                                            //Così ho notificato una sola board che voglio i suoi dati
-                                                            //socket.emit("apio.remote.sync.request");
-                                                            console.log("Asking " + data.apioId + " for sync data...");
-                                                            Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
-                                                                files: modMap,
-                                                                timestampObj: result
-                                                            });
-                                                            //console.log("Waiting for sync data...")
-                                                        } else {
-                                                            Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
-                                                            var randomToken = Date.now() + ":" + uuidgen.v4();
-                                                            Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
-                                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
-                                                            //console.log("Asking " + data.apioId + " for sync data...");
-                                                            //Così ho notificato una sola board che voglio i suoi dati
-                                                            //socket.emit("apio.remote.sync.request");
-                                                            console.log("Asking " + data.apioId + " for sync data...");
-                                                            Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
-                                                                files: modMap,
-                                                                timestampObj: result
-                                                            });
-                                                        }
-                                                    });
+                                                    final += " UNION " + q;
                                                 } else {
-                                                    if (data.test === system.test) {
-                                                        var randomToken = Date.now() + ":" + uuidgen.v4();
-                                                        Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
-                                                        Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
-                                                        //console.log("Asking " + data.apioId + " for sync data...");
-                                                        //Così ho notificato una sola board che voglio i suoi dati
-                                                        //socket.emit("apio.remote.sync.request");
-                                                        console.log("Asking " + data.apioId + " for sync data...");
-                                                        Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
-                                                            files: {},
-                                                            timestampObj: {}
-                                                        });
-                                                        //console.log("Waiting for sync data...")
-                                                    } else {
-                                                        Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
-                                                        var randomToken = Date.now() + ":" + uuidgen.v4();
-                                                        Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
-                                                        Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
-                                                        //console.log("Asking " + data.apioId + " for sync data...");
-                                                        //Così ho notificato una sola board che voglio i suoi dati
-                                                        //socket.emit("apio.remote.sync.request");
-                                                        console.log("Asking " + data.apioId + " for sync data...");
-                                                        Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
-                                                            files: {},
-                                                            timestampObj: {}
-                                                        });
-                                                    }
+                                                    final = q;
                                                 }
                                             }
-                                        });
+                                        }
+
+                                        if (final) {
+                                            sql_db.query(final, function (s_e, records) {
+                                                if (s_e) {
+                                                    console.log("Error while getting timestamp from tables: ", s_e);
+                                                }
+
+                                                var result = {};
+                                                for (var i in records) {
+                                                    result[records[i].objectId] = records[i].timestamp;
+                                                }
+                                                // sql_db.end();
+
+                                                var basePath = "public/boards/" + data.apioId;
+                                                var modMap = {};
+
+                                                var recursiveRetrieve = function (dir) {
+                                                    var files = fs.readdirSync(dir);
+                                                    for (var i in files) {
+                                                        var stats = fs.statSync(dir + "/" + files[i]);
+                                                        if (stats.isDirectory()) {
+                                                            recursiveRetrieve(dir + "/" + files[i]);
+                                                        } else {
+                                                            modMap[(dir + "/" + files[i]).replace(basePath + "/", "")] = stats.mtime.getTime();
+                                                        }
+                                                    }
+                                                };
+
+                                                if (fs.existsSync(basePath)) {
+                                                    recursiveRetrieve(basePath);
+                                                }
+
+                                                if (data.test === system.test) {
+                                                    var randomToken = Date.now() + ":" + uuidgen.v4();
+                                                    Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                                    Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                                    //console.log("Asking " + data.apioId + " for sync data...");
+                                                    //Così ho notificato una sola board che voglio i suoi dati
+                                                    //socket.emit("apio.remote.sync.request");
+                                                    console.log("Asking " + data.apioId + " for sync data...");
+                                                    Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                                        files: modMap,
+                                                        timestampObj: result
+                                                    });
+                                                    //console.log("Waiting for sync data...")
+                                                } else {
+                                                    Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
+                                                    var randomToken = Date.now() + ":" + uuidgen.v4();
+                                                    Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                                    Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                                    //console.log("Asking " + data.apioId + " for sync data...");
+                                                    //Così ho notificato una sola board che voglio i suoi dati
+                                                    //socket.emit("apio.remote.sync.request");
+                                                    console.log("Asking " + data.apioId + " for sync data...");
+                                                    Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                                        files: modMap,
+                                                        timestampObj: result
+                                                    });
+                                                }
+                                            });
+                                        } else {
+                                            if (data.test === system.test) {
+                                                var randomToken = Date.now() + ":" + uuidgen.v4();
+                                                Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                                Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                                //console.log("Asking " + data.apioId + " for sync data...");
+                                                //Così ho notificato una sola board che voglio i suoi dati
+                                                //socket.emit("apio.remote.sync.request");
+                                                console.log("Asking " + data.apioId + " for sync data...");
+                                                Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                                    files: {},
+                                                    timestampObj: {}
+                                                });
+                                                //console.log("Waiting for sync data...")
+                                            } else {
+                                                Apio.Util.log("ApioOS failed the test sending " + data.test + " against " + system.test);
+                                                var randomToken = Date.now() + ":" + uuidgen.v4();
+                                                Apio.Util.log("ApioOS successfully authenticated, sending the auth token");
+                                                Apio.io.to(data.apioId).emit("apio.remote.handshake.test.success", {token: randomToken});
+                                                //console.log("Asking " + data.apioId + " for sync data...");
+                                                //Così ho notificato una sola board che voglio i suoi dati
+                                                //socket.emit("apio.remote.sync.request");
+                                                console.log("Asking " + data.apioId + " for sync data...");
+                                                Apio.io.to(data.apioId).emit("apio.remote.sync.request", {
+                                                    files: {},
+                                                    timestampObj: {}
+                                                });
+                                            }
+                                        }
                                     }
                                 });
                             }
@@ -1918,19 +2165,19 @@ module.exports = function (enableCloudSocket) {
                                     Apio.Database.db.collection("Objects").insert(data.apio.objects, function (err) {
                                         if (!err) {
                                             console.log("ApioCloud>>> Added " + data.apio.objects.length + " objects.");
-                                            var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                                            // var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
                                             var numberOfObjects = 0;
                                             data.apio.objects.forEach(function (object) {
                                                 numberOfObjects++;
                                                 var condition_array = [];
                                                 if (Object.keys(object.properties).length) {
                                                     for (var p in object.properties) {
-                                                        if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
-                                                            condition_array.push(p + " TEXT");
+                                                        if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
+                                                            condition_array.push("`" + p + "` TEXT");
                                                         } else if (["number", "trigger", "unclickabletrigger"].indexOf(object.properties[p].type) > -1) {
-                                                            condition_array.push(p + " INT");
+                                                            condition_array.push("`" + p + "` INT");
                                                         } else if (["sensor", "slider", "unlimitedsensor"].indexOf(object.properties[p].type) > -1) {
-                                                            condition_array.push(p + " DOUBLE");
+                                                            condition_array.push("`" + p + "` DOUBLE");
                                                         }
                                                     }
 
@@ -1947,9 +2194,9 @@ module.exports = function (enableCloudSocket) {
                                                                     console.log("Error while creating index: ", e_i);
                                                                 } else {
                                                                     console.log("Index created: ", r_i);
-                                                                    if (numberOfObjects === 0) {
-                                                                        sql_db.end();
-                                                                    }
+                                                                    // if (numberOfObjects === 0) {
+                                                                    //     sql_db.end();
+                                                                    // }
                                                                 }
                                                             });
                                                         } else {
@@ -2318,14 +2565,6 @@ module.exports = function (enableCloudSocket) {
                     });
                 });
 
-                socket.on("input", function (data) {
-                    console.log(data);
-                    Apio.Database.updateProperty(data, function () {
-                        socket.broadcast.emit("apio_server_update_", data);
-                    });
-                    Apio.Serial.send(data);
-                });
-
                 socket.on("log_update.fromgateway", function (data) {
                     for (var x in Apio.connectedSockets) {
                         if (x === "admin" || validator.isEmail(x)) {
@@ -2346,10 +2585,22 @@ module.exports = function (enableCloudSocket) {
                     //cambio il nome della variabile data nella function(data) in newData, questa conterrà cioò che permette a data di essere quello ch e è ora e che attualmente si trova in dongle_logic Apio.Serial.Read nell'oggetto JSON o
                     if (Apio.Configuration.type === "gateway") {
                         console.log("---------------------serial_update-------------", data);
-                        Apio.io.emit("apio_server_update", data);
+                        // Apio.io.emit("apio_server_update", data);
+
+                        data.apioId = Apio.System.getApioIdentifier();
                         if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
-                            data.apioId = Apio.System.getApioIdentifier();
                             Apio.Remote.socket.emit('apio.server.object.update', data);
+                        }
+
+                        for (var x in Apio.connectedSockets) {
+                            if (x === "admin" || validator.isEmail(x) || Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                                var socketIds = Apio.connectedSockets[x];
+                                for (var i in socketIds) {
+                                    if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                        Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
+                                    }
+                                }
+                            }
                         }
 
                         //USING AddressBindToProperty
@@ -2537,7 +2788,19 @@ module.exports = function (enableCloudSocket) {
                 socket.on("apio_update_with_apply", function (data) {
                     data.apioId = Apio.System.getApioIdentifier();
                     Apio.Database.updateProperty(data, function () {
-                        Apio.io.emit("apio_server_update", data);
+                        // Apio.io.emit("apio_server_update", data);
+
+                        for (var x in Apio.connectedSockets) {
+                            if (x === "admin" || validator.isEmail(x) || Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                                var socketIds = Apio.connectedSockets[x];
+                                for (var i in socketIds) {
+                                    if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                        Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
+                                    }
+                                }
+                            }
+                        }
+
                         Apio.Database.db.collection("States").find({objectId: data.objectId}).toArray(function (error, result) {
                             if (error) {
                                 console.log("Error while searching for states of object with objectId " + data.objectId);
@@ -2558,6 +2821,7 @@ module.exports = function (enableCloudSocket) {
                         })
                     });
                 });
+
                 socket.on("socket_service", function (event) {
                     socket.broadcast.emit(event.name, event.data);
                 })
@@ -2817,44 +3081,79 @@ module.exports = function (enableCloudSocket) {
                 objects[objectData.objectId] = objectData;
             }
 
-            var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
-            sql_db.connect(function (err) {
-                if (err) {
-                    console.log("Error while connecting to MySQL: ", err);
+            // var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+            // sql_db.connect(function (err) {
+            //     if (err) {
+            //         console.log("Error while connecting to MySQL: ", err);
+            //     } else {
+            //         console.log("Successfully connected to MySQL");
+            //         var condition_array = [];
+            //         for (var p in objectData.properties) {
+            //             if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
+            //                 condition_array.push(p + " TEXT");
+            //             } else if (["number", "trigger", "unclickabletrigger"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
+            //                 condition_array.push(p + " INT");
+            //             } else if (["sensor", "slider", "unlimitedsensor"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
+            //                 condition_array.push(p + " DOUBLE");
+            //             }
+            //         }
+            //
+            //         var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
+            //         var table = "";
+            //         if (Apio.Configuration.type === "cloud") {
+            //             table = objectData.objectId + "_" + objectData.apioId;
+            //         } else if (Apio.Configuration.type === "gateway") {
+            //             table = objectData.objectId;
+            //         }
+            //
+            //         sql_db.query("CREATE TABLE `" + table + "` (" + condition_string + ")", function (error, result) {
+            //             if (error) {
+            //                 console.log("Error while creating table: ", error);
+            //             } else {
+            //                 console.log("Created table " + table + ", result: ", result);
+            //                 sql_db.query("CREATE INDEX timestamp ON `" + table + "` (timestamp)", function (error1, result1) {
+            //                     if (error1) {
+            //                         console.log("Error while creating table: ", error1);
+            //                     } else {
+            //                         console.log("Created index on table " + table + ", result1: ", result1);
+            //                         // sql_db.end();
+            //                     }
+            //                 });
+            //             }
+            //         });
+            //     }
+            // });
+
+            var condition_array = [];
+            for (var p in objectData.properties) {
+                if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
+                    condition_array.push("`" + p + "` TEXT");
+                } else if (["number", "trigger", "unclickabletrigger"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
+                    condition_array.push("`" + p + "` INT");
+                } else if (["sensor", "slider", "unlimitedsensor"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
+                    condition_array.push("`" + p + "` DOUBLE");
+                }
+            }
+
+            var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
+            var table = "";
+            if (Apio.Configuration.type === "cloud") {
+                table = objectData.objectId + "_" + objectData.apioId;
+            } else if (Apio.Configuration.type === "gateway") {
+                table = objectData.objectId;
+            }
+
+            sql_db.query("CREATE TABLE `" + table + "` (" + condition_string + ")", function (error, result) {
+                if (error) {
+                    console.log("Error while creating table: ", error);
                 } else {
-                    console.log("Successfully connected to MySQL");
-                    var condition_array = [];
-                    for (var p in objectData.properties) {
-                        if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
-                            condition_array.push(p + " TEXT");
-                        } else if (["number", "trigger", "unclickabletrigger"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
-                            condition_array.push(p + " INT");
-                        } else if (["sensor", "slider", "unlimitedsensor"].indexOf(objectData.properties[p].type.toLowerCase()) > -1) {
-                            condition_array.push(p + " DOUBLE");
-                        }
-                    }
-
-                    var condition_string = "id INT UNSIGNED NOT NULL AUTO_INCREMENT, " + condition_array.join(", ") + ", timestamp BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id)";
-                    var table = "";
-                    if (Apio.Configuration.type === "cloud") {
-                        table = objectData.objectId + "_" + objectData.apioId;
-                    } else if (Apio.Configuration.type === "gateway") {
-                        table = objectData.objectId;
-                    }
-
-                    sql_db.query("CREATE TABLE `" + table + "` (" + condition_string + ")", function (error, result) {
-                        if (error) {
-                            console.log("Error while creating table: ", error);
+                    console.log("Created table " + table + ", result: ", result);
+                    sql_db.query("CREATE INDEX `timestamp` ON `" + table + "` (timestamp)", function (error1, result1) {
+                        if (error1) {
+                            console.log("Error while creating table: ", error1);
                         } else {
-                            console.log("Created table " + table + ", result: ", result);
-                            sql_db.query("CREATE INDEX timestamp ON `" + table + "` (timestamp)", function (error1, result1) {
-                                if (error1) {
-                                    console.log("Error while creating table: ", error1);
-                                } else {
-                                    console.log("Created index on table " + table + ", result1: ", result1);
-                                    sql_db.end();
-                                }
-                            });
+                            console.log("Created index on table " + table + ", result1: ", result1);
+                            // sql_db.end();
                         }
                     });
                 }
@@ -2947,27 +3246,43 @@ module.exports = function (enableCloudSocket) {
             });
         }
 
-        var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
-        sql_db.connect(function (err) {
-            if (err) {
-                console.log("Error while connecting to MySQL: ", err);
-            } else {
-                console.log("Successfully connected to MySQL");
-                var table = "";
-                if (Apio.Configuration.type === "cloud") {
-                    table = id.objectId + "_" + id.apioId;
-                } else if (Apio.Configuration.type === "gateway") {
-                    table = id;
-                }
+        // var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+        // sql_db.connect(function (err) {
+        //     if (err) {
+        //         console.log("Error while connecting to MySQL: ", err);
+        //     } else {
+        //         console.log("Successfully connected to MySQL");
+        //         var table = "";
+        //         if (Apio.Configuration.type === "cloud") {
+        //             table = id.objectId + "_" + id.apioId;
+        //         } else if (Apio.Configuration.type === "gateway") {
+        //             table = id;
+        //         }
+        //
+        //         sql_db.query("DROP TABLE `" + table + "`", function (error, result) {
+        //             if (error) {
+        //                 console.log("Error while dropping table: ", error);
+        //             } else {
+        //                 console.log("Table " + table + " successfully deleted, result: ", result);
+        //                 // sql_db.end();
+        //             }
+        //         });
+        //     }
+        // });
 
-                sql_db.query("DROP TABLE `" + table + "`", function (error, result) {
-                    if (error) {
-                        console.log("Error while dropping table: ", error);
-                    } else {
-                        console.log("Table " + table + " successfully deleted, result: ", result);
-                        sql_db.end();
-                    }
-                });
+        var table = "";
+        if (Apio.Configuration.type === "cloud") {
+            table = id.objectId + "_" + id.apioId;
+        } else if (Apio.Configuration.type === "gateway") {
+            table = id;
+        }
+
+        sql_db.query("DROP TABLE `" + table + "`", function (error, result) {
+            if (error) {
+                console.log("Error while dropping table: ", error);
+            } else {
+                console.log("Table " + table + " successfully deleted, result: ", result);
+                // sql_db.end();
             }
         });
     };
@@ -3895,23 +4210,34 @@ module.exports = function (enableCloudSocket) {
                     data.apioId = Apio.System.getApioIdentifier();
                 }
 
-                for (var i in Apio.connectedSockets) {
-                    var walk = true;
-                    if (i.indexOf("-") > -1) {
-                        var components = i.split("-");
-                        if (components.length === 5 && components[0].length === 8 && components[1].length === 4 && components[2].length === 4 && components[3].length === 4 && components[4].length === 12) {
-                            walk = false;
-                        }
-                    }
+                // for (var i in Apio.connectedSockets) {
+                //     var walk = true;
+                //     if (i.indexOf("-") > -1) {
+                //         var components = i.split("-");
+                //         if (components.length === 5 && components[0].length === 8 && components[1].length === 4 && components[2].length === 4 && components[3].length === 4 && components[4].length === 12) {
+                //             walk = false;
+                //         }
+                //     }
+                //
+                //
+                //     //MODIFICA BIND ADDRESS DIRECTIVE
+                //     //va fatto un emit per ogni property legata allo stesso address!!!
+                //     //va aggiunto un ulteriore FOR
+                //     //per ogni elemeto di connectedSockets faccio un emit per ogni property risultante bindata con l'address della property attuale
+                //     for (var j in Apio.connectedSockets[i]) {
+                //         if (walk && Apio.connectedSockets[i][j] !== id && Apio.io.sockets.connected[Apio.connectedSockets[i][j]]) {
+                //             Apio.io.sockets.connected[Apio.connectedSockets[i][j]].emit("apio_server_update", data);
+                //         }
+                //     }
+                // }
 
-
-                    //MODIFICA BIND ADDRESS DIRECTIVE
-                    //va fatto un emit per ogni property legata allo stesso address!!!
-                    //va aggiunto un ulteriore FOR
-                    //per ogni elemeto di connectedSockets faccio un emit per ogni property risultante bindata con l'address della property attuale
-                    for (var j in Apio.connectedSockets[i]) {
-                        if (walk && Apio.connectedSockets[i][j] !== id && Apio.io.sockets.connected[Apio.connectedSockets[i][j]]) {
-                            Apio.io.sockets.connected[Apio.connectedSockets[i][j]].emit("apio_server_update", data);
+                for (var x in Apio.connectedSockets) {
+                    if (x === "admin" || validator.isEmail(x) || Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                        var socketIds = Apio.connectedSockets[x];
+                        for (var i in socketIds) {
+                            if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
+                            }
                         }
                     }
                 }
@@ -4041,7 +4367,7 @@ module.exports = function (enableCloudSocket) {
                 console.log("Properties have been updated");
 
                 //Mysql part
-                var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                // var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
                 var numberOfProperties = 0;
                 var final = function (table, database, field, type) {
                     sql_db.query("call add_modify_column(\"" + table + "\", \"" + database + "\", \"" + field + "\", \"" + type + "\")", function (e_f, r_f) {
@@ -4050,9 +4376,9 @@ module.exports = function (enableCloudSocket) {
                         } else {
                             console.log("r_f: ", r_f);
                             numberOfProperties--;
-                            if (numberOfProperties === 0) {
-                                sql_db.end();
-                            }
+                            // if (numberOfProperties === 0) {
+                            //     sql_db.end();
+                            // }
                         }
                     });
                 };
@@ -4095,7 +4421,7 @@ module.exports = function (enableCloudSocket) {
                 props.forEach(function (p) {
                     numberOfProperties++;
                     var colType = "";
-                    if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(newProperties[p].type) > -1) {
+                    if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(newProperties[p].type) > -1) {
                         colType = "TEXT";
                     } else if (["number", "trigger", "unclickabletrigger"].indexOf(newProperties[p].type) > -1) {
                         colType = "INT";
@@ -4151,6 +4477,12 @@ module.exports = function (enableCloudSocket) {
 
         if (Apio.Configuration.type === "cloud") {
             searchQuery.apioId = data.apioId;
+        }
+
+        for (var i in data.properties) {
+            if (!data.properties[i].hasOwnProperty("value")) {
+                data.properties[i].value = "0";
+            }
         }
 
         Apio.Database.db.collection("Objects").findAndModify(searchQuery, {}, {$set: data}, function (error, result) {

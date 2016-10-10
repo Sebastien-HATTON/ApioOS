@@ -422,10 +422,12 @@ app.get("/apio/log/getSumFileByDate/objectId/:objectId/date/:date", function (re
             for (var i = 0; i < tsArray.length - 1; i++) {
                 var query = "SELECT ";
                 for (var j in object.properties) {
-                    if (query === "SELECT ") {
-                        query += "SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
-                    } else {
-                        query += ", SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
+                    if (object.properties[j].type != "log") {
+                        if (query === "SELECT ") {
+                            query += "SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        } else {
+                            query += ", SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        }
                     }
                 }
 
@@ -438,7 +440,7 @@ app.get("/apio/log/getSumFileByDate/objectId/:objectId/date/:date", function (re
                 }
             }
 
-            final = "SELECT * FROM (" + final + ") AS T WHERE " + j + " IS NOT NULL";
+            final = "SELECT * FROM (" + final + ") AS T";
 
             sql_db.query(final).on("result", function (row) {
                 processRow(row);
@@ -482,10 +484,12 @@ app.get("/apio/log/getSumFileByRange/objectId/:objectId/from/:from/daysNumber/:d
             for (var i = 0; i < tsArray.length - 1; i++) {
                 var query = "SELECT ";
                 for (var j in object.properties) {
-                    if (query === "SELECT ") {
-                        query += "SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
-                    } else {
-                        query += ", SUM(" + j + ") AS " + j + ", COUNT(" + j + ") AS count" + j;
+                    if (object.properties[j].type != "log") {
+                        if (query === "SELECT ") {
+                            query += "SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        } else {
+                            query += ", SUM(`" + j + "`) AS `" + j + "`, COUNT(`" + j + "`) AS `count" + j + "`";
+                        }
                     }
                 }
 
@@ -498,7 +502,7 @@ app.get("/apio/log/getSumFileByRange/objectId/:objectId/from/:from/daysNumber/:d
                 }
             }
 
-            final = "SELECT * FROM (" + final + ") AS T WHERE " + j + " IS NOT NULL";
+            final = "SELECT * FROM (" + final + ") AS T";
 
             sql_db.query(final).on("result", function (row) {
                 processRow(row);

@@ -190,7 +190,12 @@ module.exports = function (Apio) {
             var token = Apio.Token.getFromText(user.email, key);
             req.session.token = token;
 
-            Apio.Database.db.collection("Users").findAndModify(user, [], {$set: {password: newHash, token: token}}, function (err, result) {
+            Apio.Database.db.collection("Users").findAndModify(user, [], {
+                $set: {
+                    password: newHash,
+                    token: token
+                }
+            }, function (err, result) {
                 if (err) {
                     console.log(err);
                     res.status(500).send({
@@ -241,7 +246,7 @@ module.exports = function (Apio) {
 
                         text += " alle " + (new Date());
 
-                        require("dns").resolve("www.google.com", function(err) {
+                        require("dns").resolve("www.google.com", function (err) {
                             if (err) {
                                 console.log("Unable to send mail: no internet connection");
                             } else {
@@ -662,7 +667,12 @@ module.exports = function (Apio) {
                 if (err) {
                     res.send(500);
                 } else {
+                    if (req.session.email === req.body.email) {
+                        req.session.priviligies = req.body.role;
+                    }
+
                     res.send(200);
+
                     var event = {
                         server: "apio.server.user.setPermission",
                         remote: "apio.remote.user.setPermission"

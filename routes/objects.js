@@ -332,7 +332,7 @@ module.exports = function (Apio) {
                                 props.forEach(function (p) {
                                     numberOfProperties++;
                                     var colType = "";
-                                    if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "log", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
+                                    if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(object.properties[p].type) > -1) {
                                         colType = "TEXT";
                                     } else if (["number", "trigger", "unclickabletrigger"].indexOf(object.properties[p].type) > -1) {
                                         colType = "INT";

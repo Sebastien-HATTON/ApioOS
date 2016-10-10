@@ -104,6 +104,10 @@ module.exports = function (libraries) {
             }
         });
 
+        Apio.Remote.socket.on('apio.remote.handshake.reset', function () {
+            socket.emit("enableCloudUpdate", true);
+        });
+
         Apio.Remote.socket.on('disconnect', function () {
             console.log("-------------DISCONNESSO");
         });
@@ -217,6 +221,140 @@ module.exports = function (libraries) {
         Apio.Remote.socket.on("apio.update.apio.app", function (data) {
             fs.writeFileSync("public/applications/" + data.objectId + "/" + data.objectId + ".html", data.html);
             fs.writeFileSync("public/applications/" + data.objectId + "/" + data.objectId + ".js", data.js);
+
+            var searchQuery = {
+                objectId: data.objectId
+            };
+
+            if (Apio.Configuration.type === "cloud") {
+                searchQuery.apioId = data.apioId;
+            }
+
+            fs.readFile("public/applications/" + data.objectId + "/" + data.objectId + ".html", "utf8", function (e_r, content) {
+                if (e_r) {
+                    console.log("Error while reading file: ", e_r);
+                } else if (content) {
+                    var htmlparser = require("htmlparser");
+                    var handler = new htmlparser.DefaultHandler(function (error, dom) {
+                        if (error) {
+                            console.log("error while instancing handler: ", error);
+                        }
+                    });
+                    var parser = new htmlparser.Parser(handler);
+                    parser.parseComplete(content);
+                    var parsed = handler.dom;
+
+                    var properties = {};
+
+                    var retrieve = function (base) {
+                        for (var x in base) {
+                            if (base[x]) {
+                                if (base[x].hasOwnProperty("attribs") && base[x].attribs.hasOwnProperty("propertyname")) {
+                                    properties[base[x].attribs.propertyname] = {
+                                        type: base[x].name
+                                    };
+
+                                    for (var j in base[x].attribs) {
+                                        if (j !== "propertyname") {
+                                            properties[base[x].attribs.propertyname][j] = base[x].attribs[j];
+                                        }
+                                    }
+                                } else if (base[x].hasOwnProperty("children")) {
+                                    retrieve(base[x].children);
+                                }
+                            }
+                        }
+                    };
+
+                    retrieve(parsed);
+
+                    Apio.Database.db.collection("Objects").update(searchQuery, {$set: {properties: properties}}, function (b_e) {
+                        if (b_e) {
+                            console.log("Error while updating binds: ", b_e);
+                        } else {
+                            var final = function (table, database, field, type) {
+                                sql_db.query("call add_modify_column(\"" + table + "\", \"" + database + "\", \"" + field + "\", \"" + type + "\")", function (e_f, r_f) {
+                                    if (e_f) {
+                                        console.log("Error while calling procedure: ", e_f);
+                                    } else {
+                                        console.log("r_f: ", r_f);
+                                        numberOfProperties--;
+                                        if (numberOfProperties === 0) {
+                                            sql_db.end();
+                                        }
+                                    }
+                                });
+                            };
+
+                            var sql_db = mysql.createConnection("mysql://root:root@127.0.0.1/Logs");
+                            var numberOfProperties = 0;
+                            var props = Object.keys(properties);
+                            var table_name = undefined;
+                            if (Apio.Configuration.type === "cloud") {
+                                table_name = searchQuery.objectId + "_" + searchQuery.apioId;
+                            } else if (Apio.Configuration.type === "gateway") {
+                                table_name = searchQuery.objectId;
+                            }
+
+                            sql_db.query("SHOW COLUMNS FROM `" + table_name + "`", function (error, cols) {
+                                if (error) {
+                                    console.log("Error while creating table: ", error);
+                                } else if (cols) {
+                                    var columns = [];
+                                    for (var x in cols) {
+                                        if (cols[x].Field !== "id" && cols[x].Field !== "timestamp") {
+                                            columns.push(cols[x].Field);
+                                        }
+                                    }
+
+                                    columns.forEach(function (col) {
+                                        if (props.indexOf(col) === -1) {
+                                            sql_db.query("ALTER TABLE `" + table_name + "` DROP COLUMN `" + col + "`", function (err, r_a_t) {
+                                                if (err) {
+                                                    console.log("Error while altering table " + table_name + ": ", err);
+                                                } else if (r_a_t) {
+                                                    console.log("Column " + col + " successfully deleted from table " + table_name + ": ", r_a_t);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+
+                            props.forEach(function (p) {
+                                numberOfProperties++;
+                                var colType = "";
+                                if (["apiobutton", "apiolink", "asyncdisplay", "autocomplete", "battery", "collapse", "dynamicview", "graph", "list", "note", "property", "ranking", "text", "textbox"].indexOf(properties[p].type) > -1) {
+                                    colType = "TEXT";
+                                } else if (["number", "trigger", "unclickabletrigger"].indexOf(properties[p].type) > -1) {
+                                    colType = "INT";
+                                } else if (["sensor", "slider", "unlimitedsensor"].indexOf(properties[p].type) > -1) {
+                                    colType = "DOUBLE";
+                                }
+
+                                sql_db.query("SELECT * FROM information_schema.routines where ROUTINE_NAME LIKE 'add_modify_column'", function (error, result) {
+                                    if (error) {
+                                        console.log("Error while creating table: ", error);
+                                    } else {
+                                        if (result.length) {
+                                            final(table_name, "Logs", p, colType);
+                                        } else {
+                                            sql_db.query("CREATE PROCEDURE add_modify_column(IN tablename TEXT, IN db_name TEXT, IN columnname TEXT, IN columntype TEXT)\nBEGIN\nIF NOT EXISTS (SELECT NULL FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = tablename AND table_schema = db_name AND column_name = columnname) THEN SET @ddl = CONCAT('alter table `', tablename, '` add column (`', columnname, '` ', columntype, ')'); PREPARE STMT FROM @ddl; EXECUTE STMT; ELSE SET @ddl = CONCAT('alter table `', tablename, '` modify `', columnname, '` ', columntype); PREPARE STMT FROM @ddl; EXECUTE STMT; END IF;\nEND", function (e_p, r_p) {
+                                                if (e_p) {
+                                                    console.log("Error while creating procedure: ", e_p);
+                                                } else {
+                                                    console.log("r_p: ", r_p);
+                                                    final(table_name, "Logs", p, colType);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+            });
         });
 
         Apio.Remote.socket.on("apio.upload.app", function (data) {
