@@ -1714,7 +1714,12 @@ module.exports = function (enableCloudSocket) {
                                         if (!Apio.boardsLastDisconnection.hasOwnProperty(data.apioId) || new Date() - Apio.boardsLastDisconnection[data.apioId] >= 20 * 60 * 1000) {
                                             Apio.io.to(data.apioId).emit("apio.remote.handshake.test", {factor: randomuuid});
                                         } else {
-                                            Apio.io.to(data.apioId).emit("apio.remote.handshake.reset");
+                                            Apio.io.to(data.apioId).emit("apio.cloud.sync.end");
+                                            if (Apio.syncedBoards.indexOf(data.apioId) === -1) {
+                                                Apio.syncedBoards.push(data.apioId);
+                                                console.log("--------------ALREADY SYNC------------------");
+                                                console.log("Apio.syncedBoards: ", Apio.syncedBoards);
+                                            }
                                         }
                                         //Ora aspetto che mi restituisce il test che deve essere uguale ad hash
                                     } else {
@@ -2888,43 +2893,87 @@ module.exports = function (enableCloudSocket) {
                 }
             });
 
+            // if (dump) {
+            //     Apio.Database.db.collection('Users').findOne({name: "verify"}, function (err, doc) {
+            //         if (err) {
+            //             var sys = require('sys');
+            //             var exec = require('child_process').exec;
+            //             var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio", function () {
+            //                 if (callback) {
+            //                     callback();
+            //                 }
+            //             });
+            //         } else if (doc) {
+            //             console.log("Il database c'è faccio il dump");
+            //             var sys = require('sys');
+            //             var exec = require('child_process').exec;
+            //             var child = exec("mongodump --out ./backup", function () {
+            //                 if (callback) {
+            //                     callback();
+            //                 }
+            //             });
+            //         } else {
+            //             console.log("Il database non c'è faccio il restore");
+            //             var sys = require('sys');
+            //             var exec = require('child_process').exec;
+            //             if (fs.existsSync("./backup/apio")) {
+            //                 console.log("C'è il backup fs.exist");
+            //                 var child = exec("mongorestore ./backup/apio -d apio", function () {
+            //                     if (callback) {
+            //                         callback();
+            //                     }
+            //                 });
+            //             } else if (fs.existsSync("./data/apio")) {
+            //                 console.log("Non c'è il backup fs.exist");
+            //                 var child = exec("mongorestore ./data/apio -d apio", function () {
+            //                     if (callback) {
+            //                         callback();
+            //                     }
+            //                 });
+            //             } else {
+            //                 Apio.Database.db.collection("Users").insert({
+            //                     disabled_notification: [],
+            //                     name: "verify",
+            //                     unread_notifications: []
+            //                 }, function (error) {
+            //                     if (error) {
+            //                         console.log("Error while adding verify");
+            //                     } else {
+            //                         console.log("Verify successfully interted");
+            //                     }
+            //
+            //                     if (callback) {
+            //                         callback();
+            //                     }
+            //                 });
+            //             }
+            //         }
+            //     });
+            // } else if (callback) {
+            //     callback();
+            // }
+
             if (dump) {
                 Apio.Database.db.collection('Users').findOne({name: "verify"}, function (err, doc) {
                     if (err) {
                         var sys = require('sys');
                         var exec = require('child_process').exec;
-                        var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio", function () {
-                            if (callback) {
-                                callback();
-                            }
-                        });
+                        var child = exec("mongo apio --eval \"db.dropDatabase()\" && mongorestore ./data/apio -d apio");
                     } else if (doc) {
                         console.log("Il database c'è faccio il dump");
                         var sys = require('sys');
                         var exec = require('child_process').exec;
-                        var child = exec("mongodump --out ./backup", function () {
-                            if (callback) {
-                                callback();
-                            }
-                        });
+                        var child = exec("mongodump --out ./backup");
                     } else {
                         console.log("Il database non c'è faccio il restore");
                         var sys = require('sys');
                         var exec = require('child_process').exec;
                         if (fs.existsSync("./backup/apio")) {
                             console.log("C'è il backup fs.exist");
-                            var child = exec("mongorestore ./backup/apio -d apio", function () {
-                                if (callback) {
-                                    callback();
-                                }
-                            });
+                            var child = exec("mongorestore ./backup/apio -d apio");
                         } else if (fs.existsSync("./data/apio")) {
                             console.log("Non c'è il backup fs.exist");
-                            var child = exec("mongorestore ./data/apio -d apio", function () {
-                                if (callback) {
-                                    callback();
-                                }
-                            });
+                            var child = exec("mongorestore ./data/apio -d apio");
                         } else {
                             Apio.Database.db.collection("Users").insert({
                                 disabled_notification: [],
@@ -2936,15 +2985,15 @@ module.exports = function (enableCloudSocket) {
                                 } else {
                                     console.log("Verify successfully interted");
                                 }
-
-                                if (callback) {
-                                    callback();
-                                }
                             });
                         }
                     }
                 });
-            } else if (callback) {
+
+            }
+
+
+            if (callback) {
                 callback();
             }
         });

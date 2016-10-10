@@ -104,10 +104,6 @@ module.exports = function (libraries) {
             }
         });
 
-        Apio.Remote.socket.on('apio.remote.handshake.reset', function () {
-            socket.emit("enableCloudUpdate", true);
-        });
-
         Apio.Remote.socket.on('disconnect', function () {
             console.log("-------------DISCONNESSO");
         });
