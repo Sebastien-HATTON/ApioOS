@@ -35,13 +35,13 @@ module.exports = function (libraries) {
         console.log("Caught exception: ", err);
     });
 
-    app.use(function (req, res, next) {
-        res.header("Accept", "*");
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET, POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        next();
-    });
+    // app.use(function (req, res, next) {
+    //     res.header("Accept", "*");
+    //     res.header("Access-Control-Allow-Origin", "*");
+    //     res.header("Access-Control-Allow-Methods", "GET, POST");
+    //     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    //     next();
+    // });
 
     app.use(bodyParser.json({
         limit: "50mb"

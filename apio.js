@@ -775,7 +775,7 @@ module.exports = function (enableCloudSocket) {
                 socket.on("close_autoInstall_modal", function (apioId) {
                     if (Apio.Configuration.type === "cloud" && Apio.connectedSockets.hasOwnProperty(apioId) && Apio.connectedSockets[apioId][0]) {
                         Apio.io.sockets.connected[Apio.connectedSockets[apioId][0]].emit("close_autoInstall_modal");
-                    } else if (Apio.Configuration.type === "gateway") {
+                    } else if (Apio.Configuration.type === "gateway" && Apio.Configuration.remote.enabled) {
                         Apio.Remote.socket.emit("close_autoInstall_modal.fromgateway", apioId);
                     }
 
@@ -1749,7 +1749,7 @@ module.exports = function (enableCloudSocket) {
                                 if (error) {
                                     console.log("Error while dropping table: ", error);
                                 } else {
-                                    console.log("Table " + table + " successfully deleted, result: ", result);
+                                    console.log("Table " + data.objectId + "_" + data.apioId + " successfully deleted, result: ", result);
                                     // sql_db.end();
                                 }
                             });

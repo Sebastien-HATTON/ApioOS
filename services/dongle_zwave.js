@@ -377,7 +377,7 @@ zwave.on("value changed", function (nodeid, comclass, value) {
                     if (comclass == 37) {
                         var fun = '00';
                         //Aggiorno lo switch
-                    } else if (comclass == 49) {
+                    } else if (comclass == 49 || comclass == 50) {
                         var fun = '01';
                         //Aggiorno la power
                     }
@@ -734,9 +734,11 @@ com.list(function (err, ports) {
 app.get("/addNode", function (req, res) {
     console.log("/addNode");
     if (zwave.hasOwnProperty("beginControllerCommand")) {
+        console.log("Modalità inclusione");
         zwave.beginControllerCommand("AddDevice", true);
         flagLearn = true
     } else {
+        console.log("ESCO da Modalità inclusione");
         zwave.addNode(false);
     }
     res.send(200)

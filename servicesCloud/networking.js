@@ -32,12 +32,12 @@ var socketClient = require("socket.io-client")("http://localhost:" + Apio.Config
 var socketServer = require("socket.io")(http);
 var port = 8111;
 
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-    next();
-});
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Methods", "GET, POST");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+//     next();
+// });
 
 app.use(bodyParser.json({
     limit: "50mb"
@@ -61,6 +61,7 @@ app.get("/apio/wifi/ssids", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(data.data instanceof Array ? 200 : 500).send(data.data);
+            socketClient.removeListener("get_wifi_ssids", fn);
         }
     };
 
@@ -104,6 +105,7 @@ app.get("/apio/wifi/currentSsid", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("get_wifi_currentSsid", fn);
         }
     };
 
@@ -139,6 +141,7 @@ app.get("/apio/wifi/status", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(typeof data.data === "string" ? 200 : 500).send(data.data);
+            socketClient.removeListener("get_wifi_status", fn);
         }
     };
 
@@ -182,6 +185,7 @@ app.get("/apio/3g/status", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("get_3g_status", fn);
         }
     };
 
@@ -233,6 +237,7 @@ app.get("/apio/3g/data", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("get_3g_data", fn);
         }
     };
 
@@ -282,6 +287,8 @@ app.get("/apio/3g/run", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(500).send(data.data);
+            socketClient.removeListener("apio_3g_get_run_ok", fn_ok);
+            socketClient.removeListener("apio_3g_get_run_error", fn_error);
         }
     };
 
@@ -289,6 +296,8 @@ app.get("/apio/3g/run", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socketClient.removeListener("apio_3g_get_run_ok", fn_ok);
+            socketClient.removeListener("apio_3g_get_run_error", fn_error);
         }
     };
 
@@ -329,6 +338,7 @@ app.get("/apio/hotspot/name", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(typeof data.data === "string" ? 200 : 500).send(data.data);
+            socketClient.removeListener("get_hotspot_name", fn);
         }
     };
 
@@ -378,6 +388,8 @@ app.post("/apio/wifi/switchStatus", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(500).send(data.data);
+            socketClient.removeListener("apio_wifi_switchStatus_ok", fn_ok);
+            socketClient.removeListener("apio_wifi_switchStatus_error", fn_error);
         }
     };
 
@@ -385,6 +397,8 @@ app.post("/apio/wifi/switchStatus", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.sendStatus(200);
+            socketClient.removeListener("apio_wifi_switchStatus_ok", fn_ok);
+            socketClient.removeListener("apio_wifi_switchStatus_error", fn_error);
         }
     };
 
@@ -447,6 +461,8 @@ app.post("/apio/3g/data", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("apio_3g_data_ok", fn_ok);
+            socketClient.removeListener("apio_3g_data_error", fn_error);
         }
     };
 
@@ -454,6 +470,8 @@ app.post("/apio/3g/data", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.sendStatus(200);
+            socketClient.removeListener("apio_3g_data_ok", fn_ok);
+            socketClient.removeListener("apio_3g_data_error", fn_error);
         }
     };
 
@@ -515,6 +533,8 @@ app.post("/apio/3g/restart", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("apio_3g_restart_ok", fn_ok);
+            socketClient.removeListener("apio_3g_restart_error", fn_error);
         }
     };
 
@@ -522,6 +542,8 @@ app.post("/apio/3g/restart", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socketClient.removeListener("apio_3g_restart_ok", fn_ok);
+            socketClient.removeListener("apio_3g_restart_error", fn_error);
         }
     };
 
@@ -584,6 +606,8 @@ app.post("/apio/3g/run", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("apio_3g_set_run_ok", fn_ok);
+            socketClient.removeListener("apio_3g_set_runt_error", fn_error);
         }
     };
 
@@ -591,6 +615,8 @@ app.post("/apio/3g/run", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socketClient.removeListener("apio_3g_set_run_ok", fn_ok);
+            socketClient.removeListener("apio_3g_set_runt_error", fn_error);
         }
     };
 
@@ -653,6 +679,8 @@ app.post("/apio/3g/status", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("apio_3g_status_ok", fn_ok);
+            socketClient.removeListener("apio_3g_status_error", fn_error);
         }
     };
 
@@ -660,6 +688,8 @@ app.post("/apio/3g/status", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.sendStatus(200);
+            socketClient.removeListener("apio_3g_status_ok", fn_ok);
+            socketClient.removeListener("apio_3g_status_error", fn_error);
         }
     };
 
@@ -722,6 +752,8 @@ app.post("/apio/hotspot/name", function (req, res) {
             } else {
                 res.sendStatus(404);
             }
+            socketClient.removeListener("apio_hotspot_name_ok", fn_ok);
+            socketClient.removeListener("apio_hotspot_name_error", fn_error);
         }
     };
 
@@ -729,6 +761,8 @@ app.post("/apio/hotspot/name", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.sendStatus(200);
+            socketClient.removeListener("apio_hotspot_name_ok", fn_ok);
+            socketClient.removeListener("apio_hotspot_name_error", fn_error);
         }
     };
 

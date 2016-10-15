@@ -187,6 +187,7 @@ app.get("/apio/dongle/getOpening", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socket.removeListener("get_dongle_opening", fn);
         }
     };
 
@@ -216,6 +217,7 @@ app.get("/apio/dongle/getSettings", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socket.removeListener("get_dongle_setting", fn);
         }
     };
 
@@ -271,6 +273,7 @@ app.get("/apio/logic", function (req, res) {
         if (req.query.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socket.removeListener("get_logics", fn);
         }
     };
 
@@ -340,6 +343,8 @@ app.post("/apio/logic/modifyFile", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(500).send(data.data);
+            socket.removeListener("apio_logic_modify_error", fn_error);
+            socket.removeListener("apio_logic_modify_ok", fn_ok);
         }
     };
 
@@ -347,6 +352,8 @@ app.post("/apio/logic/modifyFile", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socket.removeListener("apio_logic_modify_error", fn_error);
+            socket.removeListener("apio_logic_modify_ok", fn_ok);
         }
     };
 
@@ -399,6 +406,8 @@ app.post("/apio/logic/newFile", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(500).send(data.data);
+            socket.removeListener("apio_logic_new_error", fn_error);
+            socket.removeListener("apio_logic_new_ok", fn_ok);
         }
     };
 
@@ -406,6 +415,8 @@ app.post("/apio/logic/newFile", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socket.removeListener("apio_logic_new_error", fn_error);
+            socket.removeListener("apio_logic_new_ok", fn_ok);
         }
     };
 
@@ -440,6 +451,7 @@ app.post("/apio/logic/file", function (req, res) {
         if (req.body.apioId === data.apioId) {
             req.resume();
             res.status(200).send(data.data);
+            socket.removeListener("get_logic_file", fn);
         }
     };
 

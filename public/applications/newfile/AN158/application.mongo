@@ -1,0 +1,23 @@
+{
+  "appId": "AN158",
+  "db": {},
+  "name": "Smart Plug Z-Wave",
+  "notifications": {},
+  "properties": {
+    "power": {
+      "label": "Power [W]",
+      "type": "unlimitedsensor",
+      "value": "0"
+    },
+    "switch": {
+      "type": "trigger",
+      "value": "0",
+      "labeloff": "Off",
+      "labelon": "On",
+      "valueoff": "0",
+      "valueon": "1"
+    }
+  },
+  "protocol": "z",
+  "type": "object"
+}
