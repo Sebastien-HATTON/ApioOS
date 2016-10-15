@@ -1,0 +1,73 @@
+<style>
+    div#rankingLabel.box_proprietaiPhone {
+        margin-bottom: 0 !important;
+    }
+
+    div#registra_statoinput.glyphicon.glyphicon-bell {
+        color: white;
+    }
+
+    span.glyphicon.glyphicon-remove.personalizaChevron {
+        color: white;
+    }
+
+    div.appName.viewDesktop1.ng-binding {
+        color: white;
+    }
+</style>
+<div id="ApioApplication_TMP_" ng-app="ApioApplication_TMP_" style="padding: 10px; background-color: rgb(0, 116, 188);">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+            <graph graphname="analytics" plot="totalEnergy,activePower,currentDayEnergy" type="avg-15"></graph>
+            
+            <unlimitedsensor propertyname="totalEnergy" label="Total Energy [KW/h]"></unlimitedsensor>
+            <unlimitedsensor propertyname="currentDayEnergy" label="Energy Current Day[KW/h]"></unlimitedsensor>
+            <unlimitedsensor propertyname="activePower" label="Active power [KW]"></unlimitedsensor>
+            <unlimitedsensor propertyname="reactivePower" label="Reactive Output Power [kVar]"></unlimitedsensor>
+            <unlimitedsensor propertyname="totalInputPower" label="Total Input Power [KW]"></unlimitedsensor>
+            <unlimitedsensor propertyname="frequency" label="Frequency [Hz]"></unlimitedsensor>
+            <unlimitedsensor propertyname="powerFactor" label="Power Factor [phi]"></unlimitedsensor>
+            <unlimitedsensor propertyname="cabinetTemperature" label="Cabinet Temperature [C°]"></unlimitedsensor>
+            
+            <collapse propertyName="moreInfoVoltage" label="Voltage More Info">
+	            <unlimitedsensor propertyname="PV1Voltage" label="PV1 Voltage/PV1 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV2Voltage" label="PV2 Voltage/PV2 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV3Voltage" label="PV3 Voltage/PV3 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV4Voltage" label="PV4 Voltage/PV4 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV5Voltage" label="PV5 Voltage/PV5 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV6Voltage" label="PV6 Voltage/PV6 [V]"></unlimitedsensor>
+            </collapse>
+            
+            <collapse propertyName="moreInfoCurrent" label="Current More Info">
+	            <unlimitedsensor propertyname="PV1Current" label="PV1 Current/PV1 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV2Current" label="PV2 Current/PV2 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV3Current" label="PV3 Current/PV3 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV4Current" label="PV4 Current/PV4 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV5Current" label="PV5 Current/PV5 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="PV6Current" label="PV6 Current/PV6 [A]"></unlimitedsensor>
+            </collapse>
+            
+            <collapse propertyName="moreInfoNetworkVoltage" label="Network Voltage More Info">
+            	<unlimitedsensor propertyname="uab" label="Voltage L1 - L2 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="ubc" label="Voltage L2 - L3 [V]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="uca" label="Voltage L3 - L1 [V]"></unlimitedsensor>
+            </collapse>
+            
+            <collapse propertyName="moreInfoNetworkCurrent" label="Network Current More Info">
+            	<unlimitedsensor propertyname="ia" label="Current L1 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="ib" label="Current L2 [A]"></unlimitedsensor>
+	            <unlimitedsensor propertyname="ic" label="Current L3 [A]"></unlimitedsensor>
+            </collapse>
+            
+            <unlimitedsensor propertyname="status" label="Stato Inverter"></unlimitedsensor>
+            <!--<unlimitedsensor propertyname="Allarm" label="Allarmi"></unlimitedsensor>-->
+            <collapse propertyName="moreInfo" label="More Info">
+                <uploadimage propertyname="img" label="Immagine"></uploadimage>
+                <note propertyName="note" label="Note"></note>
+            </collapse>
+            <log label="Log"></log>
+        </div>
+    </div>
+</div>
+<script src="applications/_TMP_/_TMP_.js"></script>

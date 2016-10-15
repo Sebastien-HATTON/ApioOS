@@ -172,7 +172,7 @@ module.exports = function (libraries) {
 
     app.post("/apio/wifi/switchStatus", function (req, res) {
         if (req.body.status === "client") {
-            //PREVEDERE ROLLBACK QUI
+            req.pause();
             fs.readFile("/etc/wpa_supplicant/wpa_supplicant.conf", "utf8", function (err, content) {
                 if (err) {
                     res.status(500).send(err);
@@ -232,11 +232,31 @@ module.exports = function (libraries) {
                                         if (error) {
                                             res.status(500).send(error);
                                         } else {
-                                            exec("update-rc.d hostapd remove", function (error_) {
+                                            exec("service hostapd stop && service udhcpd stop && ifdown wlan0 && ifup wlan0 && ip addr flush dev wlan0 && dhclient wlan0", function (error_) {
                                                 if (error_) {
                                                     res.status(500).send(error_);
                                                 } else {
-                                                    res.sendStatus(200);
+                                                    exec("ping -c 3 -I wlan0 www.google.it", function (ee) {
+                                                        req.resume();
+                                                        if (ee) {
+                                                            var request = require("request");
+                                                            request.post("http://localhost:" + port + "/apio/wifi/switchStatus", {
+                                                                json: true,
+                                                                body: {
+                                                                    status: "hotspot"
+                                                                }
+                                                            }, function (err, httpResponse) {
+                                                                if (err) {
+                                                                    console.log("Error while rolling back to hotspot: ", err);
+                                                                } else {
+                                                                    console.log("Rolling back to hotspot");
+                                                                }
+                                                            });
+                                                            res.status(500).send(ee);
+                                                        } else {
+                                                            res.sendStatus(200);
+                                                        }
+                                                    });
                                                 }
                                             });
                                         }
@@ -274,7 +294,7 @@ module.exports = function (libraries) {
                         if (error) {
                             res.status(500).send(error);
                         } else {
-                            exec("update-rc.d hostapd defaults && update-rc.d hostapd enable", function (error_) {
+                            exec("ifdown wlan0 && ip addr flush dev wlan0 && service hostapd start && ifup wlan0 && service udhcpd start", function (error_) {
                                 if (error_) {
                                     res.status(500).send(error_);
                                 } else {
@@ -438,11 +458,6 @@ module.exports = function (libraries) {
             if (data.status === "client") {
                 fs.readFile("/etc/wpa_supplicant/wpa_supplicant.conf", "utf8", function (err, content) {
                     if (err) {
-                        // socketServer.emit("send_to_client", {
-                        //     data: err,
-                        //     message: "apio_wifi_switchStatus_error"
-                        // });
-
                         Apio.Remote.socket.emit("send_to_client", {
                             who: "networking",
                             data: {
@@ -480,11 +495,6 @@ module.exports = function (libraries) {
 
                         fs.writeFile("/etc/wpa_supplicant/wpa_supplicant.conf", content.join("\n"), function (error) {
                             if (error) {
-                                // socketServer.emit("send_to_client", {
-                                //     data: error,
-                                //     message: "apio_wifi_switchStatus_error"
-                                // });
-
                                 Apio.Remote.socket.emit("send_to_client", {
                                     who: "networking",
                                     data: {
@@ -496,11 +506,6 @@ module.exports = function (libraries) {
                             } else {
                                 fs.readFile("/etc/network/interfaces", "utf8", function (err, content) {
                                     if (err) {
-                                        // socketServer.emit("send_to_client", {
-                                        //     data: err,
-                                        //     message: "apio_wifi_switchStatus_error"
-                                        // });
-
                                         Apio.Remote.socket.emit("send_to_client", {
                                             who: "networking",
                                             data: {
@@ -513,6 +518,9 @@ module.exports = function (libraries) {
                                         content = content.split("\n");
                                         for (var i = 0; i < content.length; i++) {
                                             if (content[i][0] === "#" && content[i].indexOf("allow-hotplug wlan0") > -1) {
+                                                // content[i] = content[i].substr(1);
+                                                // content[i + 1] = content[i + 1].substr(1);
+                                                // content[i + 2] = content[i + 2].substr(1);
                                                 content[i] = content[i].substr(content[i].lastIndexOf("#") + 1);
                                                 content[i + 1] = content[i + 1].substr(content[i + 1].lastIndexOf("#") + 1);
                                                 content[i + 2] = content[i + 2].substr(content[i + 2].lastIndexOf("#") + 1);
@@ -526,11 +534,6 @@ module.exports = function (libraries) {
 
                                         fs.writeFile("/etc/network/interfaces", content.join("\n"), function (error) {
                                             if (error) {
-                                                // socketServer.emit("send_to_client", {
-                                                //     data: error,
-                                                //     message: "apio_wifi_switchStatus_error"
-                                                // });
-
                                                 Apio.Remote.socket.emit("send_to_client", {
                                                     who: "networking",
                                                     data: {
@@ -540,13 +543,8 @@ module.exports = function (libraries) {
                                                     message: "apio_wifi_switchStatus_error"
                                                 });
                                             } else {
-                                                exec("update-rc.d hostapd remove", function (error_) {
+                                                exec("service hostapd stop && service udhcpd stop && ifdown wlan0 && ifup wlan0 && ip addr flush dev wlan0 && dhclient wlan0", function (error_) {
                                                     if (error_) {
-                                                        // socketServer.emit("send_to_client", {
-                                                        //     data: error_,
-                                                        //     message: "apio_wifi_switchStatus_error"
-                                                        // });
-
                                                         Apio.Remote.socket.emit("send_to_client", {
                                                             who: "networking",
                                                             data: {
@@ -556,16 +554,38 @@ module.exports = function (libraries) {
                                                             message: "apio_wifi_switchStatus_error"
                                                         });
                                                     } else {
-                                                        // socketServer.emit("send_to_client", {
-                                                        //     message: "apio_wifi_switchStatus_ok"
-                                                        // });
-
-                                                        Apio.Remote.socket.emit("send_to_client", {
-                                                            who: "networking",
-                                                            data: {
-                                                                apioId: Apio.System.getApioIdentifier()
-                                                            },
-                                                            message: "apio_wifi_switchStatus_ok"
+                                                        exec("ping -c 3 -I wlan0 www.google.it", function (ee) {
+                                                            if (ee) {
+                                                                var request = require("request");
+                                                                request.post("http://localhost:" + port + "/apio/wifi/switchStatus", {
+                                                                    json: true,
+                                                                    body: {
+                                                                        status: "hotspot"
+                                                                    }
+                                                                }, function (err, httpResponse) {
+                                                                    if (err) {
+                                                                        console.log("Error while rolling back to hotspot: ", err);
+                                                                    } else {
+                                                                        console.log("Rolling back to hotspot");
+                                                                    }
+                                                                });
+                                                                Apio.Remote.socket.emit("send_to_client", {
+                                                                    who: "networking",
+                                                                    data: {
+                                                                        apioId: Apio.System.getApioIdentifier(),
+                                                                        data: ee
+                                                                    },
+                                                                    message: "apio_wifi_switchStatus_error"
+                                                                });
+                                                            } else {
+                                                                Apio.Remote.socket.emit("send_to_client", {
+                                                                    who: "networking",
+                                                                    data: {
+                                                                        apioId: Apio.System.getApioIdentifier()
+                                                                    },
+                                                                    message: "apio_wifi_switchStatus_ok"
+                                                                });
+                                                            }
                                                         });
                                                     }
                                                 });
@@ -580,11 +600,6 @@ module.exports = function (libraries) {
             } else if (data.status === "hotspot") {
                 fs.readFile("/etc/network/interfaces", "utf8", function (err, content) {
                     if (err) {
-                        // socketServer.emit("send_to_client", {
-                        //     data: err,
-                        //     message: "apio_wifi_switchStatus_error"
-                        // });
-
                         Apio.Remote.socket.emit("send_to_client", {
                             who: "networking",
                             data: {
@@ -601,6 +616,10 @@ module.exports = function (libraries) {
                                 content[i + 1] = "#" + content[i + 1];
                                 content[i + 2] = "#" + content[i + 2];
                             } else if (content[i][0] === "#" && content[i].indexOf("iface wlan0 inet static") > -1) {
+                                // content[i] = content[i].substr(1);
+                                // content[i + 1] = content[i + 1].substr(1);
+                                // content[i + 2] = content[i + 2].substr(1);
+                                // content[i + 4] = content[i + 4].substr(1);
                                 content[i] = content[i].substr(content[i].lastIndexOf("#") + 1);
                                 content[i + 1] = content[i + 1].substr(content[i + 1].lastIndexOf("#") + 1);
                                 content[i + 2] = content[i + 2].substr(content[i + 2].lastIndexOf("#") + 1);
@@ -610,11 +629,6 @@ module.exports = function (libraries) {
 
                         fs.writeFile("/etc/network/interfaces", content.join("\n"), function (error) {
                             if (error) {
-                                // socketServer.emit("send_to_client", {
-                                //     data: error,
-                                //     message: "apio_wifi_switchStatus_error"
-                                // });
-
                                 Apio.Remote.socket.emit("send_to_client", {
                                     who: "networking",
                                     data: {
@@ -624,13 +638,8 @@ module.exports = function (libraries) {
                                     message: "apio_wifi_switchStatus_error"
                                 });
                             } else {
-                                exec("update-rc.d hostapd defaults && update-rc.d hostapd enable", function (error_) {
+                                exec("ifdown wlan0 && ip addr flush dev wlan0 && service hostapd start && ifup wlan0 && service udhcpd start", function (error_) {
                                     if (error_) {
-                                        // socketServer.emit("send_to_client", {
-                                        //     data: error_,
-                                        //     message: "apio_wifi_switchStatus_error"
-                                        // });
-
                                         Apio.Remote.socket.emit("send_to_client", {
                                             who: "networking",
                                             data: {
@@ -640,11 +649,6 @@ module.exports = function (libraries) {
                                             message: "apio_wifi_switchStatus_error"
                                         });
                                     } else {
-                                        // socketServer.emit("send_to_client", {
-                                        //     data: err,
-                                        //     message: "apio_wifi_switchStatus_ok"
-                                        // });
-
                                         Apio.Remote.socket.emit("send_to_client", {
                                             who: "networking",
                                             data: {

@@ -253,6 +253,17 @@ app.post("/apio/dongle/onoff", function (req, res) {
     res.sendStatus(200);
 });
 
+app.post("/apio/dongle/triggerConsole", function (req, res) {
+    socketServer.emit("send_to_client_service", {
+        apioId: req.body.apioId,
+        data: req.body.data,
+        message: "trigger_console",
+        service: "dongle"
+    });
+
+    res.sendStatus(200);
+});
+
 app.get("/apio/logic", function (req, res) {
     socketServer.emit("send_to_client", {message: "ask_logics", who: req.query.apioId});
     req.pause();

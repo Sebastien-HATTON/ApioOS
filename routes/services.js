@@ -70,39 +70,45 @@ module.exports = function (Apio) {
                         route += "/";
                     }
 
-                    var body = JSON.parse(decodeURIComponent(req.params.data));
-                    if (req.hasOwnProperty("session") && req.session.hasOwnProperty("apioId")) {
-                        body.apioId = req.session.apioId;
-                    }
-                    route += serviceRoute;
-                    console.log("route: ", route);
-                    request({
-                        //body: JSON.parse(decodeURIComponent(req.params.data)),
-                        body: body,
-                        json: true,
-                        method: "POST",
-                        uri: route
-                    }, function (error, response, body) {
-                        console.log("-------------- ROUTE OF SERVICE HAS BEEN CALLED, REPONSES: --------------");
-                        console.log("error: ", error);
-                        console.log("response: ", response);
-                        console.log("body: ", body);
-                        if (response) {
-                            if (Number(response.statusCode) === 200) {
-                                if (body !== undefined) {
-                                    res.status(200).send(body);
-                                } else {
-                                    res.sendStatus(200);
-                                }
-                            } else if (Number(response.statusCode) === 404) {
-                                res.sendStatus(404);
-                            } else if (Number(response.statusCode) === 500) {
-                                res.status(500).send(error || body);
-                            }
-                        } else {
-                            res.sendStatus(404);
+                    try {
+                        req.params.data = decodeURIComponent(req.params.data);
+                    } catch (ex) {
+                        console.log("Exception deconding");
+                    } finally {
+                        var body = JSON.parse(req.params.data);
+                        if (req.hasOwnProperty("session") && req.session.hasOwnProperty("apioId")) {
+                            body.apioId = req.session.apioId;
                         }
-                    });
+                        route += serviceRoute;
+                        console.log("route: ", route);
+                        request({
+                            //body: JSON.parse(decodeURIComponent(req.params.data)),
+                            body: body,
+                            json: true,
+                            method: "POST",
+                            uri: route
+                        }, function (error, response, body) {
+                            console.log("-------------- ROUTE OF SERVICE HAS BEEN CALLED, REPONSES: --------------");
+                            console.log("error: ", error);
+                            console.log("response: ", response);
+                            console.log("body: ", body);
+                            if (response) {
+                                if (Number(response.statusCode) === 200) {
+                                    if (body !== undefined) {
+                                        res.status(200).send(body);
+                                    } else {
+                                        res.sendStatus(200);
+                                    }
+                                } else if (Number(response.statusCode) === 404) {
+                                    res.sendStatus(404);
+                                } else if (Number(response.statusCode) === 500) {
+                                    res.status(500).send(error || body);
+                                }
+                            } else {
+                                res.sendStatus(404);
+                            }
+                        });
+                    }
                 } else {
                     res.sendStatus(404);
                 }

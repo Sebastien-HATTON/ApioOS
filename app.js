@@ -1091,5 +1091,13 @@ d.run(function () {
                 console.log("The file /etc/mongodb.conf is empty");
             }
         });
+
+        var memwatch = require("memwatch-next");
+        memwatch.on("leak", function (info) {
+            console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+            console.log("Leak detected: ", info);
+            console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+            global.gc();
+        });
     });
 });

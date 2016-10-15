@@ -3601,4 +3601,12 @@ http.listen(port, "localhost", function () {
     console.log("APIO Notification Service correctly started on port " + port);
     var gc = require("./garbage_collector.js");
     gc();
+
+    var memwatch = require("memwatch-next");
+    memwatch.on("leak", function (info) {
+        console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+        console.log("Leak detected: ", info);
+        console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+        global.gc();
+    });
 });

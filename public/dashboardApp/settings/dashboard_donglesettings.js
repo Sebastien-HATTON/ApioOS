@@ -1,7 +1,15 @@
-angular.module("ApioDashboardApplication").controller("ApioDashboardDongleSettingsController", ["$rootScope", "$scope", "sweet", "userService", "objectService", "$http", "socket", function ($rootScope, $scope, sweet, userService, objectService, $http, socket) {
-    socket.on("dongle_update", function (data) {
-        $rootScope.$emit("terminal.dongle.echo", data)
-    });
+angular.module("ApioDashboardApplication").controller("ApioDashboardDongleSettingsController", ["$rootScope", "$scope", "sweet", "userService", "objectService", "$http", "socket", "$window", function ($rootScope, $scope, sweet, userService, objectService, $http, socket, $window) {
+    // socket.on("dongle_update", function (data) {
+    //     $rootScope.$emit("terminal.dongle.echo", data)
+    // });
+
+    $window.onbeforeunload = function () {
+        $http.post("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/triggerConsole") + "/data/" + encodeURIComponent(JSON.stringify({
+                data: false
+            }))).success(function (data) {
+        }).error(function (data) {
+        });
+    };
 
     $http.get("/apio/user/getSessionComplete").success(function (session) {
         $scope.session = session;
@@ -26,6 +34,7 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardDongleSettin
     });
 
     $scope.selected = 1;
+    $scope.first = true;
     // $scope.active = true;
     $scope.currentDataRate = "3";
     $scope.launchSection = function (value) {
@@ -197,4 +206,28 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardDongleSettin
             });
         });
     };
+
+    $scope.$watch("selected", function (newValue) {
+        if (newValue === 1 && !$scope.first) {
+            socket.off("dongle_update");
+            $http.post("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/triggerConsole") + "/data/" + encodeURIComponent(JSON.stringify({
+                    data: false
+                }))).success(function (data) {
+            }).error(function (data) {
+            });
+        } else if (newValue === 2) {
+            $http.post("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/triggerConsole") + "/data/" + encodeURIComponent(JSON.stringify({
+                    data: true
+                }))).success(function (data) {
+            }).error(function (data) {
+            });
+            socket.on("dongle_update", function (data) {
+                $rootScope.$emit("terminal.dongle.echo", data);
+            });
+        }
+
+        if ($scope.first) {
+            $scope.first = false;
+        }
+    });
 }]);

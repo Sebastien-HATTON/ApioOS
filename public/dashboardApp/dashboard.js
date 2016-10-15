@@ -32,14 +32,6 @@ Apio.Socket.init();
  **/
 ApioDashboardApplication.factory("socket", function ($rootScope) {
     return {
-        on: function (eventName, callback) {
-            Apio.socket.on(eventName, function () {
-                var args = arguments;
-                $rootScope.$apply(function () {
-                    callback.apply(Apio.socket, args);
-                });
-            });
-        },
         emit: function (eventName, data, callback) {
             Apio.socket.emit(eventName, data, function () {
                 var args = arguments;
@@ -49,6 +41,25 @@ ApioDashboardApplication.factory("socket", function ($rootScope) {
                     }
                 });
             })
+        },
+        off: function (eventName, callback) {
+            //Apio.socket.off(eventName, function () {
+            //    var args = arguments;
+            //    $rootScope.$apply(function () {
+            //        if (callback) {
+            //            callback.apply(Apio.socket, args);
+            //        }
+            //    });
+            //});
+            Apio.socket.off(eventName);
+        },
+        on: function (eventName, callback) {
+            Apio.socket.on(eventName, function () {
+                var args = arguments;
+                $rootScope.$apply(function () {
+                    callback.apply(Apio.socket, args);
+                });
+            });
         }
     };
 });

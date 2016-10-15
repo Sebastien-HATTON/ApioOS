@@ -24,6 +24,13 @@ module.exports = {
                 "update": "(function(data){console.log('switch');var properties = {'switch':''}; properties.switch=String(Number(data.value)); return properties;})"
             }
         },
+        "HuaweiSUN2000": {
+            "send": {},
+            "recive": {
+                "inverter": "(function(data) { console.log('*******data******', data); var properties = { dati: { 'PV1Voltage': '', 'PV2Voltage': ' ', 'PV3Voltage': '', 'PV4Voltage': '', 'PV5Voltage': '', 'PV6Voltage': '', 'PV1Current': '', 'PV2Current': '', 'PV3Current': '', 'PV4Current': '', 'PV5Current': '', 'PV6Current': '', 'activePower': '', 'uab': '', 'ubc': '', 'uca': '', 'powerFactor': '', 'cabinetTemperature': '', 'reactivePower': '', 'frequency': '', 'totalEnergy': '', 'currentDayEnergy': '', 'ia': '', 'ib': '', 'ic': '', 'totalInputPower': '', 'status': '' } }; var property = Object.keys(data.properties)[0]; if (property == 'HuaweiSUN2000') { var value = data.properties.HuaweiSUN2000.split('|'); var n = Number(value[0]); for (var h = 1; h < value.length - 1; h++) { console.log('primo valore: ', value[h][0]); if (value[h][0] == 'n') { console.log('valore negativo'); value[h] = value[h].substring(0, 0) + '-' + value[h].substring(0 + 1); } properties.dati[Object.keys(properties.dati)[n]] = value[h]; console.log('n: ', n); console.log('h: ', h); console.log('this property: ', properties.dati[Object.keys(properties.dati)[n]]); n++; } console.log('******properties: ', properties.dati); } var key = Object.keys(properties.dati); for (var x in key) { if (properties.dati[key[x]] == '') { delete properties.dati[key[x]]; } } return properties.dati; })",
+                "update": "(function(data){console.log('switch');var properties = {'switch':''}; properties.switch=String(Number(data.value)); return properties;})"
+            }
+        },
         "SenecaS500": {
             "send": {},
             "recive": {

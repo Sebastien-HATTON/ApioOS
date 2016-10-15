@@ -146,18 +146,184 @@ socket_server.on("connection", function (socket) {
     });
 
     socket.on("log_update", function (data) {
-        if (data.query) {
-            sql_db.query(data.query.replace("`" + data.objectId + "`", "`" + data.objectId + "_" + data.apioId + "`"), function (error, result) {
+        // if (data.query) {
+        //     sql_db.query(data.query.replace("`" + data.objectId + "`", "`" + data.objectId + "_" + data.apioId + "`"), function (error, result) {
+        //         if (error) {
+        //             console.log("Error while inserting logs in table " + data.objectId + ": ", error);
+        //         } else if (result) {
+        //             console.log("Data in table " + data.objectId + " successfully interted, result: ", result);
+        //         } else {
+        //             console.log("No result");
+        //         }
+        //     });
+        // }
+
+        if (database && data.apioId) {
+            database.collection("Objects").findOne({objectId: data.objectId, apioId: data.apioId}, function (error, object) {
                 if (error) {
-                    console.log("Error while inserting logs in table " + data.objectId + ": ", error);
-                } else if (result) {
-                    console.log("Data in table " + data.objectId + " successfully interted, result: ", result);
-                } else {
-                    console.log("No result");
+                    console.log("Error while getting object with objectId " + data.objectId + " and apioId " + data.apioId + ": ", error);
+                } else if (object) {
+                    sql_db.query("SHOW COLUMNS FROM `" + data.objectId + "_" + data.apioId + "`", function (error, result) {
+                        if (error) {
+                            console.log("Error while getting columns from table " + data.objectId + "_" + data.apioId + ": ", error);
+                        } else if (result) {
+                            var timestamp = new Date().getTime(), fields = [], query_string = "", log = {};
+                            delete data.properties.date;
+
+                            for (var x in result) {
+                                if (result[x].Field !== "id" && result[x].Field !== "timestamp") {
+                                    fields.push(result[x].Field);
+                                }
+                            }
+
+                            for (var i in object.properties) {
+                                if (fields.indexOf(i) > -1) {
+                                    if (query_string) {
+                                        if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+                                            query_string += ", `" + i + "` = '" + String(data.properties[i]).replace(",", ".") + "'";
+                                            if (!log.hasOwnProperty(i)) {
+                                                log[i] = {};
+                                            }
+
+                                            log[i][timestamp] = String(data.properties[i]).replace(",", ".");
+                                        } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+                                            query_string += ", `" + i + "` = '" + String(object.properties[i].value).replace(",", ".") + "'";
+                                            if (!log.hasOwnProperty(i)) {
+                                                log[i] = {};
+                                            }
+
+                                            log[i][timestamp] = String(object.properties[i].value).replace(",", ".");
+                                        }
+                                    } else {
+                                        query_string = "INSERT INTO `" + data.objectId + "_" + data.apioId + "` SET `timestamp` = '" + timestamp + "'";
+                                        if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+                                            query_string += ", `" + i + "` = '" + String(data.properties[i]).replace(",", ".") + "'";
+                                            if (!log.hasOwnProperty(i)) {
+                                                log[i] = {};
+                                            }
+
+                                            log[i][timestamp] = String(data.properties[i]).replace(",", ".");
+                                        } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+                                            query_string += ", `" + i + "` = '" + String(object.properties[i].value).replace(",", ".") + "'";
+                                            if (!log.hasOwnProperty(i)) {
+                                                log[i] = {};
+                                            }
+
+                                            log[i][timestamp] = String(object.properties[i].value).replace(",", ".");
+                                        }
+                                    }
+                                }
+                            }
+
+                            sql_db.query(query_string, function (error, result) {
+                                if (error) {
+                                    console.log("Error while inserting logs in table " + data.objectId + "_" + data.apioId + ": ", error);
+                                } else if (result) {
+                                    console.log("Data in table " + data.objectId + "_" + data.apioId + " successfully interted, result: ", result);
+                                } else {
+                                    console.log("No result");
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }
     });
+
+    // socket.on("log_update", function (dataArray) {
+    //     // if (data.query) {
+    //     //     sql_db.query(data.query.replace("`" + data.objectId + "`", "`" + data.objectId + "_" + data.apioId + "`"), function (error, result) {
+    //     //         if (error) {
+    //     //             console.log("Error while inserting logs in table " + data.objectId + ": ", error);
+    //     //         } else if (result) {
+    //     //             console.log("Data in table " + data.objectId + " successfully interted, result: ", result);
+    //     //         } else {
+    //     //             console.log("No result");
+    //     //         }
+    //     //     });
+    //     // }
+    //
+    //     if (database && dataArray && dataArray instanceof Array) {
+    //         dataArray.forEach(function (data) {
+    //             console.log("data: ", data);
+    //             if (data.apioId) {
+    //                 database.collection("Objects").findOne({
+    //                     objectId: data.objectId,
+    //                     apioId: data.apioId
+    //                 }, function (error, object) {
+    //                     if (error) {
+    //                         console.log("Error while getting object with objectId " + data.objectId + " and apioId " + data.apioId + ": ", error);
+    //                     } else if (object) {
+    //                         sql_db.query("SHOW COLUMNS FROM `" + data.objectId + "_" + data.apioId + "`", function (error, result) {
+    //                             if (error) {
+    //                                 console.log("Error while getting columns from table " + data.objectId + "_" + data.apioId + ": ", error);
+    //                             } else if (result) {
+    //                                 var timestamp = new Date().getTime(), fields = [], query_string = "", log = {};
+    //                                 delete data.properties.date;
+    //
+    //                                 for (var x in result) {
+    //                                     if (result[x].Field !== "id" && result[x].Field !== "timestamp") {
+    //                                         fields.push(result[x].Field);
+    //                                     }
+    //                                 }
+    //
+    //                                 for (var i in object.properties) {
+    //                                     if (fields.indexOf(i) > -1) {
+    //                                         if (query_string) {
+    //                                             if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+    //                                                 query_string += ", `" + i + "` = '" + String(data.properties[i]).replace(",", ".") + "'";
+    //                                                 if (!log.hasOwnProperty(i)) {
+    //                                                     log[i] = {};
+    //                                                 }
+    //
+    //                                                 log[i][timestamp] = String(data.properties[i]).replace(",", ".");
+    //                                             } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+    //                                                 query_string += ", `" + i + "` = '" + String(object.properties[i].value).replace(",", ".") + "'";
+    //                                                 if (!log.hasOwnProperty(i)) {
+    //                                                     log[i] = {};
+    //                                                 }
+    //
+    //                                                 log[i][timestamp] = String(object.properties[i].value).replace(",", ".");
+    //                                             }
+    //                                         } else {
+    //                                             query_string = "INSERT INTO `" + data.objectId + "_" + data.apioId + "` SET `timestamp` = '" + timestamp + "'";
+    //                                             if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+    //                                                 query_string += ", `" + i + "` = '" + String(data.properties[i]).replace(",", ".") + "'";
+    //                                                 if (!log.hasOwnProperty(i)) {
+    //                                                     log[i] = {};
+    //                                                 }
+    //
+    //                                                 log[i][timestamp] = String(data.properties[i]).replace(",", ".");
+    //                                             } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+    //                                                 query_string += ", `" + i + "` = '" + String(object.properties[i].value).replace(",", ".") + "'";
+    //                                                 if (!log.hasOwnProperty(i)) {
+    //                                                     log[i] = {};
+    //                                                 }
+    //
+    //                                                 log[i][timestamp] = String(object.properties[i].value).replace(",", ".");
+    //                                             }
+    //                                         }
+    //                                     }
+    //                                 }
+    //
+    //                                 sql_db.query(query_string, function (error, result) {
+    //                                     if (error) {
+    //                                         console.log("Error while inserting logs in table " + data.objectId + "_" + data.apioId + ": ", error);
+    //                                     } else if (result) {
+    //                                         console.log("Data in table " + data.objectId + "_" + data.apioId + " successfully interted, result: ", result);
+    //                                     } else {
+    //                                         console.log("No result");
+    //                                     }
+    //                                 });
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //         });
+    //     }
+    // });
 });
 
 sql_db.connect(function (err) {

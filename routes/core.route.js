@@ -1012,22 +1012,28 @@ module.exports = function (Apio) {
                                         console.log("date: ", date);
                                         console.log("lastCommit: ", lastCommit);
                                         var fetch_fn = function () {
-                                            fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
-                                                return res.text();
-                                            }).then(function (body) {
-                                                var remoteCommit = JSON.parse(body);
-                                                console.log("remoteCommit.commit: ", remoteCommit.commit);
-                                                remoteCommit.date = new Date(remoteCommit.apioOs);
-                                                console.log("remoteCommit.date: ", remoteCommit.date);
-                                                if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
-                                                    res.status(200).send(true);
+                                            require("dns").resolve("www.google.com", function (err) {
+                                                if (err) {
+                                                    console.log("No internet connection, impossible to fetch");
                                                 } else {
-                                                    res.status(200).send(false);
+                                                    fetch("https://raw.githubusercontent.com/ApioLab/updates/master/" + version_file).then(function (res) {
+                                                        return res.text();
+                                                    }).then(function (body) {
+                                                        var remoteCommit = JSON.parse(body);
+                                                        console.log("remoteCommit.commit: ", remoteCommit.commit);
+                                                        remoteCommit.date = new Date(remoteCommit.apioOs);
+                                                        console.log("remoteCommit.date: ", remoteCommit.date);
+                                                        if (remoteCommit.commit.substring(0, 7) !== lastCommit.substring(0, 7) && date <= remoteCommit.date) {
+                                                            res.status(200).send(true);
+                                                        } else {
+                                                            res.status(200).send(false);
+                                                        }
+                                                    }).catch(function (err) {
+                                                        console.log("Caught error while fetching: ", err);
+                                                        console.log("Trying to fetch again");
+                                                        fetch_fn();
+                                                    });
                                                 }
-                                            }).catch(function (err) {
-                                                console.log("Caught error while fetching: ", err);
-                                                console.log("Trying to fetch again");
-                                                fetch_fn();
                                             });
                                         };
                                         fetch_fn();

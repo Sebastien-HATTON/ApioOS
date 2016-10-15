@@ -21,7 +21,8 @@
 "use strict";
 //module.exports = function (libraries) {
 // var Apio = require("../apio.js")(require("../configuration/default.js"), false);
-var Apio = require("../apio.js")(false);
+// var Apio = require("../apio.js")(false);
+var Apio = require("../apio.js")();
 var MongoClient = require("mongodb").MongoClient;
 var bodyParser = require("body-parser");
 var com = require("serialport");
@@ -41,11 +42,6 @@ if (hiFlag === 1) {
     flagHi = true;
     fs.writeFileSync("../dongle_flag.txt", "0");
 }
-
-setTimeout(function () {
-    ////console.log("-------------------------------------------------------------");
-    ////console.log("Apio.Remote.socket: ", Apio.Remote.socket);
-}, 30000);
 
 //Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=dongle_logic"});
 Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port, {query: "associate=dongle&token=" + Apio.Token.getFromText("dongle", fs.readFileSync("../" + Apio.Configuration.type + "_key.apio", "utf8"))});
@@ -96,7 +92,8 @@ var prevObj = {};
 //var socket = require("socket.io-client")("http://localhost:" + configuration.http.port);
 var walk = false;
 
-var isLogEnabled = true;
+// var isConsoleEnabled = false;
+var isConsoleEnabled = 0;
 
 //socket.on("apio_server_update", function (data) {
 //AGGIUNTE PER LOGIC FINE
@@ -125,7 +122,7 @@ Apio.io.on("apio_server_update", function (data) {
         if (!obj.hasOwnProperty(data.objectId)) {
             database.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
                 if (err) {
-                    log("Unable to find object with objectId " + data.objectId + ": ", err);
+                    send_on_console("Unable to find object with objectId " + data.objectId + ": ", err);
                 } else if (object) {
                     obj[object.objectId] = JSON.parse(JSON.stringify(object));
                     prevObj[object.objectId] = JSON.parse(JSON.stringify(object));
@@ -134,11 +131,11 @@ Apio.io.on("apio_server_update", function (data) {
         } else {
             for (var i in data.properties) {
                 if (obj[data.objectId].properties.hasOwnProperty(i) && obj[data.objectId].properties[i].value !== data.properties[i]) {
-                    //log("interviene la socket");
+                    //send_on_console("interviene la socket");
                     prevObj[data.objectId].properties[i].value = obj[data.objectId].properties[i].value;
-                    //log(prevObj[data.objectId].properties[i].value);
+                    //send_on_console(prevObj[data.objectId].properties[i].value);
                     obj[data.objectId].properties[i].value = data.properties[i];
-                    //log(obj[data.objectId].properties[i].value);
+                    //send_on_console(obj[data.objectId].properties[i].value);
                 }
             }
         }
@@ -310,15 +307,15 @@ MongoClient.connect("mongodb://" + Apio.Configuration.database.hostname + ":" + 
 //Apio.io = require("socket.io-client")("http://localhost:" + Apio.Configuration.http.port);
 
 //Apio.io = libraries["socket.io-client"]("http://localhost:" + Apio.Configuration.http.port);
-var log = function (data) {
-    if (isLogEnabled) {
-        ////////console.log(data);
-        //socketServer.emit("dongle_update", data);
-        //socketServer.emit("send_to_client", {message: "dongle_update", data: data});
-        //AGGIUNTE PER LOGIC INIZIO
-        //socketServer.emit("logic_update", data);
-        //socketServer.emit("send_to_client", {message: "logic_update", data: data});
-        //AGGIUNTE PER LOGIC FINE
+var send_on_console = function (data) {
+    console.log("isConsoleEnabled: ", isConsoleEnabled);
+    if (isConsoleEnabled) {
+        console.log(data);
+        socketServer.emit("send_to_client", {
+            apioId: Apio.System.getApioIdentifier(),
+            data: typeof data === "object" ? JSON.stringify(data) : data,
+            message: "dongle_update"
+        });
     }
 };
 
@@ -434,6 +431,19 @@ app.post("/apio/dongle/onoff", function (req, res) {
     });
 });
 
+app.post("/apio/dongle/triggerConsole", function (req, res) {
+    if (req.body.data) {
+        isConsoleEnabled++;
+    } else {
+        isConsoleEnabled--;
+        if (isConsoleEnabled < 0) {
+            isConsoleEnabled = 0;
+        }
+    }
+
+    res.sendStatus(200);
+});
+
 //app.get("/apio/logic", function (req, res) {
 //    //var files = fs.readdirSync("./services/apio_logic");
 //    var files = fs.readdirSync("./apio_logic");
@@ -479,7 +489,7 @@ Apio.Serial.Error.prototype = Object.create(Error.prototype);
 Apio.Serial.Error.prototype.name = "Apio.Serial.Error";
 
 Apio.System.getApioIdentifierDongle = function () {
-    //log("getApioIdentifierDongle")
+    //send_on_console("getApioIdentifierDongle")
     if (null !== Apio.System.ApioIdentifier && 'undefined' !== typeof Apio.System.ApioIdentifier) {
         return Apio.System.ApioIdentifier
     } else {
@@ -537,12 +547,12 @@ Apio.Serial.init = function () {
 
     /*com.list(function (err, ports) {*/
     /*if (err) {
-     //log("Unable to get serial ports, error: ", err);
+     //send_on_console("Unable to get serial ports, error: ", err);
      } else {*/
     /*ports.forEach(function (port) {*/
-    //log("@@@@@@@@@@@@@@@@@CERCO PORTE@@@@@@@@@@@@@@@@@");
-    //log("port: ", port);
-    //log(port);
+    //send_on_console("@@@@@@@@@@@@@@@@@CERCO PORTE@@@@@@@@@@@@@@@@@");
+    //send_on_console("port: ", port);
+    //send_on_console(port);
     /*if (String(port.manufacturer) === "Apio Dongle" || String(port.manufacturer) === "Apio_Dongle") {*/
     //console.log('INIZIALIZZO LA SERIALE');
     //Apio.Configuration.serial.port = String(port.comName);
@@ -581,13 +591,13 @@ Apio.Serial.init = function () {
 
                 }, 15000)
 
-                //log("XXXX")
+                //send_on_console("XXXX")
                 //console.log("--------------------------------serialString: ", serialString);
                 serialString = serialString.toString();
-                //log("Apio.Serial data received " + serialString);
+                //send_on_console("Apio.Serial data received " + serialString);
                 //if ((serialString === "COORDINATOR ACTIVE" || (CCounter == 0 && serialString == "c")) && typeof Apio.Serial.sendInstance === 'undefined') {
                 //    Apio.Serial.queue = [];
-                //    log("Istanzio la coda degli invii")
+                //    send_on_console("Istanzio la coda degli invii")
                 //    Apio.Serial.sendInstance=true;
                 //    Apio.Serial.sendInterval();
                 //}
@@ -595,7 +605,7 @@ Apio.Serial.init = function () {
                 if (serialString === "COORDINATOR ACTIVE" || (CCounter == 0 && serialString == "c")) {
 
                     Apio.Serial.queue = [];
-                    //log("Istanzio la coda degli invii")
+                    //send_on_console("Istanzio la coda degli invii")
                     //Apio.Serial.sendInstance=true;
                     Apio.Serial.sendInterval();
                 }
@@ -679,12 +689,12 @@ Apio.Serial.init = function () {
 
                     //////////console.log("lastMessage: ", lastMessage);
                     //////////console.log("lastMessageRead: ", lastMessageRead);
-                    //log(lastMessage + "deve essere uguale a " + lastMessageRead)
+                    //send_on_console(lastMessage + "deve essere uguale a " + lastMessageRead)
                     //if (lastMessage == lastMessageRead) {
-                    //    log("UGUALIIIIIIIIIIIIIIIIII");
+                    //    send_on_console("UGUALIIIIIIIIIIIIIIIIII");
                     //    writeSerialOk = true;
                     //} else {
-                    //    log("DIVERSIIIIIIIIIIIIIIIII");
+                    //    send_on_console("DIVERSIIIIIIIIIIIIIIIII");
                     //    writeSerialOk = false;
                     //}
                 }
@@ -701,7 +711,7 @@ Apio.Serial.init = function () {
                     dataObject.properties[tokens[2]] = auxi[0];
                     //console.log('dataObject');
                     var dataObject2 = Apio.Util.ApioToJSON(serialString);
-                    //log("dataObject: ");
+                    //send_on_console("dataObject: ");
                     //console.log("dataObject2: ", dataObject2);
                     if (Apio.Util.isSet(dataObject.objectId) && Apio.Util.isSet(dataObject.command)) {
                         Apio.Serial.read(dataObject2);
@@ -753,7 +763,7 @@ Apio.Serial.closeDongle = function () {
     if (Apio && Apio.hasOwnProperty("Serial") && Apio.Serial.hasOwnProperty("close")) {
         Apio.Serial.serialPort.close(function (err) {
             if (err) {
-                //log(err);
+                //send_on_console(err);
             }
         });
     }
@@ -766,9 +776,9 @@ var CCounterTry = 0;
 
 Apio.Serial.interval = function () {
     Apio.Serial.dongleInterval = setInterval(function () {
-        //log("CCounter: ", CCounter);
+        //send_on_console("CCounter: ", CCounter);
         Apio.Serial.cMs = new Date().getTime();
-        //log(CCounter);
+        //send_on_console(CCounter);
         if (Apio.Serial.cMs - Apio.Serial.exCMs >= 10000) {
             //console.log("Sono passati 10 secondi")
             //console.log("CCounter vale ", CCounter);
@@ -796,13 +806,13 @@ Apio.Serial.interval = function () {
         /*if(CCounter<1){
          com.list(function (err, ports) {
          if (err) {
-         log("Unable to get serial ports, error: ", err);
+         send_on_console("Unable to get serial ports, error: ", err);
          } else {
          ports.forEach(function (port) {
-         //log(port);
+         //send_on_console(port);
          if(String(port.manufacturer) === "Apio Dongle" ||String(port.manufacturer) === "Apio_Dongle"){
          Apio.Configuration.serial.port = String(port.comName);
-         log("CCounter: ", CCounter);
+         send_on_console("CCounter: ", CCounter);
          Apio.Serial.close();
          Apio.Serial.instance.push(Apio.Serial.init());
          //Apio.Serial.init();
@@ -810,7 +820,7 @@ Apio.Serial.interval = function () {
          });
          }
          });
-         //log("La seriale sembra non rispondere");
+         //send_on_console("La seriale sembra non rispondere");
          //ReOpen SerialPort
          } else {
          CCounter = 0;
@@ -823,29 +833,29 @@ Apio.Serial.interval();
 //VERSIONE 1
 //Apio.Serial.sendInterval = function () {
 //    Apio.Serial.sendDongleInterval = setInterval(function () {
-//        //log("SERIAL AVAIABLE ",Apio.Serial.available);
+//        //send_on_console("SERIAL AVAIABLE ",Apio.Serial.available);
 //        if ((Apio.Serial.queue.length > 0 && Apio.Serial.available == true) || writeSerialOk == false) {
 //            Apio.Serial.available = false;
 //            var messageToSend = "";
 //            if (writeSerialOk) {
-//                log("Levo il messaggio dalla coda")
+//                send_on_console("Levo il messaggio dalla coda")
 //                lastMessage = Apio.Serial.queue.shift();
 //                writeSerialOk = false;
 //                messageToSend = lastMessage;
 //            } else {
-//                log("Il dongle non mi ha inviato ack di ok, rinvio il vecchio messaggio.")
+//                send_on_console("Il dongle non mi ha inviato ack di ok, rinvio il vecchio messaggio.")
 //                //lastMessage = Apio.Serial.queue.shift();
 //                //writeSerialOk = false;
 //                messageToSend = lastMessage;
 //            }
 //            //var messageToSend = Apio.Serial.queue.shift();
-//            log("Apio.Serial.queue is processing: " + messageToSend)
+//            send_on_console("Apio.Serial.queue is processing: " + messageToSend)
 //            Apio.Serial.serialPort.write(messageToSend, function (error) {
 //                if (error)
-//                    log("An error has occurred while sending " + messageToSend)
+//                    send_on_console("An error has occurred while sending " + messageToSend)
 //                else
-//                    log("The message '" + messageToSend + "' was correctly written to serial")
-//                //log("The message '" + messageToSend + "' was correctly written to serial");
+//                    send_on_console("The message '" + messageToSend + "' was correctly written to serial")
+//                //send_on_console("The message '" + messageToSend + "' was correctly written to serial");
 //                Apio.Serial.available = true;
 //            })
 //        }
@@ -869,12 +879,12 @@ Apio.Serial.interval();
 //                Apio.Serial.available = true;
 //            } else {
 //                ////console.log(".................................Al Dongle Mando: ", messageToSend);
-//                log("Apio.Serial.queue is processing: " + messageToSend);
+//                send_on_console("Apio.Serial.queue is processing: " + messageToSend);
 //                Apio.Serial.serialPort.write(messageToSend, function (error) {
 //                    if (error) {
-//                        log("An error has occurred while sending " + messageToSend);
+//                        send_on_console("An error has occurred while sending " + messageToSend);
 //                    } else {
-//                        log("The message '" + messageToSend + "' was correctly written to serial");
+//                        send_on_console("The message '" + messageToSend + "' was correctly written to serial");
 //                    }
 //                    Apio.Serial.available = true;
 //                });
@@ -1052,7 +1062,7 @@ Apio.Serial.stream = function (data, callback) {
             case "z":
             case "s":
                 if (!Apio.Serial.hasOwnProperty("serialPort")) {
-                    //log("The serial port is disabled, the following message cannot be sent: " + message);
+                    //send_on_console("The serial port is disabled, the following message cannot be sent: " + message);
                 } else {
                     Apio.Serial.ms = new Date().getTime();
                     if (Apio.Serial.ms - Apio.Serial.exMs >= 4) {
@@ -1071,15 +1081,15 @@ Apio.Serial.stream = function (data, callback) {
             //default:
             //    if (fs.existsSync(__dirname + "/public/applications/" + data.objectId + "/adapter.js")) {
             //        var adapter = require(__dirname + "/public/applications/" + data.objectId + "/adapter.js")(Apio);
-            //        //log("Protocollo " + protocol + " sconosciuto, lancio l'adapter manager, mado questo oggetto:");
-            //        //log(data);
+            //        //send_on_console("Protocollo " + protocol + " sconosciuto, lancio l'adapter manager, mado questo oggetto:");
+            //        //send_on_console(data);
             //        adapter.send(data);
             //        if (callback) {
-            //            //log("PARTE LA CALLBACK DELLA SERIAL");
+            //            //send_on_console("PARTE LA CALLBACK DELLA SERIAL");
             //            callback();
             //        }
             //    } else {
-            //        //log("Apio.Serial.Send() Error: protocol " + data.protocol + "is not supported and no adapter was found.");
+            //        //send_on_console("Apio.Serial.Send() Error: protocol " + data.protocol + "is not supported and no adapter was found.");
             //    }
             //    break;
         }
@@ -1413,29 +1423,37 @@ Apio.Serial.read = function (data) {
 
                     if (isLogSocketConnected) {
                         logSocket.emit("log_update", data);
+
+                        var DATA = {
+                            data: data,
+                            message: "log_update",
+                            service: "log"
+                        };
+                        DATA.data.apioId = Apio.System.getApioIdentifier();
+                        Apio.Remote.socket.emit("send_to_service", DATA);
                     } else {
                         /*Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, object) {
-                            if (err) {
-                                //console.log("Error while getting object with objectId " + data.objectId + ": ", err);
-                            } else if (object) {
-                                var logs = {}, timestamp = new Date().getTime();
-                                for (var i in object.properties) {
-                                    if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                                        logs["data." + data.objectId + "." + i + "." + timestamp] = String(data.properties[i]);
-                                    } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                                        logs["data." + data.objectId + "." + i + "." + timestamp] = String(object.properties[i].value);
-                                    }
-                                }
+                         if (err) {
+                         //console.log("Error while getting object with objectId " + data.objectId + ": ", err);
+                         } else if (object) {
+                         var logs = {}, timestamp = new Date().getTime();
+                         for (var i in object.properties) {
+                         if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+                         logs["data." + data.objectId + "." + i + "." + timestamp] = String(data.properties[i]);
+                         } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+                         logs["data." + data.objectId + "." + i + "." + timestamp] = String(object.properties[i].value);
+                         }
+                         }
 
-                                Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
-                                    if (error) {
-                                        //log("Error while updating service log: ", error);
-                                    } else if (result) {
-                                        //log("Service log successfully updated, result: ", result);
-                                    }
-                                });
-                            }
-                        });*/
+                         Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
+                         if (error) {
+                         //send_on_console("Error while updating service log: ", error);
+                         } else if (result) {
+                         //send_on_console("Service log successfully updated, result: ", result);
+                         }
+                         });
+                         }
+                         });*/
                     }
 
                     if (Apio.Configuration.type === "cloud") {
@@ -1543,6 +1561,14 @@ Apio.Serial.read = function (data) {
 
                                         if (isLogSocketConnected) {
                                             logSocket.emit("log_update", data);
+
+                                            var DATA = {
+                                                data: data,
+                                                message: "log_update",
+                                                service: "log"
+                                            };
+                                            DATA.data.apioId = Apio.System.getApioIdentifier();
+                                            Apio.Remote.socket.emit("send_to_service", DATA);
                                         }
                                         //da capire cosa fà MATTEO in questo else, sembra sia un backup nel caso in cui il servizio log non è sù
                                         else {
@@ -1561,9 +1587,9 @@ Apio.Serial.read = function (data) {
 
                                                     Apio.Database.db.collection("Services").update({name: "log"}, {$set: logs}, function (error, result) {
                                                         if (error) {
-                                                            //log("Error while updating service log: ", error);
+                                                            //send_on_console("Error while updating service log: ", error);
                                                         } else if (result) {
-                                                            //log("Service log successfully updated, result: ", result);
+                                                            //send_on_console("Service log successfully updated, result: ", result);
                                                         }
                                                     });
                                                 }
@@ -1580,14 +1606,14 @@ Apio.Serial.read = function (data) {
                         case "hi":
                             ////console.log("Ho riconosciuto la parola chiave hi");
                             if (data.objectId == "9999") {
-                                //log(data)
+                                //send_on_console(data)
                                 var o = {}
                                 o.name = "apio_autoinstall_service"
                                 o.data = data.properties.appId;
                                 Apio.io.emit("socket_service", o)
                             } else {
                                 //console.log("Hi dell' oggetto ",data.objectId)
-                                //log("L'indirizzo fisico dell'oggetto che si è appena connesso è " + data.address);
+                                //send_on_console("L'indirizzo fisico dell'oggetto che si è appena connesso è " + data.address);
 
 
                                 Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (err, document) {
@@ -1701,12 +1727,12 @@ Apio.Serial.read = function (data) {
                                         /*Apio.Database.db.collection("Objects").update({objectId: document.objectId}, {$set: {connected: true}},
                                          function (err, res) {
                                          if (err) {
-                                         //log("Error while updating field 'connected'");
+                                         //send_on_console("Error while updating field 'connected'");
                                          } else {
-                                         //log("Field 'connected' successfully updated");
+                                         //send_on_console("Field 'connected' successfully updated");
                                          }
                                          });*/
-                                        //log("l'oggetto con address " + document.address + " è " + document.objectId);
+                                        //send_on_console("l'oggetto con address " + document.address + " è " + document.objectId);
                                         if (isNotificationSocketConnected) {
                                             notificationSocket.emit("send_notification", data);
                                         }
@@ -1726,6 +1752,17 @@ Apio.Serial.read = function (data) {
 };
 
 socketServer.on("connection", function (Socket) {
+    Socket.on("trigger_console", function (data) {
+        if (data) {
+            isConsoleEnabled++;
+        } else {
+            isConsoleEnabled--;
+            if (isConsoleEnabled < 0) {
+                isConsoleEnabled = 0;
+            }
+        }
+    });
+
     Socket.on("apio_serial_send", function (data) {
         if (data) {
             if (typeof data === "object") {
@@ -1788,5 +1825,13 @@ http.listen(port, "localhost", function () {
 
     var gc = require("./garbage_collector.js");
     gc(60 * 1000);
+
+    var memwatch = require("memwatch-next");
+    memwatch.on("leak", function (info) {
+        console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+        console.log("Leak detected: ", info);
+        console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+        global.gc();
+    });
 });
 //};

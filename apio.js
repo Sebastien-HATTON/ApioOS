@@ -245,6 +245,14 @@ module.exports = function (enableCloudSocket) {
                                     Apio.Object.update(o, function () {
                                         Apio.servicesSocket.notification.emit("send_notification", o);
                                         Apio.servicesSocket.log.emit("log_update", o);
+
+                                        var DATA = {
+                                            data: o,
+                                            message: "log_update",
+                                            service: "log"
+                                        };
+                                        DATA.data.apioId = Apio.System.getApioIdentifier();
+                                        Apio.Remote.socket.emit("send_to_service", DATA);
                                     });
                                 }
                             }
@@ -295,6 +303,14 @@ module.exports = function (enableCloudSocket) {
                                     Apio.Object.update(o, function () {
                                         Apio.servicesSocket.notification.emit("send_notification", o);
                                         Apio.servicesSocket.log.emit("log_update", o);
+
+                                        var DATA = {
+                                            data: o,
+                                            message: "log_update",
+                                            service: "log"
+                                        };
+                                        DATA.data.apioId = Apio.System.getApioIdentifier();
+                                        Apio.Remote.socket.emit("send_to_service", DATA);
                                     });
                                 }
                             }
@@ -1496,9 +1512,68 @@ module.exports = function (enableCloudSocket) {
                     if (!data.hasOwnProperty('writeToDatabase')) {
                         data.writeToDatabase = true;
                     }
+                    var self = this;
                     Apio.Object.update(data, function () {
                         console.log("apio_client_update dalla board o da un client connesso");
                         Apio.servicesSocket.notification.emit("send_notification", data);
+
+                        //VECCHIO
+                        // self.arr = self.arr === undefined ? [] : self.arr;
+                        // self.arr.push(data);
+                        //
+                        // if (self.emptyDate === undefined || self.arr.length >= 50 || (self.emptyDate && new Date() - self.emptyDate >= 30 * 1000)) {
+                        //     self.emptyDate = new Date();
+                        //     Apio.servicesSocket.log.emit("log_update", self.arr);
+                        //     self.arr = [];
+                        //     global.gc();
+                        // }
+
+                        self.old_data = self.old_data === undefined ? [] : self.old_data;
+                        var checkMessage = function (data) {
+                            var checkProperties = function (p1, p2) {
+                                var ret = true, keys1 = Object.keys(p1), keys2 = Object.keys(p2);
+
+                                if (keys1.length === keys2.length) {
+                                    for (var x = 0; ret && x < keys1.length; x++) {
+                                        if (keys2.indexOf(keys1[x]) === -1) {
+                                            ret = false;
+                                        }
+                                    }
+                                } else {
+                                    ret = false;
+                                }
+
+                                return ret;
+                            };
+
+                            var send = true, ts = new Date().getTime();
+                            if (self.old_data) {
+                                for (var i = 0, found = false; !found && send && i < self.old_data.length; i++) {
+                                    if (self.old_data[i].apioId === data.apioId && self.old_data[i].objectId === data.objectId && checkProperties(self.old_data[i].properties, data.properties)) {
+                                        if (ts - self.old_data[i].timestamp < 3000) {
+                                            send = false;
+                                        } else {
+                                            data.timestamp = ts;
+                                            self.old_data[i] = data;
+                                        }
+
+                                        found = true;
+                                    }
+                                }
+                            }
+
+                            if (!found && send) {
+                                data.timestamp = ts;
+                                self.old_data.push(data);
+                            }
+
+                            return send;
+                        };
+
+                        if (typeof data === "string" || checkMessage(data)) {
+                            Apio.servicesSocket.log.emit("log_update", data);
+                            // global.gc();
+                        }
                     });
                 });
 
@@ -2598,12 +2673,17 @@ module.exports = function (enableCloudSocket) {
                         }
 
                         for (var x in Apio.connectedSockets) {
-                            if (x === "admin" || validator.isEmail(x) || Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                            if (x === "admin" || validator.isEmail(x)) {
                                 var socketIds = Apio.connectedSockets[x];
                                 for (var i in socketIds) {
-                                    if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                    if (Apio.io.sockets.connected[socketIds[i]] && data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
                                         Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
                                     }
+                                }
+                            } else if (Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                                var socketIds = Apio.connectedSockets[x];
+                                for (var i in socketIds) {
+                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
                                 }
                             }
                         }
@@ -2612,26 +2692,26 @@ module.exports = function (enableCloudSocket) {
                         Apio.Communication.sendAddressBindToProperty(data);
 
                         //LOG IN TEMPO REALE - DA TESTARE
-                        Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (error, object) {
-                            if (error) {
-                                console.log("Error while getting object with objectId " + data.objectId + ": ", error);
-                            } else if (object) {
-                                //SEND LOGS
-                                var logs = {}, timestamp = new Date().getTime();
-
-                                for (var i in object.properties) {
-                                    if (!logs.hasOwnProperty(i)) {
-                                        logs[i] = {};
-                                    }
-
-                                    if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
-                                        logs[i][timestamp] = String(data.properties[i]);
-                                    } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
-                                        logs[i][timestamp] = String(object.properties[i].value);
-                                    }
-                                }
-                            }
-                        });
+                        // Apio.Database.db.collection("Objects").findOne({objectId: data.objectId}, function (error, object) {
+                        //     if (error) {
+                        //         console.log("Error while getting object with objectId " + data.objectId + ": ", error);
+                        //     } else if (object) {
+                        //         //SEND LOGS
+                        //         var logs = {}, timestamp = new Date().getTime();
+                        //
+                        //         for (var i in object.properties) {
+                        //             if (!logs.hasOwnProperty(i)) {
+                        //                 logs[i] = {};
+                        //             }
+                        //
+                        //             if (data.properties[i] !== undefined && typeof data.properties[i] !== "object" && data.properties[i] !== null && data.properties[i] !== "" && !isNaN(String(data.properties[i]).replace(",", "."))) {
+                        //                 logs[i][timestamp] = String(data.properties[i]);
+                        //             } else if (object.properties[i].value !== undefined && typeof object.properties[i].value !== "object" && object.properties[i].value !== null && object.properties[i].value !== "" && !isNaN(String(object.properties[i].value).replace(",", "."))) {
+                        //                 logs[i][timestamp] = String(object.properties[i].value);
+                        //             }
+                        //         }
+                        //     }
+                        // });
                     } else if (data.hasOwnProperty("protocol") && data.protocol == "w" && Apio.Configuration.type === "cloud") {
                         Apio.io.emit("apio_server_update", data);
                     }
@@ -2673,6 +2753,7 @@ module.exports = function (enableCloudSocket) {
                         data = x;
                     }
 
+                    var self = this;
                     Apio.Object.update(data, function () {
                         if (Apio.Configuration.type === "gateway") {
                             if (Apio.Configuration.remote.enabled && Apio.isBoardSynced) {
@@ -2690,8 +2771,82 @@ module.exports = function (enableCloudSocket) {
 
                         Apio.servicesSocket.notification.emit("send_notification", data);
 
-                        console.log("Invio log update");
-                        Apio.servicesSocket.log.emit("log_update", data);
+                        //VECCHISSIMO
+
+                        // console.log("Invio log update");
+                        // Apio.servicesSocket.log.emit("log_update", data);
+                        //
+                        // var DATA = {
+                        //     data: data,
+                        //     message: "log_update",
+                        //     service: "log"
+                        // };
+                        // DATA.data.apioId = Apio.System.getApioIdentifier();
+                        // Apio.Remote.socket.emit("send_to_service", DATA);
+                        //
+                        // self.counter = self.counter === undefined ? 1 : self.counter + 1;
+                        // if (self.counter === 50) {
+                        //     self.counter = 0;
+                        //     global.gc();
+                        // }
+
+                        //VECHIO
+                        // self.arr = self.arr === undefined ? [] : self.arr;
+                        // self.arr.push(data);
+                        //
+                        // if (self.emptyDate === undefined || self.arr.length >= 50 || (self.emptyDate && new Date() - self.emptyDate >= 30 * 1000)) {
+                        //     self.emptyDate = new Date();
+                        //     Apio.servicesSocket.log.emit("log_update", self.arr);
+                        //     self.arr = [];
+                        //     global.gc();
+                        // }
+
+                        self.old_data = self.old_data === undefined ? [] : self.old_data;
+                        var checkMessage = function (data) {
+                            var checkProperties = function (p1, p2) {
+                                var ret = true, keys1 = Object.keys(p1), keys2 = Object.keys(p2);
+
+                                if (keys1.length === keys2.length) {
+                                    for (var x = 0; ret && x < keys1.length; x++) {
+                                        if (keys2.indexOf(keys1[x]) === -1) {
+                                            ret = false;
+                                        }
+                                    }
+                                } else {
+                                    ret = false;
+                                }
+
+                                return ret;
+                            };
+
+                            var send = true, ts = new Date().getTime();
+                            if (self.old_data) {
+                                for (var i = 0, found = false; !found && send && i < self.old_data.length; i++) {
+                                    if (self.old_data[i].apioId === data.apioId && self.old_data[i].objectId === data.objectId && checkProperties(self.old_data[i].properties, data.properties)) {
+                                        if (ts - self.old_data[i].timestamp < 3000) {
+                                            send = false;
+                                        } else {
+                                            data.timestamp = ts;
+                                            self.old_data[i] = data;
+                                        }
+
+                                        found = true;
+                                    }
+                                }
+                            }
+
+                            if (!found && send) {
+                                data.timestamp = ts;
+                                self.old_data.push(data);
+                            }
+
+                            return send;
+                        };
+
+                        if (typeof data === "string" || checkMessage(data)) {
+                            Apio.servicesSocket.log.emit("log_update", data);
+                            // global.gc();
+                        }
                     }, id);
                 });
 
@@ -2796,12 +2951,17 @@ module.exports = function (enableCloudSocket) {
                         // Apio.io.emit("apio_server_update", data);
 
                         for (var x in Apio.connectedSockets) {
-                            if (x === "admin" || validator.isEmail(x) || Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                            if (x === "admin" || validator.isEmail(x)) {
                                 var socketIds = Apio.connectedSockets[x];
                                 for (var i in socketIds) {
-                                    if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                                    if (Apio.io.sockets.connected[socketIds[i]] && data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
                                         Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
                                     }
+                                }
+                            } else if (Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                                var socketIds = Apio.connectedSockets[x];
+                                for (var i in socketIds) {
+                                    Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
                                 }
                             }
                         }
@@ -4246,6 +4406,7 @@ module.exports = function (enableCloudSocket) {
     };
 
     Apio.Object.update = function (data, callback, id) {
+        var self = this;
         if (data.writeToDatabase === true) {
             Apio.Database.updateProperty(data, function () {
                 //UPDATE COLLECTION OBJECTS AND FORCE SERVICES TO DOWNLOAD NEW COLLECTIONS
@@ -4281,23 +4442,122 @@ module.exports = function (enableCloudSocket) {
                 // }
 
                 for (var x in Apio.connectedSockets) {
-                    if (x === "admin" || validator.isEmail(x) || Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                    if (x === "admin" || validator.isEmail(x)) {
                         var socketIds = Apio.connectedSockets[x];
                         for (var i in socketIds) {
-                            if (data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+                            if (Apio.io.sockets.connected[socketIds[i]] && data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId && socketIds[i] !== id) {
                                 Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
                             }
+                        }
+                    } else if (Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+                        var socketIds = Apio.connectedSockets[x];
+                        for (var i in socketIds) {
+                            Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
                         }
                     }
                 }
 
                 if (Apio.Configuration.type === "gateway" && data && data.writeToSerial === true && Apio.Configuration.serial.enabled === true && (!data.hasOwnProperty("protocol") || Object.keys(data.protocol).length === 0)) {
-                    Apio.Serial.send(data);
+                    // Apio.Serial.send(data);
+
+                    self.old_data = self.old_data === undefined ? [] : self.old_data;
+                    var checkMessage = function (data) {
+                        var checkProperties = function (p1, p2) {
+                            var ret = true, keys1 = Object.keys(p1), keys2 = Object.keys(p2);
+
+                            if (keys1.length === keys2.length) {
+                                for (var x = 0; ret && x < keys1.length; x++) {
+                                    if (keys2.indexOf(keys1[x]) === -1) {
+                                        ret = false;
+                                    }
+                                }
+                            } else {
+                                ret = false;
+                            }
+
+                            return ret;
+                        };
+
+                        var send = true, ts = new Date().getTime();
+                        if (self.old_data) {
+                            for (var i = 0, found = false; !found && send && i < self.old_data.length; i++) {
+                                if (self.old_data[i].apioId === data.apioId && self.old_data[i].objectId === data.objectId && checkProperties(self.old_data[i].properties, data.properties)) {
+                                    if (ts - self.old_data[i].timestamp < 500) {
+                                        send = false;
+                                    } else {
+                                        data.timestamp = ts;
+                                        self.old_data[i] = data;
+                                    }
+
+                                    found = true;
+                                }
+                            }
+                        }
+
+                        if (!found && send) {
+                            data.timestamp = ts;
+                            self.old_data.push(data);
+                        }
+
+                        return send;
+                    };
+
+                    if (typeof data === "string" || checkMessage(data)) {
+                        Apio.Serial.send(data);
+                        // global.gc();
+                    }
                 }
             });
         } else {
             if (Apio.Configuration.type === "gateway" && data && data.writeToSerial === true && Apio.Configuration.serial.enabled === true && (!data.hasOwnProperty("protocol") || Object.keys(data.protocol).length === 0)) {
-                Apio.Serial.send(data);
+                // Apio.Serial.send(data);
+
+                self.old_data = self.old_data === undefined ? [] : self.old_data;
+                var checkMessage = function (data) {
+                    var checkProperties = function (p1, p2) {
+                        var ret = true, keys1 = Object.keys(p1), keys2 = Object.keys(p2);
+
+                        if (keys1.length === keys2.length) {
+                            for (var x = 0; ret && x < keys1.length; x++) {
+                                if (keys2.indexOf(keys1[x]) === -1) {
+                                    ret = false;
+                                }
+                            }
+                        } else {
+                            ret = false;
+                        }
+
+                        return ret;
+                    };
+
+                    var send = true, ts = new Date().getTime();
+                    if (self.old_data) {
+                        for (var i = 0, found = false; !found && send && i < self.old_data.length; i++) {
+                            if (self.old_data[i].apioId === data.apioId && self.old_data[i].objectId === data.objectId && checkProperties(self.old_data[i].properties, data.properties)) {
+                                if (ts - self.old_data[i].timestamp < 500) {
+                                    send = false;
+                                } else {
+                                    data.timestamp = ts;
+                                    self.old_data[i] = data;
+                                }
+
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (!found && send) {
+                        data.timestamp = ts;
+                        self.old_data.push(data);
+                    }
+
+                    return send;
+                };
+
+                if (typeof data === "string" || checkMessage(data)) {
+                    Apio.Serial.send(data);
+                    // global.gc();
+                }
             }
         }
 
@@ -4309,6 +4569,99 @@ module.exports = function (enableCloudSocket) {
             callback();
         }
     };
+
+    // Apio.Object.update = function (data, callback, id) {
+    //     var self = this;
+    //     if (data.writeToDatabase === true) {
+    //         Apio.Database.updateProperty(data, function () {
+    //             //UPDATE COLLECTION OBJECTS AND FORCE SERVICES TO DOWNLOAD NEW COLLECTIONS
+    //             if (Apio.Configuration.type === "gateway") {
+    //                 for (var p in data.properties) {
+    //                     if (objects[data.objectId].properties.hasOwnProperty(p)) {
+    //                         objects[data.objectId].properties[p].value = data.properties[p];
+    //                     }
+    //                 }
+    //
+    //                 data.apioId = Apio.System.getApioIdentifier();
+    //             }
+    //
+    //             for (var x in Apio.connectedSockets) {
+    //                 if (x === "admin" || validator.isEmail(x)) {
+    //                     var socketIds = Apio.connectedSockets[x];
+    //                     for (var i in socketIds) {
+    //                         if (Apio.io.sockets.connected[socketIds[i]] && data.apioId === Apio.io.sockets.connected[socketIds[i]].client.request.session.apioId) {
+    //                             Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
+    //                         }
+    //                     }
+    //                 } else if (Apio.Configuration.dependencies[Apio.Configuration.type].hasOwnProperty(x)) {
+    //                     var socketIds = Apio.connectedSockets[x];
+    //                     for (var i in socketIds) {
+    //                         Apio.io.sockets.connected[socketIds[i]].emit("apio_server_update", data);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    //
+    //     if (Apio.Configuration.type === "gateway" && data && data.writeToSerial === true && Apio.Configuration.serial.enabled === true && (!data.hasOwnProperty("protocol") || Object.keys(data.protocol).length === 0)) {
+    //         // Apio.Serial.send(data);
+    //
+    //         self.old_data = self.old_data === undefined ? [] : self.old_data;
+    //         var checkMessage = function (data) {
+    //             var checkProperties = function (p1, p2) {
+    //                 var ret = true, keys1 = Object.keys(p1), keys2 = Object.keys(p2);
+    //
+    //                 if (keys1.length === keys2.length) {
+    //                     for (var x = 0; ret && x < keys1.length; x++) {
+    //                         if (keys2.indexOf(keys1[x]) === -1) {
+    //                             ret = false;
+    //                         }
+    //                     }
+    //                 } else {
+    //                     ret = false;
+    //                 }
+    //
+    //                 return ret;
+    //             };
+    //
+    //             var send = true, ts = new Date().getTime();
+    //             if (self.old_data) {
+    //                 for (var i = 0, found = false; !found && send && i < self.old_data.length; i++) {
+    //                     if (self.old_data[i].apioId === data.apioId && self.old_data[i].objectId === data.objectId && checkProperties(self.old_data[i].properties, data.properties)) {
+    //                         if (ts - self.old_data[i].timestamp < 1000) {
+    //                             send = false;
+    //                         } else {
+    //                             data.timestamp = ts;
+    //                             self.old_data[i] = data;
+    //                         }
+    //
+    //                         found = true;
+    //                     }
+    //                 }
+    //             }
+    //
+    //             if (!found && send) {
+    //                 data.timestamp = ts;
+    //                 self.old_data.push(data);
+    //             }
+    //
+    //             return send;
+    //         };
+    //
+    //         if (typeof data === "string" || checkMessage(data)) {
+    //             Apio.Serial.send(data);
+    //             global.gc();
+    //         }
+    //     }
+    //
+    //     if (Apio.Configuration.type === "gateway") {
+    //         Apio.Communication.sendAddressBindToProperty(data);
+    //     }
+    //
+    //     if (callback) {
+    //         callback();
+    //     }
+    // };
 
     Apio.Object.updateProperties = function (searchQuery, newProperties, callback) {
         if (Apio.Configuration.type === "gateway") {
@@ -5093,6 +5446,7 @@ module.exports = function (enableCloudSocket) {
     };
 
     Apio.Serial = {};
+
     Apio.Serial.send = function (data) {
         console.log("APIO_SERIAL_SEND", data);
         if (typeof data === "string") {
@@ -5109,7 +5463,8 @@ module.exports = function (enableCloudSocket) {
                     protocol = "apio";
                 }
 
-                for (var py in data.properties) {
+                var pys = Object.keys(data.properties);
+                pys.forEach(function (py) {
                     if (py !== "date" && Apio.addressBindToProperty.hasOwnProperty(protocol) && Apio.addressBindToProperty[protocol].hasOwnProperty(data.address) && Apio.addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
                         data.allProperties = objects[data.objectId].properties;
                         data.protocol = {
@@ -5153,46 +5508,147 @@ module.exports = function (enableCloudSocket) {
                             Apio.io.emit("apio_zwave_send", x);
                         }
                     } else {
-                        for (var py in data.properties) {
-                            if (protocol === "apio") {
-                                Apio.io.emit("apio_serial_send", data);
-                            } else if (protocol === "enocean") {
-                                var x = {
-                                    address: data.address || objects[data.objectId].address,
-                                    message: {},
-                                    protocol: {
-                                        address: objects[data.objectId].address
-                                    }
-                                };
+                        if (protocol === "apio") {
+                            Apio.io.emit("apio_serial_send", data);
+                        } else if (protocol === "enocean") {
+                            var x = {
+                                address: data.address || objects[data.objectId].address,
+                                message: {},
+                                protocol: {
+                                    address: objects[data.objectId].address
+                                }
+                            };
 
-                                x.allProperties = objects[data.objectId].properties;
-                                x.message.property = py;
-                                x.message.value = data.properties[py];
-                                x.objectId = data.objectId;
+                            x.allProperties = objects[data.objectId].properties;
+                            x.message.property = py;
+                            x.message.value = data.properties[py];
+                            x.objectId = data.objectId;
 
-                                Apio.io.emit("apio_enocean_send", x);
-                            } else if (protocol === "zwave") {
-                                var x = {
-                                    address: data.address || objects[data.objectId].address,
-                                    message: {},
-                                    protocol: {
-                                        address: objects[data.objectId].address
-                                    }
-                                };
+                            Apio.io.emit("apio_enocean_send", x);
+                        } else if (protocol === "zwave") {
+                            var x = {
+                                address: data.address || objects[data.objectId].address,
+                                message: {},
+                                protocol: {
+                                    address: objects[data.objectId].address
+                                }
+                            };
 
-                                x.allProperties = objects[data.objectId].properties;
-                                x.message.property = py;
-                                x.message.value = data.properties[py];
-                                x.objectId = data.objectId;
+                            x.allProperties = objects[data.objectId].properties;
+                            x.message.property = py;
+                            x.message.value = data.properties[py];
+                            x.objectId = data.objectId;
 
-                                Apio.io.emit("apio_zwave_send", x);
-                            }
+                            Apio.io.emit("apio_zwave_send", x);
                         }
                     }
-                }
+                });
             }
         }
     };
+
+    //BUONO
+
+    // Apio.Serial.send = function (data) {
+    //     console.log("APIO_SERIAL_SEND", data);
+    //     if (typeof data === "string") {
+    //         Apio.io.emit("apio_serial_send", data);
+    //     } else if (typeof data === "object") {
+    //         if (objects.hasOwnProperty(data.objectId)) {
+    //             var protocol = objects[data.objectId].protocol;
+    //
+    //             if (protocol === "e") {
+    //                 protocol = "enocean";
+    //             } else if (protocol === "z") {
+    //                 protocol = "zwave";
+    //             } else if (!communication.hasOwnProperty(protocol)) {
+    //                 protocol = "apio";
+    //             }
+    //
+    //             for (var py in data.properties) {
+    //                 if (py !== "date" && Apio.addressBindToProperty.hasOwnProperty(protocol) && Apio.addressBindToProperty[protocol].hasOwnProperty(data.address) && Apio.addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
+    //                     data.allProperties = objects[data.objectId].properties;
+    //                     data.protocol = {
+    //                         name: protocol,
+    //                         type: Apio.addressBindToProperty[protocol][data.address].type,
+    //                         address: data.address,
+    //                         property: py
+    //                     };
+    //
+    //                     if (protocol === "apio") {
+    //                         data.protocol.fun = "update";
+    //
+    //                         Apio.io.emit("apio_serial_send", data);
+    //                     } else if (protocol === "enocean") {
+    //                         data.protocol.fun = "01";
+    //                         var x = {
+    //                             address: data.protocol.address,
+    //                             message: {},
+    //                             protocol: data.protocol
+    //                         };
+    //
+    //                         x.allProperties = objects[data.objectId].properties;
+    //                         x.message.property = py;
+    //                         x.message.value = data.properties[py];
+    //                         x.objectId = data.objectId;
+    //
+    //                         Apio.io.emit("apio_enocean_send", x);
+    //                     } else if (protocol === "zwave") {
+    //                         data.protocol.fun = "01";
+    //                         var x = {
+    //                             address: data.protocol.address,
+    //                             message: {},
+    //                             protocol: data.protocol
+    //                         };
+    //
+    //                         x.allProperties = objects[data.objectId].properties;
+    //                         x.message.property = py;
+    //                         x.message.value = data.properties[py];
+    //                         x.objectId = data.objectId;
+    //
+    //                         Apio.io.emit("apio_zwave_send", x);
+    //                     }
+    //                 } else {
+    //                     for (var py in data.properties) {
+    //                         if (protocol === "apio") {
+    //                             Apio.io.emit("apio_serial_send", data);
+    //                         } else if (protocol === "enocean") {
+    //                             var x = {
+    //                                 address: data.address || objects[data.objectId].address,
+    //                                 message: {},
+    //                                 protocol: {
+    //                                     address: objects[data.objectId].address
+    //                                 }
+    //                             };
+    //
+    //                             x.allProperties = objects[data.objectId].properties;
+    //                             x.message.property = py;
+    //                             x.message.value = data.properties[py];
+    //                             x.objectId = data.objectId;
+    //
+    //                             Apio.io.emit("apio_enocean_send", x);
+    //                         } else if (protocol === "zwave") {
+    //                             var x = {
+    //                                 address: data.address || objects[data.objectId].address,
+    //                                 message: {},
+    //                                 protocol: {
+    //                                     address: objects[data.objectId].address
+    //                                 }
+    //                             };
+    //
+    //                             x.allProperties = objects[data.objectId].properties;
+    //                             x.message.property = py;
+    //                             x.message.value = data.properties[py];
+    //                             x.objectId = data.objectId;
+    //
+    //                             Apio.io.emit("apio_zwave_send", x);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // };
 
     Apio.Serial.stream = function (data) {
         if (typeof data === "string") {

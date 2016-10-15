@@ -614,4 +614,12 @@ http.listen(port, "localhost", function () {
 
     var gc = require("./garbage_collector.js");
     gc();
+
+    var memwatch = require("memwatch-next");
+    memwatch.on("leak", function (info) {
+        console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+        console.log("Leak detected: ", info);
+        console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§");
+        global.gc();
+    });
 });

@@ -207,26 +207,21 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
                 ssid: $scope.ssid,
                 password: $scope.password
             }))).success(function () {
+            $scope.originalStatus = "client";
             sweet.show({
                 title: "Your Wi-Fi has been set as client!",
                 text: "A reboot is required, wanna proceed?",
                 type: "success",
-                cancelButtonText: "No",
-                closeOnCancel: true,
                 closeOnConfirm: true,
-                confirmButtonText: "Yes",
-                showCancelButton: true,
+                showCancelButton: false,
                 showLoaderOnConfirm: true
-            }, function (isConfirm) {
-                if (isConfirm) {
-                    $http.post("/apio/rebootBoard").success();
-                    $window.location = "app#/home?clear=true";
-                }
             });
         }).error(function (e) {
+            $scope.status = "hotspot";
+            $scope.wifiSSIDs = [];
             sweet.show({
                 title: "An error occurred while setting your Wi-Fi as client",
-                text: e,
+                text: "Rolling back as hotspot",
                 type: "error",
                 closeOnConfirm: true,
                 showCancelButton: false,
@@ -254,21 +249,14 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
             });
         } else if ($scope.status !== $scope.originalStatus && $scope.status === "hotspot") {
             $http.post("/apio/service/networking/route/" + encodeURIComponent("/apio/wifi/switchStatus") + "/data/" + encodeURIComponent(JSON.stringify({status: $scope.status}))).success(function () {
+                $scope.wifiSSIDs = [];
                 sweet.show({
                     title: "Your Wi-Fi has been set as hotspot!",
                     text: "A reboot is required, wanna proceed?",
                     type: "success",
-                    cancelButtonText: "No",
-                    closeOnCancel: true,
                     closeOnConfirm: true,
-                    confirmButtonText: "Yes",
-                    showCancelButton: true,
+                    showCancelButton: false,
                     showLoaderOnConfirm: true
-                }, function (isConfirm) {
-                    if (isConfirm) {
-                        $http.post("/apio/rebootBoard").success();
-                        $window.location = "app#/home?clear=true";
-                    }
                 });
             }).error(function (e) {
                 sweet.show({

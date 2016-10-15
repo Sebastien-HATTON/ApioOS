@@ -1,0 +1,185 @@
+{
+  "appId": "HuaweiSUN2000",
+  "category": "modbus",
+  "connected": true,
+  "created": "2015-10-24",
+  "db": {},
+  "log": {},
+  "name": "Inverter Huawei SUN2000",
+  "notifications": {},
+  "properties": {
+	  "totalEnergy" : {
+            "type" : "unlimitedsensor",
+            "label" : "Total Energy [KW/h]",
+            "value" : "0"
+        },
+        "currentDayEnergy" : {
+            "type" : "unlimitedsensor",
+            "label" : "Energy Current Day[KW/h]",
+            "value" : "0"
+        },
+        "activePower" : {
+            "type" : "unlimitedsensor",
+            "label" : "Active power [KW]",
+            "value" : "0"
+        },
+        "reactivePower" : {
+            "type" : "unlimitedsensor",
+            "label" : "Reactive Output Power [kVar]",
+            "value" : "0"
+        },
+        "totalInputPower" : {
+            "type" : "unlimitedsensor",
+            "label" : "Total Input Power [KW]",
+            "value" : "0"
+        },
+        "frequency" : {
+            "type" : "unlimitedsensor",
+            "label" : "Frequency [Hz]",
+            "value" : "0"
+        },
+        "powerFactor" : {
+            "type" : "unlimitedsensor",
+            "label" : "Power Factor [phi]",
+            "value" : "0"
+        },
+        "cabinetTemperature" : {
+            "type" : "unlimitedsensor",
+            "label" : "Cabinet Temperature [C°]",
+            "value" : "0"
+        },
+        "moreInfoVoltage" : {
+            "type" : "collapse",
+            "label" : "Voltage More Info",
+            "value" : "0"
+        },
+        "PV1Voltage" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV1 Voltage/PV1 [V]",
+            "value" : "0"
+        },
+        "PV2Voltage" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV2 Voltage/PV2 [V]",
+            "value" : "0"
+        },
+        "PV3Voltage" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV3 Voltage/PV3 [V]",
+            "value" : "0"
+        },
+        "PV4Voltage" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV4 Voltage/PV4 [V]",
+            "value" : "0"
+        },
+        "PV5Voltage" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV5 Voltage/PV5 [V]",
+            "value" : "0"
+        },
+        "PV6Voltage" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV6 Voltage/PV6 [V]",
+            "value" : "0"
+        },
+        "moreInfoCurrent" : {
+            "type" : "collapse",
+            "label" : "Current More Info",
+            "value" : "0"
+        },
+        "PV1Current" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV1 Current/PV1 [A]",
+            "value" : "0"
+        },
+        "PV2Current" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV2 Current/PV2 [A]",
+            "value" : "0"
+        },
+        "PV3Current" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV3 Current/PV3 [A]",
+            "value" : "0"
+        },
+        "PV4Current" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV4 Current/PV4 [A]",
+            "value" : "0"
+        },
+        "PV5Current" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV5 Current/PV5 [A]",
+            "value" : "0"
+        },
+        "PV6Current" : {
+            "type" : "unlimitedsensor",
+            "label" : "PV6 Current/PV6 [A]",
+            "value" : "0"
+        },
+        "moreInfoNetworkVoltage" : {
+            "type" : "collapse",
+            "label" : "Network Voltage More Info",
+            "value" : "0"
+        },
+        "uab" : {
+            "type" : "unlimitedsensor",
+            "label" : "Voltage L1 - L2 [V]",
+            "value" : "0"
+        },
+        "ubc" : {
+            "type" : "unlimitedsensor",
+            "label" : "Voltage L2 - L3 [V]",
+            "value" : "0"
+        },
+        "uca" : {
+            "type" : "unlimitedsensor",
+            "label" : "Voltage L3 - L1 [V]",
+            "value" : "0"
+        },
+        "moreInfoNetworkCurrent" : {
+            "type" : "collapse",
+            "label" : "Network Current More Info",
+            "value" : "0"
+        },
+        "ia" : {
+            "type" : "unlimitedsensor",
+            "label" : "Current L1 [A]",
+            "value" : "0"
+        },
+        "ib" : {
+            "type" : "unlimitedsensor",
+            "label" : "Current L2 [A]",
+            "value" : "0"
+        },
+        "ic" : {
+            "type" : "unlimitedsensor",
+            "label" : "Current L3 [A]",
+            "value" : "0"
+        },
+        "status" : {
+            "type" : "unlimitedsensor",
+            "label" : "Stato Inverter",
+            "value" : "0"
+        },
+        "moreInfo" : {
+            "type" : "collapse",
+            "label" : "More Info",
+            "value" : "0"
+        },
+        "img" : {
+            "type" : "uploadimage",
+            "label" : "Immagine",
+            "value" : "0"
+        },
+        "note" : {
+            "type" : "note",
+            "label" : "Note",
+            "value" : "0"
+        }
+  },
+  "protocol": "l",
+  "tag": "#energia #inverter",
+  "type": "object"
+}
