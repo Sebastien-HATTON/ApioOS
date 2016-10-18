@@ -45,6 +45,21 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardLogicControl
         });
     });
 
+    socket.on("logic_error", function (data) {
+        addLog({
+            message: data,
+            type: "warning"
+        });
+
+        if ($scope.showHelpDevelop !== "console") {
+            $scope.openCloseConsole();
+        }
+
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
+    });
+
     socket.on("logic_log", function (data) {
         for (var x in data) {
             addLog({
