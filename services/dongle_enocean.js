@@ -250,7 +250,9 @@ var enoceanAppliance = function (data) {
                     //console.log('la funzione da eseguire è: ',s);
                     //console.log('il dato che gli verrà passato è: ',data);
                     console.log("Chiamo la receive");
-                    console.log("oggetto in DB:",objects[bindToProperty.enocean[data.senderId].objectId].properties);
+                    if (objects[bindToProperty.enocean[data.senderId].objectId]) {
+                        console.log("oggetto in DB:", objects[bindToProperty.enocean[data.senderId].objectId].properties);
+                    }
                     var x = eval.call(null, s);
                     //la call back deve restituire
 

@@ -100,6 +100,8 @@ var singleton_socket = function () {
     };
 }();
 
+var addressBindToProperty = {}, communication = {}, objects = {};
+
 module.exports = function (enableCloudSocket) {
     "use strict";
     var Apio = {};
@@ -212,10 +214,10 @@ module.exports = function (enableCloudSocket) {
                     protocol = "apio";
                 }
 
-                if (Apio.addressBindToProperty[protocol].hasOwnProperty(data.protocol.address) && Apio.addressBindToProperty[protocol][data.protocol.address].hasOwnProperty(data.protocol.property) && Apio.addressBindToProperty[protocol][data.protocol.address][data.protocol.property].hasOwnProperty(data.objectId)) {
+                if (addressBindToProperty[protocol].hasOwnProperty(data.protocol.address) && addressBindToProperty[protocol][data.protocol.address].hasOwnProperty(data.protocol.property) && addressBindToProperty[protocol][data.protocol.address][data.protocol.property].hasOwnProperty(data.objectId)) {
                     var propertiesKeys = Object.keys(data.properties);
                     for (var x in propertiesKeys) {
-                        if (propertiesKeys[x] !== "date" && propertiesKeys[x] === Apio.addressBindToProperty[protocol][data.protocol.address][data.protocol.property][data.objectId]) {
+                        if (propertiesKeys[x] !== "date" && propertiesKeys[x] === addressBindToProperty[protocol][data.protocol.address][data.protocol.property][data.objectId]) {
                             var propertyValue = data.properties[propertiesKeys[x]];
                             for (var o in objects) {
                                 if (data.protocol.address === objects[o].address) {
@@ -271,12 +273,12 @@ module.exports = function (enableCloudSocket) {
                         protocol = "apio";
                     }
 
-                    if (Apio.addressBindToProperty[protocol].hasOwnProperty(data.address)) {
+                    if (addressBindToProperty[protocol].hasOwnProperty(data.address)) {
                         var propertiesKeys = Object.keys(data.properties);
                         for (var x in propertiesKeys) {
-                            if (propertiesKeys[x] !== "date" && Apio.addressBindToProperty[protocol][data.address].hasOwnProperty(propertiesKeys[x])) {
+                            if (propertiesKeys[x] !== "date" && addressBindToProperty[protocol][data.address].hasOwnProperty(propertiesKeys[x])) {
                                 var propertyValue = data.properties[propertiesKeys[x]];
-                                var objectIdToUpdate = Object.keys(Apio.addressBindToProperty[protocol][data.address][propertiesKeys[x]]);
+                                var objectIdToUpdate = Object.keys(addressBindToProperty[protocol][data.address][propertiesKeys[x]]);
                                 for (var oId in objectIdToUpdate) {
                                     var d = new Date();
                                     var day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
@@ -298,7 +300,7 @@ module.exports = function (enableCloudSocket) {
                                         writeToDatabase: true,
                                         writeToSerial: false
                                     };
-                                    o.properties[Apio.addressBindToProperty[protocol][data.address][propertiesKeys[x]][objectIdToUpdate[oId]]] = propertyValue;
+                                    o.properties[addressBindToProperty[protocol][data.address][propertiesKeys[x]][objectIdToUpdate[oId]]] = propertyValue;
                                     console.log("************************o (2): ", o);
                                     Apio.Object.update(o, function () {
                                         Apio.servicesSocket.notification.emit("send_notification", o);
@@ -791,6 +793,7 @@ module.exports = function (enableCloudSocket) {
                 });
 
                 socket.on("update_collections", function () {
+                    console.log("------------------------update collections-------------------");
                     Apio.Database.db.collection("Communication").findOne({name: "integratedCommunication"}, function (err, doc) {
                         if (err) {
                             console.log("Error while getting integratedCommunication protocols: ", err);
@@ -804,8 +807,9 @@ module.exports = function (enableCloudSocket) {
                         if (err) {
                             console.log("Error while getting integratedCommunication protocols: ", err);
                         } else if (doc) {
-                            Apio.addressBindToProperty = doc;
-                            delete Apio.addressBindToProperty._id;
+                            addressBindToProperty = doc;
+                            delete addressBindToProperty._id;
+                            console.log("addressBindToProperty: ", addressBindToProperty);
                         }
                     });
 
@@ -1786,6 +1790,10 @@ module.exports = function (enableCloudSocket) {
                                 Apio.Database.db.collection("systems").update({apioId: data.apioId}, {$set: {test: hash}}, function (err) {
                                     if (!err) {
                                         Apio.Util.log("successfully created a temporary test for apioOS with id " + data.apioId);
+                                        if (data.force === 1) {
+                                            delete Apio.boardsLastDisconnection[data.apioId];
+                                        }
+
                                         if (!Apio.boardsLastDisconnection.hasOwnProperty(data.apioId) || new Date() - Apio.boardsLastDisconnection[data.apioId] >= 20 * 60 * 1000) {
                                             Apio.io.to(data.apioId).emit("apio.remote.handshake.test", {factor: randomuuid});
                                         } else {
@@ -3010,8 +3018,8 @@ module.exports = function (enableCloudSocket) {
         return Apio.Database.db;
     };
 
-    Apio.addressBindToProperty = {};
-    var communication = {}, objects = {};
+    // var addressBindToProperty = {};
+    // var communication = {}, objects = {};
 
     Apio.Database.connect = function (callback, dump) {
         if (dump === undefined || dump === null) {
@@ -3038,8 +3046,8 @@ module.exports = function (enableCloudSocket) {
                 if (err) {
                     console.log("Error while getting integratedCommunication protocols: ", err);
                 } else if (doc) {
-                    Apio.addressBindToProperty = doc;
-                    delete Apio.addressBindToProperty._id;
+                    addressBindToProperty = doc;
+                    delete addressBindToProperty._id;
                 }
             });
 
@@ -3389,7 +3397,81 @@ module.exports = function (enableCloudSocket) {
                 if (err) {
                     console.log("Error while retreiving object with objectId " + id + ": ", err);
                 } else if (obj) {
-                    var protocols = Object.keys(Apio.addressBindToProperty);
+                    // Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (err, doc) {
+                    //     if (err) {
+                    //         console.log("Error while getting integratedCommunication protocols: ", err);
+                    //     } else if (doc) {
+                    //         addressBindToProperty = doc;
+                    //         delete addressBindToProperty._id;
+                    //
+                    //         var protocols = Object.keys(addressBindToProperty);
+                    //         for (var i = 0, found = false; !found && i < protocols.length; i++) {
+                    //             if (protocols[i] === "name") {
+                    //                 found = true;
+                    //                 protocols.splice(i--, 1);
+                    //             }
+                    //         }
+                    //
+                    //         for (var p in protocols) {
+                    //             var addresses = Object.keys(addressBindToProperty[protocols[p]]);
+                    //             for (var a in addresses) {
+                    //                 var properties = Object.keys(addressBindToProperty[protocols[p]][addresses[a]]);
+                    //                 for (var prop in properties) {
+                    //                     if (typeof addressBindToProperty[protocols[p]][addresses[a]][properties[prop]] === "object") {
+                    //                         if (addressBindToProperty[protocols[p]][addresses[a]][properties[prop]].hasOwnProperty(id)) {
+                    //                             delete addressBindToProperty[protocols[p]][addresses[a]][properties[prop]][id];
+                    //                         }
+                    //
+                    //                         if (Object.keys(addressBindToProperty[protocols[p]][addresses[a]][properties[prop]]).length === 0) {
+                    //                             delete addressBindToProperty[protocols[p]][addresses[a]][properties[prop]];
+                    //                         }
+                    //                     }
+                    //                 }
+                    //
+                    //                 if (Object.keys(addressBindToProperty[protocols[p]][addresses[a]]).length === 0) {
+                    //                     delete addressBindToProperty[protocols[p]][addresses[a]];
+                    //                 }
+                    //             }
+                    //
+                    //             console.log("id: ", id, "protocols[p]: ", protocols[p], "addressBindToProperty[protocols[p]]: ", addressBindToProperty[protocols[p]], "obj.address: ", obj.address);
+                    //             console.log("typeof obj.address: ", obj.address, "addressBindToProperty[protocols[p]].hasOwnProperty(obj.address): ", addressBindToProperty[protocols[p]].hasOwnProperty(obj.address));
+                    //             if (addressBindToProperty[protocols[p]].hasOwnProperty(obj.address)) {
+                    //                 console.log("ENTRATO+++++++++++++++++++++++");
+                    //                 delete addressBindToProperty[protocols[p]][obj.address];
+                    //             }
+                    //             console.log("addressBindToProperty[protocols[p]]: ", addressBindToProperty[protocols[p]]);
+                    //         }
+                    //
+                    //         Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: addressBindToProperty}, function (err_updt) {
+                    //             if (err_updt) {
+                    //                 console.log("Error while updating communication addressBindToProperty: ", err_updt);
+                    //             } else {
+                    //                 console.log("Communication addressBindToProperty successfully updated");
+                    //
+                    //                 var servicesKeys = Object.keys(Apio.servicesSocket);
+                    //                 servicesKeys.forEach(function (service) {
+                    //                     Apio.servicesSocket[service].emit("update_collections");
+                    //                 });
+                    //             }
+                    //         });
+                    //
+                    //         Apio.Database.db.collection("Objects").remove({objectId: id}, function (error) {
+                    //             if (error) {
+                    //                 console.log("Error while removing object: ", error);
+                    //                 throw new Apio.Database.Error("Apio.Database.deleteObject() encountered an error while trying to connect to the database");
+                    //             } else if (callback) {
+                    //                 delete objects[id];
+                    //                 console.log("**********ELIMINATO OGGETTO*********", objects);
+                    //                 console.log("Chiamo callback");
+                    //                 callback();
+                    //             }
+                    //         });
+                    //     }
+                    // });
+
+                    console.log("ELIMINO OGGETTO");
+                    console.log("addressBindToProperty: ", addressBindToProperty, "id: ", id);
+                    var protocols = Object.keys(addressBindToProperty);
                     for (var i = 0, found = false; !found && i < protocols.length; i++) {
                         if (protocols[i] === "name") {
                             found = true;
@@ -3398,36 +3480,34 @@ module.exports = function (enableCloudSocket) {
                     }
 
                     for (var p in protocols) {
-                        var addresses = Object.keys(Apio.addressBindToProperty[protocols[p]]);
+                        var addresses = Object.keys(addressBindToProperty[protocols[p]]);
                         for (var a in addresses) {
-                            var properties = Object.keys(Apio.addressBindToProperty[protocols[p]][addresses[a]]);
+                            var properties = Object.keys(addressBindToProperty[protocols[p]][addresses[a]]);
                             for (var prop in properties) {
-                                if (typeof Apio.addressBindToProperty[protocols[p]][addresses[a]][properties[prop]] === "object") {
-                                    if (Apio.addressBindToProperty[protocols[p]][addresses[a]][properties[prop]].hasOwnProperty(id)) {
-                                        delete Apio.addressBindToProperty[protocols[p]][addresses[a]][properties[prop]][id];
+                                if (typeof addressBindToProperty[protocols[p]][addresses[a]][properties[prop]] === "object") {
+                                    if (addressBindToProperty[protocols[p]][addresses[a]][properties[prop]].hasOwnProperty(id)) {
+                                        delete addressBindToProperty[protocols[p]][addresses[a]][properties[prop]][id];
                                     }
 
-                                    if (Object.keys(Apio.addressBindToProperty[protocols[p]][addresses[a]][properties[prop]]).length === 0) {
-                                        delete Apio.addressBindToProperty[protocols[p]][addresses[a]][properties[prop]];
-                                    }
+                                    // if (Object.keys(addressBindToProperty[protocols[p]][addresses[a]][properties[prop]]).length === 0) {
+                                    //     delete addressBindToProperty[protocols[p]][addresses[a]][properties[prop]];
+                                    // }
                                 }
                             }
 
-                            if (Object.keys(Apio.addressBindToProperty[protocols[p]][addresses[a]]).length === 0) {
-                                delete Apio.addressBindToProperty[protocols[p]][addresses[a]];
-                            }
+                            // if (Object.keys(addressBindToProperty[protocols[p]][addresses[a]]).length === 0) {
+                            //     delete addressBindToProperty[protocols[p]][addresses[a]];
+                            // }
                         }
 
-                        console.log("id: ", id, "protocols[p]: ", protocols[p], "Apio.addressBindToProperty[protocols[p]]: ", Apio.addressBindToProperty[protocols[p]], "obj.address: ", obj.address);
-                        console.log("typeof obj.address: ", obj.address, "Apio.addressBindToProperty[protocols[p]].hasOwnProperty(obj.address): ", Apio.addressBindToProperty[protocols[p]].hasOwnProperty(obj.address));
-                        if (Apio.addressBindToProperty[protocols[p]].hasOwnProperty(obj.address)) {
-                            console.log("ENTRATO+++++++++++++++++++++++");
-                            delete Apio.addressBindToProperty[protocols[p]][obj.address];
+                        console.log("obj.address: ", obj.address);
+                        if (addressBindToProperty[protocols[p]].hasOwnProperty(obj.address)) {
+                            console.log("ELIMINATO");
+                            delete addressBindToProperty[protocols[p]][obj.address];
                         }
-                        console.log("Apio.addressBindToProperty[protocols[p]]: ", Apio.addressBindToProperty[protocols[p]]);
                     }
 
-                    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: Apio.addressBindToProperty}, function (err_updt) {
+                    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: addressBindToProperty}, function (err_updt) {
                         if (err_updt) {
                             console.log("Error while updating communication addressBindToProperty: ", err_updt);
                         } else {
@@ -4276,13 +4356,13 @@ module.exports = function (enableCloudSocket) {
             } else if (result) {
                 //MODIFYING COMMUNICATION
                 if (Apio.Configuration.type === "gateway" && o.address !== result.address) {
-                    for (var protocol in Apio.addressBindToProperty) {
+                    for (var protocol in addressBindToProperty) {
                         if (protocol !== "name") {
-                            var addresses = Object.keys(Apio.addressBindToProperty[protocol]);
+                            var addresses = Object.keys(addressBindToProperty[protocol]);
                             for (var a in addresses) {
                                 if (addresses[a] === result.address) {
-                                    Apio.addressBindToProperty[protocol][o.address] = JSON.parse(JSON.stringify(Apio.addressBindToProperty[protocol][addresses[a]]));
-                                    delete Apio.addressBindToProperty[protocol][addresses[a]];
+                                    addressBindToProperty[protocol][o.address] = JSON.parse(JSON.stringify(addressBindToProperty[protocol][addresses[a]]));
+                                    delete addressBindToProperty[protocol][addresses[a]];
                                 }
                             }
                         }
@@ -4300,7 +4380,7 @@ module.exports = function (enableCloudSocket) {
 
                     console.log("**********MODIFICATO OGGETTO (1)*********", objects);
 
-                    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: Apio.addressBindToProperty}, function (err_updt) {
+                    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: addressBindToProperty}, function (err_updt) {
                         if (err_updt) {
                             console.log("Error while updating communication addressBindToProperty: ", err_updt);
                         } else {
@@ -4670,7 +4750,7 @@ module.exports = function (enableCloudSocket) {
 
             console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             console.log("OBJECT (VECCHIO): ", objects);
-            console.log("APIO.ADDRESSBINDTOPERTY (VECCHIO): ", Apio.addressBindToProperty);
+            console.log("APIO.ADDRESSBINDTOPERTY (VECCHIO): ", addressBindToProperty);
             objects[searchQuery.objectId].properties = newProperties;
             var protocol = objects[searchQuery.objectId].protocol;
             var address = objects[searchQuery.objectId].address;
@@ -4683,53 +4763,53 @@ module.exports = function (enableCloudSocket) {
                 protocol = "apio";
             }
 
-            if (!Apio.addressBindToProperty.hasOwnProperty(protocol)) {
-                Apio.addressBindToProperty[protocol] = {};
+            if (!addressBindToProperty.hasOwnProperty(protocol)) {
+                addressBindToProperty[protocol] = {};
             }
 
-            if (Apio.addressBindToProperty[protocol].hasOwnProperty(address)) {
+            if (addressBindToProperty[protocol].hasOwnProperty(address)) {
                 //ADDRESS FOUND, SOMETHING COULD BE ADDED, MODIFIED OR DELETED
-                var tempProps = Object.keys(Apio.addressBindToProperty[protocol][address]);
+                var tempProps = Object.keys(addressBindToProperty[protocol][address]);
 
                 //CHECK IF IN THE BIND THERE'S ONE OR MORE PROPERTIES HAVE BEEN DELETED
                 for (var prop in tempProps) {
                     if (tempProps[prop] !== "objectId" && tempProps[prop] !== "type" && tempProps[prop] !== "sleep" && !newProperties.hasOwnProperty(tempProps[prop])) {
                         //THIS PROPERTY HAS BEEN DELETED SO I DELETE IT FROM THE BIND
-                        delete Apio.addressBindToProperty[protocol][address][tempProps[prop]];
+                        delete addressBindToProperty[protocol][address][tempProps[prop]];
                     }
                 }
 
                 //CHECK IF THERE'S ONE OR MORE PROPERTIES TO ADD IN THE BIND
                 for (var prop in newProperties) {
-                    if (!Apio.addressBindToProperty[protocol][address].hasOwnProperty(prop)) {
+                    if (!addressBindToProperty[protocol][address].hasOwnProperty(prop)) {
                         //A NEW PROPERTY HAS BEEN ADDED, I ADD IT IN THE BIND
-                        Apio.addressBindToProperty[protocol][address][prop] = {};
+                        addressBindToProperty[protocol][address][prop] = {};
                     }
                 }
             } else {
                 //NO ADDRESS FOUND, THE STRUCTURE HAVE TO CREATED
-                Apio.addressBindToProperty[protocol][address] = {};
-                Apio.addressBindToProperty[protocol][address].objectId = searchQuery.objectId;
-                Apio.addressBindToProperty[protocol][address].type = objects[searchQuery.objectId].appId || "generic";
+                addressBindToProperty[protocol][address] = {};
+                addressBindToProperty[protocol][address].objectId = searchQuery.objectId;
+                addressBindToProperty[protocol][address].type = objects[searchQuery.objectId].appId || "generic";
                 for (var p in newProperties) {
-                    Apio.addressBindToProperty[protocol][address][p] = {};
+                    addressBindToProperty[protocol][address][p] = {};
                 }
             }
 
             //CHECK IF PROPERTIES HAVE CHANGED THEIR BIND
-            var protocols = Object.keys(Apio.addressBindToProperty);
+            var protocols = Object.keys(addressBindToProperty);
             for (var p = 0; p < protocols.length; p++) {
-                if (typeof Apio.addressBindToProperty[protocols[p]] === "object") {
-                    var addresses = Object.keys(Apio.addressBindToProperty[protocols[p]]);
+                if (typeof addressBindToProperty[protocols[p]] === "object") {
+                    var addresses = Object.keys(addressBindToProperty[protocols[p]]);
                     for (var a = 0; a < addresses.length; a++) {
-                        var bindedProperties = Object.keys(Apio.addressBindToProperty[protocols[p]][addresses[a]]);
+                        var bindedProperties = Object.keys(addressBindToProperty[protocols[p]][addresses[a]]);
                         for (var bp = 0; bp < bindedProperties.length; bp++) {
-                            if (typeof Apio.addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]] === "object" && Apio.addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]].hasOwnProperty(searchQuery.objectId)) {
-                                var bindedProperty = Apio.addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]][searchQuery.objectId];
+                            if (typeof addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]] === "object" && addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]].hasOwnProperty(searchQuery.objectId)) {
+                                var bindedProperty = addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]][searchQuery.objectId];
 
                                 //CHECK IF IN THE NEW PROPERTIES THE BIND IS THE SAME
                                 if (!newProperties.hasOwnProperty(bindedProperty) || !newProperties[bindedProperty].hasOwnProperty("protocol") || protocols[p] !== newProperties[bindedProperty].protocol.name || addresses[a] !== newProperties[bindedProperty].protocol.address || bindedProperties[bp] !== newProperties[bindedProperty].protocol.property) {
-                                    delete Apio.addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]][searchQuery.objectId];
+                                    delete addressBindToProperty[protocols[p]][addresses[a]][bindedProperties[bp]][searchQuery.objectId];
                                 }
                             }
                         }
@@ -4740,24 +4820,24 @@ module.exports = function (enableCloudSocket) {
             //CHECK IF IN THE NEW PROPERTIES SOME BIND HAVE BEEN ADDED
             for (var prop in newProperties) {
                 if (newProperties[prop].hasOwnProperty("protocol") && newProperties[prop].protocol.name != null && newProperties[prop].protocol.address != null && newProperties[prop].protocol.property != null) {
-                    if (!Apio.addressBindToProperty.hasOwnProperty(newProperties[prop].protocol.name)) {
-                        Apio.addressBindToProperty[newProperties[prop].protocol.name] = {};
+                    if (!addressBindToProperty.hasOwnProperty(newProperties[prop].protocol.name)) {
+                        addressBindToProperty[newProperties[prop].protocol.name] = {};
                     }
 
-                    if (!Apio.addressBindToProperty[newProperties[prop].protocol.name].hasOwnProperty(newProperties[prop].protocol.address)) {
-                        Apio.addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address] = {};
+                    if (!addressBindToProperty[newProperties[prop].protocol.name].hasOwnProperty(newProperties[prop].protocol.address)) {
+                        addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address] = {};
                     }
 
-                    if (!Apio.addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address].hasOwnProperty(newProperties[prop].protocol.property)) {
-                        Apio.addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address][newProperties[prop].protocol.property] = {};
+                    if (!addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address].hasOwnProperty(newProperties[prop].protocol.property)) {
+                        addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address][newProperties[prop].protocol.property] = {};
                     }
 
-                    Apio.addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address][newProperties[prop].protocol.property][searchQuery.objectId] = prop;
+                    addressBindToProperty[newProperties[prop].protocol.name][newProperties[prop].protocol.address][newProperties[prop].protocol.property][searchQuery.objectId] = prop;
                 }
             }
 
             console.log("OBJECT (NUOVO): ", objects);
-            console.log("APIO.ADDRESSBINDTOPERTY (NUOVO): ", Apio.addressBindToProperty);
+            console.log("APIO.ADDRESSBINDTOPERTY (NUOVO): ", addressBindToProperty);
             console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         }
 
@@ -4852,7 +4932,7 @@ module.exports = function (enableCloudSocket) {
                 });
 
                 if (Apio.Configuration.type === "gateway") {
-                    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: Apio.addressBindToProperty}, function (b_e) {
+                    Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: addressBindToProperty}, function (b_e) {
                         if (b_e) {
                             console.log("Error while updating binds: ", b_e);
                             callback(b_e);
@@ -4901,19 +4981,19 @@ module.exports = function (enableCloudSocket) {
                     console.log("**********MODIFICATO OGGETTO (2)*********", objects);
 
                     if (data.hasOwnProperty("address") && data.address !== result.address) {
-                        for (var protocol in Apio.addressBindToProperty) {
+                        for (var protocol in addressBindToProperty) {
                             if (protocol !== "name") {
-                                var addresses = Object.keys(Apio.addressBindToProperty[protocol]);
+                                var addresses = Object.keys(addressBindToProperty[protocol]);
                                 for (var a in addresses) {
                                     if (addresses[a] === result.address) {
-                                        Apio.addressBindToProperty[protocol][data.address] = JSON.parse(JSON.stringify(Apio.addressBindToProperty[protocol][addresses[a]]));
-                                        delete Apio.addressBindToProperty[protocol][addresses[a]];
+                                        addressBindToProperty[protocol][data.address] = JSON.parse(JSON.stringify(addressBindToProperty[protocol][addresses[a]]));
+                                        delete addressBindToProperty[protocol][addresses[a]];
                                     }
                                 }
                             }
                         }
 
-                        Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: Apio.addressBindToProperty}, function (err_updt) {
+                        Apio.Database.db.collection("Communication").update({name: "addressBindToProperty"}, {$set: addressBindToProperty}, function (err_updt) {
                             if (err_updt) {
                                 console.log("Error while updating communication addressBindToProperty: ", err_updt);
                             } else {
@@ -5465,11 +5545,11 @@ module.exports = function (enableCloudSocket) {
 
                 var pys = Object.keys(data.properties);
                 pys.forEach(function (py) {
-                    if (py !== "date" && Apio.addressBindToProperty.hasOwnProperty(protocol) && Apio.addressBindToProperty[protocol].hasOwnProperty(data.address) && Apio.addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
+                    if (py !== "date" && addressBindToProperty.hasOwnProperty(protocol) && addressBindToProperty[protocol].hasOwnProperty(data.address) && addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
                         data.allProperties = objects[data.objectId].properties;
                         data.protocol = {
                             name: protocol,
-                            type: Apio.addressBindToProperty[protocol][data.address].type,
+                            type: addressBindToProperty[protocol][data.address].type,
                             address: data.address,
                             property: py
                         };
@@ -5566,11 +5646,11 @@ module.exports = function (enableCloudSocket) {
     //             }
     //
     //             for (var py in data.properties) {
-    //                 if (py !== "date" && Apio.addressBindToProperty.hasOwnProperty(protocol) && Apio.addressBindToProperty[protocol].hasOwnProperty(data.address) && Apio.addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
+    //                 if (py !== "date" && addressBindToProperty.hasOwnProperty(protocol) && addressBindToProperty[protocol].hasOwnProperty(data.address) && addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
     //                     data.allProperties = objects[data.objectId].properties;
     //                     data.protocol = {
     //                         name: protocol,
-    //                         type: Apio.addressBindToProperty[protocol][data.address].type,
+    //                         type: addressBindToProperty[protocol][data.address].type,
     //                         address: data.address,
     //                         property: py
     //                     };
@@ -5665,11 +5745,11 @@ module.exports = function (enableCloudSocket) {
             }
 
             for (var py in data.properties) {
-                if (py !== "date" && Apio.addressBindToProperty.hasOwnProperty(protocol) && Apio.addressBindToProperty[protocol].hasOwnProperty(data.address) && Apio.addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
+                if (py !== "date" && addressBindToProperty.hasOwnProperty(protocol) && addressBindToProperty[protocol].hasOwnProperty(data.address) && addressBindToProperty[protocol][data.address].hasOwnProperty(py)) {
                     data.allProperties = objects[data.objectId].properties;
                     data.protocol = {
                         name: protocol,
-                        type: Apio.addressBindToProperty[protocol][data.address].type,
+                        type: addressBindToProperty[protocol][data.address].type,
                         address: data.address,
                         property: py
                     };

@@ -330,11 +330,25 @@ module.exports = function (Apio) {
             } else if (Apio.Configuration.type === "gateway") {
                 setTimeout(function () {
                     var execReboot = function () {
-                        exec("sudo reboot", function (error, stdout, stderr) {
-                            if (error || stderr) {
-                                console.log("exec error: " + error || stderr);
-                            } else if (stdout) {
-                                console.log("Board is rebooting in a while, please wait");
+                        // exec("sudo reboot", function (error, stdout, stderr) {
+                        //     if (error || stderr) {
+                        //         console.log("exec error: " + error || stderr);
+                        //     } else if (stdout) {
+                        //         console.log("Board is rebooting in a while, please wait");
+                        //     }
+                        // });
+                        fs.writeFile("./force_sync.apio", "1", function (err) {
+                            if (err) {
+                                console.log("Error while writing force_sync.apio: ", err);
+                            } else {
+                                console.log("force_sync.apio correctly updated");
+                                exec("sudo reboot", function (error, stdout, stderr) {
+                                    if (error || stderr) {
+                                        console.log("exec error: " + error || stderr);
+                                    } else if (stdout) {
+                                        console.log("Board is rebooting in a while, please wait");
+                                    }
+                                });
                             }
                         });
                     };
@@ -438,13 +452,28 @@ module.exports = function (Apio) {
                     var execShutdown = function () {
                         exec("echo 1-1 | tee /sys/bus/usb/drivers/usb/unbind", function () {
                             setTimeout(function () {
-                                exec("sudo shutdown -h now", function (error, stdout, stderr) {
-                                    if (error || stderr) {
-                                        console.log("exec error: " + error || stderr);
-                                        res.sendStatus(500);
-                                    } else if (stdout) {
-                                        console.log("Board is shutting down in a while, please wait");
-                                        res.sendStatus(200);
+                                // exec("sudo shutdown -h now", function (error, stdout, stderr) {
+                                //     if (error || stderr) {
+                                //         console.log("exec error: " + error || stderr);
+                                //         res.sendStatus(500);
+                                //     } else if (stdout) {
+                                //         console.log("Board is shutting down in a while, please wait");
+                                //         res.sendStatus(200);
+                                //     }
+                                // });
+
+                                fs.writeFile("./force_sync.apio", "1", function (err) {
+                                    if (err) {
+                                        console.log("Error while writing force_sync.apio: ", err);
+                                    } else {
+                                        console.log("force_sync.apio correctly updated");
+                                        exec("sudo shutdown -h now", function (error, stdout, stderr) {
+                                            if (error || stderr) {
+                                                console.log("exec error: " + error || stderr);
+                                            } else if (stdout) {
+                                                console.log("Board is shutting down in a while, please wait");
+                                            }
+                                        });
                                     }
                                 });
                             }, 1000);

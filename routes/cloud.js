@@ -286,6 +286,7 @@ module.exports = function (Apio) {
                                 res.status(500).end(err);
                             } else {
                                 console.log("Sent:", appRoot.path + "/public/html/board_name.html");
+                                res.sendStatus(200);
                             }
                             Apio.servicesSocket.boardSync.off("apio_get_boards_to_sync");
                         });
@@ -293,8 +294,6 @@ module.exports = function (Apio) {
                         res.status(500).send("Board already registered");
                         Apio.servicesSocket.boardSync.off("apio_get_boards_to_sync");
                     }
-
-                    //Apio.servicesSocket.boardSync.off("apio_get_boards_to_sync");
                 });
             } else {
                 res.status(500).send("apioId not well formed");
@@ -357,7 +356,6 @@ module.exports = function (Apio) {
         assignToken: function (req, res) {
             var isUUIDGood = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
             if (isUUIDGood.test(req.body.apioId)) {
-
                 req.pause();
                 Apio.servicesSocket.boardSync.emit("apio_ask_boards_to_sync");
                 Apio.servicesSocket.boardSync.on("apio_get_boards_to_sync", function (data) {
@@ -371,18 +369,6 @@ module.exports = function (Apio) {
                                 console.log("Error while inserting data of the new system: ", err);
                                 res.status(500).send(err);
                             } else {
-                                //if (!Apio.hasOwnProperty("connectedSockets")) {
-                                //    Apio.connectedSockets = {};
-                                //}
-                                //
-                                //if (!Apio.connectedSockets.hasOwnProperty(req.body.apioId)) {
-                                //    Apio.connectedSockets[req.body.apioId] = [];
-                                //}
-                                //
-                                //if (Apio.connectedSockets[req.body.apioId].indexOf(data[req.body.apioId]) === -1) {
-                                //    Apio.connectedSockets[req.body.apioId].push(data[req.body.apioId]);
-                                //}
-
                                 Apio.servicesSocket.boardSync.emit("apio_board_has_been_enabled", {
                                     body: req.body,
                                     bytes: bytes

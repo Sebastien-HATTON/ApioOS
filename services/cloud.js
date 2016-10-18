@@ -99,7 +99,8 @@ module.exports = function (libraries) {
             var token = fs.existsSync("./token.apio") ? fs.readFileSync("./token.apio", "utf8").trim() : "";
             if (token) {
                 Apio.Remote.socket.emit('apio.server.handshake', {
-                    apioId: Apio.System.getApioIdentifierCloud()
+                    apioId: Apio.System.getApioIdentifierCloud(),
+                    force: fs.existsSync("./force_sync.apio") ? Number(fs.readFileSync("./force_sync.apio", "utf8").trim()) : 1
                 });
             }
         });
@@ -205,11 +206,23 @@ module.exports = function (libraries) {
                 } else {
                     console.log("Token registered successfully");
                     console.log("--------------------------------RICONNESSIONE");
-                    request({
-                        json: true,
-                        method: "POST",
-                        uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/restartSystem"
+                    fs.writeFile("./force_sync.apio", "1", function (err) {
+                        if (err) {
+                            console.log("Error while writing force_sync.apio: ", err);
+                        } else {
+                            console.log("force_sync.apio correctly updated");
+                            request({
+                                json: true,
+                                method: "POST",
+                                uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/restartSystem"
+                            });
+                        }
                     });
+                    // request({
+                    //     json: true,
+                    //     method: "POST",
+                    //     uri: "http://localhost:" + Apio.Configuration.http.port + "/apio/restartSystem"
+                    // });
                 }
             });
         });
@@ -647,11 +660,26 @@ module.exports = function (libraries) {
             socket.emit("send_to_client", {message: "apio_board_reboot", data: data});
 
             var execReboot = function () {
-                exec("sudo reboot", function (error, stdout, stderr) {
-                    if (error || stderr) {
-                        console.log("exec error: " + error || stderr);
-                    } else if (stdout) {
-                        console.log("Board is rebooting in a while, please wait");
+                // exec("sudo reboot", function (error, stdout, stderr) {
+                //     if (error || stderr) {
+                //         console.log("exec error: " + error || stderr);
+                //     } else if (stdout) {
+                //         console.log("Board is rebooting in a while, please wait");
+                //     }
+                // });
+
+                fs.writeFile("./force_sync.apio", "1", function (err) {
+                    if (err) {
+                        console.log("Error while writing force_sync.apio: ", err);
+                    } else {
+                        console.log("force_sync.apio correctly updated");
+                        exec("sudo reboot", function (error, stdout, stderr) {
+                            if (error || stderr) {
+                                console.log("exec error: " + error || stderr);
+                            } else if (stdout) {
+                                console.log("Board is rebooting in a while, please wait");
+                            }
+                        });
                     }
                 });
             };
@@ -745,11 +773,26 @@ module.exports = function (libraries) {
             console.log("apio_shutdown_board: ", data);
 
             var execShutdown = function () {
-                exec("sudo shutdown -h now", function (error, stdout, stderr) {
-                    if (error || stderr) {
-                        console.log("exec error: " + error || stderr);
-                    } else if (stdout) {
-                        console.log("Board is shutting down in a while, please wait");
+                // exec("sudo shutdown -h now", function (error, stdout, stderr) {
+                //     if (error || stderr) {
+                //         console.log("exec error: " + error || stderr);
+                //     } else if (stdout) {
+                //         console.log("Board is shutting down in a while, please wait");
+                //     }
+                // });
+
+                fs.writeFile("./force_sync.apio", "1", function (err) {
+                    if (err) {
+                        console.log("Error while writing force_sync.apio: ", err);
+                    } else {
+                        console.log("force_sync.apio correctly updated");
+                        exec("sudo shutdown -h now", function (error, stdout, stderr) {
+                            if (error || stderr) {
+                                console.log("exec error: " + error || stderr);
+                            } else if (stdout) {
+                                console.log("Board is shutting down in a while, please wait");
+                            }
+                        });
                     }
                 });
             };
@@ -1823,6 +1866,13 @@ module.exports = function (libraries) {
                     });
 
                     Apio.Remote.socket.emit('apio.server.sync', payload);
+                    fs.writeFile("./force_sync.apio", "0", function (err) {
+                        if (err) {
+                            console.log("Error while writing force_sync.apio: ", err);
+                        } else {
+                            console.log("force_sync.apio correctly updated");
+                        }
+                    });
                     //Ora invio le appp
                     console.log("ApioOS>>> Compressing and packaging applications for the upload... ");
 
@@ -1978,6 +2028,24 @@ module.exports = function (libraries) {
                     socket.emit("apio_server_delete", data);
                 }
             });
+            // Apio.Database.db.collection("Communication").findOne({name: "addressBindToProperty"}, function (err, doc) {
+            //     if (err) {
+            //         console.log("Error while getting integratedCommunication protocols: ", err);
+            //     } else if (doc) {
+            //         Apio.addressBindToProperty = doc;
+            //         delete Apio.addressBindToProperty._id;
+            //         console.log("Apio.addressBindToProperty: ", Apio.addressBindToProperty);
+            //
+            //         Apio.Database.deleteObject(data, function (err) {
+            //             if (err) {
+            //                 console.log('error while deleting the object ' + data + ' from the db');
+            //             } else {
+            //                 Apio.System.deleteFolderRecursive('public/applications/' + data);
+            //                 socket.emit("apio_server_delete", data);
+            //             }
+            //         });
+            //     }
+            // });
         });
 
         //Tenere, si vede in seguito
