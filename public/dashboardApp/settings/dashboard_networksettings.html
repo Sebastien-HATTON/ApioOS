@@ -61,7 +61,7 @@
             <div class="form-group">
                 <label for="wi-fi_configuration" class="control-label">Configured as:</label>
                 <select id="wi-fi_configuration" class="form-control" ng-options="s for s in wifiStatuses"
-                        ng-model="status" ng-change="statusHasChanged()"></select>
+                        ng-model="status" ng-change="statusHasChanged()" ng-disabled="disableAll"></select>
             </div>
             <div class="form-group" ng-hide="status === 'client'">
                 <label for="hotspot_name" class="control-label">Hotspot name:</label>
@@ -70,12 +70,12 @@
                            placeholder="Hotspot name" ng-disabled="change_hotspot_name">
                     <span class="input-group-btn">
 				        <button ng-hide="hide_change_button" class="btn btn-default" type="button"
-                                ng-click="changeHotspotName()">Change
+                                ng-click="changeHotspotName()" ng-disabled="disableAll">Change
                         </button>
 				        <button ng-show="hide_change_button" class="btn btn-danger" type="button"
-                                ng-click="backHotspotName()"><span class="glyphicon glyphicon-remove"></span></button>
+                                ng-click="backHotspotName()" ng-disabled="disableAll"><span class="glyphicon glyphicon-remove"></span></button>
 				        <button ng-show="hide_change_button" class="btn btn-success" type="button"
-                                ng-click="saveHotspotName()"><span class="glyphicon glyphicon-ok"></span></button>
+                                ng-click="saveHotspotName()" ng-disabled="disableAll"><span class="glyphicon glyphicon-ok"></span></button>
 				    </span>
                 </div>
             </div>
@@ -91,15 +91,15 @@
                 <label for="client_configuration" class="control-label">Select Network (current: <i>{{currentSsid === ""
                     ? "none" : currentSsid}}</i>):</label>
                 <select id="client_configuration" class="form-control" ng-options="s for s in wifiSSIDs"
-                        ng-model="ssid"></select>
+                        ng-model="ssid" ng-disabled="disableAll"></select>
             </div>
             <div class="form-group" ng-show="status === 'client' && wifiSSIDs.length">
                 <label for="password" class="control-label">Type password:</label>
                 <div class="input-group">
                     <input type="text" class="form-control" id="password" ng-model="password"
-                           placeholder="Leave empty if the Wi-Fi is free">
+                           placeholder="Leave empty if the Wi-Fi is free" ng-disabled="disableAll">
                     <span class="input-group-btn">
-				        <button class="btn btn-success" type="button" ng-click="setAsClient()">Submit</button>
+				        <button class="btn btn-success" type="button" ng-click="setAsClient()" ng-disabled="disableAll">Submit</button>
 				    </span>
                 </div>
             </div>

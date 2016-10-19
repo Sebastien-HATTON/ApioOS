@@ -4,11 +4,11 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardDongleSettin
     // });
 
     $window.onbeforeunload = function () {
-        $http.post("/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/triggerConsole") + "/data/" + encodeURIComponent(JSON.stringify({
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/apio/service/dongle/route/" + encodeURIComponent("/apio/dongle/triggerConsole") + "/data/" + encodeURIComponent(JSON.stringify({
                 data: false
-            }))).success(function (data) {
-        }).error(function (data) {
-        });
+            })), false);
+        xhttp.send();
     };
 
     $http.get("/apio/user/getSessionComplete").success(function (session) {

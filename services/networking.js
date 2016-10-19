@@ -446,7 +446,13 @@ module.exports = function (libraries) {
                     if (error) {
                         res.status(500).send(error);
                     } else {
-                        res.sendStatus(200);
+                        exec("service hostapd restart && sleep 5 && service udhcpd restart && sleep 5 && service hostapd restart && sleep 5 && service udhcpd restart", function (e) {
+                            if (e) {
+                                res.status(500).send(e);
+                            } else {
+                                res.sendStatus(200);
+                            }
+                        });
                     }
                 });
             }
@@ -1061,12 +1067,25 @@ module.exports = function (libraries) {
                             //     message: "apio_hotspot_name_ok"
                             // });
 
-                            Apio.Remote.socket.emit("send_to_client", {
-                                who: "networking",
-                                data: {
-                                    apioId: Apio.System.getApioIdentifier()
-                                },
-                                message: "apio_hotspot_name_ok"
+                            exec("service hostapd restart && sleep 5 && service udhcpd restart && sleep 5 && service hostapd restart && sleep 5 && service udhcpd restart", function (e) {
+                                if (e) {
+                                    Apio.Remote.socket.emit("send_to_client", {
+                                        who: "networking",
+                                        data: {
+                                            apioId: Apio.System.getApioIdentifier(),
+                                            data: e
+                                        },
+                                        message: "apio_hotspot_name_error"
+                                    });
+                                } else {
+                                    Apio.Remote.socket.emit("send_to_client", {
+                                        who: "networking",
+                                        data: {
+                                            apioId: Apio.System.getApioIdentifier()
+                                        },
+                                        message: "apio_hotspot_name_ok"
+                                    });
+                                }
                             });
                         }
                     });

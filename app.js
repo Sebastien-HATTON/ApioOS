@@ -195,6 +195,42 @@ d.run(function () {
                                     console.log("App Analytics successfully installed");
                                 }
                             });
+
+                            Apio.Database.db.collection("Objects").insert({
+                                address: "23",
+                                db: {},
+                                marker: {},
+                                name: "Z-Wave",
+                                notifications: {},
+                                objectId: "13",
+                                properties: {
+                                    addNode: {
+                                        type: "trigger",
+                                        labelon: "Learning Mode",
+                                        labeloff: "Learning Mode",
+                                        valueon: "1",
+                                        valueoff: "0",
+                                        value: "0"
+                                    },
+                                    removeNode: {
+                                        type: "trigger",
+                                        labelon: "Remove Mode",
+                                        labeloff: "Remove Mode",
+                                        valueon: "1",
+                                        valueoff: "0",
+                                        value: "0"
+                                    }
+                                },
+                                protocol: "b",
+                                type: "service",
+                                user: []
+                            }, function (error, result1) {
+                                if (error) {
+                                    console.log("Error while inserting App Z-Wave: ", error);
+                                } else if (result1) {
+                                    console.log("App Z-Wave successfully installed");
+                                }
+                            });
                         }
                     }
                 });

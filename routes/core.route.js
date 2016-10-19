@@ -314,11 +314,22 @@ module.exports = function (Apio) {
                 } else {
                     console.log("Configuration successfully saved");
                     if (Apio.Configuration.remote.enabled === true) {
-                        Apio.Remote.socket.connect();
+                        if (Apio.Remote.socket) {
+                            Apio.Remote.socket.connect();
+                            res.sendStatus(200);
+                        } else {
+                            res.status(200).send("restart");
+                            request.post("http://localhost:" + Apio.Configuration.http.port + "/apio/restartSystem", function (err) {
+                                if (err) {
+                                    console.log("Error while restarting system: ", err);
+                                    res.sendStatus(500);
+                                }
+                            });
+                        }
                     } else if (Apio.Configuration.remote.enabled === false) {
                         Apio.Remote.socket.disconnect();
+                        res.sendStatus(200);
                     }
-                    res.sendStatus(200);
                 }
             });
         },

@@ -153,8 +153,24 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardSystemContro
     };
 
     $scope.toggleEnableCloud = function () {
-        $http.post("/apio/configuration/toggleEnableCloud").success(function () {
+        $http.post("/apio/configuration/toggleEnableCloud").success(function (data) {
             $scope.cloudStatus = $scope.cloudStatus === "Disable" ? "Enable" : "Disable";
+
+            if (data && data === "restart") {
+                sweet.show({
+                    title: "System is restarting",
+                    text: "It will be on-line in a while, please wait",
+                    type: "success",
+                    closeOnConfirm: true,
+                    showCancelButton: false,
+                    showLoaderOnConfirm: true
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        $http.post("/apio/restartSystem").success();
+                        $window.location = "app#/home?clear=true";
+                    }
+                });
+            }
         }).error(function (error) {
             console.log("Error while toggling cloud access: ", error);
         });

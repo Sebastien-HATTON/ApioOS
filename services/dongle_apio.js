@@ -470,6 +470,8 @@ app.get("/apio/dongle/updateDongle", function (req, res) {
                 }
             });
         });
+    }).on("error", function (e) {
+        console.log("Error on pipe: ", e);
     });
 
     socketServer.emit("send_to_client", {

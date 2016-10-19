@@ -1,0 +1,22 @@
+<div id="ApioApplication13" ng-app="ApioApplication13" style="padding: 10px;">
+    <div ng-controller="defaultController">
+        <topappapplication></topappapplication>
+        <div id="app" style="display: block;">
+            <trigger propertyname="addNode" labelon="Learning Mode" labeloff="Learning Mode" valueon="1" valueoff="0"
+                     writetoserial="false" listener="addNode()"></trigger>
+            <trigger propertyname="removeNode" labelon="Remove Mode" labeloff="Remove Mode" valueon="1" valueoff="0"
+                     writetoserial="false" listener="removeNode()"></trigger>
+            <div>
+                <div ng-show="!reset" style="width: 74px; margin-left: auto; margin-right: auto;">
+                    <md-button ng-click="hardReset()" class="md-fab md-warn" aria-label="FAB">
+                        RESET
+                    </md-button>
+                </div>
+                <div ng-show="reset" style="width: 40px; margin-left: auto; margin-right: auto;">
+                    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="applications/13/13.js"></script>

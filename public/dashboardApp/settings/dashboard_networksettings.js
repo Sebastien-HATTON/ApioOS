@@ -80,7 +80,7 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
 
             sweet.show({
                 title: "Your 3G has been " + $scope.status3g + "!",
-                text: "A reboot is required, wanna proceed?",
+                // text: "A reboot is required, wanna proceed?",
                 type: "success",
                 cancelButtonText: "No",
                 closeOnCancel: true,
@@ -158,6 +158,7 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
     };
 
     $scope.saveHotspotName = function () {
+        $scope.disableAll = true;
         $http.post("/apio/service/networking/route/" + encodeURIComponent("/apio/hotspot/name") + "/data/" + encodeURIComponent(JSON.stringify({
                 hotspot: $scope.hotspot_name
             }))).success(function () {
@@ -166,6 +167,7 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
             $scope.hotspotNameSaved = false;
             $scope.last_hotspot_name = $scope.hotspot_name;
             $scope.hotspotNameSaved = true;
+            $scope.disableAll = false;
             setTimeout(function () {
                 $scope.hotspotNameSaved = false;
                 if (!$scope.$$phase) {
@@ -175,21 +177,14 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
 
             sweet.show({
                 title: "The name of the Hotspot has been changed!",
-                text: "A reboot is required, wanna proceed?",
+                // text: "A reboot is required, wanna proceed?",
                 type: "success",
-                cancelButtonText: "No",
-                closeOnCancel: true,
                 closeOnConfirm: true,
-                confirmButtonText: "Yes",
-                showCancelButton: true,
+                showCancelButton: false,
                 showLoaderOnConfirm: true
-            }, function (isConfirm) {
-                if (isConfirm) {
-                    $http.post("/apio/rebootBoard").success();
-                    $window.location = "app#/home?clear=true";
-                }
             });
         }).error(function (e) {
+            $scope.disableAll = false;
             sweet.show({
                 title: "An error occurred while setting the hotspot name",
                 text: e,
@@ -202,15 +197,17 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
     };
 
     $scope.setAsClient = function () {
+        $scope.disableAll = true;
         $http.post("/apio/service/networking/route/" + encodeURIComponent("/apio/wifi/switchStatus") + "/data/" + encodeURIComponent(JSON.stringify({
                 status: $scope.status,
                 ssid: $scope.ssid,
                 password: $scope.password
             }))).success(function () {
             $scope.originalStatus = "client";
+            $scope.disableAll = false;
             sweet.show({
                 title: "Your Wi-Fi has been set as client!",
-                text: "A reboot is required, wanna proceed?",
+                // text: "A reboot is required, wanna proceed?",
                 type: "success",
                 closeOnConfirm: true,
                 showCancelButton: false,
@@ -219,6 +216,7 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
         }).error(function (e) {
             $scope.status = "hotspot";
             $scope.wifiSSIDs = [];
+            $scope.disableAll = false;
             sweet.show({
                 title: "An error occurred while setting your Wi-Fi as client",
                 text: "Rolling back as hotspot",
@@ -248,17 +246,20 @@ angular.module("ApioDashboardApplication").controller("ApioDashboardNetworkSetti
                 });
             });
         } else if ($scope.status !== $scope.originalStatus && $scope.status === "hotspot") {
+            $scope.disableAll = true;
             $http.post("/apio/service/networking/route/" + encodeURIComponent("/apio/wifi/switchStatus") + "/data/" + encodeURIComponent(JSON.stringify({status: $scope.status}))).success(function () {
                 $scope.wifiSSIDs = [];
+                $scope.disableAll = false;
                 sweet.show({
                     title: "Your Wi-Fi has been set as hotspot!",
-                    text: "A reboot is required, wanna proceed?",
+                    // text: "A reboot is required, wanna proceed?",
                     type: "success",
                     closeOnConfirm: true,
                     showCancelButton: false,
                     showLoaderOnConfirm: true
                 });
             }).error(function (e) {
+                $scope.disableAll = false;
                 sweet.show({
                     title: "An error occurred while setting your Wi-Fi as hotspot",
                     text: e,

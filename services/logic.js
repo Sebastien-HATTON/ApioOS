@@ -450,6 +450,21 @@ var intervalLogic = function () {
 };
 
 socketServer.on("connection", function (Socket) {
+    Socket.on("update_collections", function () {
+        database.collection("Objects").find().toArray(function (err, objects) {
+            if (err) {
+                console.log("Unable to find object with objectId " + data.objectId + ": ", err);
+            } else if (objects) {
+                prevObj = JSON.parse(JSON.stringify(obj));
+                obj = {};
+                for (var i in objects) {
+                    obj[objects[i].objectId] = JSON.parse(JSON.stringify(objects[i]));
+                }
+                walk = true;
+            }
+        });
+    });
+
     Socket.on("apio_logic_delete", function (data) {
         data.apioId = Apio.System.getApioIdentifier();
         require.uncache("./apio_logic/" + data.name);
